@@ -75,14 +75,61 @@ TeamCreate:
 - [ ] Hardcodes que deveriam ser configs?
 - [ ] API publica estavel?
 
+## Confidence Scoring (OBRIGATORIO)
+
+Cada issue encontrada DEVE receber um score de confianca 0-100:
+
+| Score | Significado |
+|-------|-------------|
+| 0 | False positive — nao e issue real |
+| 25 | Pode ser issue, mas provavelmente nao |
+| 50 | Issue real mas minor, improvavel em pratica |
+| 75 | Issue real e importante, verificada no codigo |
+| 100 | Certeza absoluta, evidencia direta confirma |
+
+**Threshold: so reportar issues com score >= 80.**
+
+Para cada issue, perguntar:
+> "Qual a evidencia concreta? Posso apontar a linha exata e o cenario real onde isso falha?"
+
+Se nao consegue responder com evidencia → score < 80 → NAO reportar.
+
+## Validation Subagents (para 5+ issues encontradas)
+
+Apos encontrar issues, spawnar subagents de validacao para confirmar cada uma:
+
+1. Agrupar issues por tipo (design, bug, compliance)
+2. Para cada grupo, spawnar Agent com prompt:
+   ```
+   "Validar se estas issues sao reais. Para cada uma:
+    - Verificar no codigo se a evidencia existe
+    - Confirmar que nao e pre-existente (anterior ao diff)
+    - Score 0-100 de confianca
+    Issues: [lista]"
+   ```
+3. Apenas issues VALIDADAS (score >= 80 pelo subagent) entram no report final
+
+Isso elimina false positives ANTES de reportar ao usuario.
+
+## False Positives — NAO Reportar
+
+Ignorar explicitamente:
+- Issues **pre-existentes** (anteriores ao diff/PR)
+- Problemas que **linter ja detecta** (se lint passa, nao e concern)
+- **Nitpicks pedanticos** que engenheiro senior ignoraria
+- **Estilo/formatacao** — Prettier/ESLint cuida disso
+- Issues com **lint-ignore explícito** no codigo (decisao consciente do autor)
+- **Sugestoes genericas** sem evidencia concreta ("poderia ser melhor")
+- **Cobertura de testes** generica (a menos que CLAUDE.md exija)
+
 ## Framework de Severidade
 
-| Severidade | Definicao | Acao |
-|-----------|-----------|------|
-| **Blocker** | Defeito de design que causa bugs ou impede manutencao | DEVE corrigir antes de merge |
-| **Major** | Complexidade desnecessaria ou pattern inconsistente | DEVERIA corrigir |
-| **Minor** | Melhoria que nao bloqueia | PODE corrigir (opcional) |
-| **Suggestion** | Ideia para considerar no futuro | Informativo |
+| Severidade | Definicao | Score Minimo | Acao |
+|-----------|-----------|-------------|------|
+| **Blocker** | Defeito de design que causa bugs ou impede manutencao | >= 90 | DEVE corrigir antes de merge |
+| **Major** | Complexidade desnecessaria ou pattern inconsistente | >= 80 | DEVERIA corrigir |
+| **Minor** | Melhoria que nao bloqueia | >= 80 | PODE corrigir (opcional) |
+| **Suggestion** | Ideia para considerar no futuro | qualquer | Informativo (NAO conta como finding) |
 
 ## Output
 
@@ -91,13 +138,15 @@ TeamCreate:
 
 ### Resumo
 - Arquivos revisados: N
-- Findings: X blocker, Y major, Z minor
+- Issues encontradas: X | Validadas (>=80): Y | Reportadas: Z
+- Breakdown: A blocker, B major, C minor
 
 ### Findings
 
-#### [BLOCKER] Titulo curto
+#### [BLOCKER] (95) Titulo curto
 - **Arquivo:** path/to/file.ts:42
 - **Problema:** [o que esta errado]
+- **Evidencia:** [linha/cenario concreto onde falha]
 - **Sugestao:** [alternativa concreta com codigo se possivel]
 ```
 
@@ -107,11 +156,16 @@ TeamCreate:
 - **NUNCA dar feedback vago** — "esse codigo e confuso" nao e acionavel.
 - **NUNCA reescrever o codigo do autor** — sugerir abordagem, nao impor.
 - **NUNCA review sem ler o diff completo** — ler TUDO antes de commentar.
+- **NUNCA reportar issue sem evidencia** — se nao pode apontar a linha e o cenario, score < 80.
+- **NUNCA reportar issue pre-existente** — review e sobre o diff, nao sobre o codebase inteiro.
 
 ## Quality Gate
 
-- Cada finding tem severidade?
-- O feedback e acionavel?
+- Cada finding tem severidade E score de confianca?
+- Apenas findings com score >= 80 foram reportados?
+- Validation subagents confirmaram issues (se 5+ encontradas)?
+- O feedback e acionavel com evidencia concreta?
 - Review cobriu TODOS os arquivos do diff?
+- False positives da lista acima foram filtrados?
 
 $ARGUMENTS
