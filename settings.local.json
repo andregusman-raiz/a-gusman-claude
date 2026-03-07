@@ -1,21 +1,27 @@
 {
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60"
   },
   "hooks": {
     "PostToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/session-logger.sh",
+            "statusMessage": "Session logging..."
+          }
+        ]
+      },
       {
         "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Remember: remove unused imports and run typecheck before committing TS files'",
-            "statusMessage": "Checking TS file edit..."
-          },
-          {
-            "type": "command",
-            "command": "FILE=\"$CLAUDE_TOOL_INPUT\"; if echo \"$FILE\" | grep -q '\\.test\\.ts\\|\\.spec\\.ts'; then echo 'TEST QUALITY CHECK (prompt-style): Verify this test file has NO theatrical anti-patterns: .catch(() => false), || true, toBeGreaterThanOrEqual(0), conditional expects without else. Each expect() must be able to FAIL.'; fi",
-            "statusMessage": "Test theatrical detection (prompt-style)..."
+            "command": "FILE=\"$CLAUDE_TOOL_INPUT\"; if echo \"$FILE\" | grep -q '\\.test\\.ts\\|\\.spec\\.ts'; then echo 'TEST QUALITY CHECK: Verify NO theatrical anti-patterns: .catch(() => false), || true, toBeGreaterThanOrEqual(0), conditional expects without else.'; fi",
+            "statusMessage": "Test theatrical detection..."
           }
         ]
       },
@@ -24,43 +30,23 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git commit'; then echo 'POST-COMMIT: verify lint-staged stash list and check for orphan stashes'; fi",
-            "statusMessage": "Git commit hook..."
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git commit'; then COMMIT_MSG=$(git log -1 --pretty=%B 2>/dev/null); if echo \"$COMMIT_MSG\" | grep -qE '^(feat|fix|refactor|docs|test|chore|ci|perf|style|build)'; then true; else echo 'COMMIT-QUALITY WARNING: Message does not follow conventional commits (feat:|fix:|refactor:|docs:|test:|chore:).'; fi; fi",
+            "statusMessage": "Commit quality check..."
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm run build'; then echo 'POST-BUILD: Check exit code. If prerender errors, check for missing force-dynamic or env var issues.'; fi",
-            "statusMessage": "Post-build check..."
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git push'; then bash ~/.claude/hooks/webhook-git-audit.sh; fi",
+            "statusMessage": "Git audit webhook..."
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm test\\|npx vitest\\|npx playwright'; then echo 'POST-TEST: Review failures before proceeding. Do not skip failing tests.'; fi",
-            "statusMessage": "Post-test check..."
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'npm test|npx vitest|npx playwright'; then bash ~/.claude/hooks/webhook-test-metrics.sh; fi",
+            "statusMessage": "Test metrics webhook..."
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git commit'; then COMMIT_MSG=$(git log -1 --pretty=%B 2>/dev/null); if echo \"$COMMIT_MSG\" | grep -qE '^(feat|fix|refactor|docs|test|chore|ci|perf|style|build)'; then echo 'COMMIT-QUALITY: OK — conventional commit format detected'; else echo 'COMMIT-QUALITY WARNING: Message does not follow conventional commits (feat:|fix:|refactor:|docs:|test:|chore:). Consider amending.'; fi; fi",
-            "statusMessage": "Commit quality check (prompt-style)..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'tsc --noEmit\\|typecheck'; then echo 'TS-SEVERITY: Review errors by severity — CRITICAL (type mismatches, missing properties) vs WARN (unused vars) vs INFO (style). Fix CRITICAL first.'; fi",
-            "statusMessage": "TypeScript severity classifier (prompt-style)..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git push'; then REPO=$(git remote get-url origin 2>/dev/null | sed 's/.*github.com[:/]//;s/.git$//'); BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); COMMITS=$(git log origin/$BRANCH..$BRANCH --oneline 2>/dev/null | wc -l | tr -d ' '); curl -s -X POST 'https://n8n.raizeducacao.com.br/webhook/git-audit' -H 'Content-Type: application/json' -d \"{\\\"repo\\\":\\\"$REPO\\\",\\\"branch\\\":\\\"$BRANCH\\\",\\\"commits\\\":$COMMITS,\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\"}\" > /dev/null 2>&1 || true; echo 'GIT-AUDIT: Push event sent to n8n webhook.'; fi",
-            "statusMessage": "Git audit webhook (http-style)..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm test\\|npx vitest\\|npx playwright'; then curl -s -X POST 'https://n8n.raizeducacao.com.br/webhook/test-metrics' -H 'Content-Type: application/json' -d \"{\\\"suite\\\":\\\"$(basename $(pwd))\\\",\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\"}\" > /dev/null 2>&1 || true; echo 'TEST-METRICS: Test run event sent to n8n webhook.'; fi",
-            "statusMessage": "Test metrics webhook (http-style)..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm run build'; then if [ \"$CLAUDE_TOOL_EXIT_CODE\" != \"0\" ] 2>/dev/null; then curl -s -X POST 'https://n8n.raizeducacao.com.br/webhook/build-alert' -H 'Content-Type: application/json' -d \"{\\\"project\\\":\\\"$(basename $(pwd))\\\",\\\"branch\\\":\\\"$(git rev-parse --abbrev-ref HEAD 2>/dev/null)\\\",\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\",\\\"status\\\":\\\"FAILED\\\"}\" > /dev/null 2>&1 || true; echo 'BUILD-ALERT: Build failure sent to n8n webhook.'; fi; fi",
-            "statusMessage": "Build alert webhook (http-style)..."
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm run build'; then bash ~/.claude/hooks/webhook-build-alert.sh; fi",
+            "statusMessage": "Build alert webhook..."
           }
         ]
       }
@@ -96,18 +82,8 @@
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm run build'; then echo 'PRE-BUILD SAFETY (agent-style): Before building, verify: 1) No unused imports in modified files 2) force-dynamic present in root layout 3) .env vars not corrupted. Run typecheck first if not done.'; fi",
-            "statusMessage": "Pre-build safety agent..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'gh pr create|vercel deploy'; then BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); if [ \"$BRANCH\" = \"main\" ] || [ \"$BRANCH\" = \"master\" ]; then echo 'DEPLOY PREFLIGHT BLOCKED: Cannot deploy from main/master directly. Create a feature branch first.'; exit 2; fi; echo 'DEPLOY PREFLIGHT (agent-style): Verify before proceeding: 1) Build passes locally 2) Typecheck clean 3) Tests pass 4) Env vars correct 5) Branch is not main'; fi",
-            "statusMessage": "Deploy preflight agent..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'supabase migration|supabase db push'; then echo 'MIGRATION SAFETY (agent-style): Verify: 1) RLS policy included in migration 2) Rollback SQL exists 3) Migration naming follows YYYYMMDDHHMMSS_desc.sql 4) No destructive operations without backup'; fi",
-            "statusMessage": "Migration safety agent..."
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'gh pr create|vercel deploy'; then BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); if [ \"$BRANCH\" = \"main\" ] || [ \"$BRANCH\" = \"master\" ]; then echo 'DEPLOY PREFLIGHT BLOCKED: Cannot deploy from main/master directly. Create a feature branch first.'; exit 2; fi; fi",
+            "statusMessage": "Deploy preflight guard..."
           }
         ]
       },
@@ -198,7 +174,13 @@
       "Edit(.env)",
       "Edit(.env.*)",
       "Edit(**/.env)",
-      "Edit(**/.env.*)"
+      "Edit(**/.env.*)",
+      "Bash(cat .env*)",
+      "Bash(cat **/.env*)",
+      "Bash(head .env*)",
+      "Bash(tail .env*)",
+      "Bash(less .env*)",
+      "Bash(more .env*)"
     ]
   }
 }

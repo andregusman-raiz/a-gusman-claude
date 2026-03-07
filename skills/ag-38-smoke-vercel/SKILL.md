@@ -1,6 +1,7 @@
 ---
 name: ag-38-smoke-vercel
 description: Smoke tests contra URL Vercel deployada (preview ou production). Verifica saude minima do deploy — homepage, assets, auth, console errors, performance. Usa Playwright MCP ou suite de smoke tests. Use apos cada deploy para garantir que nada quebrou.
+disable-model-invocation: true
 ---
 
 > **Modelo recomendado:** sonnet

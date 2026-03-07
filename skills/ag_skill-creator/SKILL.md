@@ -1,6 +1,7 @@
 ---
 name: ag_skill-creator
 description: Cria novas skills, modifica e melhora skills existentes, e mede performance de skills com evals quantitativos. Use quando o usuario quer criar uma skill do zero, atualizar ou otimizar uma skill existente, rodar evals para testar uma skill, fazer benchmark de performance com analise de variancia, ou otimizar a description de uma skill para melhor triggering. Tambem use quando o usuario mencionar "criar skill", "melhorar skill", "avaliar skill", "benchmark skill", "testar skill", "description optimizer", ou qualquer referencia a criacao/melhoria de skills do sistema ag-*.
+disable-model-invocation: true
 ---
 
 > **Modelo recomendado:** opus
