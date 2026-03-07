@@ -3,9 +3,9 @@
 # Roda o pipeline de auto-melhoria para uma ou mais skills.
 #
 # Uso:
-#   ./run_self_improve.sh --project ~/Claude/GitHub/rAIz-AI-Prof
-#   ./run_self_improve.sh --project ~/Claude/GitHub/rAIz-AI-Prof --skill ag-09-depurar-erro --dry-run
-#   ./run_self_improve.sh --all-skills --project ~/Claude/GitHub/rAIz-AI-Prof
+#   ./run_self_improve.sh --project /path/to/your-project
+#   ./run_self_improve.sh --project /path/to/your-project --skill ag-09-depurar-erro --dry-run
+#   ./run_self_improve.sh --all-skills --project /path/to/your-project
 #
 # Requisitos: python3, claude CLI no PATH
 

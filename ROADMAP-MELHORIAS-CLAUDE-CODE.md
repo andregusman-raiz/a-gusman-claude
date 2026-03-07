@@ -25,7 +25,7 @@
 | 4 | Usar exemplo concreto (link para domain module exemplar) em vez de tabelas descritivas | DONE | BAIXO |
 
 ### Passo a Passo — Items 1-4:
-1. Ler `D:/GitHub/rAIz-AI-Prof/CLAUDE.md` completo
+1. Ler o CLAUDE.md do projeto alvo completo
 2. Identificar secoes que Claude pode descobrir sozinho (Estrutura, Estado Atual, Docs)
 3. Mover convencoes de naming para `D:/.claude/rules/naming-conventions.md`
 4. Remover duplicacao de Quality Gates — manter apenas em `D:/.claude/rules/quality-gate.md`

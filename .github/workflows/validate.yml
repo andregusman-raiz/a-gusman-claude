@@ -1,0 +1,32 @@
+name: Validate Framework
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate framework integrity
+        run: bash scripts/validate-framework.sh
+
+      - name: Check shell script syntax
+        run: |
+          for f in hooks/*.sh scripts/*.sh; do
+            echo "Checking $f..."
+            bash -n "$f"
+          done
+
+      - name: Verify no secrets in repo
+        run: |
+          if grep -rE "(sk-[a-zA-Z0-9]{20,}|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36})" \
+            --include="*.md" --include="*.json" --include="*.sh" --include="*.py" .; then
+            echo "FAIL: Potential secrets found!"
+            exit 1
+          fi
+          echo "OK: No secrets detected"
