@@ -2,10 +2,10 @@
 name: ag-15-auditar-codigo
 description: "Auditoria de seguranca, qualidade e conformidade. Use antes de deploy para garantir seguranca e qualidade do codigo. Security audit, OWASP checks, secrets scan."
 model: sonnet
-tools: Read, Glob, Grep, Bash
-disallowedTools: Write, Edit, Agent
+tools: Read, Glob, Grep, Bash, Agent
+disallowedTools: Write, Edit
 permissionMode: plan
-maxTurns: 40
+maxTurns: 80
 background: true
 ---
 
@@ -49,6 +49,34 @@ grep -rn "sk_\|pk_\|api_key\|apikey\|secret\|password\|token" \
 git log --all --full-history -- "*.env" ".env*"
 npm audit --production
 ```
+
+## Auditoria Paralela (Projetos Grandes)
+
+Para projetos com 100+ arquivos afetados, spawnar subagents paralelos via Agent tool:
+
+### Quando ativar
+- Projeto tem 100+ arquivos no escopo da auditoria
+- Auditoria completa solicitada (nao foco em area especifica)
+
+### Subagents
+```
+1. OWASP Security — A01-A10 checklist contra codigo
+2. Secrets Scan — grep por tokens, passwords, API keys expostos
+3. Deps Audit — npm audit, CVE check, licencas
+4. Test Quality — theatrical detection, coverage gaps, anti-patterns
+```
+
+### Fluxo
+1. Parent ag-15 avalia tamanho do projeto
+2. Se 100+ arquivos → spawnar 4 subagents em paralelo
+3. Cada subagent retorna findings estruturados
+4. Parent ag-15 agrega em report unico com severidade consolidada
+5. Se < 100 arquivos → executar sequencialmente (comportamento atual)
+
+### Limites
+- Subagents sao read-only (herdam permissionMode: plan)
+- Max 4 subagents paralelos
+- Cada subagent usa modelo haiku (scans rapidos)
 
 ## Modo: Test Quality Audit
 

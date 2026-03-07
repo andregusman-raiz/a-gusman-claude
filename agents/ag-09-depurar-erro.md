@@ -2,9 +2,8 @@
 name: ag-09-depurar-erro
 description: "Diagnostica e corrige bugs. Le errors-log.md antes de comecar para nao repetir tentativas que ja falharam. Use quando algo nao funciona, da erro, quebrou, trava, build falha, ou qualquer comportamento inesperado."
 model: opus
-tools: Read, Write, Edit, Glob, Grep, Bash
-disallowedTools: Agent
-maxTurns: 60
+tools: Read, Write, Edit, Glob, Grep, Bash, Agent
+maxTurns: 80
 ---
 
 # ag-09 — Depurar Erro
@@ -58,6 +57,32 @@ Corrigir a causa raiz, nao o sintoma. Se nao conseguir identificar a causa raiz 
 ### 5. Verificar
 
 Rodar o cenario que reproduzia o bug e confirmar que esta resolvido. Verificar que nao quebrou nada adjacente.
+
+## Debug Paralelo (Multi-Layer Bugs)
+
+Quando o bug afeta 3+ camadas (frontend + backend + DB), usar subagents para investigacao paralela:
+
+### Quando ativar
+- Bug classificado como "Silent Fail" ou "Multi-layer" na arvore de decisao
+- Stack trace cruza frontend e backend
+- Sintomas visiveis em multiplas camadas simultaneamente
+
+### Como usar
+```
+1. Identificar camadas afetadas (frontend, backend, DB, infra)
+2. Spawnar 1 subagent por camada via Agent tool:
+   - Subagent Frontend: console errors, network requests, state
+   - Subagent Backend: server logs, API responses, auth flow
+   - Subagent DB: queries, RLS, constraints, migrations
+3. Cada subagent reporta findings
+4. Parent ag-09 correlaciona findings e determina root cause
+```
+
+### Limites
+- Max 3 subagents paralelos
+- Cada subagent faz apenas investigacao (Read, Grep, Bash) — nao aplica fix
+- Parent ag-09 aplica o fix apos determinar root cause
+- Se subagents nao convergem apos 1 rodada → investigar sequencialmente
 
 ## Decision Tree por Tipo de Bug
 
