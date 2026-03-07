@@ -3,7 +3,7 @@ name: ag-13-testar-codigo
 description: "Cria e executa testes unitarios e de integracao. Verifica logica, nao experiencia de usuario. Registra falhas em errors-log.md. Use when creating or running tests."
 model: sonnet
 tools: Read, Write, Edit, Glob, Grep, Bash, TaskCreate, TaskUpdate, TaskList, Agent, TeamCreate, TeamDelete
-maxTurns: 60
+maxTurns: 80
 background: true
 ---
 
