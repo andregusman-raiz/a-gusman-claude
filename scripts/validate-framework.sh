@@ -104,7 +104,7 @@ for f in commands/ag*.md; do
   # Extract agent name from skill reference
   if echo "$content" | grep -q "ag-00-orquestrar\|ag-01-iniciar\|ag-02-setup\|ag-M-melhorar\|ag_skill-creator\|ag-22-testar-e2e\|ag-36-testar-manual\|ag-37-gerar-testes\|ag-38-smoke-vercel"; then
     # Skill-based command - check skill dir exists
-    skill_ref=$(echo "$content" | grep -oE 'ag-[0-9]+-[a-z-]+|ag-M-[a-z-]+|ag_skill-creator|ui-ux-pro-max|nextjs-react|python-patterns|supabase-patterns|typescript-patterns' | head -1)
+    skill_ref=$(echo "$content" | grep -oE 'ag-[0-9]+-[a-z0-9-]+|ag-M-[a-z-]+|ag_skill-creator|ui-ux-pro-max|nextjs-react|python-patterns|supabase-patterns|typescript-patterns' | head -1)
     if [ -n "$skill_ref" ] && [ ! -d "skills/$skill_ref" ]; then
       warn "$cmd: references skill '$skill_ref' but skills/$skill_ref/ not found"
     fi

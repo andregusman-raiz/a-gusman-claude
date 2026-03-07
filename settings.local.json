@@ -156,11 +156,8 @@
       "WebFetch(domain:playwright.dev)",
       "WebFetch(domain:zod.dev)",
       "WebFetch(domain:docs.python.org)",
-      "WebFetch(domain:raizeducacao.com.br)",
       "WebFetch(domain:www.brandcolorcode.com)",
-      "WebFetch(domain:brandfetch.com)",
-      "WebFetch(domain:www.fundacaovale.org)",
-      "WebFetch(domain:midiasstoragesec.blob.core.windows.net)"
+      "WebFetch(domain:brandfetch.com)"
     ],
     "deny": [
       "Read(.env)",

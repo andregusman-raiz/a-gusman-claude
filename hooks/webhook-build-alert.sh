@@ -29,7 +29,13 @@ echo "$COMMAND" | grep -q "npm run build" || exit 0
 # Only alert on failure
 [ "$EXIT_CODE" = "0" ] && exit 0
 
-curl -s -X POST 'https://n8n.raizeducacao.com.br/webhook/build-alert' \
+WEBHOOK_URL="${CLAUDE_WEBHOOK_BUILD_ALERT_URL:-${CLAUDE_WEBHOOK_BASE_URL:-}}"
+if [ -z "$WEBHOOK_URL" ]; then
+  echo "BUILD-ALERT: No webhook URL configured. Set CLAUDE_WEBHOOK_BUILD_ALERT_URL or CLAUDE_WEBHOOK_BASE_URL."
+  exit 0
+fi
+
+curl -s -X POST "${WEBHOOK_URL}/webhook/build-alert" \
   -H 'Content-Type: application/json' \
   -d "{\"project\":\"$(basename "$(pwd)")\",\"branch\":\"$(git rev-parse --abbrev-ref HEAD 2>/dev/null)\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"status\":\"FAILED\"}" \
   > /dev/null 2>&1 || true
