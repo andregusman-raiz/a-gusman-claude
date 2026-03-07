@@ -1,53 +1,69 @@
----
-description: "14 regras OOXML criticas para geracao de PPTX com python-pptx"
-paths:
-  - "**/*.py"
----
+# PPTX Generation — 13 Regras OOXML
 
-# Regras OOXML para PPTX
+## Regras Inviolaveis (cada uma causou bug real)
 
-## REGRA 1 — solidFill ANTES de latin/cs
-Ordem OOXML: `solidFill → effectLst → highlight → latin → ea → cs → sym`
-Ao criar: SubElement solidFill primeiro, depois latin/cs.
-Ao modificar: `rPr.insert(0, sf)` — NUNCA SubElement.
+### 1. solidFill ANTES de latin/cs
+```python
+# CORRETO: insert(0, ...) garante posicao correta
+rPr.insert(0, solidFill_element)
 
-## REGRA 2 — Background dentro de cSld
-`<p:bg>` e filho de `<p:cSld>`, NAO de `<p:sld>`. PowerPoint ignora silenciosamente se errado.
+# ERRADO: SubElement coloca no final — PowerPoint ignora, texto fica PRETO
+etree.SubElement(rPr, solidFill)
+```
 
-## REGRA 3 — Layout-Aware Theming
-SEMPRE detectar layout antes de aplicar cores. Mesmo idx pode ser titulo num layout e body em outro.
+### 2. Background em cSld, NUNCA em sld
+Background de slide deve ser inserido no elemento `cSld`, nao no `sld` raiz.
 
-## REGRA 4 — Contraste Fundo/Fonte
-- DARK bg → texto BRANCO + accent GOLD
-- LIGHT bg → texto ESCURO + accent GREEN
-- NUNCA confiar na cor default do theme
+### 3. Fonte explicita em TODOS os runs
+Todo run de texto DEVE ter fonte Arial (ou a definida no design system) com `latin` E `cs`.
 
-## REGRA 5 — Fonte Explicita em TODOS os Runs
-Sempre: `<a:latin typeface='Arial'/>` e `<a:cs typeface='Arial'/>` em todo rPr.
+### 4. Ghost text = " " (espaco), NUNCA string vazia
+Placeholders que devem ficar vazios: setar texto como `" "` (um espaco).
+String vazia faz o PowerPoint mostrar "Clique para editar...".
 
-## REGRA 6 — Subtitle Max 9pt + Auto-Shrink
-PH subtitle geralmente tem ~0.41" altura. normAutofit obrigatorio.
+### 5. Text ANTES de reorder, design DEPOIS
+Ao reconstruir slides composicionais:
+1. Inserir todo o texto/conteudo primeiro
+2. Aplicar reorder (z-order) depois
+3. Aplicar design visual (sombras, gradientes) por ultimo
 
-## REGRA 7 — Overflow Guard
-Calcular se texto cabe ANTES de inserir. Reduzir fonte progressivamente (default → min).
+### 6. extract_slide_texts() ANTES de clear_slide_shapes()
+Ao refazer slide existente, SEMPRE extrair texto antes de limpar shapes.
 
-## REGRA 8 — Ghost Text Prevention
-NUNCA placeholder vazio "". Usar " " (espaco) para prevenir texto-fantasma do master.
+### 7. NUNCA deletar image placeholder
+Mover off-screen (x=-10000, y=-10000). Deletar causa erro de reparo.
 
-## REGRA 9 — Paginacao vs Logo
-Verificar posicao do logo antes de posicionar slide number.
+### 8. Subtitle em placeholder idx=10: max 9pt
+Fontes maiores causam sobreposicao com titulo.
 
-## REGRA 10 — Image Placeholder: Esconder, Nao Deletar
-Mover off-screen: `shape.left = Emu(-10000000)`. NUNCA `spTree.remove()`.
+### 9. force_font_on_all_runs como final pass
+Antes de salvar, iterar TODOS os slides/shapes/paragraphs/runs e garantir fonte explicita.
 
-## REGRA 11 — Slide Reorder via XML
-Reordenar via `sldIdLst`. Text transforms ANTES, design DEPOIS.
+### 10. NUNCA truncar titulos
+Se titulo e longo, reduzir tamanho da fonte (min 14pt). NUNCA cortar o texto.
 
-## REGRA 12 — Fluxo Obrigatorio
-Ler → Mapear → Text transforms → Notes → Reorder → Design → Font pass → Salvar → Validar.
+### 11. Contraste minimo
+Texto escuro em fundo escuro = invisivel. Verificar combinacoes.
 
-## REGRA 13 — Inspecionar Template ANTES de Programar
-Escanear layouts e PHs (idx, pos, size) antes de escrever codigo.
+### 12. Margins e padding consistentes
+Cards: margin 12pt. Textboxes: min 0.5" das bordas do slide.
 
-## REGRA 14 — NUNCA Perder Conteudo
-Extrair TODOS os textos ANTES de limpar shapes. Reconstruir com dados originais.
+### 13. Diagnostico do template (para PPTX existente)
+Antes de editar, mapear TODOS os layouts e placeholders.
+
+## Library de Componentes
+
+Usar `~/.claude/lib/pptx_components.py`:
+```python
+import sys, os
+sys.path.insert(0, os.path.expanduser('~/.claude/lib'))
+from pptx_components import (
+    add_badge, add_card, add_banner, add_quote_box,
+    add_hline, add_vbar, add_textbox_styled, add_accent_underline,
+    add_numbered_item, add_section_divider, add_section_divider_rich,
+    add_card_grid_2x2, add_column_cards, add_footer_bar,
+    add_table_styled, add_two_column_compare, add_timeline,
+    extract_slide_texts, clear_slide_shapes,
+    validate_variety, check_overlap, check_accents
+)
+```

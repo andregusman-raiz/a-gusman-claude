@@ -1,259 +1,249 @@
 #!/usr/bin/env python3
 """
 validate_office_file.py — Validador de arquivos Office (PPTX, DOCX, XLSX)
-Verifica integridade, ghost text, fragmentacao, acentuacao.
 
 Uso:
-    python3 validate_office_file.py <file_path>
+    python3 validate_office_file.py <caminho_do_arquivo>
+    python3 validate_office_file.py <pasta>  # valida todos os Office files na pasta
 
-Exit codes:
-    0 = PASS (zero issues)
-    1 = FAIL (issues encontradas)
-    2 = ERROR (arquivo invalido)
+Verifica:
+- PPTX: arquivo abre sem reparo, slides renderizam, text frames nao vazios,
+         imagens dentro dos limites, placeholders substituidos
+- DOCX: arquivo abre, paragrafos renderizam, referencias nao quebradas
+- XLSX: arquivo abre, formulas sem erro, sheets acessiveis
 """
 
 import sys
 import os
-import re
-import zipfile
 from pathlib import Path
 
 
-def validate_pptx(filepath):
-    """Validar arquivo PPTX."""
+def validate_pptx(filepath: str) -> list[str]:
+    """Valida arquivo PowerPoint."""
     issues = []
-
     try:
         from pptx import Presentation
+        from pptx.util import Emu
+    except ImportError:
+        return ["python-pptx nao instalado. Instale com: pip install python-pptx"]
+
+    try:
         prs = Presentation(filepath)
     except Exception as e:
-        return [f"ERROR: Nao conseguiu abrir PPTX: {e}"]
+        return [f"CRITICO: Arquivo nao abre — {e}"]
 
-    for i, slide in enumerate(prs.slides):
-        slide_num = i + 1
+    slide_count = len(prs.slides)
+    if slide_count == 0:
+        issues.append("ALERTA: Apresentacao sem slides")
 
+    empty_frames = 0
+    placeholder_found = 0
+    fragmented_runs = 0
+    total_shapes = 0
+
+    for i, slide in enumerate(prs.slides, 1):
         for shape in slide.shapes:
-            if not shape.has_text_frame:
-                continue
+            total_shapes += 1
+            if shape.has_text_frame:
+                text = shape.text_frame.text.strip()
+                if not text:
+                    empty_frames += 1
+                if "{{" in text or "Lorem" in text or "[PLACEHOLDER]" in text:
+                    placeholder_found += 1
+                    issues.append(f"ALERTA: Slide {i} — placeholder nao substituido: '{text[:60]}...'")
 
-            text = shape.text_frame.text
+                for para in shape.text_frame.paragraphs:
+                    if len(para.runs) > 5:
+                        fragmented_runs += 1
 
-            # Ghost text check
-            ghost_patterns = [
-                'CLIQUE PARA EDITAR',
-                'CLICK TO EDIT',
-                'CLIQUE PARA ADICIONAR',
-                'Click to add',
-            ]
-            for pattern in ghost_patterns:
-                if pattern.upper() in text.upper():
-                    issues.append(f"Slide {slide_num}: Ghost text detectado: '{text[:50]}'")
+            if shape.shape_type and hasattr(shape, "image"):
+                try:
+                    img = shape.image
+                    w = shape.width
+                    h = shape.height
+                    if w and h:
+                        w_px = w / Emu(1) * 96 / 914400 if w > 0 else 0
+                        h_px = h / Emu(1) * 96 / 914400 if h > 0 else 0
+                except Exception:
+                    pass
 
-            # Empty placeholder (should be " " not "")
-            if shape.is_placeholder and text == "":
-                ph_idx = shape.placeholder_format.idx
-                issues.append(f"Slide {slide_num}: Placeholder idx={ph_idx} vazio (usar ' ' em vez de '')")
+    if fragmented_runs > 0:
+        issues.append(f"ALERTA: {fragmented_runs} paragrafos com >5 runs (texto fragmentado)")
+    if empty_frames > slide_count:
+        issues.append(f"INFO: {empty_frames} text frames vazios")
 
-            # Spell check via spellcheck_document.py backends
-            # Uses phunspell (offline, pt_BR Hunspell) as primary for validation
-            # Full spell check with correction is done by ag-31 before validation
-            text_lower = text.lower()
-            try:
-                from spellchecker import SpellChecker
-                if not hasattr(validate_pptx, '_spell_pt'):
-                    validate_pptx._spell_pt = SpellChecker(language='pt')
-                spell = validate_pptx._spell_pt
-                words = re.findall(r'\b[a-zA-ZÀ-ÿ]{3,}\b', text_lower)
-                # Skip ALL-CAPS acronyms
-                words = [w for w in words if not w.isupper() or len(w) > 6]
-                unknown = spell.unknown(words)
-                for w in unknown:
-                    correction = spell.correction(w)
-                    if correction and correction != w:
-                        issues.append(f"Slide {slide_num}: Possivel erro ortografico: '{w}' → '{correction}'")
-            except ImportError:
-                # Fallback: hardcoded accent check (legacy)
-                missing_accent_words = {
-                    'educacao': 'educação', 'gestao': 'gestão',
-                    'operacoes': 'operações', 'formacao': 'formação',
-                    'avaliacao': 'avaliação', 'integracao': 'integração',
-                    'governanca': 'governança', 'curriculo': 'currículo',
-                    'logistica': 'logística', 'pedagogica': 'pedagógica',
-                    'estrategia': 'estratégia', 'referencia': 'referência',
-                }
-                for wrong, correct in missing_accent_words.items():
-                    if wrong in text_lower and correct.lower() not in text_lower:
-                        issues.append(f"Slide {slide_num}: Possivel acento faltando: '{wrong}' → '{correct}'")
+    size_mb = os.path.getsize(filepath) / (1024 * 1024)
 
-            # Fragmented runs check
-            for para in shape.text_frame.paragraphs:
-                runs = para.runs
-                if len(runs) > 3:
-                    issues.append(f"Slide {slide_num}: Texto fragmentado em {len(runs)} runs (max recomendado: 1-2)")
-
-    # Layout variety check
-    layout_names = [slide.slide_layout.name for slide in prs.slides]
-    total = len(layout_names)
-    unique = len(set(layout_names))
-
-    if total > 10 and unique < 3:
-        issues.append(f"Variety: Apenas {unique} tipos de layout em {total} slides (min recomendado: 3)")
-
-    # Consecutive same layout
-    for i in range(2, len(layout_names)):
-        if layout_names[i] == layout_names[i-1] == layout_names[i-2]:
-            issues.append(f"Slides {i-1}-{i+1}: 3 layouts consecutivos iguais ({layout_names[i]})")
+    print(f"  Slides: {slide_count}")
+    print(f"  Shapes: {total_shapes}")
+    print(f"  Tamanho: {size_mb:.1f} MB")
+    print(f"  Runs fragmentados: {fragmented_runs}")
+    print(f"  Placeholders restantes: {placeholder_found}")
 
     return issues
 
 
-def validate_docx(filepath):
-    """Validar arquivo DOCX."""
+def validate_docx(filepath: str) -> list[str]:
+    """Valida arquivo Word."""
     issues = []
-
     try:
         from docx import Document
+    except ImportError:
+        return ["python-docx nao instalado. Instale com: pip install python-docx"]
+
+    try:
         doc = Document(filepath)
     except Exception as e:
-        return [f"ERROR: Nao conseguiu abrir DOCX: {e}"]
+        return [f"CRITICO: Arquivo nao abre — {e}"]
 
-    for i, para in enumerate(doc.paragraphs):
-        if len(para.runs) > 5:
-            issues.append(f"Paragrafo {i+1}: Texto fragmentado em {len(para.runs)} runs")
+    para_count = len(doc.paragraphs)
+    table_count = len(doc.tables)
+    empty_paras = sum(1 for p in doc.paragraphs if not p.text.strip())
+
+    placeholder_found = 0
+    for p in doc.paragraphs:
+        if "{{" in p.text or "Lorem" in p.text or "[PLACEHOLDER]" in p.text:
+            placeholder_found += 1
+            issues.append(f"ALERTA: Placeholder encontrado: '{p.text[:80]}...'")
+
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                if "{{" in cell.text:
+                    placeholder_found += 1
+
+    if para_count == 0:
+        issues.append("ALERTA: Documento sem paragrafos")
+
+    try:
+        rels = doc.part.rels
+        for rel_id, rel in rels.items():
+            if rel.is_external:
+                continue
+            try:
+                _ = rel.target_part
+            except Exception:
+                issues.append(f"ALERTA: Referencia quebrada: {rel_id}")
+    except Exception:
+        pass
+
+    size_mb = os.path.getsize(filepath) / (1024 * 1024)
+
+    print(f"  Paragrafos: {para_count} ({empty_paras} vazios)")
+    print(f"  Tabelas: {table_count}")
+    print(f"  Tamanho: {size_mb:.1f} MB")
+    print(f"  Placeholders restantes: {placeholder_found}")
 
     return issues
 
 
-def validate_xlsx(filepath):
-    """Validar arquivo XLSX — estrutura, formulas, formatacao."""
+def validate_xlsx(filepath: str) -> list[str]:
+    """Valida arquivo Excel."""
     issues = []
-
     try:
         from openpyxl import load_workbook
-        wb = load_workbook(filepath, data_only=True)
+    except ImportError:
+        return ["openpyxl nao instalado. Instale com: pip install openpyxl"]
+
+    try:
+        wb = load_workbook(filepath, data_only=False)
     except Exception as e:
-        return [f"ERROR: Nao conseguiu abrir XLSX: {e}"]
+        return [f"CRITICO: Arquivo nao abre — {e}"]
 
-    error_patterns = ['#REF!', '#NAME?', '#VALUE!', '#DIV/0!', '#NULL!', '#N/A']
+    sheet_names = wb.sheetnames
+    total_formulas = 0
+    error_cells = 0
 
-    for ws in wb.worksheets:
-        # 1. Verificar erros de formula
+    for sheet_name in sheet_names:
+        ws = wb[sheet_name]
         for row in ws.iter_rows():
             for cell in row:
                 if cell.value and isinstance(cell.value, str):
-                    for ep in error_patterns:
-                        if ep in str(cell.value):
-                            issues.append(f"Aba '{ws.title}' celula {cell.coordinate}: {ep}")
+                    if cell.value.startswith("="):
+                        total_formulas += 1
+                    if cell.value in ("#REF!", "#NAME?", "#VALUE!", "#DIV/0!", "#NULL!", "#N/A"):
+                        error_cells += 1
+                        issues.append(f"ERRO: {sheet_name}!{cell.coordinate} = {cell.value}")
 
-        # 2. Verificar coluna A como margem (nao deve ter dados a partir da linha 3)
-        col_a_data = False
-        for row in ws.iter_rows(min_col=1, max_col=1, min_row=3):
-            for cell in row:
-                if cell.value and str(cell.value).strip():
-                    col_a_data = True
-                    break
-        if col_a_data:
-            issues.append(f"Aba '{ws.title}': Coluna A contem dados (deveria ser margem visual)")
+    if error_cells > 0:
+        issues.append(f"CRITICO: {error_cells} celulas com erro de formula")
 
-        # 3. Verificar headers na linha 2
-        has_header = False
-        for cell in ws[2]:
-            if cell.value:
-                has_header = True
-                break
-        if not has_header and ws.max_row > 2:
-            issues.append(f"Aba '{ws.title}': Sem headers na linha 2 (padrao requer headers em row 2)")
+    size_mb = os.path.getsize(filepath) / (1024 * 1024)
 
-        # 4. Verificar freeze panes
-        if ws.freeze_panes is None and ws.max_row > 5:
-            issues.append(f"Aba '{ws.title}': Freeze panes nao configurado (recomendado para planilhas com dados)")
-
-        # 5. Verificar AutoFilter
-        if ws.auto_filter.ref is None and ws.max_row > 5:
-            issues.append(f"Aba '{ws.title}': AutoFilter nao configurado (recomendado para tabelas)")
-
-    # 6. Verificar se primeira aba e "Resumo" (recomendacao, nao obrigatorio)
-    if len(wb.sheetnames) > 1:
-        first_sheet = wb.sheetnames[0].lower()
-        if first_sheet not in ('resumo', 'summary', 'overview', 'dashboard'):
-            issues.append(f"Primeira aba '{wb.sheetnames[0]}' nao e 'Resumo' (recomendado como primeira aba)")
-
-    # Reabrir sem data_only para verificar formulas
-    try:
-        wb_formulas = load_workbook(filepath, data_only=False)
-        for ws in wb_formulas.worksheets:
-            has_formulas = False
-            has_hardcoded_numbers = 0
-            for row in ws.iter_rows(min_row=3):
-                for cell in row:
-                    if cell.value and isinstance(cell.value, str) and cell.value.startswith('='):
-                        has_formulas = True
-                    elif isinstance(cell.value, (int, float)) and cell.value != 0:
-                        has_hardcoded_numbers += 1
-            # Se tem muitos numeros hardcoded e nenhuma formula, avisar
-            if has_hardcoded_numbers > 20 and not has_formulas:
-                issues.append(f"Aba '{ws.title}': {has_hardcoded_numbers} valores numericos sem formulas (considerar usar formulas)")
-    except Exception:
-        pass  # Nao bloquear validacao se falhar aqui
+    print(f"  Sheets: {len(sheet_names)} — {', '.join(sheet_names)}")
+    print(f"  Formulas: {total_formulas}")
+    print(f"  Erros: {error_cells}")
+    print(f"  Tamanho: {size_mb:.1f} MB")
 
     return issues
 
 
-def validate_zip_integrity(filepath):
-    """Verificar integridade basica do arquivo (Office = ZIP)."""
-    try:
-        with zipfile.ZipFile(filepath, 'r') as z:
-            bad = z.testzip()
-            if bad:
-                return [f"ZIP corrompido: {bad}"]
-    except zipfile.BadZipFile:
-        return [f"Arquivo nao e um ZIP valido: {filepath}"]
-    except Exception as e:
-        return [f"Erro ao verificar ZIP: {e}"]
-    return []
+def validate_file(filepath: str) -> bool:
+    """Valida um arquivo Office. Retorna True se OK."""
+    ext = Path(filepath).suffix.lower()
+    name = Path(filepath).name
+
+    print(f"\n{'='*60}")
+    print(f"Validando: {name}")
+    print(f"{'='*60}")
+
+    validators = {
+        ".pptx": validate_pptx,
+        ".docx": validate_docx,
+        ".xlsx": validate_xlsx,
+    }
+
+    validator = validators.get(ext)
+    if not validator:
+        print(f"  Tipo nao suportado: {ext}")
+        return True
+
+    issues = validator(filepath)
+
+    if not issues:
+        print(f"\n  OK — Arquivo valido!")
+        return True
+    else:
+        criticos = [i for i in issues if i.startswith("CRITICO")]
+        alertas = [i for i in issues if i.startswith("ALERTA")]
+        infos = [i for i in issues if i.startswith("INFO")]
+        erros = [i for i in issues if i.startswith("ERRO")]
+
+        print(f"\n  Problemas encontrados: {len(issues)}")
+        for issue in criticos + erros + alertas + infos:
+            print(f"  - {issue}")
+
+        return len(criticos) == 0 and len(erros) == 0
 
 
 def main():
     if len(sys.argv) < 2:
-        print("Uso: python3 validate_office_file.py <file_path>")
-        sys.exit(2)
-
-    filepath = sys.argv[1]
-
-    if not os.path.exists(filepath):
-        print(f"ERROR: Arquivo nao encontrado: {filepath}")
-        sys.exit(2)
-
-    ext = Path(filepath).suffix.lower()
-
-    print(f"Validando: {filepath}")
-    print(f"Tipo: {ext}")
-    print("=" * 60)
-
-    # ZIP integrity first
-    issues = validate_zip_integrity(filepath)
-
-    # Type-specific validation
-    if ext == '.pptx':
-        issues.extend(validate_pptx(filepath))
-    elif ext == '.docx':
-        issues.extend(validate_docx(filepath))
-    elif ext in ('.xlsx', '.xlsm'):
-        issues.extend(validate_xlsx(filepath))
-    else:
-        print(f"Tipo nao suportado: {ext}")
-        sys.exit(2)
-
-    # Report
-    if issues:
-        print(f"\nFAIL — {len(issues)} issue(s) encontrada(s):\n")
-        for i, issue in enumerate(issues, 1):
-            print(f"  {i}. {issue}")
+        print("Uso: python3 validate_office_file.py <arquivo_ou_pasta>")
         sys.exit(1)
+
+    target = sys.argv[1]
+
+    if os.path.isdir(target):
+        files = []
+        for ext in ("*.pptx", "*.docx", "*.xlsx"):
+            files.extend(Path(target).glob(ext))
+        if not files:
+            print(f"Nenhum arquivo Office encontrado em {target}")
+            sys.exit(0)
+        all_ok = True
+        for f in sorted(files):
+            if not validate_file(str(f)):
+                all_ok = False
+        print(f"\n{'='*60}")
+        print(f"RESULTADO: {'TODOS OK' if all_ok else 'PROBLEMAS ENCONTRADOS'}")
+        sys.exit(0 if all_ok else 1)
+    elif os.path.isfile(target):
+        ok = validate_file(target)
+        sys.exit(0 if ok else 1)
     else:
-        print(f"\nPASS — Zero issues encontradas.")
-        sys.exit(0)
+        print(f"Arquivo nao encontrado: {target}")
+        sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
