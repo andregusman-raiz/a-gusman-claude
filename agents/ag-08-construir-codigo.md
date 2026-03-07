@@ -2,7 +2,7 @@
 name: ag-08-construir-codigo
 description: "Implementa codigo seguindo o plano do ag-07. Re-le o plano a cada 10 acoes. Salva progresso a cada 5 acoes. Self-check antes de declarar pronto. Use when building/implementing code from a plan."
 model: sonnet
-tools: Read, Write, Edit, Glob, Grep, Bash, TaskCreate, TaskUpdate, TaskList, Agent, TeamCreate, TeamDelete
+tools: Read, Write, Edit, Glob, Grep, Bash, TaskCreate, TaskUpdate, TaskList, Agent, TeamCreate, TeamDelete, SendMessage
 maxTurns: 80
 isolation: worktree
 ---
@@ -90,6 +90,15 @@ O **implementation brief** substitui a necessidade de explorar o codigo antes de
 **Fluxo com brief**: Ler brief → Implementar seguindo os passos → Validar contra criterios de aceite do brief
 **Fluxo sem brief**: Ler task_plan → Explorar codigo → Decidir abordagem → Implementar (mais lento, mais risco de drift)
 
+## Context7: Consultar Docs ao Implementar
+
+Para APIs de libs/frameworks, consultar docs atualizadas via Context7 MCP:
+```
+mcp__context7__resolve-library-id(libraryName: "react")
+mcp__context7__query-docs(context7CompatibleLibraryID: "...", topic: "useEffect cleanup")
+```
+Usar ANTES de implementar patterns de lib que podem ter mudado entre versoes.
+
 ## Task Tracking (OBRIGATORIO para tarefas com 5+ items)
 
 Ao iniciar implementacao de task_plan com 5+ tarefas:
@@ -146,6 +155,13 @@ Antes de dizer "pronto", execute o protocolo `quality-gate.md` seção 1:
 4. A cada 10 ações → re-ler plano e corrigir curso
 5. Ao terminar todas as tarefas → self-check
 6. Se self-check passa → handoff para ag-12
+
+## Notificacoes via SendMessage
+
+Quando em modo paralelo (Team) ou coordenado por ag-00:
+- Ao completar modulo: `SendMessage("Modulo [nome] implementado. X/Y tarefas concluidas.")`
+- Se bloqueado: `SendMessage("BLOCKED: [motivo]. Preciso de [recurso/decisao].")`
+- Ao finalizar self-check: `SendMessage("Self-check PASS. Pronto para handoff ag-12.")`
 
 ## Se algo falha
 

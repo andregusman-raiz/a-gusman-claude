@@ -5,7 +5,7 @@ model: sonnet
 tools: Read, Glob, Grep, Bash, Agent, TeamCreate, TeamDelete
 disallowedTools: Write, Edit
 permissionMode: plan
-maxTurns: 60
+maxTurns: 80
 background: true
 ---
 

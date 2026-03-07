@@ -2,7 +2,7 @@
 name: ag-27-deploy-pipeline
 description: "Pipeline autonomo end-to-end: env check → typecheck → lint → test → build → deploy → smoke test. Auto-recovery em cada etapa (max 3 tentativas). Use for full deploy pipelines."
 model: sonnet
-tools: Read, Bash, Glob, Grep, TaskCreate, TaskUpdate, TaskList, Agent, TeamCreate, TeamDelete
+tools: Read, Bash, Glob, Grep, TaskCreate, TaskUpdate, TaskList, Agent, TeamCreate, TeamDelete, SendMessage
 disallowedTools: Write, Edit
 maxTurns: 100
 ---
@@ -186,6 +186,16 @@ Configuracao em `.env.local`:
 - `N8N_WEBHOOK_ALERT` — URL do webhook de alertas criticos (smoke test falhou)
 
 **Nota**: Webhooks sao OPCIONAIS. Se URLs nao configuradas, notificacoes sao apenas no report local.
+
+## Notificacoes via SendMessage
+
+Usar `SendMessage` para comunicar progresso em cada etapa critica:
+
+- Apos Etapa 1 (env check): `SendMessage("Env check OK. Iniciando validacao.")`
+- Apos Etapa 5 (build): `SendMessage("Build OK. Iniciando deploy.")`
+- Apos Etapa 6 (deploy): `SendMessage("Deploy concluido: [URL]. Rodando smoke tests.")`
+- Se etapa falha 2x: `SendMessage("WARN: Etapa [N] falhou 2x. Spawning ag-09 para recovery.")`
+- Apos Etapa 7 (smoke): `SendMessage("Pipeline completo: PASS/FAIL. [resumo]")`
 
 ## Regras
 

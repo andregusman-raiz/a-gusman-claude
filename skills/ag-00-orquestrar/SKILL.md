@@ -87,11 +87,17 @@ Legenda: BG=background, Sub=subagents, WT=worktree, Teams=Agent Teams, Plan=perm
 ### Quando usar Teams (3+ tarefas independentes, sem overlap de arquivos)
 ag-08 (3+ modulos) | ag-13 (unit+integ+E2E) | ag-14 (10+ arquivos PR) | ag-22 (30+ specs) | ag-23 (3-5 bugs) | ag-24 (6+ bugs) | ag-27 (2+ envs) | ag-29 (5+ modulos)
 
-### Quando usar Subagents
+### Quando usar Subagents (SEMPRE com subagent_type: "Explore")
 ag-09 (bug multi-layer 3+ camadas) | ag-15 (projeto 100+ arquivos, 4 audits paralelos) | ag-27 (auto-recovery spawna ag-09, pos-deploy spawna ag-20)
+**Regra**: Subagents de investigacao/analise DEVEM usar `subagent_type: "Explore"` para otimizar contexto (200K dedicados, sem poluir parent).
 
 ### Worktree (operacoes de risco com rollback)
 ag-08 | ag-10 | ag-11 | ag-23 | ag-35
+
+### Cron Scheduling (sessoes longas e monitoramento)
+Para sessoes 2h+ ou pos-deploy, agendar health checks recorrentes:
+`CronCreate(schedule: "*/30 * * * *", command: "/ag28")` → CronDelete ao finalizar sessao.
+Tambem util para: reindexacao, limpeza sessions.csv, polling de CI status.
 
 ### Hooks automaticos — ag-00 NAO duplica
 BLOCKERS: vercel --prod, git push --force, --no-verify, deploy de main
@@ -503,6 +509,36 @@ TODOS os workflows que produzem codigo DEVEM seguir automaticamente:
 **Deploy**: Via PR + CI/CD. Pipeline manual via ag-27 (com auto-recovery).
 **Migration**: ag-17 verifica constraints e naming. Nunca `supabase db reset` sem confirmacao.
 **Release**: ag-18 release: changelog + tag semver + GitHub Release.
+
+---
+
+## 13. Knowledge Graph MCP (Persistencia de Conhecimento)
+
+Agentes DEVEM usar Knowledge Graph para persistir decisoes e aprendizados entre sessoes:
+
+| Momento | Entity Type | Agente |
+|---------|------------|--------|
+| Decisao arquitetural | ArchDecision | ag-06, ag-07 |
+| Bug resolvido | BugResolution | ag-09 |
+| Modulo criado | Module | ag-08 |
+| Tech debt encontrado | TechDebt | ag-04, ag-14 |
+| Deploy realizado | DeployEvent | ag-27 |
+
+**Consultar ANTES de decidir**: `search_nodes` antes de tomar decisao que pode ja ter sido tomada.
+**Regra completa**: `.claude/rules/knowledge-graph-ingestion.md`
+
+---
+
+## 14. SendMessage (Comunicacao Inter-Agent)
+
+Agentes com `SendMessage` no tools DEVEM notificar progresso em momentos-chave:
+
+- **ag-08**: Ao completar modulo, se bloqueado, ao finalizar self-check
+- **ag-24**: Ao criar team, quando teammate termina/falha, apos merge
+- **ag-27**: Apos env check, build, deploy, se etapa falha 2x, apos smoke test
+
+**Quando usar**: Em workflows coordenados (Teams, multi-agent) para manter coordinator informado.
+**Quando NAO usar**: Em execucao solo simples (fix unico, doc update).
 
 ---
 

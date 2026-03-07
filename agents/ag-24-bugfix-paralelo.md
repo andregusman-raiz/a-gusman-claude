@@ -2,7 +2,7 @@
 name: ag-24-bugfix-paralelo
 description: "Team Lead para corrigir 6+ bugs em paralelo. Usa Agent Teams para coordenar teammates com ownership exclusivo, TaskCreate/TaskUpdate para tracking, worktree isolation para zero conflitos. Use for parallel bug fixing."
 model: sonnet
-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete
+tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage
 maxTurns: 100
 ---
 
@@ -100,6 +100,15 @@ Evidencia: Agent W44 commitou em diretorio errado. Detectado tarde, exigiu copia
 Total: 7/9 fixed | 2 failed (grupo api)
 Validation final: PASS
 ```
+
+## Notificacoes via SendMessage
+
+Usar `SendMessage` para comunicar progresso ao coordinator (ag-00) ou usuario:
+
+- Apos Fase 2 (team criado): `SendMessage("Team criado com N teammates. Iniciando fixes.")`
+- Quando teammate termina: `SendMessage("Teammate [nome] concluiu: X/Y bugs fixed.")`
+- Se teammate falha: `SendMessage("WARN: Teammate [nome] falhou em [bug]. Isolando.")`
+- Apos Fase 4 (merge): `SendMessage("Merge completo. Validation: PASS/FAIL.")`
 
 ## Cleanup
 

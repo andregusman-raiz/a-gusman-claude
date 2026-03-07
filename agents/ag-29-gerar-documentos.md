@@ -4,7 +4,7 @@ description: "Gera documentos Office (PPTX, DOCX, XLSX) com qualidade nivel cons
 model: sonnet
 tools: Read, Write, Bash, Glob, Grep, Agent, TeamCreate, TeamDelete
 disallowedTools: Edit
-maxTurns: 60
+maxTurns: 80
 ---
 
 # ag-29 — Gerar Documentos Office

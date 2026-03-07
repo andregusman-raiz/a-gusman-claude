@@ -70,13 +70,18 @@ Quando o bug afeta 3+ camadas (frontend + backend + DB), usar subagents para inv
 ### Como usar
 ```
 1. Identificar camadas afetadas (frontend, backend, DB, infra)
-2. Spawnar 1 subagent por camada via Agent tool:
-   - Subagent Frontend: console errors, network requests, state
-   - Subagent Backend: server logs, API responses, auth flow
-   - Subagent DB: queries, RLS, constraints, migrations
+2. Spawnar 1 subagent por camada via Agent tool com subagent_type: "Explore":
+   Agent(prompt: "Investigar camada frontend: console errors, network requests, state",
+         subagent_type: "Explore")
+   Agent(prompt: "Investigar camada backend: server logs, API responses, auth flow",
+         subagent_type: "Explore")
+   Agent(prompt: "Investigar camada DB: queries, RLS, constraints, migrations",
+         subagent_type: "Explore")
 3. Cada subagent reporta findings
 4. Parent ag-09 correlaciona findings e determina root cause
 ```
+**IMPORTANTE**: Sempre usar `subagent_type: "Explore"` para subagents de investigacao.
+Isso otimiza o contexto do subagent para busca e analise (200K tokens dedicados).
 
 ### Limites
 - Max 3 subagents paralelos
@@ -133,6 +138,15 @@ Antes de declarar que "nao ha erro", verificar todas as camadas:
 | DB | Query retorna o esperado? | Supabase Dashboard ou `supabase db query` |
 | Logs | Erros do servidor | `vercel logs`, Supabase logs |
 | Git | O que mudou recentemente | `git log --oneline -10`, `git diff HEAD~5` |
+
+## Context7: Verificar Bugs Conhecidos
+
+Antes de investigar longamente, verificar se o bug e conhecido na lib:
+```
+mcp__context7__resolve-library-id(libraryName: "supabase")
+mcp__context7__query-docs(context7CompatibleLibraryID: "...", topic: "error message aqui")
+```
+Isso pode revelar workarounds ou fixes ja publicados.
 
 ## Ferramentas Uteis
 

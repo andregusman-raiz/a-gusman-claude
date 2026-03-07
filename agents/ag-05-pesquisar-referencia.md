@@ -34,11 +34,18 @@ Ler docs do framework → Ler benchmark → SALVAR em findings.md
 
 ## Fontes de Pesquisa (ordem de prioridade)
 
-1. **Documentacao oficial** — docs da lib/framework (sempre mais confiavel)
-2. **GitHub Issues/Discussions** — problemas reais de usuarios reais
-3. **Stack Overflow** — solucoes validadas pela comunidade
-4. **Blog posts tecnicos** — analises aprofundadas (verificar data)
-5. **Benchmarks publicados** — comparacoes com dados (verificar metodologia)
+1. **Context7 MCP** — docs atualizadas direto da fonte (PREFERIR para libs conhecidas):
+   ```
+   mcp__context7__resolve-library-id(libraryName: "next.js")
+   → mcp__context7__query-docs(context7CompatibleLibraryID: "/vercel/next.js", topic: "app router")
+   ```
+2. **Documentacao oficial** — docs da lib/framework via WebFetch
+3. **GitHub Issues/Discussions** — problemas reais de usuarios reais
+4. **Stack Overflow** — solucoes validadas pela comunidade
+5. **Blog posts tecnicos** — analises aprofundadas (verificar data)
+6. **Benchmarks publicados** — comparacoes com dados (verificar metodologia)
+
+**Regra**: Para qualquer lib/framework, PRIMEIRO tentar Context7. Se nao encontrar, fallback para WebSearch/WebFetch.
 
 ## Template de Comparacao
 

@@ -68,7 +68,13 @@ Para projetos com 100+ arquivos afetados, spawnar subagents paralelos via Agent 
 
 ### Fluxo
 1. Parent ag-15 avalia tamanho do projeto
-2. Se 100+ arquivos → spawnar 4 subagents em paralelo
+2. Se 100+ arquivos → spawnar 4 subagents em paralelo com `subagent_type: "Explore"`:
+   ```
+   Agent(prompt: "OWASP Security scan: A01-A10 contra [path]", subagent_type: "Explore")
+   Agent(prompt: "Secrets scan: tokens, passwords, API keys em [path]", subagent_type: "Explore")
+   Agent(prompt: "Deps audit: npm audit, CVE check em [path]", subagent_type: "Explore")
+   Agent(prompt: "Test quality: theatrical detection em [path]", subagent_type: "Explore")
+   ```
 3. Cada subagent retorna findings estruturados
 4. Parent ag-15 agrega em report unico com severidade consolidada
 5. Se < 100 arquivos → executar sequencialmente (comportamento atual)
@@ -77,6 +83,7 @@ Para projetos com 100+ arquivos afetados, spawnar subagents paralelos via Agent 
 - Subagents sao read-only (herdam permissionMode: plan)
 - Max 4 subagents paralelos
 - Cada subagent usa modelo haiku (scans rapidos)
+- **SEMPRE** usar `subagent_type: "Explore"` — otimiza contexto para analise
 
 ## Modo: Test Quality Audit
 
