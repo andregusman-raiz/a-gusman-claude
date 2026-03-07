@@ -1,4 +1,4 @@
-# Claude Code Agent System
+# Claude Code Agent System feito pelo Andre Gusman
 
 Sistema de 34+ agentes e skills para desenvolvimento autônomo com Claude Code.
 
@@ -44,3 +44,4 @@ Sistema de 34+ agentes e skills para desenvolvimento autônomo com Claude Code.
 - **Task Tracking**: TaskCreate/TaskUpdate em 8 agentes
 - **9 Hooks ativos**: safety (force-push, --no-verify, stash, db push, config protection, vercel --prod) + quality (post-build, post-test, post-commit)
 - **Webhook n8n**: notificações de deploy e alertas
+
