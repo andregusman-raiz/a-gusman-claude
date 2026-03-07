@@ -40,13 +40,48 @@ Antes de merge:
 - Lint passando
 - Commit com mensagem descritiva
 
-### 6. Limites
+### 6. Limites de Paralelismo
 - Max 5 agents paralelos
 - Max 8 arquivos por agent
 - Se total < 6 tasks → usar sequencial
+
+### 7. Limites de Recursos (Memory Safety)
+MacBook Pro M5 com 36GB RAM — proteger contra memory overflow.
+
+**Regra: max 4 sessoes Claude Code simultaneas**
+
+| Cenario | Sessoes | Subagents/sessao | Total estimado |
+|---------|---------|-------------------|----------------|
+| Conservador | 2 | 2 | ~16GB |
+| Normal | 3 | 3 | ~27GB |
+| Agressivo | 4 | 3 | ~36GB |
+| MAX (nunca exceder) | 5 | 2 | ~35GB |
+
+**Dentro de cada sessao (Agent Teams):**
+- Max 4 teammates simultaneos (nao 5)
+- Cada teammate sem subagents proprios (flat, nao nested)
+- `TeamDelete` IMEDIATO apos teammates terminarem (liberar memoria)
+- Preferir sequencial (ag-23) quando < 6 tasks
+
+**MCP servers:**
+- Subagents herdam MCPs da sessao pai — NAO iniciar MCPs extras
+- Se sessao nao precisa de browser → nao carregar playwright/chrome-devtools
+
+**Monitoramento durante execucao paralela:**
+```bash
+# Verificar memoria antes de spawnar mais agents
+memory_pressure  # macOS: normal/warn/critical
+# Se warn ou critical → NAO spawnar mais agents, aguardar os atuais
+```
+
+**iTerm2:**
+- Scrollback: max 10.000 linhas (Settings → Profiles → Terminal)
+- Fechar abas/terminais inativos — iTerm2 mantém processos vivos
 
 ## Anti-Patterns
 - NUNCA agents sem escopo definido
 - NUNCA dois agents no mesmo arquivo
 - NUNCA merge branch sem validation
 - NUNCA modificar package.json em paralelo
+- NUNCA spawnar agents sem verificar memory_pressure
+- NUNCA manter Teams vivos apos conclusao (TeamDelete obrigatorio)
