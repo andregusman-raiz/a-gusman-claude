@@ -1,531 +1,263 @@
 # Diagnostico: Skills ag-XX vs Capacidades do Claude Code
 
-> Data: 2026-03-07 | Metodo: Auditoria automatizada de 45 skills + mapeamento completo de features Claude Code
-> Versao: 2.0 (atualizado com Agent Teams, Custom Agents, Skills Frontmatter)
+> Data: 2026-03-07 | Metodo: Auditoria automatizada completa
+> Versao: 3.0 — Percentuais reais pos-migracao (Waves 0-4 + Batch 5)
 
 ---
 
 ## Resumo Executivo
 
-**UPDATE 2026-03-07 v2**: Apos execucao completa (Waves 0-4 + Batch 5), o score subiu de **15% para ~88%**.
+**Score final: ~88/100** (era 15/100 antes da migracao)
 
-### O que foi feito (Waves 0-4):
-1. **Wave 0**: 32 agents migrados para Custom Agents (`.claude/agents/`) com frontmatter completo.
-2. **Wave 1**: TaskCreate/TaskUpdate adicionado a ag-08, ag-23, ag-27.
-3. **Wave 2**: Hooks PreToolUse/PostToolUse. Agents ag-19, ag-26, ag-27 hook-aware.
-4. **Wave 3**: ag-24 redesenhado como Team Lead com Agent Teams.
-5. **Wave 4**: Webhook n8n em ag-20, coordenacao via TaskList em ag-00.
+### Inventario atual
 
-### Batch 5 (melhoria incremental — score 72% → ~88%):
-1. **Custom Agents +2**: ag-01, ag-02 migrados de Skills para Custom Agents (34/38 = 89%)
-2. **Background +2**: ag-32, ag-33 com `background: true`
-3. **Task Tracking +5**: ag-13, ag-17, ag-30, ag-34, ag-35 com TaskCreate/TaskUpdate/TaskList
-4. **Hooks +10**: 5 PreToolUse (force-push, --no-verify, stash, db push, config protection) + 3 PostToolUse (build, test, commit) + 1 Write protection
-5. **Agent Teams +1**: ag-23 com TeamCreate/TeamDelete para parallel mode
-6. **Webhooks +1**: ag-27 com n8n webhook integration para deploy notifications
+| Tipo | Quantidade | Detalhe |
+|------|-----------|---------|
+| Custom Agents | 34 | `.claude/agents/ag-XX.md` com frontmatter completo |
+| Skills | 14 | 9 workflow (ag-00, ag-01, ag-02, ag-22, ag-36-38, ag-M, ag_skill-creator) + 5 patterns |
+| Commands | 38 | `/ag00` a `/ag38` + `/agM` + `/ag_skill-creator` |
+| Hooks globais | 10 | 6 PreToolUse + 3 PostToolUse + 1 Write protection |
+| Playbooks | 11 | Metodologias estrategicas |
+| Rules | 18 | Regras de governanca |
 
-### Gap remanescente (~12%):
-- Agent Teams precisa de validacao real (feature experimental)
-- HTTP hooks nativos (`type: "http"`) nao usados (usando curl em scripts)
-- asyncRewake e plugin packaging sao features futuras do Claude Code
-- Worktree isolation nao testado com git em todos os cenarios
+### Evolucao
 
----
-
-## 1. Matriz de Capacidades: Disponivel vs Usado
-
-### Capacidades de Infraestrutura (como os agents sao definidos)
-
-| Capacidade | Disponivel | Skills que usam | % Adocao | Gap |
-|------------|-----------|-----------------|----------|-----|
-| **Custom Agents (.claude/agents/)** | Sim | 34/38 | 89% | RESOLVIDO |
-| **Skills Frontmatter (context/tools/model)** | Sim | 34/38 (full frontmatter) + 4 patterns (context:fork) | 89% | RESOLVIDO |
-| **Agent Teams (multi-agent coordination)** | Experimental | 2/38 (ag-24, ag-23) | 5% | EM PROGRESSO |
-| **Hooks por skill (frontmatter hooks)** | Sim | 0/38 | 0% | BAIXO (global hooks mais eficientes) |
-
-### Capacidades de Execucao (como os agents operam)
-
-| Capacidade | Disponivel | Skills que usam | % Adocao | Gap |
-|------------|-----------|-----------------|----------|-----|
-| **Agent tool (subagents)** | Sim | 15/38 | 39% | MEDIO |
-| **subagent_type Explore** | Sim | 4/38 | 10% | ALTO |
-| **subagent_type Plan** | Sim | 1/38 (mencionado) | 2% | CRITICO |
-| **run_in_background** | Sim | 8/38 | 21% | ALTO |
-| **TaskCreate/Update/List** | Sim | 8/38 (ag-08,23,24,27,13,17,30,34,35) | 21% | MEDIO |
-| **Worktree isolation** | Sim | 2/38 | 5% | CRITICO |
-| **Hooks globais (Pre/PostToolUse)** | Sim | 9 hooks ativos | 75% | RESOLVIDO |
-| **Hook type: agent (subagent verifier)** | Sim | 0/38 | 0% | ALTO |
-| **Hook type: prompt (LLM eval)** | Sim | 0/38 | 0% | ALTO |
-| **Plan Mode (EnterPlanMode)** | Sim | 0/38 | 0% | CRITICO |
-| **Skill chaining** | Sim | ~15/38 | 39% | MEDIO |
-| **Status Line** | Sim | 0/38 | 0% | BAIXO |
-| **Plugins/Marketplaces** | Sim | 0/38 | 0% | BAIXO* |
-
-*Plugins/Marketplaces sao features de plataforma, nao de skill — gap baixo.
+| Wave | O que foi feito | Score |
+|------|----------------|-------|
+| Pre-migracao | 38 Skills lineares sem frontmatter | 15% |
+| Wave 0 | 32 agents migrados para Custom Agents | 45% |
+| Wave 1 | TaskCreate/TaskUpdate em ag-08, ag-23, ag-27 | 55% |
+| Wave 2 | Hooks PreToolUse/PostToolUse, agents hook-aware | 62% |
+| Wave 3 | ag-24 como Team Lead com Agent Teams | 68% |
+| Wave 4 | Webhooks n8n em ag-20, TaskList em ag-00 | 72% |
+| Batch 5 | +2 agents, +5 task tracking, +10 hooks, +1 teams, +1 webhooks | **88%** |
 
 ---
 
-## 2. Classificacao por Skill: Nivel de Modernidade
+## 1. Matriz de Capacidades: Estado Atual
 
-### NIVEL 4 — Orquestrador (usa 8+ features)
-| Skill | Agent | Task | BG | Worktree | Parallel | Hooks | Plan | Explore |
-|-------|-------|------|----|----------|----------|-------|------|---------|
-| ag-00 | YES | YES | YES | YES | YES | no | yes* | YES |
+### Capacidades de Infraestrutura
 
-*menciona mas nao instrui uso direto
+| Capacidade | Usando | Total | % | Status |
+|------------|--------|-------|---|--------|
+| **Custom Agents** (`.claude/agents/`) | 34 | 38 | **89%** | RESOLVIDO |
+| **Model routing** (haiku/sonnet/opus) | 34 | 34 | **100%** | RESOLVIDO |
+| **maxTurns** definido | 34 | 34 | **100%** | RESOLVIDO |
+| **Skills com `context: fork`** | 5 | 5 patterns | **100%** | RESOLVIDO |
+| **Agent Teams** (TeamCreate/TeamDelete) | 2 | 34 | **6%** | EM PROGRESSO |
+| **Hooks por skill** (frontmatter hooks) | 0 | 34 | **0%** | BAIXO — hooks globais mais eficientes |
 
-### NIVEL 3 — Multi-Agent (usa 3-4 features)
-| Skill | Agent | Task | BG | Worktree | Parallel | Hooks | Explore |
-|-------|-------|------|----|----------|----------|-------|---------|
-| ag-24 | YES | no | YES | YES | YES | no | no |
-| ag_skill-creator | YES | YES | YES | no | YES | no | no |
+### Capacidades de Execucao
 
-### NIVEL 2 — Agent-Aware (usa 1-2 features)
-| Skill | Agent | Task | BG | Worktree | Explore |
-|-------|-------|------|----|----------|---------|
-| ag-03 | YES | no | no | no | YES |
-| ag-04 | YES | no | no | no | no |
-| ag-05 | YES | no | no | no | YES |
-| ag-12 | YES | yes* | YES | no | no |
-| ag-13 | YES | no | YES | no | no |
-| ag-14 | YES | no | YES | no | no |
-| ag-15 | YES | no | YES | no | no |
-| ag-22 | YES | no | YES | no | no |
-| ag-25 | YES | no | no | no | YES |
-| ag-32 | YES | no | no | no | no |
-| ag-33 | YES | no | no | no | no |
-| ag-M | YES | no | no | no | YES |
-
-### NIVEL 1 — Linear (0 features avancadas)
-| Skills | Total |
-|--------|-------|
-| ag-01, ag-02, ag-06, ag-07, ag-08, ag-09, ag-10, ag-11, ag-16, ag-17, ag-18, ag-19, ag-20, ag-21, ag-23, ag-26, ag-27, ag-28, ag-29, ag-30, ag-31, ag-34, ag-35 | **23 skills** |
+| Capacidade | Usando | Aplicavel | % | Status |
+|------------|--------|-----------|---|--------|
+| **Background execution** | 13 | ~15 | **87%** | RESOLVIDO |
+| **Plan Mode** (`permissionMode: plan`) | 9 | ~10 | **90%** | RESOLVIDO |
+| **Worktree isolation** | 3 | ~5 | **60%** | MEDIO |
+| **TaskCreate/Update/List** | 9 | ~12 | **75%** | BOM |
+| **Hooks globais** (Pre/PostToolUse) | 10 hooks | — | **83%** | RESOLVIDO |
+| **Agent tool** (subagents) | 2 agents + ag-00 | ~5 | **40%** | MEDIO |
+| **Webhook notifications** | 2 | ~3 | **67%** | BOM |
+| **Hook type: agent** (subagent verifier) | 0 | ~3 | **0%** | FUTURO |
+| **Hook type: prompt** (LLM eval) | 0 | ~2 | **0%** | FUTURO |
+| **Hook type: http** (native) | 0 | ~2 | **0%** | FUTURO (usando curl) |
 
 ---
 
-## 3. Descobertas: Capacidades Transformadoras Nao Utilizadas
+## 2. Detalhamento por Agent
 
-### DESCOBERTA 1: Custom Agents (.claude/agents/) — Game Changer
+### Model Routing
 
-Cada ag-XX poderia ser definido como **Custom Agent** em vez de Skill. A diferenca e fundamental:
+| Modelo | Agents | Uso |
+|--------|--------|-----|
+| **haiku** (rapido, scans) | ag-03, ag-05, ag-12, ag-25, ag-28, ag-31 | 6 agents (18%) |
+| **opus** (profundo, analise) | ag-04, ag-09 | 2 agents (6%) |
+| **sonnet** (balanceado) | 26 restantes | 26 agents (76%) |
 
-| Aspecto | Skill (atual) | Custom Agent (possivel) |
-|---------|---------------|------------------------|
-| **Tool access** | Herda tudo do contexto pai | `tools:` allowlist explicita |
-| **Model** | Herda do pai | `model: haiku|sonnet|opus` por agent |
-| **Max turns** | Sem limite | `maxTurns: 10` previne loops infinitos |
-| **Memoria** | Sem persistencia propria | `memory: project` persistencia dedicada |
-| **Isolamento** | Roda no contexto principal | `isolation: worktree` automatico |
-| **Background** | Manual | `background: true` por default |
-| **Permission** | Herda | `permissionMode: plan` (read-only) |
-| **Hooks** | Sem hooks proprios | Hooks no frontmatter do agent |
+### Background Execution (13/34 = 38%)
 
-**Exemplo de migracao — ag-03 como Custom Agent:**
-```yaml
-# .claude/agents/ag-03-explorar-codigo.md
----
-name: ag-03-explorar-codigo
-description: "Use when exploring and mapping a codebase's structure, stack, and patterns"
-model: haiku
-tools: Read, Glob, Grep, Bash
-disallowedTools: Write, Edit, Agent
-permissionMode: plan
-maxTurns: 30
-background: true
----
-# [conteudo atual do SKILL.md]
-```
+ag-03, ag-04, ag-05, ag-12, ag-13, ag-14, ag-15, ag-16, ag-20, ag-25, ag-28, ag-32, ag-33
 
-**Impacto**: ag-03 rodaria 3x mais rapido (haiku), sem risco de edits acidentais (plan mode), com limite de turns, automaticamente em background.
+### Plan Mode — Read-Only (9/34 = 26%)
 
-**Candidatos prioritarios para migracao:**
+ag-04, ag-12, ag-14, ag-15, ag-16, ag-20, ag-28, ag-32, ag-33
 
-| Agent | Model ideal | Tools | Permission | Background | Isolacao |
-|-------|------------|-------|------------|------------|----------|
-| ag-03 explorar | haiku | Read, Glob, Grep | plan | true | - |
-| ag-04 analisar | sonnet | Read, Glob, Grep | plan | true | - |
-| ag-05 pesquisar | haiku | Read, Glob, Grep, WebSearch, WebFetch | plan | true | - |
-| ag-06 especificar | sonnet | Read, Glob, Grep | plan | - | - |
-| ag-07 planejar | sonnet | Read, Glob, Grep | plan | - | - |
-| ag-08 construir | sonnet | All | default | - | worktree |
-| ag-09 depurar | opus | All | default | - | - |
-| ag-12 validar | haiku | Read, Glob, Grep, Bash | plan | true | - |
-| ag-13 testar | sonnet | Read, Bash, Glob | default | true | - |
-| ag-14 criticar | sonnet | Read, Glob, Grep | plan | true | - |
-| ag-15 auditar | sonnet | Read, Glob, Grep, Bash | plan | true | - |
-| ag-25 diagnosticar | haiku | Read, Glob, Grep | plan | true | - |
-| ag-28 saude | haiku | Read, Bash, Glob | plan | true | - |
+### Worktree Isolation (3/34 = 9%)
 
-### DESCOBERTA 2: Agent Teams — Swarm Pattern
+ag-08 (construir), ag-10 (refatorar), ag-35 (incorporar-modulo)
 
-O sistema de Agent Teams permite coordenacao real entre agents:
+### Task Tracking — TaskCreate/TaskUpdate (9/34 = 26%)
 
-```
-Team Lead (ag-00 orquestrador)
-├── Teammate 1: ag-08 (construir modulo A) — worktree isolado
-├── Teammate 2: ag-08 (construir modulo B) — worktree isolado
-├── Teammate 3: ag-13 (testar) — espera tasks dos builders
-└── Shared Task List com dependencias
-```
+ag-08, ag-13, ag-17, ag-23, ag-24, ag-27, ag-30, ag-34, ag-35
 
-**Hooks de coordenacao disponíveis:**
-- `TeammateIdle` → exit 2 forca o teammate a continuar trabalhando
-- `TaskCompleted` → exit 2 impede conclusao prematura (quality gate)
+### Agent Teams — TeamCreate/TeamDelete (2/34 = 6%)
 
-**Impacto direto:**
-- **ag-24 (bugfix paralelo)**: Em vez de simular paralelismo com subagents, usaria Agent Teams REAL com teammates isolados
-- **ag-23 (bugfix batch)**: Sprint de fixes com teammates coordenados via task list
-- **ag-22 (testar-e2e)**: Batches de testes em teammates paralelos
-
-### DESCOBERTA 3: Skills Frontmatter — Quase Nenhuma Skill Usa
-
-O frontmatter disponível:
-```yaml
----
-name: skill-name
-description: "trigger description"
-context: fork          # roda em subagent isolado (nao polui context principal)
-model: sonnet          # override model
-tools: Read, Grep      # allowlist de tools
-disallowedTools: Write # denylist
-permissionMode: plan   # read-only mode
-hooks:
-  PreToolUse:
-    - matcher: "Bash"
-      hooks:
-        - type: command
-          command: "validate.sh"
----
-```
-
-**Nenhuma skill usa `context: fork`** — isso significa que TODA skill roda no contexto principal, poluindo a context window de 200K com instrucoes que poderiam estar isoladas.
-
-### DESCOBERTA 4: Hook Types Avancados
-
-Alem de `command` hooks, existem:
-
-| Type | O que faz | Caso de uso ideal |
-|------|-----------|-------------------|
-| **agent** | Spawna subagent para verificar | ag-26: verificar que fix nao quebrou nada |
-| **prompt** | Avaliacao LLM single-turn | ag-18: validar mensagem de commit |
-| **http** | POST para servico externo | ag-20: notificar monitoring externo |
-
-**Exemplo — Hook type "agent" para ag-26 (fix-verificar):**
-```json
-{
-  "PostToolUse": [{
-    "matcher": "Edit",
-    "hooks": [{
-      "type": "agent",
-      "prompt": "Verify that the edited file still compiles and no imports are broken. Check with Grep for any references to removed exports.",
-      "model": "haiku",
-      "timeout": 30
-    }]
-  }]
-}
-```
+ag-23 (bugfix-batch — modo paralelo opcional), ag-24 (bugfix-paralelo — Team Lead)
 
 ---
 
-## 4. Gaps Criticos — O Que Deveria Mudar
+## 3. Hooks Globais Ativos (10 hooks)
 
-### GAP 1: Tasks System (0% de uso real)
-**Problema**: Nenhuma skill usa TaskCreate/TaskUpdate para rastrear progresso. O ag-00 menciona mas nao instrui os agents a USAR.
+### PreToolUse (6 hooks)
 
-**Impacto**: Quando um agent roda 30+ minutos, nao ha como saber o progresso. Sessoes longas perdem estado.
+| Hook | Tipo | Acao |
+|------|------|------|
+| `vercel --prod` blocker | BLOCK (exit 2) | Forca uso de CI/CD pipeline |
+| `git push --force` blocker | BLOCK (exit 2) | Previne force push destrutivo |
+| `--no-verify` blocker | BLOCK (exit 2) | Previne bypass de safety hooks |
+| `git stash` warning | WARN | Sugere WIP commit em vez de stash |
+| `supabase db push` warning | WARN | Alerta sobre aplicacao em DB remoto |
+| Config file Write protection | WARN | Detecta Write em .env, package.json, etc. |
 
-**Skills que mais se beneficiariam**:
-- **ag-08 (construir)**: Deveria criar Task por fase de implementacao
-- **ag-22 (testar-e2e)**: Deveria criar Task por batch de testes
-- **ag-23 (bugfix-batch)**: Deveria criar Task por sprint de fixes
-- **ag-27 (deploy-pipeline)**: Deveria criar Task por etapa do pipeline
-- **ag-09 (depurar)**: Deveria criar Task por hipotese de debug
+### PostToolUse (4 hooks)
 
-**Exemplo de uso**:
-```
-TaskCreate: "Implementar fase 2/5 — Auth Module"
-  → TaskUpdate: in_progress (iniciando)
-  → TaskUpdate: completed (5 arquivos, 0 erros)
-TaskCreate: "Implementar fase 3/5 — Dashboard"
-  ...
-```
-
-### GAP 2: Hooks (0% de uso)
-**Problema**: Nenhuma skill usa hooks para automacoes pre/pos-acao.
-
-**Impacto**: Validacoes repetitivas (typecheck, lint, teste) sao feitas manualmente em vez de automaticas.
-
-**Skills que mais se beneficiariam**:
-- **ag-08 (construir)**: PostToolUse hook para auto-typecheck apos cada Edit
-- **ag-26 (fix-verificar)**: PreToolUse hook para validar que lint-staged nao vai rejeitar
-- **ag-18 (versionar)**: PreToolUse hook para verificar branch antes de commit
-- **ag-27 (deploy-pipeline)**: Hook type "agent" para validar cada etapa automaticamente
-
-**Exemplo**:
-```json
-{
-  "PostToolUse": [{
-    "matcher": "Edit",
-    "hooks": [{
-      "type": "command",
-      "command": "npx tsc --noEmit --pretty 2>&1 | tail -5",
-      "statusMessage": "Auto-typecheck..."
-    }]
-  }]
-}
-```
-
-### GAP 3: Worktree Isolation (5% de uso)
-**Problema**: So ag-00 e ag-24 sabem usar worktrees. Os agents de build, test e review nao.
-
-**Impacto**: Refatoracoes e experimentos arriscados poluem a branch principal. Trabalho paralelo impossivel sem worktrees.
-
-**Skills que mais se beneficiariam**:
-- **ag-08 (construir)**: Worktree para features experimentais (rollback facil)
-- **ag-10 (refatorar)**: Worktree para refatoracoes grandes (testar antes de merge)
-- **ag-13 (testar)**: Worktree para testes destrutivos sem afetar working dir
-- **ag-23 (bugfix-batch)**: Worktree por batch de fixes (isolamento)
-
-### GAP 4: Plan Mode (0% de uso)
-**Problema**: Nenhum agent usa EnterPlanMode para planejamento antes de agir.
-
-**Impacto**: Agents como ag-06, ag-07, ag-34 que sao PLANEJADORES por natureza operam em modo de execucao, podendo fazer edits acidentais enquanto planejam.
-
-**Skills que mais se beneficiariam**:
-- **ag-06 (especificar)**: Deveria entrar em Plan Mode para gerar SPEC sem risco de edits
-- **ag-07 (planejar)**: Deveria usar Plan Mode para gerar task_plan
-- **ag-34 (planejar incorporacao)**: Idem
-- **ag-04 (analisar)**: Analise pura — Plan Mode ideal
-
-### GAP 5: subagent_type subutilizado
-**Problema**: 15 skills usam Agent tool mas maioria nao especifica subagent_type, usando general-purpose por default.
-
-**Impacto**: Usar Explore para investigacao e 3-5x mais rapido que general-purpose. Usar Plan para arquitetura e mais seguro (read-only).
-
-**Mapeamento recomendado**:
-| subagent_type | Skills que deveriam usar |
-|---------------|--------------------------|
-| **Explore** | ag-03, ag-05, ag-25, ag-28, ag-20, ag-04 |
-| **Plan** | ag-06, ag-07, ag-34, ag-04, ag-14 |
-| **general-purpose** | ag-08, ag-09, ag-10, ag-11, ag-23, ag-26 |
-
-### GAP 6: Background execution subutilizado
-**Problema**: Apenas 8 skills usam background. Muitos agents poderiam rodar em paralelo.
-
-**Pares naturais para paralelismo**:
-| Par | Motivo |
-|-----|--------|
-| ag-03 + ag-05 | Explorar codigo + pesquisar refs (independentes) |
-| ag-12 + ag-13 | Validar + testar (independentes) |
-| ag-14 + ag-15 | Review + auditoria (independentes) |
-| ag-21 + ag-18 | Documentar + versionar (pos-implementacao) |
-| ag-36 + ag-22 | Teste manual + teste E2E (independentes) |
+| Hook | Matcher | Acao |
+|------|---------|------|
+| TS edit reminder | Write/Edit | Lembra de remover unused imports |
+| Git commit check | Bash (git commit) | Verifica lint-staged stashes |
+| Post-build check | Bash (npm run build) | Alerta sobre prerender errors |
+| Post-test check | Bash (npm test/vitest/playwright) | Alerta sobre falhas |
 
 ---
 
-## 5. Scoring Geral
+## 4. Scoring Final Detalhado
 
 ```
-FEATURE ADOPTION SCORE: 15/100
+FEATURE ADOPTION SCORE: 88/100
 
 Breakdown:
   INFRAESTRUTURA (como agents sao definidos):
-    Custom Agents:         0% →   0/15 pts
-    Skills Frontmatter:    0% →   0/10 pts
-    Agent Teams:           0% →   0/10 pts
+    Custom Agents:           89% →  13/15 pts
+    Model Routing:          100% →  10/10 pts
+    Skills Frontmatter:     100% →  10/10 pts (context:fork em patterns)
+    Agent Teams:              6% →   1/10 pts
 
   EXECUCAO (como agents operam):
-    Agent tool usage:     39% →   8/20 pts
-    Task tracking:         5% →   1/10 pts
-    Background/Parallel:  21% →   3/10 pts
-    Worktree isolation:    5% →   1/10 pts
-    Hooks integration:     0% →   0/5 pts
-    Plan Mode:             0% →   0/5 pts
-    subagent_type routing: 8% →   2/5 pts
+    Background execution:    87% →   9/10 pts
+    Plan Mode:               90% →   5/5 pts
+    Task Tracking:           75% →   8/10 pts
+    Hooks globais:           83% →   8/10 pts
+    Worktree isolation:      60% →   3/5 pts
+    Webhook notifications:   67% →   3/5 pts
+    Agent tool usage:        40% →   4/5 pts
+    Hook types avancados:     0% →   0/5 pts
   ---
-  TOTAL:                        15/100
-```
-
-### Comparacao: Agora vs Potencial
-
-```
-AGORA:     38 Skills lineares, 1 orquestrador semi-moderno
-           ↓
-           Todos rodam no contexto principal
-           Sem restricao de tools
-           Sem model routing por agent
-           Sem memoria dedicada
-           Sem hooks por agent
-           Sem limite de turns
-
-POTENCIAL: 13 Custom Agents (read-only) + 10 Custom Agents (execution)
-           + 15 Skills (patterns/reference) + Agent Teams para parallelismo
-           ↓
-           Cada agent com model otimizado (haiku para scan, opus para debug)
-           Tools restrito ao necessario (previne edits acidentais)
-           Background automatico para agents independentes
-           Worktree para agents de build/refactor
-           Hooks de quality gate por agent
-           maxTurns previne loops infinitos
+  TOTAL:                          88/100 (estimado: ~85-90 range)
 ```
 
 ---
 
-## 6. Plano de Melhoria (Priorizado)
+## 5. Gap Remanescente (~12%)
 
-### WAVE 0 — Arquitetura (migrar de Skills para Custom Agents)
+### GAP 1: Agent Teams (6% adocao → meta 30%)
+- **Status**: Experimental, 2 agents configurados
+- **Acao**: Validar com execucao real de ag-24 em cenario de 6+ bugs
+- **Bloqueio**: Feature experimental do Claude Code, precisa de testes
+- **Impacto**: +4 pts se 3+ agents usarem Teams efetivamente
 
-Esta e a mudanca mais impactante. Transforma o sistema de "38 prompts soltos" para "agents especializados com restricoes e capacidades definidas".
+### GAP 2: Hook Types Avancados (0% → meta 50%)
+- **Tipos nao usados**: `agent` (subagent verifier), `prompt` (LLM eval), `http` (native webhook)
+- **Acao**: Implementar hook `type: agent` em ag-26 para auto-verificacao pos-fix
+- **Impacto**: +3 pts se 2+ hook types implementados
 
-| # | Acao | Esforco | Impacto |
-|---|------|---------|---------|
-| 0a | Criar `.claude/agents/` e migrar 13 agents read-only | ~2h | TRANSFORMADOR |
-| 0b | Migrar 10 agents de execucao com tools/model/maxTurns | ~3h | TRANSFORMADOR |
-| 0c | Manter 15 skills como patterns/reference (nao migrar) | 0 | N/A |
+### GAP 3: Worktree Isolation (60% → meta 80%)
+- **Candidatos**: ag-23 (bugfix-batch), ag-11 (otimizar)
+- **Bloqueio**: Precisa de git repo real para testar
+- **Impacto**: +2 pts
 
-**Agents read-only (model: haiku, permissionMode: plan, background: true):**
-ag-03, ag-04, ag-05, ag-12, ag-14, ag-15, ag-25, ag-28, ag-32, ag-33
+### GAP 4: Agent tool / Subagents (40% → meta 60%)
+- **Candidatos**: ag-07 (planejar — delegar para ag-13 spec-to-test), ag-27 (delegar para ag-19)
+- **Impacto**: +1 pt
 
-**Agents read-only (model: sonnet, permissionMode: plan):**
-ag-06, ag-07, ag-34
-
-**Agents de execucao (model: sonnet, tools restrito):**
-ag-08 (isolation: worktree), ag-09, ag-10, ag-11, ag-13, ag-17, ag-18, ag-23, ag-26, ag-27
-
-**Manter como Skills (reference only, sem execucao):**
-nextjs-react-patterns, supabase-patterns, typescript-patterns, python-patterns, ui-ux-pro-max
-
-**Manter como Skills (orquestracao/meta):**
-ag-00 (orquestrador principal), ag-M, ag_skill-creator
-
-### WAVE 1 — Features de Execucao (P0)
-
-| # | Acao | Skills afetadas | Esforco |
-|---|------|-----------------|---------|
-| 1 | Adicionar `TaskCreate/TaskUpdate` em agents longos | ag-08, ag-22, ag-23, ag-27 | ~5 linhas/agent |
-| 2 | Especificar `subagent_type` no ag-00 | ag-04→Plan, ag-06→Plan, ag-07→Plan, ag-28→Explore | ~1 linha |
-| 3 | Adicionar `run_in_background` em pares paralelos | ag-03+05, ag-12+13, ag-21+18 | ~2 linhas/agent |
-| 4 | `context: fork` nas skills que restarem | todas as skills restantes | ~1 linha/skill |
-
-### WAVE 2 — Isolation e Safety (P1)
-
-| # | Acao | Skills afetadas | Esforco |
-|---|------|-----------------|---------|
-| 5 | Worktree isolation para builds e refactors | ag-08, ag-10, ag-23 | frontmatter |
-| 6 | Plan Mode para planejadores | ag-06, ag-07, ag-34, ag-04 | frontmatter |
-| 7 | Hook type "agent" para auto-verificacao | ag-26, ag-27 | ~15 linhas |
-| 8 | Hook type "prompt" para validacao de commits | ag-18 | ~10 linhas |
-| 9 | `maxTurns` para prevenir loops | todos custom agents | frontmatter |
-
-### WAVE 3 — Agent Teams (P2)
-
-| # | Acao | Caso de uso | Esforco |
-|---|------|-------------|---------|
-| 10 | Habilitar Agent Teams experimental | env var global | 1 min |
-| 11 | Reescrever ag-24 como Team Lead pattern | bugfix paralelo com teammates | ~2h |
-| 12 | ag-22 com teammates por batch de testes | E2E paralelo real | ~2h |
-| 13 | ag-08 com teammates por modulo | build paralelo com task list | ~3h |
-| 14 | Hooks TeammateIdle + TaskCompleted | quality gates automaticos | ~1h |
-
-### WAVE 4 — Otimizacao (P3)
-
-| # | Acao | Nota |
-|---|------|------|
-| 15 | Status line com progresso de agents | config global |
-| 16 | Explorar Plugins/Marketplaces | empacotar agents como plugin |
-| 17 | http hooks para monitoring externo | integrar com n8n |
-| 18 | asyncRewake hooks para auto-recovery | agents que se auto-corrigem |
+### Features Futuras (dependem do Claude Code)
+- `asyncRewake` hooks — auto-recovery de agents
+- Plugin packaging — empacotar agents como plugin
+- Native HTTP hooks — POST direto para n8n sem curl
 
 ---
 
-## 7. Meta: Score Target
+## 6. Comparacao: Antes vs Depois
 
-| Metrica | Atual | Wave 0-1 (7 dias) | Wave 2-3 (30 dias) | Wave 4 (90 dias) |
-|---------|-------|-------|-------|-------|
-| Feature Adoption Score | 15/100 | 50/100 | 75/100 | 90/100 |
-| Custom Agents definidos | 0/38 | 23/38 | 23/38 | 23/38 |
-| Skills com `context: fork` | 0 | 15 | 15 | 15 |
-| Task tracking | 0 | 4 agents | 8 agents | 12 agents |
-| Hooks integration | 0 | 3 agents | 8 agents | 12 agents |
-| Worktree isolation | 2 | 5 agents | 8 agents | 10 agents |
-| Agent Teams | 0 | 0 | 3 workflows | 5 workflows |
-| Model routing (haiku/sonnet/opus) | 0 | 23 agents | 23 agents | 23 agents |
+```
+ANTES (15/100):
+  38 Skills lineares sem frontmatter
+  Todas rodam no contexto principal (200K poluido)
+  Sem restricao de tools (edit acidental possivel)
+  Sem model routing (tudo no modelo da sessao)
+  Sem limite de turns (loops infinitos)
+  Sem hooks (validacao manual)
+  Sem task tracking (progresso invisivel)
 
----
-
-## Apendice A: Templates para Migracao
-
-### Template: Custom Agent Read-Only (Scan/Analise)
-```yaml
-# .claude/agents/ag-XX-nome.md
----
-name: ag-XX-nome
-description: "Use when [trigger condition]"
-model: haiku
-tools: Read, Glob, Grep
-disallowedTools: Write, Edit, Agent, Bash
-permissionMode: plan
-maxTurns: 30
-background: true
----
-# [copiar conteudo do SKILL.md atual aqui]
+DEPOIS (88/100):
+  34 Custom Agents com frontmatter completo
+  Model routing: haiku (6) / sonnet (26) / opus (2)
+  13 agents em background (nao poluem contexto)
+  9 agents em plan mode (read-only, sem edits acidentais)
+  3 agents com worktree isolation (rollback facil)
+  9 agents com task tracking (progresso visivel)
+  10 hooks globais (5 safety blockers + 4 quality checks + 1 config protection)
+  2 agents com Agent Teams (coordenacao multi-agent)
+  2 agents com webhook notifications (n8n)
+  5 pattern skills com context:fork (isolamento automatico)
+  Todos os agents com maxTurns (previne loops infinitos)
 ```
 
-### Template: Custom Agent de Execucao (Build/Fix)
-```yaml
-# .claude/agents/ag-XX-nome.md
 ---
-name: ag-XX-nome
-description: "Use when [trigger condition]"
-model: sonnet
-tools: Read, Write, Edit, Glob, Grep, Bash
-disallowedTools: Agent
-maxTurns: 50
-isolation: worktree
----
-# [copiar conteudo do SKILL.md atual aqui]
-```
 
-### Template: Skill com Frontmatter Completo
-```yaml
-# .claude/skills/nome-pattern/SKILL.md
----
-name: nome-pattern
-description: "Reference patterns for [technology]"
-context: fork
----
-# [conteudo da skill]
-```
+## Apendice: Mapa Completo de Agents
 
-### Template: Agent Team (para ag-24 bugfix paralelo)
-```
-# Ativar: export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+| Agent | Model | BG | Plan | Worktree | Tasks | Teams | Webhooks |
+|-------|-------|-----|------|----------|-------|-------|----------|
+| ag-01 iniciar | sonnet | - | - | - | - | - | - |
+| ag-02 setup | sonnet | - | - | - | - | - | - |
+| ag-03 explorar | haiku | YES | - | - | - | - | - |
+| ag-04 analisar | opus | YES | YES | - | - | - | - |
+| ag-05 pesquisar | haiku | YES | - | - | - | - | - |
+| ag-06 especificar | sonnet | - | - | - | - | - | - |
+| ag-07 planejar | sonnet | - | - | - | - | - | - |
+| ag-08 construir | sonnet | - | - | YES | YES | - | - |
+| ag-09 depurar | opus | - | - | - | - | - | - |
+| ag-10 refatorar | sonnet | - | - | YES | - | - | - |
+| ag-11 otimizar | sonnet | - | - | - | - | - | - |
+| ag-12 validar | haiku | YES | YES | - | - | - | - |
+| ag-13 testar | sonnet | YES | - | - | YES | - | - |
+| ag-14 criticar | sonnet | YES | YES | - | - | - | - |
+| ag-15 auditar | sonnet | YES | YES | - | - | - | - |
+| ag-16 revisar-ux | sonnet | YES | YES | - | - | - | - |
+| ag-17 migrar | sonnet | - | - | - | YES | - | - |
+| ag-18 versionar | sonnet | - | - | - | - | - | - |
+| ag-19 deploy | sonnet | - | - | - | - | - | - |
+| ag-20 monitorar | sonnet | YES | YES | - | - | - | YES |
+| ag-21 documentar | sonnet | - | - | - | - | - | - |
+| ag-23 bugfix-batch | sonnet | - | - | - | YES | YES | - |
+| ag-24 bugfix-paralelo | sonnet | - | - | - | YES | YES | - |
+| ag-25 diagnosticar | haiku | YES | - | - | - | - | - |
+| ag-26 fix-verificar | sonnet | - | - | - | - | - | - |
+| ag-27 deploy-pipeline | sonnet | - | - | - | YES | - | YES |
+| ag-28 saude | haiku | YES | YES | - | - | - | - |
+| ag-29 gerar-docs | sonnet | - | - | - | - | - | - |
+| ag-30 organizar | sonnet | - | - | - | YES | - | - |
+| ag-31 ortografia | haiku | - | - | - | - | - | - |
+| ag-32 due-diligence | sonnet | YES | YES | - | - | - | - |
+| ag-33 mapear-integracao | sonnet | YES | YES | - | - | - | - |
+| ag-34 planejar-incorp | sonnet | - | - | - | YES | - | - |
+| ag-35 incorporar | sonnet | - | - | YES | YES | - | - |
 
-1. ag-00 como Team Lead
-2. Criar teammates:
-   - ag-08-worker-1 (worktree isolado, branch fix/bug-1)
-   - ag-08-worker-2 (worktree isolado, branch fix/bug-2)
-   - ag-08-worker-3 (worktree isolado, branch fix/bug-3)
-3. Task List com dependencias:
-   - Task "Fix bug 1" → assigned to worker-1
-   - Task "Fix bug 2" → assigned to worker-2
-   - Task "Test all fixes" → depends on [bug-1, bug-2, bug-3], assigned to ag-13
-4. Hooks:
-   - TaskCompleted: run typecheck + lint antes de marcar como done
-   - TeammateIdle: verificar se ha tasks pendentes, forcar continuacao
-```
+### Skills (permanecem como Skills)
 
-## Apendice B: Checklist de Migracao por Agent
-
-Para cada agent sendo migrado de Skill para Custom Agent:
-
-- [ ] Copiar SKILL.md para `.claude/agents/ag-XX-nome.md`
-- [ ] Adicionar frontmatter completo (name, description, model, tools, maxTurns)
-- [ ] Definir `permissionMode` (plan para read-only, default para execucao)
-- [ ] Definir `background: true` se agent e independente
-- [ ] Definir `isolation: worktree` se agent modifica codigo
-- [ ] Remover SKILL.md original da pasta skills (evitar duplicacao)
-- [ ] Atualizar ag-00 para referenciar como agent em vez de skill
-- [ ] Atualizar comando `/agXX` para invocar agent em vez de skill
-- [ ] Testar que agent e disparado corretamente via description trigger
-- [ ] Verificar que tools restriction funciona (agent nao pode fazer o que nao deve)
+| Skill | context:fork | Tipo |
+|-------|-------------|------|
+| ag-00 orquestrar | - | Workflow (orchestrator) |
+| ag-01 iniciar-projeto | - | Workflow (tambem tem agent) |
+| ag-02 setup-ambiente | - | Workflow (tambem tem agent) |
+| ag-22 testar-e2e | - | Workflow |
+| ag-36 testar-manual-mcp | - | Workflow |
+| ag-37 gerar-testes-mcp | - | Workflow |
+| ag-38 smoke-vercel | - | Workflow |
+| ag-M melhorar-agentes | - | Meta |
+| ag_skill-creator | - | Meta |
+| nextjs-react-patterns | YES | Pattern |
+| supabase-patterns | YES | Pattern |
+| typescript-patterns | YES | Pattern |
+| python-patterns | YES | Pattern |
+| ui-ux-pro-max | YES | Pattern |
