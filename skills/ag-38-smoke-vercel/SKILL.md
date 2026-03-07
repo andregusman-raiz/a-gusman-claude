@@ -31,11 +31,8 @@ Diferenca de ag-22: ag-22 testa fluxos completos. ag-38 verifica apenas se o dep
 ## Modo 1: Suite Automatizada (preferido)
 
 ```bash
-# rAIz-AI-Prof
+# Run smoke tests against a Vercel deploy URL
 PLAYWRIGHT_TEST_BASE_URL=[url] npx playwright test --project=smoke
-
-# raiz-platform
-PLAYWRIGHT_BASE_URL=[url] npx playwright test --project=smoke
 ```
 
 ## Modo 2: MCP Exploratorio

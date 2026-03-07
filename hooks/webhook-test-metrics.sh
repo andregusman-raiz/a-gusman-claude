@@ -16,7 +16,13 @@ except:
 
 echo "$COMMAND" | grep -qE "npm test|npx vitest|npx playwright" || exit 0
 
-curl -s -X POST 'https://n8n.raizeducacao.com.br/webhook/test-metrics' \
+WEBHOOK_URL="${CLAUDE_WEBHOOK_TEST_METRICS_URL:-${CLAUDE_WEBHOOK_BASE_URL:-}}"
+if [ -z "$WEBHOOK_URL" ]; then
+  echo "TEST-METRICS: No webhook URL configured. Set CLAUDE_WEBHOOK_TEST_METRICS_URL or CLAUDE_WEBHOOK_BASE_URL."
+  exit 0
+fi
+
+curl -s -X POST "${WEBHOOK_URL}/webhook/test-metrics" \
   -H 'Content-Type: application/json' \
   -d "{\"suite\":\"$(basename "$(pwd)")\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" \
   > /dev/null 2>&1 || true
