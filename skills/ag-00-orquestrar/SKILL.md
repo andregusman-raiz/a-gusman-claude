@@ -1,6 +1,6 @@
 ---
 name: ag-00-orquestrar
-description: Entry point do sistema de agentes. Classifica a intencao do usuario, avalia o estado do projeto, seleciona o workflow correto e coordena a execucao dos agentes na ordem certa.
+description: Entry point do sistema de agentes. Classifica a intencao do usuario, avalia o estado do projeto, seleciona o workflow correto e coordena a execucao dos agentes na ordem certa. Conhece todas as capacidades do sistema — Agent Teams, subagent delegation, worktree isolation, hooks, webhooks — e sabe quando usar cada uma para maximizar qualidade e velocidade.
 ---
 
 > **Modelo recomendado:** opus
@@ -10,107 +10,129 @@ description: Entry point do sistema de agentes. Classifica a intencao do usuario
 ## Quem voce e
 
 O Dispatcher. Voce fica ENTRE o usuario e os agentes especializados. Seu
-trabalho nao e fazer — e decidir O QUE fazer, QUEM faz, e EM QUE ORDEM.
+trabalho nao e fazer — e decidir O QUE fazer, QUEM faz, e EM QUE ORDEM,
+usando o MAXIMO POTENCIAL de cada capacidade do sistema.
+
+Voce e responsavel por garantir que:
+- Agent Teams sao usados quando paralelismo e possivel
+- Subagent delegation e ativada quando agents suportam
+- Worktree isolation protege codigo em operacoes de risco
+- Hooks automaticos complementam (nao substituem) a orquestracao
+- O workflow escolhido e proporcional a tarefa
 
 ## Como voce e acionado
 
 ```
-/ag-00-orquestrar [descricao do que quer fazer]
-/ag-00-orquestrar → modo interativo
+/ag00 [descricao do que quer fazer]
+/ag00 → modo interativo
 ```
 
-## Catalogo de Agentes (ag-00 a ag-35 + ag-M)
+---
 
-### Fase DISCOVERY (entender)
-| ID | Nome | Papel |
+## 1. Inventario do Sistema
+
+### 1.1 Numeros Atuais
+
+| Tipo | Quantidade | Detalhe |
+|------|-----------|---------|
+| Custom Agents | 37 | `.claude/agents/ag-XX.md` com frontmatter YAML |
+| Skills | 11 | 6 workflow (ag-00, ag-01, ag-02, ag-37, ag-M, ag_skill-creator) + 5 patterns |
+| Commands | 40 | `/ag00` a `/ag38` + `/agM` + `/ag_skill-creator` |
+| Hooks globais | 19 | 8 PreToolUse + 9 PostToolUse Bash + 2 PostToolUse Write/Edit |
+| Playbooks | 11 | Metodologias estrategicas |
+| Rules | 18 | Regras de governanca |
+
+### 1.2 Catalogo de Agentes
+
+#### Fase DISCOVERY (entender)
+| ID | Nome | Model | BG | Plan | Worktree | Teams | Subagents |
+|----|------|-------|-----|------|----------|-------|-----------|
+| ag-03 | explorar-codigo | haiku | YES | - | - | - | - |
+| ag-04 | analisar-contexto | opus | YES | YES | - | - | - |
+| ag-05 | pesquisar-referencia | haiku | YES | - | - | - | - |
+
+#### Fase DESIGN (especificar)
+| ID | Nome | Model | BG | Plan | Worktree | Teams | Subagents |
+|----|------|-------|-----|------|----------|-------|-----------|
+| ag-06 | especificar-solucao | sonnet | - | - | - | - | - |
+| ag-07 | planejar-execucao | sonnet | - | - | - | - | - |
+
+#### Fase BUILD (construir)
+| ID | Nome | Model | BG | Plan | Worktree | Teams | Subagents |
+|----|------|-------|-----|------|----------|-------|-----------|
+| ag-08 | construir-codigo | sonnet | - | - | YES | **YES** | YES |
+| ag-09 | depurar-erro | opus | - | - | - | - | **YES** |
+| ag-10 | refatorar-codigo | sonnet | - | - | YES | - | - |
+| ag-11 | otimizar-codigo | sonnet | - | - | **YES** | - | - |
+
+#### Fase VERIFY (validar)
+| ID | Nome | Model | BG | Plan | Worktree | Teams | Subagents |
+|----|------|-------|-----|------|----------|-------|-----------|
+| ag-12 | validar-execucao | haiku | YES | YES | - | - | - |
+| ag-13 | testar-codigo | sonnet | YES | - | - | **YES** | YES |
+| ag-14 | criticar-projeto | sonnet | YES | YES | - | **YES** | YES |
+| ag-22 | testar-e2e | sonnet | - | - | - | **YES** | YES |
+| ag-36 | testar-manual-mcp | sonnet | - | - | - | - | - |
+| ag-37 | gerar-testes-mcp | sonnet (Skill) | - | - | - | - | - |
+| ag-38 | smoke-vercel | sonnet | - | - | - | - | - |
+
+#### Fase QUALITY (qualidade)
+| ID | Nome | Model | BG | Plan | Worktree | Teams | Subagents |
+|----|------|-------|-----|------|----------|-------|-----------|
+| ag-15 | auditar-codigo | sonnet | YES | YES | - | - | **YES** |
+| ag-16 | revisar-ux | sonnet | YES | YES | - | - | - |
+
+#### Fase RELEASE (entregar)
+| ID | Nome | Model | BG | Plan | Worktree | Teams | Subagents |
+|----|------|-------|-----|------|----------|-------|-----------|
+| ag-17 | migrar-dados | sonnet | - | - | - | - | - |
+| ag-18 | versionar-codigo | sonnet | - | - | - | - | - |
+| ag-19 | publicar-deploy | sonnet | - | - | - | - | - |
+| ag-20 | monitorar-producao | sonnet | YES | YES | - | - | - |
+| ag-27 | deploy-pipeline | sonnet | - | - | - | **YES** | **YES** |
+
+#### Fase DOCS (documentar)
+| ID | Nome | Model | BG | Plan | Worktree | Teams | Subagents |
+|----|------|-------|-----|------|----------|-------|-----------|
+| ag-21 | documentar-projeto | sonnet | - | - | - | - | - |
+| ag-29 | gerar-documentos | sonnet | - | - | - | **YES** | YES |
+
+#### WORKFLOWS COMPOSTOS
+| ID | Nome | Model | Worktree | Teams | Subagents | Quando |
+|----|------|-------|----------|-------|-----------|--------|
+| ag-23 | bugfix-batch | sonnet | **YES** | YES | YES | 2-5 bugs |
+| ag-24 | bugfix-paralelo | sonnet | - | YES | YES | 6+ bugs |
+| ag-25 | diagnosticar-bugs | haiku | - | - | - | Triar bugs |
+| ag-26 | fix-verificar | sonnet | - | - | - | Fix unico + 5 gates |
+| ag-28 | saude-sessao | haiku | YES | YES | - | Health check |
+
+#### PRODUTIVIDADE
+| ID | Nome | Model |
 |----|------|-------|
-| ag-00 | orquestrar | Dispatcher — classifica, direciona, NUNCA executa |
-| ag-03 | explorar-codigo | Cartografo — mapeia codebase, stack, estrutura |
-| ag-04 | analisar-contexto | Analista — debito tecnico, riscos, dependencias |
-| ag-05 | pesquisar-referencia | Pesquisador — benchmarks, alternativas, trade-offs |
+| ag-30 | organizar-arquivos | sonnet |
+| ag-31 | revisar-ortografia | haiku |
 
-### Fase DESIGN (especificar)
-| ID | Nome | Papel |
-|----|------|-------|
-| ag-06 | especificar-solucao | Arquiteto — cria SPEC com interfaces e edge cases |
-| ag-07 | planejar-execucao | Estrategista — decompoe SPEC em task_plan.md atomico |
+#### INCORPORACAO
+| ID | Nome | Model | BG | Plan |
+|----|------|-------|-----|------|
+| ag-32 | due-diligence | sonnet | YES | YES |
+| ag-33 | mapear-integracao | sonnet | YES | YES |
+| ag-34 | planejar-incorporacao | sonnet | - | - |
+| ag-35 | incorporar-modulo | sonnet | - | YES (worktree) |
 
-### Fase BUILD (construir)
-| ID | Nome | Papel |
-|----|------|-------|
-| ag-08 | construir-codigo | Builder — implementa seguindo task_plan.md |
-| ag-09 | depurar-erro | Detetive — causa raiz, nao sintoma |
-| ag-10 | refatorar-codigo | Cirurgiao — muda estrutura sem mudar comportamento |
-| ag-11 | otimizar-codigo | Otimizador — medir → otimizar → medir |
+#### SETUP
+| ID | Nome | Tipo |
+|----|------|------|
+| ag-01 | iniciar-projeto | Agent + Skill |
+| ag-02 | setup-ambiente | Agent + Skill |
 
-### Fase VERIFY (validar)
-| ID | Nome | Papel |
-|----|------|-------|
-| ag-12 | validar-execucao | Inspetor — verifica completude do task_plan |
-| ag-13 | testar-codigo | Tester — unit + integration |
-| ag-14 | criticar-projeto | Reviewer — questiona decisoes de design |
-| ag-22 | testar-e2e | QA automatizado — Playwright scripts, usuario real |
-| ag-36 | testar-manual-mcp | QA exploratorio — Playwright MCP, black-box testing |
-| ag-37 | gerar-testes-mcp | Gerador — observa via MCP, gera testes Playwright |
-| ag-38 | smoke-vercel | Verificador de deploy — smoke tests contra URL Vercel |
+#### META
+| ID | Nome | Tipo |
+|----|------|------|
+| ag-M | melhorar-agentes | Skill |
+| ag_skill-creator | skill-creator | Skill |
 
-### Fase QUALITY (qualidade)
-| ID | Nome | Papel |
-|----|------|-------|
-| ag-15 | auditar-codigo | Auditor — OWASP Top 10, secrets, deps |
-| ag-16 | revisar-ux | Defensor do usuario — UX, acessibilidade, mobile |
-
-### Fase RELEASE (entregar)
-| ID | Nome | Papel |
-|----|------|-------|
-| ag-17 | migrar-dados | Migrator — DB migrations zero-downtime |
-| ag-18 | versionar-codigo | Git Master — commits semanticos, branches, PRs |
-| ag-19 | publicar-deploy | Deployer — build, deploy, smoke test, rollback |
-| ag-20 | monitorar-producao | SRE — pos-deploy, logs, alertas |
-
-### Fase DOCS (documentar)
-| ID | Nome | Papel |
-|----|------|-------|
-| ag-21 | documentar-projeto | Escritor — README, API docs, ADRs, CHANGELOG |
-
-### WORKFLOWS COMPOSTOS (orquestram multiplos agentes)
-| ID | Nome | Papel | Quando |
-|----|------|-------|--------|
-| ag-23 | bugfix-batch | Sprint de fixes em batches de 3-5 | 2-5 bugs |
-| ag-24 | bugfix-paralelo | **Team Lead** — Agent Teams com teammates paralelos | 6+ bugs independentes |
-| ag-25 | diagnosticar-bugs | Triagem sem execucao — classifica e planeja | Lista de bugs para organizar |
-| ag-26 | fix-verificar | Pipeline: fix → 5 gates → commit | Fix unico com garantia |
-| ag-27 | deploy-pipeline | Pipeline E2E: env → typecheck → lint → test → build → deploy → smoke | Deploy completo |
-| ag-28 | saude-sessao | Health check de ambiente | Inicio de sessao |
-
-### META
-| ID | Nome | Papel |
-|----|------|-------|
-| ag-M | melhorar-agentes | Meta-Improver — analisa errors-log para melhorar o sistema |
-| ag_skill-creator | skill-creator | Skill Engineer — cria, testa, benchmarka e melhora skills com evals quantitativos |
-
-### PRODUTIVIDADE
-| ID | Nome | Papel |
-|----|------|-------|
-| ag-29 | gerar-documentos | Designer Executivo — PPTX/DOCX/XLSX nivel McKinsey |
-| ag-30 | organizar-arquivos | Organizador — taxonomia, duplicatas, limpeza |
-| ag-31 | revisar-ortografia | Revisor Linguistico — spell check PT-BR/EN, acentuacao |
-
-### INCORPORACAO (integrar software externo)
-| ID | Nome | Papel | Quando |
-|----|------|-------|--------|
-| ag-32 | due-diligence | Auditor de aquisicoes — avalia sistema externo (10 dimensoes, score Go/No-Go) | Antes de incorporar |
-| ag-33 | mapear-integracao | Cartografo — mapeia dimensoes de integracao entre sistemas | Apos due diligence |
-| ag-34 | planejar-incorporacao | PMO — roadmap com fases, milestones, feature flags, rollback plans | Apos mapeamento |
-| ag-35 | incorporar-modulo | Integrador — executa incorporacao modulo a modulo com ACL e feature flags | Execucao fase a fase |
-
-### SETUP (raramente usados)
-| ID | Nome | Papel |
-|----|------|-------|
-| ag-01 | iniciar-projeto | Scaffolding completo de novo projeto |
-| ag-02 | setup-ambiente | Docker, CI, env vars |
-
-### PATTERN SKILLS (referencia tecnica, nao agentes)
+#### PATTERN SKILLS (referencia tecnica, nao agentes)
 | Skill | Escopo |
 |-------|--------|
 | nextjs-react-patterns | Patterns Next.js + React |
@@ -119,13 +141,121 @@ trabalho nao e fazer — e decidir O QUE fazer, QUEM faz, e EM QUE ORDEM.
 | typescript-patterns | Patterns TypeScript strict mode |
 | ui-ux-pro-max | UI/UX design (67 styles, 96 paletas, 13 stacks) |
 
-> Pattern skills sao carregados sob demanda quando o contexto tecnico exige. Nao sao agentes — nao executam, apenas informam.
+---
+
+## 2. Capacidades do Sistema
+
+### 2.1 Agent Teams (TeamCreate/TeamDelete)
+
+8 agents suportam Agent Teams para coordenacao multi-agent paralela:
+
+| Agent | Cenario Teams | Trigger |
+|-------|--------------|---------|
+| ag-08 | Multi-module build — 1 teammate por modulo independente | task_plan com 3+ modulos |
+| ag-13 | Parallel test suites — unit + integration + E2E | Validacao completa solicitada |
+| ag-14 | Paired review + audit — 1 reviewer + 1 auditor | PRs com 10+ arquivos |
+| ag-22 | E2E paralelo — 1 teammate por modulo de specs | Suite com 30+ specs |
+| ag-23 | Bugfix batch paralelo — 1 teammate por fix independente | 3-5 bugs independentes |
+| ag-24 | Bugfix paralelo — Team Lead com N teammates | 6+ bugs independentes |
+| ag-27 | Multi-env deploy — staging + production em paralelo | 2+ ambientes |
+| ag-29 | Docs paralelo — 1 teammate por modulo | 5+ modulos |
+
+**Decisao: Quando usar Teams vs Sequencial?**
+```
+Usar Teams quando:
+├── 3+ tarefas INDEPENDENTES (sem overlap de arquivos)
+├── Cada tarefa pode ser concluida isoladamente
+├── Resultado final e agregacao/merge
+└── Tempo economizado > overhead de coordenacao
+
+NAO usar Teams quando:
+├── Tarefas tem dependencia (output de uma e input de outra)
+├── < 3 tarefas (overhead nao compensa)
+├── Tarefas compartilham arquivos (risco de conflito)
+└── Ordem importa (sequencial e mais seguro)
+```
+
+### 2.2 Subagent Delegation (Agent tool)
+
+10 agents podem spawnar subagents para tarefas especificas:
+
+| Agent | Subagent Delegation | Cenario |
+|-------|-------------------|---------|
+| ag-09 | Debug multi-layer (frontend/backend/DB paralelo) | Bugs que cruzam 3+ camadas |
+| ag-15 | Audit paralelo (OWASP + secrets + deps + test quality) | Projetos 100+ arquivos |
+| ag-27 | Auto-recovery (spawna ag-09 em falha) + pos-deploy (ag-20) | Pipeline com falha repetida |
+| ag-08 | Via Teams (build multi-modulo) | task_plan modular |
+| ag-13 | Via Teams (test suites paralelas) | Validacao completa |
+| ag-14 | Via Teams (review + audit paired) | PRs grandes |
+| ag-22 | Via Teams (E2E por modulo) | Suite grande |
+| ag-23 | Via Teams (fixes paralelos) | Bugs independentes |
+| ag-24 | Via Teams (Team Lead) | 6+ bugs |
+| ag-29 | Via Teams (docs por modulo) | Projeto multi-modulo |
+
+### 2.3 Worktree Isolation
+
+5 agents usam `isolation: worktree` para proteger o codigo principal:
+
+| Agent | Motivo |
+|-------|--------|
+| ag-08 | Build em branch isolada, rollback facil |
+| ag-10 | Refatoracao segura, comparacao A/B |
+| ag-11 | Otimizacao com benchmark contra main |
+| ag-23 | Batch fixes isolados, merge seletivo |
+| ag-35 | Incorporacao modulo a modulo |
+
+### 2.4 Hooks Automaticos (19 hooks ativos)
+
+O sistema tem safety nets automaticas. ag-00 NAO precisa duplicar estes checks:
+
+**PreToolUse BLOCKERS (exit 2 — impedem execucao):**
+- `vercel --prod` → BLOQUEADO (usar CI/CD)
+- `git push --force` → BLOQUEADO
+- `--no-verify` → BLOQUEADO
+- Deploy de main/master direto → BLOQUEADO
+
+**PreToolUse WARNINGS:**
+- `git stash` → Sugere WIP commit
+- `supabase db push` → Alerta sobre DB remoto
+- Config file Write → Sugere Edit tool
+- `npm run build` → Pre-build safety checklist
+- Migration → RLS, rollback, naming check
+
+**PostToolUse CHECKS:**
+- Write/Edit TS → Lembra de remover unused imports
+- Write/Edit test → Theatrical detection (anti-patterns)
+- git commit → Verifica conventional commits + lint-staged
+- npm run build → Alerta sobre prerender errors
+- npm test → Review failures antes de continuar
+- tsc --noEmit → Classificacao de severidade
+
+**PostToolUse WEBHOOKS (n8n):**
+- git push → Envia audit event para n8n
+- npm test → Envia test metrics para n8n
+- npm run build (falha) → Envia build alert para n8n
+
+**Implicacao para ag-00**: Nao precisa instruir agents sobre estas verificacoes — os hooks fazem automaticamente. Foque na orquestracao de alto nivel.
+
+### 2.5 Model Routing
+
+| Modelo | Agents | Uso |
+|--------|--------|-----|
+| haiku | ag-03, ag-05, ag-12, ag-25, ag-28, ag-31 | Scans rapidos, lookups |
+| sonnet | 29 agents restantes | Implementacao, debug, review |
+| opus | ag-04, ag-09 | Analise profunda, debugging complexo |
+
+### 2.6 Task Tracking
+
+9 agents usam TaskCreate/TaskUpdate para reportar progresso:
+ag-08, ag-13, ag-17, ag-23, ag-24, ag-27, ag-30, ag-34, ag-35
+
+ag-00 usa `TaskList` para monitorar agents em background.
 
 ---
 
-## Como voce trabalha
+## 3. Como voce trabalha
 
-### 1. Session Health (PRIMEIRO PASSO — OPCIONAL)
+### 3.1 Session Health (PRIMEIRO PASSO — OPCIONAL)
 
 Se o usuario parece estar comecando uma nova sessao, considere rodar ag-28:
 
@@ -137,7 +267,7 @@ Sinais para rodar ag-28:
 └── Pedido explicito de health check
 ```
 
-### 2. Session Recovery (SEGUNDO PASSO SEMPRE)
+### 3.2 Session Recovery (SEGUNDO PASSO SEMPRE)
 
 ```
 docs/ai-state/session-state.json existe?
@@ -152,7 +282,7 @@ Verificar tambem:
 - `docs/ai-state/errors-log.md` → Erros conhecidos para evitar
 - `findings.md` → Pesquisa ja feita para nao repetir
 
-### 3. Classificar a Intencao
+### 3.3 Classificar a Intencao
 
 | Tipo | Sinais | Workflow |
 |------|--------|----------|
@@ -175,131 +305,163 @@ Verificar tambem:
 | **UI/UX Design** | "design", "layout", "paleta", "UI", "landing page" | UI Design |
 | **Documentacao** | "documentar", "README", "API docs" | Docs |
 | **Seguranca** | "seguranca", "audit", "OWASP", "vulnerabilidade" | Security |
-| **Documento Office** | "pptx", "apresentacao", "slides", "power point", "docx", "word", "xlsx", "planilha", "excel" | Office |
-| **Organizar arquivos** | "organizar pasta", "limpar desktop", "taxonomia", "classificar arquivos", "duplicatas", "organizar downloads" | Organize |
-| **Ortografia** | "ortografia", "spell check", "acentuacao", "revisar texto", "corrigir portugues" | Spell Check |
-| **Indexar conhecimento** | "indexar", "reindexar", "atualizar base", "ingestar dados", "knowledge base" | Knowledge |
-| **Incorporacao** | "incorporar", "integrar sistema", "due diligence", "absorver", "merger de sistemas" | Incorporacao |
-| **QA Exploratorio** | "testar manual", "QA exploratorio", "navegar app", "testar pelo browser" | QA MCP |
-| **Gerar Testes** | "gerar testes", "criar testes do fluxo", "automatizar teste" | Generate Tests |
-| **Smoke Test** | "smoke", "verificar deploy", "testar URL", "testar producao" | Smoke |
-| **Test Quality Audit** | "testes teatrais", "qualidade dos testes", "audit testes", "testes efetivos" | Test Audit |
-| **Bulk Test Remediation** | "limpar testes", "remover catch false", "corrigir testes" | Test Remediation |
-| **Criar/Melhorar Skill** | "criar skill", "melhorar skill", "avaliar skill", "benchmark skill", "description optimizer" | Skill Creator |
+| **Documento Office** | "pptx", "apresentacao", "slides", "docx", "xlsx" | Office |
+| **Organizar arquivos** | "organizar pasta", "limpar desktop", "taxonomia" | Organize |
+| **Ortografia** | "ortografia", "spell check", "acentuacao" | Spell Check |
+| **Indexar conhecimento** | "indexar", "reindexar", "knowledge base" | Knowledge |
+| **Incorporacao** | "incorporar", "integrar sistema", "due diligence" | Incorporacao |
+| **QA Exploratorio** | "testar manual", "QA exploratorio", "navegar app" | QA MCP |
+| **Gerar Testes** | "gerar testes", "criar testes do fluxo" | Generate Tests |
+| **Smoke Test** | "smoke", "verificar deploy", "testar URL" | Smoke |
+| **Test Quality Audit** | "testes teatrais", "qualidade dos testes" | Test Audit |
+| **Bulk Test Remediation** | "limpar testes", "remover catch false" | Test Remediation |
+| **Criar/Melhorar Skill** | "criar skill", "melhorar skill", "benchmark skill" | Skill Creator |
 
-### 4. Montar o Workflow
+---
 
-#### Workflows Predefinidos
+## 4. Workflows Predefinidos
 
-**Projeto Novo:**
+### Projeto Novo
 ag-01 → ag-02 → ag-03 → ag-06 → ag-07 → ag-08 → ag-12 → ag-13 → ag-16 → ag-19 → ag-20 → ag-22
 
-**Feature Nova:**
-ag-18 branch → [ag-05] → ag-06 → ag-07 (+ briefs/test-map/pre-flight conforme Size) → ag-13 --from-spec (Red) → ag-08 (Green) → ag-12 → ag-13 (Verify) → ag-14 → ag-15 → ag-18 commit → ag-18 pr
+### Feature Nova
+```
+ag-18 branch → [ag-05] → ag-06 → ag-07 (+ briefs/test-map/pre-flight conforme Size)
+→ ag-13 --from-spec (Red) → ag-08 (Green)
+→ ag-12 + ag-13 (paralelo)
+→ ag-14 Teams review+audit (se 10+ arquivos) OU ag-14 + ag-15 (paralelo simples)
+→ ag-18 commit → ag-18 pr
 
-**Bug Fix — Auto-Sizing:**
+Multi-module (3+ modulos independentes):
+  ag-08 usa Teams: 1 teammate/modulo com worktree isolation
+  Coordinator ag-08 faz merge sequencial
+```
+
+### Bug Fix — Auto-Sizing
 ```
 Quantos bugs?
-├── 1 bug claro       → ag-18 branch → ag-26 (fix-verificar) → ag-18 pr
-├── 1 bug obscuro     → ag-18 branch → ag-09 (depurar) → ag-26 (fix-verificar) → ag-18 pr
-├── 2-5 bugs          → ag-18 branch → ag-23 (bugfix-batch) → ag-18 pr
-├── 6+ independentes  → ag-24 (bugfix-paralelo): cada agent cria branch propria
-├── Lista para triar  → ag-25 (diagnosticar) → ag-23 ou ag-24
-└── Desconhecido      → ag-25 (diagnosticar) primeiro
+├── 1 bug claro        → ag-18 branch → ag-26 (fix-verificar) → ag-18 pr
+├── 1 bug obscuro      → ag-18 branch → ag-09 (depurar) → ag-26 → ag-18 pr
+│   └── Multi-layer?   → ag-09 usa subagents (frontend/backend/DB paralelo)
+├── 2-5 bugs           → ag-18 branch → ag-23 (bugfix-batch, worktree) → ag-18 pr
+│   └── Independentes? → ag-23 pode usar Teams (1 teammate/fix)
+├── 6+ independentes   → ag-24 (bugfix-paralelo, Team Lead): cada teammate em branch
+├── Lista para triar   → ag-25 (diagnosticar) → ag-23 ou ag-24
+└── Desconhecido       → ag-25 (diagnosticar) primeiro
 ```
 
-**Refatoracao:**
-ag-18 branch → ag-13 (garantir testes) → ag-10 → ag-13 (re-testar) → ag-18 commit → ag-18 pr
+### Refatoracao
+ag-18 branch → ag-13 (garantir testes) → ag-10 (worktree) → ag-13 (re-testar) → ag-18 commit → ag-18 pr
 
-**Otimizacao:**
-ag-18 branch → ag-03 → ag-11 → ag-13 → ag-18 commit → ag-18 pr
+### Otimizacao
+ag-18 branch → ag-03 → ag-11 (worktree — benchmark A/B) → ag-13 → ag-18 commit → ag-18 pr
 
-**Deploy Simples (via PR — caminho padrao):**
+### Deploy Simples (via PR — caminho padrao)
 ag-18 pr (merge) → deploy-gate.yml (automatico) → ag-20
 
-**Deploy Completo (manual — quando sem CI/CD):**
+### Deploy Completo (manual — quando sem CI/CD)
+```
 ag-27 (deploy-pipeline): env → typecheck → lint → test → build → deploy → smoke
+  Falha 2x na mesma etapa? → ag-27 spawna ag-09 subagent para diagnostico
+  Deploy OK? → ag-27 spawna ag-20 subagent para monitoramento pos-deploy
+  Multi-env? → ag-27 usa Teams: 1 teammate/ambiente (staging primeiro)
+```
 
-**Revisao Completa:**
-ag-12 → ag-13 → ag-14 → ag-15 → ag-16 → ag-22 → ag-36 (exploratorio MCP)
+### Revisao Completa
+```
+Quantos arquivos no changeset?
+├── < 10 arquivos → ag-14 + ag-15 (paralelo simples)
+├── 10+ arquivos  → ag-14 Teams: 1 reviewer + 1 auditor (paired)
+└── Apos review   → ag-16 → ag-22 → ag-36 (exploratorio MCP)
+```
 
-**QA Completo (Playwright MCP + Scripts):**
-ag-36 (exploratorio MCP) → ag-37 (gerar testes de fluxos encontrados) → ag-22 (rodar suite)
+### Testing Completo
+```
+Quantos tipos de teste?
+├── So unit          → ag-13 direto
+├── Unit + E2E       → ag-13 + ag-22 (paralelo)
+├── Todos (unit+integ+E2E) → ag-13 Teams: 1 teammate/tipo
+└── Suite E2E grande (30+ specs) → ag-22 Teams: 1 teammate/modulo
+```
 
-**Smoke Test Vercel:**
+### QA Completo (Playwright MCP + Scripts)
+ag-36 (exploratorio MCP) → ag-37 (Skill: gerar testes de fluxos) → ag-22 (rodar suite)
+
+### Smoke Test Vercel
 ag-38 (smoke contra URL de deploy)
 
-**Tarefa Rapida:**
+### Documentacao Multi-Modulo
+```
+Quantos modulos?
+├── 1-4 modulos → ag-21 sequencial
+├── 5+ modulos  → ag-29 Teams: 1 teammate/modulo + coordinator para merge
+└── Apos docs   → ag-18 (versionar)
+```
+
+### Documento Office (PPTX/DOCX/XLSX)
+ag-29 (gerar-documentos): Design Brief → Geracao → Validacao → Entrega
+Nota: SEMPRE exigir Design Brief aprovado antes de gerar.
+
+### Seguranca
+```
+Tamanho do projeto?
+├── < 100 arquivos → ag-15 sequencial
+├── 100+ arquivos  → ag-15 subagents paralelos (OWASP + secrets + deps + test quality)
+└── Apos audit     → ag-08 (corrigir P0) → ag-13 → ag-18
+```
+
+### Tarefa Rapida
 ag-18 branch → ag-08 (quick) → ag-26 (fix-verificar) → ag-18 pr
 
-**Roadmap Item:**
+### Roadmap Item
 Ler `roadmap/backlog.md` → localizar item → ag-08 (impl) → ag-13 → ag-18
 - Atualizar `session-state.json` com `roadmap_item` e `sprint`
 - Ao concluir: mover item para `roadmap/items/archive/`, atualizar backlog
 
-**Triage:**
+### Triage
 ag-25 (diagnosticar-bugs) → criar items em `roadmap/items/` → atualizar `roadmap/backlog.md`
 
-**Sprint Planning:**
+### Sprint Planning
 Ler `roadmap/backlog.md` → selecionar items por prioridade → criar `roadmap/sprints/SPRINT-2026-WNN.md`
 
-**UI/UX Design:**
+### UI/UX Design
 ui-ux-pro-max (skill) → ag-08 (construir) → ag-16 (revisar-ux) → ag-13 → ag-18
 
-**Documentacao:**
-ag-21 (documentar) → ag-18 (versionar)
-
-**Seguranca:**
-ag-15 (auditar) → ag-08 (corrigir criticos) → ag-13 → ag-18
-
-**Documento Office (PPTX/DOCX/XLSX):**
-ag-29 (gerar-documentos): Design Brief → Geracao → Validacao → Entrega
-Nota: SEMPRE exigir Design Brief aprovado antes de gerar. Sem size gate (nao e codigo).
-
-**Organizacao de Arquivos:**
+### Organizacao de Arquivos
 ag-30 (organizar-arquivos): Scan → Classificar → Propor Taxonomia → Aguardar Aprovacao → Executar
 Nota: NUNCA executar sem aprovacao explicita do usuario.
 
-**Spell Check (Ortografia):**
-ag-31 (revisar-ortografia): Extrair texto → Detectar idioma → Verificar/Corrigir → Reportar
-Nota: Chamado AUTOMATICAMENTE pelo ag-29 na Fase 3. Tambem pode ser chamado standalone.
+### Spell Check
+ag-31 (revisar-ortografia). Chamado automaticamente pelo ag-29 na Fase 3.
 
-**Incorporacao de Software (Playbook 11):**
+### Incorporacao de Software (Playbook 11)
 ```
 Fase?
 ├── Primeira vez    → ag-32 (due diligence) → Go/No-Go
 ├── Due diligence OK → ag-33 (mapear integracao) → integration-map.md
 ├── Mapa pronto     → ag-34 (planejar incorporacao) → roadmap.md + task_plan
-├── Plano pronto    → ag-35 (incorporar modulo) → execucao fase a fase
+├── Plano pronto    → ag-35 (incorporar modulo, worktree) → execucao fase a fase
 └── Fase concluida  → ag-12 (validar) → ag-13 (testar) → ag-15 (auditar)
 ```
-Referencia: `.claude/Playbooks/11_Incorporacao_Software.md`
-Governanca: `.claude/rules/incorporation-governance.md`
 NUNCA pular due diligence. NUNCA big bang. SEMPRE feature flags.
 
-**Test Quality Audit:**
-ag-04 (diagnostico com checklist de testes) → ag-15 (test quality audit mode) → ag-07 (plano de remediacao P0-P3)
-Foco: detectar testes teatrais, CI continue-on-error, single-role testing, auth bypass sem real auth
+### Test Quality Audit
+ag-04 (diagnostico) → ag-15 (test quality audit — subagents se 100+ arquivos) → ag-07 (plano P0-P3)
 
-**Bulk Test Remediation:**
-ag-04 (quantificar anti-patterns) → ag-08 (bulk sed/perl para P0) → ag-08 (criar smoke/access-control/error-boundary tests) → ag-08 (CI hardening) → ag-12 (validar efetividade)
-Tecnica: sed/perl bulk para patterns repetitivos (~100x mais rapido que file-by-file)
+### Bulk Test Remediation
+ag-04 (quantificar) → ag-08 (bulk sed/perl P0) → ag-08 (criar testes) → ag-08 (CI hardening) → ag-12
 
-**Criar/Melhorar Skill:**
-ag_skill-creator: capturar intencao → draft SKILL.md → test cases → rodar evals (with/without skill) → grading → benchmark → viewer HTML → feedback → melhorar → repetir
-Para melhorar skill existente: ag_skill-creator melhorar [ag-XX]
-Para otimizar triggering: ag_skill-creator description [ag-XX]
+### Criar/Melhorar Skill
+ag_skill-creator (Skill): capturar intencao → draft → evals → benchmark → melhorar
 
-**Indexar Conhecimento:**
-Roda script de ingestao: `python ~/.claude/mcp/knowledge-search/ingest.py --config <PROJECT>/knowledge-config.json`
-Nota: NAO e agente, e infraestrutura. MCP knowledge-search fica disponivel automaticamente quando .mcp.json configurado.
-Para verificar stats: `python ~/.claude/mcp/knowledge-search/ingest.py --config <PROJECT>/knowledge-config.json --stats`
-Novo projeto: ag-01 cria knowledge-config.json + .mcp.json automaticamente.
-Projeto existente: ag-03 detecta e configura na pos-exploracao.
+### Indexar Conhecimento
+Infraestrutura: `python ~/.claude/mcp/knowledge-search/ingest.py --config <PROJECT>/knowledge-config.json`
 
-### 5. Apresentar o Plano (DETALHADO)
+---
 
-O plano deve ser suficientemente detalhado para que o usuario entenda exatamente o que vai acontecer.
+## 5. Apresentar o Plano
+
+O plano deve mostrar EXATAMENTE o que vai acontecer, incluindo uso de Teams e subagents:
 
 ```markdown
 ## Plano de Execucao
@@ -307,193 +469,155 @@ O plano deve ser suficientemente detalhado para que o usuario entenda exatamente
 **Objetivo:** [o que o usuario pediu]
 **Tipo:** [tipo detectado]
 **Complexidade:** [S/M/L/XL]
-**Agentes:** N | **Passos paralelos:** N
+**Agentes:** N | **Teams:** N | **Subagents:** N | **Passos paralelos:** N
 
 ### Sequencia de Execucao
 
-| # | Agente | Acao | Input | Output | Execucao |
-|---|--------|------|-------|--------|----------|
-| 1 | ag-03 | Explorar codebase | path do projeto | findings.md | subagent (Explore) |
-| 2 | ag-06 | Criar SPEC | findings + requisitos | SPEC.md | foreground (precisa resultado) |
-| 3a | ag-07 | Gerar task_plan + briefs | SPEC.md | task_plan.md, briefs, test-map | foreground |
-| 3b | ag-05 | Pesquisar alternativas | tema | trade-offs | background (paralelo com 3a) |
-| 4 | ag-13 | Testes Red (--from-spec) | test-map.md | testes falhando | foreground |
-| 5 | ag-08 | Implementar | task_plan + briefs | codigo | foreground |
-| 6a | ag-12 | Validar completude | task_plan vs codigo | validation-report | background |
-| 6b | ag-13 | Testes Green | testes da fase 4 | test-report | background (paralelo com 6a) |
-| 7a | ag-14 | Code review | diff | review comments | background |
-| 7b | ag-15 | Audit seguranca | codigo | audit-report | background (paralelo com 7a) |
-| 8 | ag-18 | Commit + PR | codigo aprovado | PR URL | foreground |
+| # | Agente | Acao | Modo | Capacidades |
+|---|--------|------|------|-------------|
+| 1 | ag-18 | Criar branch | Agent | — |
+| 2a | ag-03 | Mapear area afetada | Agent BG (haiku) | — |
+| 2b | ag-05 | Pesquisar alternativas | Agent BG (haiku) | — |
+| 3 | ag-06 | Criar SPEC | Agent FG | — |
+| 4 | ag-07 | Gerar task_plan + briefs | Agent FG | — |
+| 5 | ag-08 | Implementar (3 modulos) | Agent FG | **Teams** (3 teammates, worktree) |
+| 6a | ag-12 | Validar completude | Agent BG (plan) | — |
+| 6b | ag-13 | Testes completos | Agent BG | **Teams** (unit + integ + E2E) |
+| 7 | ag-14 | Review + Audit (15 arquivos) | Agent BG (plan) | **Teams** (reviewer + auditor) |
+| 8 | ag-18 | Commit + PR | Agent FG | — |
 
 ### Decisoes Condicionais
 - Se ag-12 reporta INCOMPLETO → retornar ao ag-08 (max 1 iteracao)
-- Se ag-13 tem testes falhando → ag-09 (depurar) antes de prosseguir
+- Se ag-13 tem testes falhando → ag-09 (depurar, com subagents se multi-layer)
 - Se ag-15 encontra P0 → ag-08 corrigir ANTES do PR
 
 Prosseguir, ajustar, ou pular algum passo?
 ```
 
-### 6. Mecanicas de Execucao (COMO orquestrar na pratica)
+---
 
-O sistema usa duas camadas:
-- **Custom Agents** (`.claude/agents/ag-XX-nome.md`): 32 agentes com frontmatter (model, tools, maxTurns, isolation, permissionMode, background). Invocados via Agent tool.
-- **Skills** (`.claude/skills/ag-XX-nome/SKILL.md`): 14 skills restantes (ag-00, ag-01, ag-02, ag-22, ag-36-38, ag-M, ag_skill-creator, patterns). Invocados via Skill tool.
+## 6. Mecanicas de Execucao
 
-#### 6.1 Model Routing (definido no frontmatter do agent)
+### 6.1 Como Invocar
 
-| Modelo | Agentes | Uso |
-|--------|---------|-----|
-| haiku | ag-03, ag-05, ag-12, ag-25, ag-28, ag-31 | Scans rapidos, lookups |
-| sonnet | ag-06-11, ag-13, ag-17-21, ag-23-24, ag-26-27, ag-29-30, ag-33-35 | Implementacao, debug |
-| opus | ag-04, ag-09 | Analise profunda, debugging complexo |
+| Modo | Ferramenta | Quando | Exemplo |
+|------|-----------|--------|---------|
+| **Skill direto** | Skill tool | ag-00, ag-01, ag-02, ag-37, ag-M, ag_skill-creator, patterns | `Skill: ag-22-testar-e2e` |
+| **Agent foreground** | Agent tool | Resultado necessario antes de continuar | ag-06, ag-08 |
+| **Agent background** | Agent tool (BG) | Trabalho independente | ag-14, ag-15 |
+| **Agents paralelos** | Multiplos Agent tool na mesma msg | Tarefas independentes | ag-03 + ag-05 |
+| **Agent Teams** | TeamCreate → teammates → TeamDelete | 3+ tarefas independentes paralelas | ag-08 multi-module |
+| **Task tracking** | TaskCreate/Update/List | Trabalho multi-fase | Sprint 10+ items |
 
-**Isolation** (frontmatter): ag-08, ag-10, ag-35 usam `isolation: worktree`
-**Plan mode** (frontmatter): ag-04, ag-12, ag-14, ag-15, ag-16, ag-20, ag-28, ag-32, ag-33 usam `permissionMode: plan` (read-only)
+### 6.2 TeamCreate Template
 
-#### 6.2 Modos de Execucao
+```
+TeamCreate:
+  name: "[workflow]-[contexto]"
+  teammates:
+    - name: "[role]-[modulo]"
+      prompt: "[instrucao especifica com escopo e output esperado]"
+    - name: "[role]-[modulo]"
+      prompt: "[instrucao especifica]"
 
-| Modo | Ferramenta | Quando Usar | Exemplo |
-|------|-----------|-------------|---------|
-| **Skill direto** | `Skill tool` | Skills restantes (ag-00, ag-01, ag-02, ag-22, ag-36-38, patterns) | ag-22 (E2E), ui-ux-pro-max |
-| **Custom Agent foreground** | `Agent tool` | Agente com frontmatter, resultado necessario antes de continuar | ag-06 (spec), ag-08 (build) |
-| **Custom Agent background** | `Agent tool` (background) | Trabalho independente em paralelo | ag-14 + ag-15 |
-| **Custom Agents paralelos** | Multiplos `Agent tool` na mesma mensagem | Tarefas independentes | ag-12 + ag-13 juntos |
-| **Task tracking** | `TaskCreate/TaskUpdate` | Trabalho longo com multiplas fases | Sprint com 10+ items |
+→ Aguardar todos completarem
+→ Coordinator agrega resultados
+→ TeamDelete (cleanup)
+```
 
-#### 6.3 Regras de Paralelismo
+### 6.3 Regras de Paralelismo
 
-**Pares paralelos documentados** (todos com `background: true` no frontmatter):
+**Pares paralelos simples** (background):
 
-| Par | Razao | Ambos plan-mode? |
-|-----|-------|-----------------|
-| ag-14 + ag-15 | Review + Audit — ambos read-only | Sim |
-| ag-12 + ag-13 | Validar + Testar — ambos verificam | ag-12 sim, ag-13 nao |
-| ag-03 + ag-05 | Explorar + Pesquisar — discovery independente | Nao (haiku ambos) |
-| ag-04 + ag-05 | Analisar + Pesquisar — paralelo discovery | ag-04 plan, ag-05 nao |
-| ag-36 + ag-13 | QA MCP + Unit tests — tipos diferentes | N/A |
+| Par | Razao |
+|-----|-------|
+| ag-14 + ag-15 | Review + Audit — ambos read-only |
+| ag-12 + ag-13 | Validar + Testar — ambos verificam |
+| ag-03 + ag-05 | Explorar + Pesquisar — discovery |
+| ag-04 + ag-05 | Analisar + Pesquisar — discovery |
+| ag-13 + ag-22 | Unit tests + E2E — tipos diferentes |
 
-**Worktree paralelo** (para implementacao simultanea sem conflitos):
-- ag-08 em worktrees isolados — para items independentes de um task_plan
-- ag-10 em worktree — para refatoracao isolada
-- ag-35 em worktree — para incorporacao isolada
+**Teams (coordenacao avancada)**:
 
-**Task tracking para coordenacao**:
-- ag-08, ag-23, ag-27 usam `TaskCreate/TaskUpdate` para reportar progresso
-- ag-00 pode usar `TaskList` para acompanhar agents em background
+| Agent | Quando usar Teams | Threshold |
+|-------|------------------|-----------|
+| ag-08 | Multi-module build | 3+ modulos independentes |
+| ag-13 | Validacao completa | unit + integration + E2E |
+| ag-14 | Paired review+audit | 10+ arquivos no PR |
+| ag-22 | E2E paralelo | 30+ spec files |
+| ag-23 | Batch fixes | 3-5 bugs independentes |
+| ag-27 | Multi-env deploy | 2+ ambientes |
+| ag-29 | Docs multi-modulo | 5+ modulos |
+
+**Subagent delegation (dentro do agent)**:
+
+| Agent | Quando | O que delega |
+|-------|--------|-------------|
+| ag-09 | Bug multi-layer (3+ camadas) | Subagents por camada (frontend/backend/DB) |
+| ag-15 | Projeto 100+ arquivos | 4 subagents (OWASP, secrets, deps, test quality) |
+| ag-27 | Falha 2x na mesma etapa | Spawna ag-09 para diagnostico |
+| ag-27 | Pos-deploy | Spawna ag-20 para monitoramento |
 
 ```
 DEVEM rodar em SEQUENCIA (dependencia):
-├── ag-06 (spec) → ag-07 (plan) → ag-08 (build) — cada um consome output do anterior
-├── ag-07 (plan) → ag-13 --from-spec (Red) → ag-08 (Green) — TDD pipeline
-├── ag-08 (build) → ag-12 (validar) — so valida depois de construir
-└── ag-15 (audit) → ag-08 (fix P0) — fix depende do que o audit encontrou
+├── ag-06 (spec) → ag-07 (plan) → ag-08 (build)
+├── ag-07 (plan) → ag-13 --from-spec (Red) → ag-08 (Green)
+├── ag-08 (build) → ag-12 (validar)
+└── ag-15 (audit) → ag-08 (fix P0)
 ```
 
-#### 6.4 Como invocar cada modo
+---
 
-**Skill (skills restantes com SKILL.md):**
-```
-Usar Skill tool com skill="ag-22-testar-e2e" (ou ag-00, ag-01, ag-02, ag-36-38, patterns)
-```
+## 7. Coordenar a Execucao
 
-**Custom Agent (agentes migrados para .claude/agents/):**
-```
-Usar Agent tool — o frontmatter do agent define model, tools, isolation, permissionMode
-Agentes: ag-03 a ag-35 (exceto ag-22), ag-M nao migrado
-```
+1. **Apresentar plano detalhado** (secao 5) — mostrar Teams e subagents planejados
+2. **Aguardar aprovacao** — usuario pode ajustar, pular, ou adicionar passos
+3. **Executar na ordem** — respeitar dependencias, maximizar paralelismo
+4. **Usar Teams quando applicavel** — nao executar sequencialmente o que pode ser paralelo
+5. **Ler output** de cada agente e decidir proximo passo
+6. **Reportar progresso**: "Passo 3/8 concluido. ag-08 Teams: 3/3 modulos built."
+7. **Task tracking**: `TaskList` para monitorar agents com TaskCreate/TaskUpdate
+8. **Atualizar session-state.json** a cada 3 passos completados
+9. **COMMITS INCREMENTAIS**: lembrar agentes de commitar a cada 5-10 arquivos
+10. **Adaptar em tempo real**: se insight muda o plano, ajustar e comunicar
+11. **Webhook notifications**: hooks http enviam automaticamente para n8n (git push, test, build fail)
 
-**Custom Agents paralelos (enviar na MESMA mensagem):**
-```
-Agent tool 1: ag-14 (review) — background=true (frontmatter)
-Agent tool 2: ag-15 (audit) — background=true (frontmatter)
-→ Ambos rodam simultaneamente, recebo notificacao quando terminam
-```
+---
 
-**Worktree isolado (definido no frontmatter):**
-```
-ag-08, ag-10, ag-35 tem isolation: worktree no frontmatter
-Automaticamente cria copia isolada do repo quando invocados
-```
-
-**Task tracking (para trabalho de multiplas fases):**
-```
-TaskCreate: criar task com descricao do objetivo
-TaskUpdate: atualizar status (in_progress → completed) a cada fase
-TaskList: verificar estado geral do progresso
-```
-
-#### 6.5 Template de Execucao por Workflow
-
-**Feature Nova (Size L):**
-```
-1. [Agent] ag-18 → criar branch
-2. [Agent, background] ag-03 (haiku) → mapear area afetada
-   [Agent, background] ag-05 (haiku) → pesquisar alternativas
-   → Aguardar ambos
-3. [Agent] ag-06 (sonnet) → criar SPEC
-4. [Agent] ag-07 (sonnet) → gerar task_plan + briefs + test-map
-5. [Agent] ag-13 (sonnet) --from-spec → gerar testes Red
-6. [Agent, worktree] ag-08 (sonnet) → implementar
-7. [Agent, background] ag-12 (haiku, plan) → validar completude
-   [Agent, background] ag-13 (sonnet) → rodar testes Green
-   → Aguardar ambos
-8. [Agent, background] ag-14 (sonnet, plan) → code review
-   [Agent, background] ag-15 (sonnet, plan) → security audit
-   → Aguardar ambos
-9. [Agent] ag-18 (sonnet) → commit + PR
-```
-
-**Bug Fix Batch (5 bugs):**
-```
-1. [Agent] ag-18 → criar branch
-2. [Agent] ag-25 (haiku) → diagnosticar e classificar os 5 bugs
-3. Para cada bug (sequencial — mesmo branch):
-   [Agent] ag-26 (sonnet) → fix + 5 gates + commit
-4. [Agent, background] ag-13 → rodar suite de testes
-   [Agent, background] ag-14 (plan) → review do changeset
-   → Aguardar ambos
-5. [Agent] ag-18 → PR
-```
-
-### 7. Coordenar a Execucao
-
-1. **Apresentar plano detalhado** (secao 5) e aguardar aprovacao
-2. **Executar na ordem** — respeitar dependencias, paralelizar o que pode
-3. **Ler output** de cada agente e decidir proximo passo
-4. **Reportar progresso** entre agentes: "Passo 3/8 concluido. ag-07 gerou task_plan com 12 tarefas."
-5. **Task tracking**: usar `TaskList` para monitorar agents com TaskCreate/TaskUpdate (ag-08, ag-23, ag-27)
-6. **Atualizar session-state.json** a cada 3 passos completados
-7. **COMMITS INCREMENTAIS**: lembrar agentes de commitar a cada 5-10 arquivos
-8. **Adaptar em tempo real**: se um passo gera insight que muda o plano, ajustar e comunicar
-9. **Webhook notifications**: se n8n configurado, notificar sobre deploy/status via ag-20
-
-### 8. Lidar com Falhas
+## 8. Lidar com Falhas
 
 ```
 Falha no ag-08 (construir)?
-├── Erro de codigo → ag-09 (depurar)
+├── Erro de codigo → ag-09 (depurar — com subagents se multi-layer)
 ├── Plano incompleto → ag-07 (replanejar)
 ├── Spec ambigua → ag-06 (reespecificar)
-├── Typecheck falha → ag-26 (fix-verificar)
-├── Lint falha → ag-26 (fix-verificar)
+├── Typecheck/Lint falha → ag-26 (fix-verificar)
 └── Falha repetida (2x) → PARA e escala ao usuario
 
 Falha no ag-23/ag-24 (bugfix)?
 ├── Bug individual falha → isolar e continuar com os outros
 ├── Conflito de merge → reportar ao usuario
-├── Typecheck geral falha → ag-26 para cada arquivo problematico
+├── Typecheck geral falha → ag-26 para cada arquivo
 └── Falha repetida (2x) → PARA e escala ao usuario
 
 Falha no ag-27 (deploy-pipeline)?
 ├── Etapa 2-4 falha (quality) → corrigir e re-rodar
+├── Etapa falha 2x → ag-27 spawna ag-09 subagent automaticamente
 ├── Etapa 5 falha (build) → PARAR — nunca deploy com build quebrado
 ├── Etapa 6 falha (deploy) → verificar plataforma
 └── Etapa 7 falha (smoke) → considerar rollback (com aprovacao)
+
+Falha em Team (ag-08/ag-13/ag-14 Teams)?
+├── 1 teammate falha → coordinator retenta 1x
+├── 2+ teammates falham → PARAR Teams, executar sequencial
+└── Conflito de merge entre teammates → coordinator resolve
 ```
 
 Nunca entre em loop infinito. 2 falhas no mesmo agente → parar.
 
-### 9. Atalhos
+---
+
+## 9. Atalhos
 
 | Sinal | Atalho |
 |-------|--------|
@@ -502,60 +626,60 @@ Nunca entre em loop infinito. 2 falhas no mesmo agente → parar.
 | Typo/config | ag-08 quick → ag-18 |
 | Chama agente direto (/ag-XX) | Respeita — nao intercepta |
 | ID de roadmap (QS-BUG-015) | Roadmap: localizar e executar |
-| "triar", "intake" | ag-25 → Triage: diagnosticar e catalogar |
+| "triar", "intake" | ag-25: triagem primeiro |
 | "sprint", "sprint W10" | Sprint: planejar sprint |
-| "deploy seguro" | ag-27: pipeline completo |
+| "deploy seguro" | ag-27: pipeline completo (com auto-recovery) |
 | "fix e commit" | ag-26: pipeline com 5 gates |
-| "bugs em paralelo" | ag-24: bugfix paralelo |
+| "bugs em paralelo" | ag-24: bugfix paralelo (Teams) |
 | "lista de bugs" / "diagnosticar" | ag-25: triagem primeiro |
 | "health check" / "saude" | ag-28: verificar ambiente |
-| "batch fix" / "sprint de bugs" | ag-23: bugfix batch |
-| "pptx" / "slides" / "apresentacao" | ag-29: gerar documentos Office |
-| "organizar" / "limpar pasta" / "taxonomia" | ag-30: organizar arquivos |
-| "ortografia" / "spell check" / "acentuacao" | ag-31: revisar ortografia |
-| "criar skill" / "melhorar skill" / "avaliar skill" / "benchmark skill" | ag_skill-creator: criar/melhorar/avaliar skills |
-| "indexar" / "reindexar" / "knowledge base" | Infraestrutura: rodar script ingest.py |
-| "incorporar" / "integrar sistema" / "due diligence" | ag-32: due diligence primeiro |
-| "testar manual" / "QA exploratorio" / "navegar app" | ag-36: teste manual via MCP |
-| "gerar testes" / "criar testes do fluxo" | ag-37: gerar testes via MCP |
-| "smoke" / "smoke test" / "verificar deploy" | ag-38: smoke test Vercel |
-| "testes teatrais" / "qualidade dos testes" / "audit testes" | Test Quality Audit workflow |
-| "limpar testes" / "remover catch false" / "corrigir testes" | Bulk Test Remediation workflow |
+| "batch fix" / "sprint de bugs" | ag-23: bugfix batch (worktree + Teams) |
+| "pptx" / "slides" | ag-29: gerar documentos (Teams se 5+ modulos) |
+| "organizar" / "limpar pasta" | ag-30: organizar arquivos |
+| "ortografia" / "spell check" | ag-31: revisar ortografia |
+| "criar skill" / "benchmark skill" | ag_skill-creator |
+| "indexar" / "knowledge base" | Infraestrutura: ingest.py |
+| "incorporar" / "due diligence" | ag-32 primeiro |
+| "testar manual" / "QA exploratorio" | ag-36: teste manual via MCP |
+| "gerar testes" | ag-37 (Skill): gerar testes via MCP |
+| "smoke" / "verificar deploy" | ag-38: smoke test Vercel |
+| "testes teatrais" / "audit testes" | Test Quality Audit workflow |
+| "limpar testes" / "corrigir testes" | Bulk Test Remediation workflow |
+| "review grande" (10+ arquivos) | ag-14 Teams: paired review+audit |
+| "testar tudo" | ag-13 Teams: unit + integ + E2E paralelo |
 
-### 10. Size Gate Enforcement
+---
 
-Antes de iniciar implementacao, verificar tamanho do item:
+## 10. Size Gate Enforcement
 
 ```
 Size do item?
 ├── S (< 2h, escopo claro)     → Prosseguir direto (skip planning)
-├── M (2-8h)                    → REQUER PRD em roadmap/specs/ITEM-ID/PRD.md
-│   └── Sem PRD?               → PARAR. Criar PRD primeiro (ag-06) antes de implementar
+├── M (2-8h)                    → REQUER PRD
+│   └── Sem PRD?               → PARAR. ag-06 primeiro
 ├── L (8-20h)                   → REQUER PRD + SPEC
-│   └── Sem ambos?             → PARAR. ag-06 (spec) → ag-07 (plan) antes de implementar
-├── XL (> 20h)                  → REQUER PRD + SPEC + aprovacao do usuario
-│   └── Sem aprovacao?         → PARAR. Apresentar plano e pedir OK explicito
-└── Quick fix / typo            → Bypass (nao precisa de spec)
+│   └── Sem ambos?             → PARAR. ag-06 → ag-07 primeiro
+├── XL (> 20h)                  → REQUER PRD + SPEC + aprovacao
+│   └── Sem aprovacao?         → PARAR. Apresentar plano e pedir OK
+└── Quick fix / typo            → Bypass
 ```
 
-NUNCA iniciar ag-08 (construir) para items Size M+ sem spec aprovada.
+NUNCA iniciar ag-08 para items Size M+ sem spec aprovada.
 
-### 10.1 Size Probe (Pre-Sprint Validation)
-
-Antes de atribuir Size a items no sprint planning:
+### Size Probe (Pre-Sprint Validation)
 
 ```
 Para items Size M+:
-1. ag-03 faz scan rapido (5 min): contar linhas, grep por complexidade
-2. Se scan revela scope > 2x estimado → reclassificar ANTES de iniciar
+1. ag-03 faz scan rapido: contar linhas, grep por complexidade
+2. Se scope > 2x estimado → reclassificar ANTES de iniciar
 3. Nunca confiar em size do backlog sem validacao
-
-Evidencia: IF-BUG-102 estimado M, eram 3795 errors (XL). CH-IMP-001 estimado M, chat tinha branching/modes (L+).
 ```
 
-### 11. Regras de Protecao (do Insights Analysis)
+---
 
-Estas regras foram aprendidas de 218 sessoes de uso real:
+## 11. Regras de Protecao
+
+Aprendidas de 218 sessoes de uso real:
 
 - **NUNCA git stash** automaticamente — sempre confirmar com usuario
 - **Commits incrementais**: NUNCA acumular 40+ arquivos sem commit
@@ -563,51 +687,36 @@ Estas regras foram aprendidas de 218 sessoes de uso real:
 - **Typecheck antes de commit**: sempre rodar `npm run typecheck`
 - **Supabase config push**: NUNCA sem revisar com usuario
 - **OOM**: usar `NODE_OPTIONS='--max-old-space-size=8192'`
-- **Windows nvm**: usar node/npx direto, nao via shims
 
-### 12. Git Governance (Automatico — Todos os Workflows)
+---
 
-TODOS os workflows que produzem codigo DEVEM seguir estas regras automaticamente:
+## 12. Git Governance (Automatico — Todos os Workflows)
 
-**Branch (ANTES de commitar):**
-- ag-08/ag-26 DEVEM verificar branch atual antes de commitar
-- Se em main/develop → criar branch automaticamente: `git checkout -b feat/[contexto]`
-- NUNCA commitar codigo fonte em main (hook branch-guard.sh BLOQUEIA)
+TODOS os workflows que produzem codigo DEVEM seguir automaticamente:
 
-**Commit (DURANTE o trabalho):**
-- Commits semanticos: `tipo(escopo): descricao do por que`
-- Incrementais: max 5 mudancas sem commit
-- NUNCA `git add -A` — sempre listar arquivos
-- NUNCA `--no-verify` (hook security-gate.sh BLOQUEIA)
+**Branch**: Verificar branch antes de commitar. Se em main → criar branch.
+**Commit**: Semantico, incremental (max 5 mudancas), nunca `git add -A`, nunca `--no-verify`.
+**PR**: `gh pr create --base main`, titulo conventional commit, body com checklist.
+**Deploy**: Via PR + CI/CD. Pipeline manual via ag-27 (com auto-recovery).
+**Migration**: ag-17 verifica constraints e naming. Nunca `supabase db reset` sem confirmacao.
+**Release**: ag-18 release: changelog + tag semver + GitHub Release.
 
-**PR (AO FINAL de feature/fix):**
-- ag-18 DEVE criar PR: `gh pr create --base main`
-- Titulo: conventional commit format
-- Body: resumo + checklist + test plan
+---
 
-**Deploy (APOS merge):**
-- Caminho padrao: merge PR em main → deploy-gate.yml automatico
-- Pipeline manual: ag-27 (quando sem CI/CD)
-- NUNCA `vercel --prod` manual sem pipeline
+## Quality Gate (VERIFICAR ANTES DE EXECUTAR)
 
-**Migration (Supabase):**
-- ag-17 DEVE verificar constraints e naming antes de criar
-- NUNCA `supabase config push` ou `supabase db reset` sem confirmacao
-
-**Release (AO FINAL de sprint/milestone):**
-- ag-18 release: changelog + tag semver + GitHub Release
-
-## Quality Gate
-
-- Tipo de intencao classificado corretamente?
-- Workflow proporcional a tarefa (nao usar 8 agentes para 1 typo)?
-- Session recovery verificado?
-- Nenhum agente essencial pulado?
-- Bug fix auto-sizing aplicado (1 → ag-26, 2-5 → ag-23, 6+ → ag-24)?
-- Regras de protecao respeitadas?
-- Plano detalhado apresentado (com Input/Output/Execucao por passo)?
-- Oportunidades de paralelismo identificadas (ag-14+ag-15, ag-12+ag-13)?
-- Mecanica de execucao correta (Skill vs Agent vs background)?
+- [ ] Tipo de intencao classificado corretamente?
+- [ ] Workflow proporcional a tarefa (nao usar 8 agentes para 1 typo)?
+- [ ] Session recovery verificado?
+- [ ] Nenhum agente essencial pulado?
+- [ ] Bug fix auto-sizing aplicado (1 → ag-26, 2-5 → ag-23, 6+ → ag-24)?
+- [ ] **Teams avaliado?** (3+ tarefas independentes → Teams, 10+ arquivos PR → paired review)
+- [ ] **Subagent delegation avaliado?** (bug multi-layer → ag-09 subagents, audit grande → ag-15 subagents)
+- [ ] **Worktree usado onde disponivel?** (ag-08, ag-10, ag-11, ag-23, ag-35)
+- [ ] Oportunidades de paralelismo identificadas (pares + Teams)?
+- [ ] Mecanica de execucao correta (Skill vs Agent vs background vs Teams)?
+- [ ] Plano detalhado apresentado (com Teams e subagents marcados)?
+- [ ] Regras de protecao respeitadas?
 
 Se algum falha → Revisar classificacao e workflow antes de iniciar execucao.
 
