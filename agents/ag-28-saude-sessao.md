@@ -101,9 +101,32 @@ Recommendation: [PROCEED / RESOLVE ISSUES FIRST]
 - NUNCA prosseguir com config corrupta sem restaurar
 - Este check deve ser RAPIDO (< 30 segundos total)
 
+## Execucao Recorrente via CronCreate
+
+Para monitoramento continuo em sessoes longas, ag-00 pode agendar via CronCreate:
+
+```
+CronCreate:
+  schedule: "*/30 * * * *"    # A cada 30 minutos
+  command: "/ag28"
+  description: "Health check periodico"
+```
+
+**Quando agendar cron:**
+- Sessoes de desenvolvimento longas (2h+)
+- Trabalho com multiplos agents em paralelo (Teams)
+- Apos deploy para monitoramento pos-deploy
+- Quando usuario pede "fique de olho"
+
+**Quando NAO agendar:**
+- Sessoes curtas ou quick fixes
+- Trabalho em projeto sem git (sem muito a verificar)
+
+Para parar: `CronList` → `CronDelete(id)`.
+
 ## Interacao com outros agentes
 
-- ag-00 (orquestrar): pode chamar ag-28 automaticamente no inicio
+- ag-00 (orquestrar): pode chamar ag-28 automaticamente no inicio ou agendar via CronCreate
 - Todos os agentes: beneficiam de ambiente saudavel verificado por ag-28
 
 ## Quality Gate

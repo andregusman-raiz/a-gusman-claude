@@ -3,7 +3,7 @@ name: ag-22-testar-e2e
 description: "QA automatizado com Playwright. Simula usuario real navegando na aplicacao - clica, preenche, navega, e captura tudo que quebra. Gera report visual com screenshots e logs. Use apos /construir e /validar para verificar que a aplicacao funciona de ponta a ponta."
 model: sonnet
 tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TeamCreate, TeamDelete
-maxTurns: 60
+maxTurns: 80
 ---
 
 # ag-22 — Testar E2E (Playwright)
