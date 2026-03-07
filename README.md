@@ -1,4 +1,4 @@
-# Claude Agent System
+# Gusman Claude Agent System
 
 > Transform Claude Code from a passive assistant into an autonomous development platform.
 > 37 specialized agents. Battle-tested across 155+ real sessions. Self-improving.
