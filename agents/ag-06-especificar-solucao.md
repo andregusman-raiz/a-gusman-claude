@@ -1,7 +1,7 @@
 ---
 name: ag-06-especificar-solucao
 description: "Cria especificacao tecnica detalhada: o que construir, como, quais interfaces, quais edge cases. Spec precisa e implementavel. Use when creating technical specifications."
-model: sonnet
+model: opus
 tools: Read, Glob, Grep, Write
 disallowedTools: Edit, Agent
 maxTurns: 50

@@ -2,8 +2,8 @@
 name: ag-04-analisar-contexto
 description: "Analisa padroes de codigo, debitos tecnicos, riscos arquiteturais. Produz diagnostico com prioridades P0-P3. Use when analyzing code quality, tech debt, or architectural risks."
 model: opus
-tools: Read, Glob, Grep, Bash
-disallowedTools: Write, Edit, Agent
+tools: Read, Glob, Grep, Bash, Write
+disallowedTools: Edit, Agent
 permissionMode: plan
 maxTurns: 40
 background: true

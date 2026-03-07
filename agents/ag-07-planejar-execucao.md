@@ -1,7 +1,7 @@
 ---
 name: ag-07-planejar-execucao
 description: "Quebra spec em fases e tarefas atomicas com dependencias, criterios de done e estimativas. Produz task_plan.md. Use when breaking specs into execution plans."
-model: sonnet
+model: opus
 tools: Read, Glob, Grep, Write
 disallowedTools: Edit, Agent
 maxTurns: 50
