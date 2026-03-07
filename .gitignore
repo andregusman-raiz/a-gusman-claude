@@ -1,6 +1,9 @@
-# Session data (transient, not versioned)
+# Session data (user-specific, not versioned)
 projects/
 usage-data/
+docs/ai-state/session-state.json
+docs/ai-state/errors-log.md
+docs/ai-state/findings.md
 
 # Skills workspace (generated eval data)
 skills-workspace/*/runs/
@@ -14,3 +17,7 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Node (if using npx installer)
+node_modules/
+package-lock.json

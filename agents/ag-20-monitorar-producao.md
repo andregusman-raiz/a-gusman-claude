@@ -69,7 +69,7 @@ Quando integrado com n8n, pode disparar notificacoes via webhook:
 
 ```bash
 # Exemplo: notificar n8n sobre status de deploy
-curl -s -X POST "https://n8n.raizeducacao.com.br/webhook/deploy-status" \
+curl -s -X POST "YOUR_WEBHOOK_URL/deploy-status" \
   -H "Content-Type: application/json" \
   -d '{"project": "[nome]", "status": "OK|DEGRADED|DOWN", "url": "[deploy-url]", "timestamp": "[ISO-8601]"}'
 ```
