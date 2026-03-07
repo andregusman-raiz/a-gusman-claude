@@ -172,7 +172,7 @@ model: opus     # Powerful -- for complex analysis
 | [Playbooks](docs/06-PLAYBOOKS.md) | 11 strategic methodologies |
 | [Best Practices](docs/07-BEST-PRACTICES.md) | Lessons from 155+ sessions |
 | [Decision Trees](docs/08-DECISION-TREES.md) | When to use each agent |
-| [Examples](examples/) | Real-world configurations |
+| Examples | *(coming soon)* |
 
 ## FAQ
 

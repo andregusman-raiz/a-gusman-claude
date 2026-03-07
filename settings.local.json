@@ -53,6 +53,16 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "TeamCreate|TaskCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/memory-guard.sh >/dev/null 2>&1; EXIT=$?; if [ $EXIT -eq 2 ]; then echo 'BLOCKED: Memory pressure CRITICAL. Fechar sessoes/terminais antes de spawnar novos agents. Rode: bash ~/.claude/scripts/memory-guard.sh para detalhes.'; exit 2; elif [ $EXIT -eq 1 ]; then echo 'WARNING: Memory pressure elevada. Considere aguardar agents atuais terminarem antes de spawnar novos.'; fi",
+            "statusMessage": "Memory guard check..."
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {

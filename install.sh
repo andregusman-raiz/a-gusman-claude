@@ -3,7 +3,7 @@
 # Installs the multi-agent framework for Claude Code
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/USER/claude-agent-system/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/andregusman-raiz/a-gusman-claude/main/install.sh | bash
 #   # or with options:
 #   bash install.sh [--tier starter|standard|full] [--dest .claude]
 
@@ -20,7 +20,8 @@ NC='\033[0m'
 TIER="${TIER:-full}"
 DEST="${DEST:-.claude}"
 REPO_URL="https://github.com/andregusman-raiz/a-gusman-claude"
-RAW_URL="https://raw.githubusercontent.com/USER/claude-agent-system/main"
+RAW_URL="https://raw.githubusercontent.com/andregusman-raiz/a-gusman-claude/main"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Parse args
 while [[ $# -gt 0 ]]; do
@@ -124,7 +125,7 @@ for agent in "${STANDARD_AGENTS[@]}"; do
 done
 
 # Remaining rules
-ALL_RULES=($(ls /tmp/a-gusman-claude/rules/*.md 2>/dev/null | xargs -I{} basename {} .md))
+ALL_RULES=($(ls ${SCRIPT_DIR}/rules/*.md 2>/dev/null | xargs -I{} basename {} .md))
 for rule in "${ALL_RULES[@]}"; do
   if [[ ! -f "$DEST/rules/${rule}.md" ]]; then
     install_file "rules/${rule}.md" "$DEST/rules/${rule}.md"
@@ -133,7 +134,7 @@ for rule in "${ALL_RULES[@]}"; do
 done
 
 # Remaining hooks
-ALL_HOOKS=($(ls /tmp/a-gusman-claude/hooks/*.sh 2>/dev/null | xargs -I{} basename {} .sh))
+ALL_HOOKS=($(ls ${SCRIPT_DIR}/hooks/*.sh 2>/dev/null | xargs -I{} basename {} .sh))
 for hook in "${ALL_HOOKS[@]}"; do
   if [[ ! -f "$DEST/hooks/${hook}.sh" ]]; then
     install_file "hooks/${hook}.sh" "$DEST/hooks/${hook}.sh"
@@ -165,7 +166,7 @@ echo ""
 echo -e "${YELLOW}Installing Full tier (all agents + skills + playbooks)...${NC}"
 
 # Remaining agents
-ALL_AGENTS=($(ls /tmp/a-gusman-claude/agents/*.md 2>/dev/null | xargs -I{} basename {} .md))
+ALL_AGENTS=($(ls ${SCRIPT_DIR}/agents/*.md 2>/dev/null | xargs -I{} basename {} .md))
 for agent in "${ALL_AGENTS[@]}"; do
   if [[ ! -f "$DEST/agents/${agent}.md" ]]; then
     install_file "agents/${agent}.md" "$DEST/agents/${agent}.md"
@@ -174,7 +175,7 @@ for agent in "${ALL_AGENTS[@]}"; do
 done
 
 # Remaining commands
-ALL_COMMANDS=($(ls /tmp/a-gusman-claude/commands/*.md 2>/dev/null | xargs -I{} basename {} .md))
+ALL_COMMANDS=($(ls ${SCRIPT_DIR}/commands/*.md 2>/dev/null | xargs -I{} basename {} .md))
 for cmd in "${ALL_COMMANDS[@]}"; do
   if [[ ! -f "$DEST/commands/${cmd}" ]]; then
     install_file "commands/${cmd}" "$DEST/commands/${cmd}"
@@ -183,13 +184,13 @@ for cmd in "${ALL_COMMANDS[@]}"; do
 done
 
 # Remaining skills
-ALL_SKILLS=($(ls -d /tmp/a-gusman-claude/skills/*/ 2>/dev/null | xargs -I{} basename {}))
+ALL_SKILLS=($(ls -d ${SCRIPT_DIR}/skills/*/ 2>/dev/null | xargs -I{} basename {}))
 for skill in "${ALL_SKILLS[@]}"; do
   if [[ ! -d "$DEST/skills/${skill}" ]]; then
     mkdir -p "$DEST/skills/${skill}"
     # Copy all files in the skill directory
-    for f in $(find "/tmp/a-gusman-claude/skills/${skill}" -type f); do
-      rel=$(echo "$f" | sed "s|/tmp/a-gusman-claude/||")
+    for f in $(find "${SCRIPT_DIR}/skills/${skill}" -type f); do
+      rel=$(echo "$f" | sed "s|${SCRIPT_DIR}/||")
       dst_path="$DEST/skills/${skill}/$(basename $f)"
       install_file "$rel" "$dst_path"
     done
@@ -198,14 +199,14 @@ for skill in "${ALL_SKILLS[@]}"; do
 done
 
 # Playbooks
-for pb in /tmp/a-gusman-claude/Playbooks/*.md; do
+for pb in ${SCRIPT_DIR}/Playbooks/*.md; do
   name=$(basename "$pb")
   install_file "Playbooks/${name}" "$DEST/Playbooks/${name}"
   echo -e "${GREEN}  Playbooks/${name}${NC}"
 done
 
 # Scripts
-for sc in /tmp/a-gusman-claude/scripts/*; do
+for sc in ${SCRIPT_DIR}/scripts/*; do
   name=$(basename "$sc")
   install_file "scripts/${name}" "$DEST/scripts/${name}"
   chmod +x "$DEST/scripts/${name}" 2>/dev/null
