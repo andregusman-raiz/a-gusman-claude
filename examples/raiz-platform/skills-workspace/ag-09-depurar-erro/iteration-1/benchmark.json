@@ -1,0 +1,47 @@
+{
+  "skill_name": "ag-09-depurar-erro",
+  "iteration": 1,
+  "configurations": {
+    "old_skill": {
+      "description": "Versao original (75 linhas, fluxo generico sem decision tree)",
+      "evals": [
+        { "eval_name": "env-var-crash", "passed": 3, "total": 5, "pass_rate": 0.60 },
+        { "eval_name": "silent-spinner", "passed": 2, "total": 4, "pass_rate": 0.50 },
+        { "eval_name": "build-only-type-error", "passed": 2, "total": 5, "pass_rate": 0.40 }
+      ],
+      "aggregate": {
+        "total_passed": 7,
+        "total_assertions": 14,
+        "overall_pass_rate": 0.50,
+        "lines": 75
+      }
+    },
+    "new_skill": {
+      "description": "Versao melhorada (170 linhas, decision tree, checklist, exemplos, ferramentas)",
+      "evals": [
+        { "eval_name": "env-var-crash", "passed": 5, "total": 5, "pass_rate": 1.00 },
+        { "eval_name": "silent-spinner", "passed": 4, "total": 4, "pass_rate": 1.00 },
+        { "eval_name": "build-only-type-error", "passed": 5, "total": 5, "pass_rate": 1.00 }
+      ],
+      "aggregate": {
+        "total_passed": 14,
+        "total_assertions": 14,
+        "overall_pass_rate": 1.00,
+        "lines": 170
+      }
+    }
+  },
+  "delta": {
+    "pass_rate_improvement": "+50pp (0.50 → 1.00)",
+    "assertions_fixed": 7,
+    "lines_added": 95
+  },
+  "analyst_notes": [
+    "Assertions que passam em ambas versoes (7/14): todas relacionadas a errors-log.md e regressao — o fluxo basico ja cobria isso",
+    "Assertions que so passam na nova versao (7/14): todas relacionadas a diagnostico especifico — env vars, silent failures, build vs dev",
+    "A nova versao nao quebrou nenhuma assertion que passava antes (zero regressao)",
+    "As 3 assertions de 'processo' (ler errors-log, registrar) passam igualmente — a melhoria e puramente em 'diagnostico'",
+    "O custo e +95 linhas (+127%), mas o skill ainda esta bem abaixo do limite de 500 linhas (170 vs 500)",
+    "Description melhorada: adicionou triggers para 'trava', 'carrega infinitamente', 'build falha' — deve melhorar triggering"
+  ]
+}

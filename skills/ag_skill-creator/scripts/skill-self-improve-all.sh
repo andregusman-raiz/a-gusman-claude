@@ -8,7 +8,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-LOG_DIR="$HOME/Claude/.claude/skills-workspace/self-improve-logs"
+LOG_DIR="$HOME/.claude/skills-workspace/self-improve-logs"
 mkdir -p "$LOG_DIR"
 
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
@@ -21,8 +21,9 @@ fi
 
 # Projects to scan
 PROJECTS=(
-  "$HOME/Claude/GitHub/rAIz-AI-Prof"
-  "$HOME/Claude/GitHub/raiz-platform"
+  # Add your project paths here, e.g.:
+  # "$HOME/projects/your-project-1"
+  # "$HOME/projects/your-project-2"
 )
 
 # Skills to evaluate

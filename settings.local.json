@@ -49,17 +49,17 @@
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git push'; then REPO=$(git remote get-url origin 2>/dev/null | sed 's/.*github.com[:/]//;s/.git$//'); BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); COMMITS=$(git log origin/$BRANCH..$BRANCH --oneline 2>/dev/null | wc -l | tr -d ' '); curl -s -X POST 'https://n8n.raizeducacao.com.br/webhook/git-audit' -H 'Content-Type: application/json' -d \"{\\\"repo\\\":\\\"$REPO\\\",\\\"branch\\\":\\\"$BRANCH\\\",\\\"commits\\\":$COMMITS,\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\"}\" > /dev/null 2>&1 || true; echo 'GIT-AUDIT: Push event sent to n8n webhook.'; fi",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git push'; then REPO=$(git remote get-url origin 2>/dev/null | sed 's/.*github.com[:/]//;s/.git$//'); BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); COMMITS=$(git log origin/$BRANCH..$BRANCH --oneline 2>/dev/null | wc -l | tr -d ' '); curl -s -X POST 'YOUR_WEBHOOK_URL/git-audit' -H 'Content-Type: application/json' -d \"{\\\"repo\\\":\\\"$REPO\\\",\\\"branch\\\":\\\"$BRANCH\\\",\\\"commits\\\":$COMMITS,\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\"}\" > /dev/null 2>&1 || true; echo 'GIT-AUDIT: Push event sent to n8n webhook.'; fi",
             "statusMessage": "Git audit webhook (http-style)..."
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm test\\|npx vitest\\|npx playwright'; then curl -s -X POST 'https://n8n.raizeducacao.com.br/webhook/test-metrics' -H 'Content-Type: application/json' -d \"{\\\"suite\\\":\\\"$(basename $(pwd))\\\",\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\"}\" > /dev/null 2>&1 || true; echo 'TEST-METRICS: Test run event sent to n8n webhook.'; fi",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm test\\|npx vitest\\|npx playwright'; then curl -s -X POST 'YOUR_WEBHOOK_URL/test-metrics' -H 'Content-Type: application/json' -d \"{\\\"suite\\\":\\\"$(basename $(pwd))\\\",\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\"}\" > /dev/null 2>&1 || true; echo 'TEST-METRICS: Test run event sent to n8n webhook.'; fi",
             "statusMessage": "Test metrics webhook (http-style)..."
           },
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm run build'; then if [ \"$CLAUDE_TOOL_EXIT_CODE\" != \"0\" ] 2>/dev/null; then curl -s -X POST 'https://n8n.raizeducacao.com.br/webhook/build-alert' -H 'Content-Type: application/json' -d \"{\\\"project\\\":\\\"$(basename $(pwd))\\\",\\\"branch\\\":\\\"$(git rev-parse --abbrev-ref HEAD 2>/dev/null)\\\",\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\",\\\"status\\\":\\\"FAILED\\\"}\" > /dev/null 2>&1 || true; echo 'BUILD-ALERT: Build failure sent to n8n webhook.'; fi; fi",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm run build'; then if [ \"$CLAUDE_TOOL_EXIT_CODE\" != \"0\" ] 2>/dev/null; then curl -s -X POST 'YOUR_WEBHOOK_URL/build-alert' -H 'Content-Type: application/json' -d \"{\\\"project\\\":\\\"$(basename $(pwd))\\\",\\\"branch\\\":\\\"$(git rev-parse --abbrev-ref HEAD 2>/dev/null)\\\",\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\",\\\"status\\\":\\\"FAILED\\\"}\" > /dev/null 2>&1 || true; echo 'BUILD-ALERT: Build failure sent to n8n webhook.'; fi; fi",
             "statusMessage": "Build alert webhook (http-style)..."
           }
         ]
@@ -180,11 +180,7 @@
       "WebFetch(domain:playwright.dev)",
       "WebFetch(domain:zod.dev)",
       "WebFetch(domain:docs.python.org)",
-      "WebFetch(domain:raizeducacao.com.br)",
-      "WebFetch(domain:www.brandcolorcode.com)",
-      "WebFetch(domain:brandfetch.com)",
-      "WebFetch(domain:www.fundacaovale.org)",
-      "WebFetch(domain:midiasstoragesec.blob.core.windows.net)"
+      "WebFetch(domain:npmjs.com)"
     ],
     "deny": [
       "Read(.env)",
