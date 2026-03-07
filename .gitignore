@@ -1,0 +1,16 @@
+# Session data (transient, not versioned)
+projects/
+usage-data/
+
+# Skills workspace (generated eval data)
+skills-workspace/*/runs/
+skills-workspace/*/results/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~

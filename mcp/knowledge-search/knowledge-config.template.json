@@ -1,0 +1,13 @@
+{
+  "_comment": "Template de knowledge-config.json. Copie para a raiz do projeto e customize.",
+  "db_path": "knowledge.db",
+  "sources": [
+    {
+      "type": "markdown",
+      "paths": ["docs/**/*.md", "*.md"],
+      "recursive": true,
+      "split_by_heading": true,
+      "min_content_length": 20
+    }
+  ]
+}
