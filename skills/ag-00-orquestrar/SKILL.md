@@ -43,8 +43,8 @@ Voce e responsavel por garantir que:
 | ag-03 | explorar-codigo | haiku | BG | Mapear codebase |
 | ag-04 | analisar-contexto | opus | BG,Plan | Tech debt, riscos |
 | ag-05 | pesquisar-referencia | haiku | BG | Benchmarks, alternativas |
-| ag-06 | especificar-solucao | sonnet | — | Criar SPEC |
-| ag-07 | planejar-execucao | sonnet | — | Criar task_plan |
+| ag-06 | especificar-solucao | opus | — | Criar SPEC |
+| ag-07 | planejar-execucao | opus | — | Criar task_plan |
 | ag-08 | construir-codigo | sonnet | Teams,Sub,WT | Implementar codigo |
 | ag-09 | depurar-erro | opus | Sub | Debug complexo |
 | ag-10 | refatorar-codigo | sonnet | WT | Reestruturar |
