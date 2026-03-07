@@ -1,0 +1,159 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Remember: remove unused imports and run typecheck before committing TS files'",
+            "statusMessage": "Checking TS file edit..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git commit'; then echo 'POST-COMMIT: verify lint-staged stash list and check for orphan stashes'; fi",
+            "statusMessage": "Git commit hook..."
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm run build'; then echo 'POST-BUILD: Check exit code. If prerender errors, check for missing force-dynamic or env var issues.'; fi",
+            "statusMessage": "Post-build check..."
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm test\\|npx vitest\\|npx playwright'; then echo 'POST-TEST: Review failures before proceeding. Do not skip failing tests.'; fi",
+            "statusMessage": "Post-test check..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'vercel --prod'; then echo 'BLOCKED: Use CI/CD pipeline (gh pr create + merge) instead of direct vercel --prod'; exit 2; fi",
+            "statusMessage": "Deploy safety check..."
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git push.*--force'; then echo 'BLOCKED: Force push is dangerous. Use git push without --force, or discuss with user first.'; exit 2; fi",
+            "statusMessage": "Force push guard..."
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q -- '--no-verify'; then echo 'BLOCKED: --no-verify bypasses safety hooks. Fix the underlying issue instead.'; exit 2; fi",
+            "statusMessage": "No-verify guard..."
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git stash'; then echo 'WARNING: git stash can cause issues with lint-staged. Consider git commit (WIP) instead.'; fi",
+            "statusMessage": "Stash warning..."
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'supabase db push'; then echo 'WARNING: supabase db push applies migrations to remote DB. Verify target environment first.'; fi",
+            "statusMessage": "DB push safety..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=\"$CLAUDE_TOOL_INPUT\"; for f in .env .mcp.json package.json tsconfig.json vercel.json playwright.config.ts; do if echo \"$INPUT\" | grep -q \"$f\"; then echo \"WARNING: Writing to config file $f. Use Edit tool for surgical changes instead of Write to avoid overwriting existing config.\"; break; fi; done",
+            "statusMessage": "Config protection..."
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(supabase:*)",
+      "Bash(vercel:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(cat:*)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(sort:*)",
+      "Bash(tree:*)",
+      "Bash(du:*)",
+      "Bash(echo:*)",
+      "Bash(curl:*)",
+      "Bash(chmod:*)",
+      "Bash(pytest:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(brew:*)",
+      "Bash(claude --version:*)",
+      "Bash(cd:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python3:*)",
+      "Bash(npm install:*)",
+      "Bash(rsync:*)",
+      "Bash(unzip:*)",
+      "Bash(diff:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(xargs:*)",
+      "Bash(open:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:nextjs.org)",
+      "WebFetch(domain:supabase.com)",
+      "WebFetch(domain:vercel.com)",
+      "WebFetch(domain:developer.mozilla.org)",
+      "WebFetch(domain:typescriptlang.org)",
+      "WebFetch(domain:tailwindcss.com)",
+      "WebFetch(domain:react.dev)",
+      "WebFetch(domain:playwright.dev)",
+      "WebFetch(domain:zod.dev)",
+      "WebFetch(domain:docs.python.org)",
+      "WebFetch(domain:raizeducacao.com.br)",
+      "WebFetch(domain:www.brandcolorcode.com)",
+      "WebFetch(domain:brandfetch.com)",
+      "WebFetch(domain:www.fundacaovale.org)",
+      "WebFetch(domain:midiasstoragesec.blob.core.windows.net)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(~/.ssh/**)",
+      "Read(**/secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)"
+    ]
+  }
+}

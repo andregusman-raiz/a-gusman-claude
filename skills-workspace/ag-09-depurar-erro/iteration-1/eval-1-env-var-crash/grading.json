@@ -1,0 +1,66 @@
+{
+  "eval_name": "env-var-crash",
+  "prompt": "o login ta dando erro 500 quando clico em entrar. o console mostra 'TypeError: Cannot read properties of undefined (reading supabaseUrl)'. acho que quebrou depois que atualizei as env vars ontem",
+  "configurations": {
+    "old_skill": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "Old skill line 16: 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md' — instrucao explicita"
+        },
+        {
+          "text": "Identificou a causa raiz como env var faltando/malformada",
+          "passed": false,
+          "evidence": "Old skill nao menciona env vars, .env files, ou configuracao como fonte de bugs"
+        },
+        {
+          "text": "Tracou a cadeia completa: erro 500 → TypeError → supabaseUrl undefined → env var",
+          "passed": false,
+          "evidence": "Old skill diz 'Reproduzir → Isolar → Diagnosticar' sem tecnicas de tracing"
+        },
+        {
+          "text": "Registrou o erro no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "Template completo com Sintoma, Causa raiz, Tentativas, Solucao, Licao"
+        },
+        {
+          "text": "Sugeriu ou criou teste de regressao",
+          "passed": true,
+          "evidence": "Output section: 'Teste de regressao sugerido'"
+        }
+      ],
+      "summary": { "passed": 3, "failed": 2, "total": 5, "pass_rate": 0.60 }
+    },
+    "new_skill": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "Preserva instrucao + adiciona referencia a root-cause-debugging.md"
+        },
+        {
+          "text": "Identificou a causa raiz como env var faltando/malformada",
+          "passed": true,
+          "evidence": "Decision tree CRASH → TypeError → verificar nomes. Checklist Env vars. Exemplo 1: exatamente este cenario"
+        },
+        {
+          "text": "Tracou a cadeia completa: erro 500 → TypeError → supabaseUrl undefined → env var",
+          "passed": true,
+          "evidence": "Decision tree + Checklist + Exemplo 1 mostra cadeia completa"
+        },
+        {
+          "text": "Registrou o erro no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "Template preservado"
+        },
+        {
+          "text": "Sugeriu ou criou teste de regressao",
+          "passed": true,
+          "evidence": "Preservado em Output e Quality Gate"
+        }
+      ],
+      "summary": { "passed": 5, "failed": 0, "total": 5, "pass_rate": 1.00 }
+    }
+  }
+}

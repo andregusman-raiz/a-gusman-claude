@@ -1,0 +1,64 @@
+=== Skill Self-Improvement Run: 20260305-180959 ===
+Projects: 2 | Skills: 1 | Dry run: --dry-run
+
+--- Project: rAIz-AI-Prof ---
+  Skill: ag-09-depurar-erro
+=== Skill Self-Improvement: ag-09-depurar-erro ===
+Project: /Users/andregusmandeoliveira/Claude/GitHub/rAIz-AI-Prof
+Threshold: 80%
+
+--- FASE 1: HARVEST ---
+Encontradas 6 entradas no errors-log.md
+
+Distribuicao por tipo:
+  unknown: 4
+  crash: 1
+  silent-fail: 1
+
+Gerados 6 eval cases de 6 entradas
+Salvo em: /Users/andregusmandeoliveira/Claude/.claude/skills-workspace/ag-09-depurar-erro/auto-evals/_tmp_errors-log.md
+
+Encontradas 1 entradas no errors-log.md
+
+Distribuicao por tipo:
+  unknown: 1
+
+Gerados 1 eval cases de 1 entradas
+Salvo em: /Users/andregusmandeoliveira/Claude/.claude/skills-workspace/ag-09-depurar-erro/auto-evals/_tmp_errors-log.md
+
+Total: 7 evals unicos de 2 arquivos
+
+[DRY RUN] 7 evals harvested. Parando aqui.
+  OK
+
+--- Project: raiz-platform ---
+  Skill: ag-09-depurar-erro
+=== Skill Self-Improvement: ag-09-depurar-erro ===
+Project: /Users/andregusmandeoliveira/Claude/GitHub/raiz-platform
+Threshold: 80%
+
+--- FASE 1: HARVEST ---
+Encontradas 11 entradas no errors-log.md
+
+Distribuicao por tipo:
+  unknown: 6
+  crash: 4
+  config: 1
+
+Gerados 11 eval cases de 11 entradas
+Salvo em: /Users/andregusmandeoliveira/Claude/.claude/skills-workspace/ag-09-depurar-erro/auto-evals/_tmp_errors-log.md
+
+Encontradas 1 entradas no errors-log.md
+
+Distribuicao por tipo:
+  config: 1
+
+Gerados 1 eval cases de 1 entradas
+Salvo em: /Users/andregusmandeoliveira/Claude/.claude/skills-workspace/ag-09-depurar-erro/auto-evals/_tmp_errors-log.md
+
+Total: 12 evals unicos de 2 arquivos
+
+[DRY RUN] 12 evals harvested. Parando aqui.
+  OK
+
+=== Run complete: 20260305-180959 ===
