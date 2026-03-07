@@ -6,12 +6,12 @@
 
 ## Visao Geral
 
-O diretorio `~/Claude` e o workspace principal de desenvolvimento. Cada subdiretorio pode conter seu proprio projeto com CLAUDE.md especifico que herda estas regras raiz.
+O workspace e o diretorio principal de desenvolvimento. Cada subdiretorio pode conter seu proprio projeto com CLAUDE.md especifico que herda estas regras raiz.
 
 ### Estrutura do Workspace
 
 ```
-~/Claude/
+<workspace>/
 ├── CLAUDE.md                 # Este arquivo (regras globais)
 ├── .claude/                  # Configuracao Claude Code
 │   ├── settings.local.json   # Permissoes
@@ -24,8 +24,7 @@ O diretorio `~/Claude` e o workspace principal de desenvolvimento. Cada subdiret
 │   ├── protocols/            # pre-flight, handoff, persistent-state
 │   └── .context/             # session-state, findings, errors-log
 ├── .templates/               # Templates para novos projetos
-├── GitHub/                   # Repos git (raiz-platform, rAIz-AI-Prof)
-├── projetos/                 # Projetos standalone
+├── projects/                 # Repos git e projetos
 ├── docs/                     # Documentacao, specs, diagnosticos
 │   ├── ai-state/             # Estado de sessoes AI
 │   ├── diagnostico-cruzado/  # Diagnosticos tecnicos

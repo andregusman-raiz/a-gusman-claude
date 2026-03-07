@@ -22,7 +22,7 @@ from pathlib import Path
 from datetime import datetime
 
 
-# Detect workspace: scripts live under ~/Claude/.claude/skills/ag_skill-creator/scripts/
+# Detect workspace: scripts live under <workspace>/.claude/skills/ag_skill-creator/scripts/
 SCRIPT_DIR = Path(__file__).parent
 CLAUDE_DIR = SCRIPT_DIR.parent.parent.parent  # .claude/
 SKILLS_DIR = CLAUDE_DIR / "skills"
@@ -194,7 +194,7 @@ def find_errors_logs(project_path: Path) -> list[Path]:
     candidates = [
         project_path / ".agents" / ".context" / "errors-log.md",
         project_path / "docs" / "ai-state" / "errors-log.md",
-        project_path / "raiz-bugs" / "docs" / "ai-state" / "errors-log.md",
+        project_path / "bugs" / "docs" / "ai-state" / "errors-log.md",
     ]
     return [c for c in candidates if c.exists()]
 

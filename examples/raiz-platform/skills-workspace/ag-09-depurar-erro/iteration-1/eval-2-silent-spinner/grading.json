@@ -1,0 +1,56 @@
+{
+  "eval_name": "silent-spinner",
+  "prompt": "a pagina de dashboard ta carregando infinitamente. nao da erro no console, so fica o spinner pra sempre. comecou a acontecer hoje de manha, ontem funcionava normal",
+  "configurations": {
+    "old_skill": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "Instrucao explicita preservada"
+        },
+        {
+          "text": "Nao pulou direto para um fix — investigou sistematicamente antes",
+          "passed": false,
+          "evidence": "Old skill diz 'Reproduzir → Isolar → Diagnosticar' mas sem guia de COMO investigar silent failures. Modelo pode pular direto para hipotese"
+        },
+        {
+          "text": "Verificou multiplas hipoteses (API, state, loading condition, race condition)",
+          "passed": false,
+          "evidence": "Old skill nao menciona: silent failures, loading states, race conditions, useEffect deps. Sem checklist de investigacao"
+        },
+        {
+          "text": "Registrou o erro no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "Template presente"
+        }
+      ],
+      "summary": { "passed": 2, "failed": 2, "total": 4, "pass_rate": 0.50 }
+    },
+    "new_skill": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "Instrucao preservada"
+        },
+        {
+          "text": "Nao pulou direto para um fix — investigou sistematicamente antes",
+          "passed": true,
+          "evidence": "Step 3 Diagnosticar: 'A primeira hipotese raramente e a correta — resistir a tentacao de pular direto para o fix'. Anti-pattern: 'Pular direto para o fix'"
+        },
+        {
+          "text": "Verificou multiplas hipoteses (API, state, loading condition, race condition)",
+          "passed": true,
+          "evidence": "Decision tree SILENT FAIL → Spinner infinito → 'promise que nunca resolve, loading state sem set(false), useEffect com deps erradas'. Checklist cobre Console, Network, State, DB. Exemplo 3: exatamente loading infinito por useEffect loop"
+        },
+        {
+          "text": "Registrou o erro no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "Template preservado"
+        }
+      ],
+      "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.00 }
+    }
+  }
+}
