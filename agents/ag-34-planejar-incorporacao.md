@@ -164,6 +164,14 @@ Para cada fase, definir como reverter:
 4. **Rollback primeiro**: planejar como reverter ANTES de planejar como avancar
 5. **Menor mudanca possivel**: preferir wrappers a rewrites
 
+## Naming Conventions
+
+- Branch: `feat/incorp-[nome]-[modulo]`
+- Commits: `feat(incorp-[nome]): [descricao]`
+- Migrations: `YYYYMMDDHHMMSS_incorp_[nome]_[descricao].sql`
+- Feature flags: `incorp_[nome]_[feature]`
+- Adapter files: `src/lib/incorporation/[nome]/adapter.ts`
+
 ## O que NAO fazer
 
 - **NUNCA** planejar big bang (tudo em uma fase)

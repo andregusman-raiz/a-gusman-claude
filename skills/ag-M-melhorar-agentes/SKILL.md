@@ -1,6 +1,7 @@
 ---
 name: ag-M-melhorar-agentes
 description: Analisa reports dos outros agentes, identifica padrões de falha, propõe melhorias nos prompts. O meta-agente anti-frágil.
+disable-model-invocation: true
 ---
 
 > **Modelo recomendado:** opus

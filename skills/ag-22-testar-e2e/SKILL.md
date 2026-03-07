@@ -1,6 +1,7 @@
 ---
 name: ag-22-testar-e2e
 description: QA automatizado com Playwright. Simula usuario real navegando na aplicacao - clica, preenche, navega, e captura tudo que quebra (erros de console, falhas de rede, UI inacessivel, fluxos interrompidos). Gera report visual com screenshots e logs. Use apos /construir e /validar para verificar que a aplicacao funciona de ponta a ponta.
+disable-model-invocation: true
 ---
 
 > **Modelo recomendado:** sonnet

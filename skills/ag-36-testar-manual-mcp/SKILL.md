@@ -1,6 +1,7 @@
 ---
 name: ag-36-testar-manual-mcp
 description: Teste exploratorio via Playwright MCP. Navega na aplicacao como usuario real usando browser controlado por IA. Captura screenshots, erros de console, problemas de acessibilidade. Gera relatorio estruturado. Use para QA exploratoria antes de merge ou apos deploy.
+disable-model-invocation: true
 ---
 
 > **Modelo recomendado:** sonnet
