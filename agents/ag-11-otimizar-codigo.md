@@ -5,6 +5,7 @@ model: sonnet
 tools: Read, Write, Edit, Glob, Grep, Bash
 disallowedTools: Agent
 maxTurns: 50
+isolation: worktree
 ---
 
 # ag-11 — Otimizar Código

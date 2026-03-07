@@ -4,6 +4,7 @@ description: "Sprint de bug-fix em batches. Classifica por severidade, agrupa em
 model: sonnet
 tools: Read, Write, Edit, Glob, Grep, Bash, TaskCreate, TaskUpdate, TaskList, Agent, TeamCreate, TeamDelete
 maxTurns: 80
+isolation: worktree
 ---
 
 # ag-23 — Bugfix Batch

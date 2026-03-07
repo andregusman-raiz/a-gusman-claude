@@ -2,9 +2,9 @@
 name: ag-27-deploy-pipeline
 description: "Pipeline autonomo end-to-end: env check → typecheck → lint → test → build → deploy → smoke test. Auto-recovery em cada etapa (max 3 tentativas). Use for full deploy pipelines."
 model: sonnet
-tools: Read, Bash, Glob, Grep, TaskCreate, TaskUpdate, TaskList
-disallowedTools: Write, Edit, Agent
-maxTurns: 60
+tools: Read, Bash, Glob, Grep, TaskCreate, TaskUpdate, TaskList, Agent, TeamCreate, TeamDelete
+disallowedTools: Write, Edit
+maxTurns: 100
 ---
 
 # ag-27 — Deploy Pipeline
@@ -36,6 +36,29 @@ O ag-27 manual e para quando:
 - Precisa de controle granular sobre cada etapa
 - Debug de falhas no pipeline automatico de CI
 - Primeiro deploy de um projeto novo
+
+## Auto-Recovery via Subagents
+
+Quando uma etapa do pipeline falha 2x consecutivas, usar Agent tool para delegar diagnostico:
+
+### Recovery Flow
+```
+Etapa falha 1x → tentar fix interno (auto-recovery padrao)
+Etapa falha 2x → spawnar ag-09 (depurar) como subagent
+ag-09 retorna diagnostico → ag-27 aplica fix → retry etapa
+Se 3x falha → ABORT e reportar ao usuario
+```
+
+### Post-Deploy Monitoring
+Apos deploy bem-sucedido (Etapa 7 PASS):
+1. Spawnar ag-20 (monitorar) em background via Agent tool
+2. ag-20 verifica saude por 5 minutos: logs, errors, latency
+3. Se ag-20 detecta problema → ag-27 reporta ao usuario
+
+### Limites
+- Max 1 subagent de recovery por etapa
+- ag-09 subagent e read-only + Bash (diagnostico apenas)
+- ag-20 subagent roda em background (nao bloqueia pipeline)
 
 ## Modo Preview (para PRs)
 
