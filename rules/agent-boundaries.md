@@ -74,9 +74,12 @@ memory_pressure  # macOS: normal/warn/critical
 # Se warn ou critical → NAO spawnar mais agents, aguardar os atuais
 ```
 
-**iTerm2:**
+**iTerm2 + tmux:**
+- `teammateMode: "tmux"` ativo — Agent Teams abrem em split panes nativos via `tmux -CC`
 - Scrollback: max 10.000 linhas (Settings → Profiles → Terminal)
-- Fechar abas/terminais inativos — iTerm2 mantém processos vivos
+- Fechar panes/sessoes inativas — tmux e iTerm2 mantém processos vivos
+- Usar `tmux ls` para verificar sessoes ativas antes de spawnar novos agents
+- Prefix `Ctrl+A` (nao `Ctrl+B`) — remapeado para evitar conflito com Claude Code
 
 ## Anti-Patterns
 - NUNCA agents sem escopo definido
