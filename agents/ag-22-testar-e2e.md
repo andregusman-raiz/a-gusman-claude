@@ -4,6 +4,7 @@ description: "QA automatizado com Playwright. Simula usuario real navegando na a
 model: sonnet
 tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TeamCreate, TeamDelete
 maxTurns: 80
+background: true
 ---
 
 # ag-22 — Testar E2E (Playwright)

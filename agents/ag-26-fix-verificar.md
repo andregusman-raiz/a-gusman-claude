@@ -130,4 +130,5 @@ Arquivos: 3 modified
 - ag-13 (testar): para testes mais complexos
 - ag-18 (versionar): para commits complexos ou PRs
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, arquivo(s) modificado(s), e descricao do fix a verificar.

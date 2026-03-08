@@ -2,8 +2,8 @@
 name: ag-16-revisar-ux
 description: "Avalia experiencia do usuario, compara com benchmarks do mercado e propoe melhorias priorizadas. Use after implementing screens or UI flows for UX review."
 model: sonnet
-tools: Read, Glob, Grep
-disallowedTools: Write, Edit, Agent, Bash
+tools: Read, Glob, Grep, Bash
+disallowedTools: Write, Edit, Agent
 permissionMode: plan
 maxTurns: 40
 background: true
@@ -77,4 +77,5 @@ em heuristicas comprovadas, nao em opiniao pessoal.
 - **NUNCA sugerir sem priorizar** — P0-P3 obrigatorio
 - **NUNCA avaliar sem usar** — navegar pelo fluxo como usuario
 
-$ARGUMENTS
+## Input
+O prompt deve conter: tela ou fluxo a revisar, URL da aplicacao, e modo (review completo, benchmark, acessibilidade, ou mobile).

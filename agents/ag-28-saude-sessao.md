@@ -139,4 +139,5 @@ Para parar: `CronList` → `CronDelete(id)`.
 
 Se algum falha → Reportar ao usuario com detalhes do que faltou.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto e modo (check rapido, diagnostico completo, ou restaurar estado).

@@ -72,4 +72,5 @@ ANTES de criar qualquer migration:
 
 Se algum falha → PARAR. Nao prosseguir sem corrigir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, tipo de migration (criar tabela, alterar schema, backfill), e descricao da mudanca.

@@ -71,4 +71,5 @@ O Infraestrutor. Gera tudo que um dev precisa para rodar o projeto.
 
 Se algum falha → PARAR. Corrigir antes de prosseguir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto e modo desejado (setup, docker, ci, env, diagnosticar).

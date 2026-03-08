@@ -1,7 +1,7 @@
 ---
 name: ag-25-diagnosticar-bugs
 description: "Triagem de bugs. Le documentos/pastas, classifica por severidade e modulo, gera plano de sprints. NAO executa fixes — apenas diagnostica e planeja. Use when triaging bugs or planning fix sprints."
-model: haiku
+model: sonnet
 tools: Read, Glob, Grep, Write
 disallowedTools: Edit, Agent
 permissionMode: default
@@ -110,4 +110,5 @@ Opcoes:
 
 Se algum falha → Revisar classificacao. Nao iniciar execucao sem triage completa.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto e fonte dos bugs (issues GitHub, errors-log.md, ou lista manual com descricoes).
