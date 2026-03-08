@@ -32,7 +32,7 @@ Voce e responsavel por garantir que:
 ## 1. Inventario do Sistema
 
 ### 1.1 Numeros Atuais
-37 agents | 14 skills | 41 commands | 19 hooks | 11 playbooks | 20 rules
+38 agents | 14 skills | 42 commands | 19 hooks | 11 playbooks | 20 rules
 
 ### 1.2 Catalogo Compacto
 
@@ -76,6 +76,7 @@ Voce e responsavel por garantir que:
 | ag-36 | testar-manual-mcp | sonnet | — | QA exploratorio |
 | ag-37 | gerar-testes-mcp | sonnet | Skill | Testes de fluxo |
 | ag-38 | smoke-vercel | sonnet | Skill | Smoke deploys |
+| ag-39 | ciclo-teste-completo | opus | BG | Test-Fix-Retest cycle |
 | ag-M | melhorar-agentes | opus | Skill | Self-improvement |
 
 Legenda: BG=background, Sub=subagents, WT=worktree, Teams=Agent Teams, Plan=permissionMode:plan
@@ -125,6 +126,13 @@ Sinais para rodar ag-28:
 └── Pedido explicito de health check
 ```
 
+### 3.1b tmux Awareness (com teammateMode: tmux)
+
+Se rodando dentro de tmux (`tmux -CC`), Agent Teams abrem em split panes nativos.
+- Antes de Teams: `tmux ls` para verificar sessoes ativas (max 3 simultaneas)
+- Apos Teams: `TeamDelete` fecha panes automaticamente
+- Se panes orfaos: `tmux kill-session -t [nome]` para cleanup
+
 ### 3.2 Session Recovery (SEGUNDO PASSO SEMPRE)
 
 ```
@@ -161,6 +169,7 @@ Verificar tambem:
 | **Triage** | "triar", "novos bugs", "diagnostico", "intake" | Triage |
 | **Sprint plan** | "planejar sprint", "sprint W10", "sprint planning" | Sprint |
 | **UI/UX Design** | "design", "layout", "paleta", "UI", "landing page" | UI Design |
+| **Ciclo de teste** | "rodar testes", "test cycle", "test-fix-retest", "suite completa" | Test Cycle |
 | **Documentacao** | "documentar", "README", "API docs" | Docs |
 | **Seguranca** | "seguranca", "audit", "OWASP", "vulnerabilidade" | Security |
 | **Documento Office** | "pptx", "apresentacao", "slides", "docx", "xlsx" | Office |
@@ -180,6 +189,8 @@ Verificar tambem:
 ## 4. Workflows Predefinidos
 
 ### Projeto Novo
+**Pre-requisito**: ag-01 DEVE usar templates de `~/.shared/` (roadmap, E2E, CI, database, project-init).
+Patterns em `~/.shared/patterns/` e gotchas em `~/.shared/gotchas/` sao referencia para ag-06/ag-07.
 ag-01 → ag-02 → ag-03 → ag-06 → ag-07 → ag-08 → ag-12 → ag-13 → ag-16 → ag-19 → ag-20 → ag-22
 
 ### Feature Nova
@@ -194,6 +205,15 @@ Multi-module (3+ modulos independentes):
   ag-08 usa Teams: 1 teammate/modulo com worktree isolation
   Coordinator ag-08 faz merge sequencial
 ```
+
+### Bugfix Routing
+
+| Cenario | Agent | Motivo |
+|---------|-------|--------|
+| 1 bug complexo (root cause analysis needed) | ag-26 (fix-verificar) | 5 quality gates, fix individual |
+| 2-5 bugs (mixed modules) | ag-23 (bugfix-batch) | Sprints sequenciais de 3-5 |
+| 6+ bugs independentes | ag-24 (bugfix-paralelo) | Agent Teams, ownership exclusivo |
+| Bug com stack trace claro | ag-09 (depurar-erro) | Root cause first, debug profundo |
 
 ### Bug Fix — Auto-Sizing
 ```
@@ -240,6 +260,15 @@ Quantos tipos de teste?
 ├── Unit + E2E       → ag-13 + ag-22 (paralelo)
 ├── Todos (unit+integ+E2E) → ag-13 Teams: 1 teammate/tipo
 └── Suite E2E grande (30+ specs) → ag-22 Teams: 1 teammate/modulo
+```
+
+### Ciclo Completo de Teste (Test-Fix-Retest)
+```
+ag-39 (ciclo-teste-completo): baseline → triage → fix sprints → retest → convergence → report
+  Autonomo, max 3 ciclos, commits incrementais
+  Usa patterns de: ag-09 (root cause), ag-26 (quality gates), ag-25 (triage)
+  Output: baseline report + triage + fixes commitados + report final
+  Quando: "rodar testes completos", "test cycle", "corrigir todos os testes"
 ```
 
 ### QA Completo (Playwright MCP + Scripts)
