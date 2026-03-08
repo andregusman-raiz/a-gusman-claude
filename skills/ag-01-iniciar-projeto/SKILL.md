@@ -19,6 +19,36 @@ prettier, tsconfig), .env.example, gitignore, CI base, README.
 /ag-01-iniciar-projeto [stack] [nome] → Direto com defaults inteligentes
 ```
 
+## Shared Layer (OBRIGATORIO)
+
+Antes de gerar qualquer scaffolding, copiar templates de `~/.shared/`:
+
+```bash
+# 1. Templates de roadmap
+cp -r ~/.shared/templates/roadmap/ <project>/roadmap/templates/
+
+# 2. Templates de E2E (se projeto tem testes)
+mkdir -p <project>/tests/e2e/shared/
+cp -r ~/.shared/templates/e2e/ <project>/tests/e2e/shared/
+
+# 3. Templates de CI
+cp -r ~/.shared/templates/ci-workflows/ <project>/.github/workflows/
+
+# 4. Templates de database (se Supabase)
+cp -r ~/.shared/templates/database/ <project>/supabase/templates/
+
+# 5. Templates de projeto
+cp ~/.shared/templates/project-init/CLAUDE.template.md <project>/CLAUDE.md
+cp ~/.shared/templates/project-init/.env.template <project>/.env.example
+cp ~/.shared/templates/project-init/tsconfig.template.json <project>/tsconfig.json
+
+# 6. Roadmap inicial
+cp ~/.shared/templates/roadmap/backlog.template.md <project>/roadmap/backlog.md
+```
+
+Apos copiar, customizar cada arquivo para o projeto especifico.
+Patterns em `~/.shared/patterns/` e gotchas em `~/.shared/gotchas/` sao referencia (nao copiados).
+
 ## O que gera
 
 - Estrutura de pastas baseada nas convenções da stack
@@ -27,6 +57,9 @@ prettier, tsconfig), .env.example, gitignore, CI base, README.
 - `.gitignore` apropriado
 - `README.md` com seção de setup
 - `docs/ai-state/` pré-populado com project-profile.json
+- `roadmap/` pre-populado com templates do .shared/
+- `tests/e2e/shared/` com base fixtures do .shared/
+- `.github/workflows/` com CI templates do .shared/
 - Git inicializado com primeiro commit
 
 ## Knowledge Search Setup
