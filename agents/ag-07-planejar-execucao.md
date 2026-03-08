@@ -197,4 +197,5 @@ Quando o diagnostico (ag-04) revela testes teatrais ou baixa efetividade, usar e
 
 Se algum falha → PARAR. Corrigir antes de prosseguir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path da SPEC.md a decompor, path do projeto, e estimativa de tamanho (P/M/G/XL).

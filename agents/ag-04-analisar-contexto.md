@@ -4,7 +4,6 @@ description: "Analisa padroes de codigo, debitos tecnicos, riscos arquiteturais.
 model: opus
 tools: Read, Glob, Grep, Bash, Write
 disallowedTools: Edit, Agent
-permissionMode: plan
 maxTurns: 40
 background: true
 ---
@@ -103,4 +102,5 @@ Diagnostico em `findings.md` com prioridades P0 (critico) a P3 (desejavel).
 
 Se algum falha → PARAR. Corrigir antes de prosseguir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto e foco da analise (debito tecnico, riscos, padroes, seguranca, ou analise completa).

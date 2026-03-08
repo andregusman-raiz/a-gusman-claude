@@ -134,4 +134,5 @@ const featureSchema = z.object({ ... });
 
 Se algum falha → PARAR. Corrigir antes de prosseguir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: descricao da feature/mudanca, path do projeto, e modo (spec completa, minimal, ou review de spec existente).

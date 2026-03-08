@@ -253,4 +253,5 @@ Se validacao falha 3x → parar e reportar ao usuario.
 - Ortografia e acentuacao corretas? (ag-31 spell check)
 - Validacao automatica passou?
 
-$ARGUMENTS
+## Input
+O prompt deve conter: tipo de documento (PDF, DOCX, PPTX, XLSX), conteudo ou path do source, e formato/template desejado.

@@ -165,4 +165,5 @@ D1 (Database) → bloqueia D4 (UI), D7 (Dados)
 
 Se algum falha → PARAR. Mapa incompleto leva a incorporacao falha.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do software externo, path do projeto destino, e escopo da integracao (APIs, dados, UI, auth).

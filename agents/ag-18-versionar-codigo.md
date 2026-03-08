@@ -203,4 +203,5 @@ Evidencia: 13 stash entries encontradas, 9 lint-staged backups. 1 revert explici
 
 Se algum falha → PARAR. Nao prosseguir sem corrigir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto e modo (branch, commit, pr, release, ou cleanup).

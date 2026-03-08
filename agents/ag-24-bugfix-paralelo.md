@@ -146,4 +146,5 @@ Apos report final:
 
 Se algum falha → NAO mergear branch vermelha. Reportar ao usuario com detalhes.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, lista de bugs independentes a corrigir em paralelo, e max agents simultaneos.

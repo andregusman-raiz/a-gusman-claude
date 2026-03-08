@@ -73,4 +73,5 @@ Para deploy producao, usar: `gh pr create` → merge → deploy-gate.yml automat
 
 Se algum falha → PARAR. Nao prosseguir sem corrigir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, ambiente (preview ou production), e URL do deploy (se rollback).

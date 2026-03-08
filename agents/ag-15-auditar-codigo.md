@@ -2,8 +2,8 @@
 name: ag-15-auditar-codigo
 description: "Auditoria de seguranca, qualidade e conformidade. Use antes de deploy para garantir seguranca e qualidade do codigo. Security audit, OWASP checks, secrets scan."
 model: sonnet
-tools: Read, Glob, Grep, Bash, Agent
-disallowedTools: Write, Edit
+tools: Read, Glob, Grep, Bash, Agent, Write
+disallowedTools: Edit
 permissionMode: plan
 maxTurns: 80
 background: true
@@ -122,4 +122,5 @@ grep -rn "KNOWN_ERROR_PATTERNS\|KNOWN_BENIGN" tests/ test/ --include="*.ts"
 
 Se algum falha → BLOQUEAR deploy.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto ou modulo a auditar e modo (completa, seguranca, secrets, ou dependencias).

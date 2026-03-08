@@ -2,8 +2,8 @@
 name: ag-21-documentar-projeto
 description: "Mantem docs atualizadas - README, API, guias e changelog. Use apos mudancas significativas no codigo."
 model: sonnet
-tools: Read, Write, Edit, Glob, Grep
-disallowedTools: Agent, Bash
+tools: Read, Write, Edit, Glob, Grep, Bash
+disallowedTools: Agent
 maxTurns: 40
 ---
 
@@ -70,4 +70,5 @@ ADRs existentes: `docs/adr/0001-0006` cobrem as 6 decisoes fundacionais.
 
 Se algum falha → Iterar ate completar. Docs incompletas = divida tecnica.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto e modo (readme, api, guia, changelog, ou adr).

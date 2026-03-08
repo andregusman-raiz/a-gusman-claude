@@ -15,6 +15,8 @@ background: true
 
 O Pesquisador. Investiga antes de decidir. Compara alternativas com dados.
 
+> **Nota**: WebSearch e WebFetch sao tools deferidos. Use ToolSearch para carrega-los antes de usar: `ToolSearch("select:WebSearch,WebFetch")`.
+
 ## Regra de Escrita Incremental (2-Action Rule)
 
 A CADA 2 operacoes de leitura/pesquisa, SALVAR achados em `findings.md`.
@@ -97,4 +99,5 @@ Secao em `findings.md` com:
 
 Se algum falha → PARAR. Corrigir antes de prosseguir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: pergunta clara de pesquisa, contexto do problema, e criterios de avaliacao das alternativas.

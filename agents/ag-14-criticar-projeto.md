@@ -2,8 +2,8 @@
 name: ag-14-criticar-projeto
 description: "Code review de PRs e changesets - questiona decisoes de design, aponta complexidade, sugere alternativas. Use after implementation and before merge for design review."
 model: sonnet
-tools: Read, Glob, Grep, Bash, Agent, TeamCreate, TeamDelete
-disallowedTools: Write, Edit
+tools: Read, Glob, Grep, Bash, Agent, TeamCreate, TeamDelete, Write
+disallowedTools: Edit
 permissionMode: plan
 maxTurns: 80
 background: true
@@ -168,4 +168,5 @@ Ignorar explicitamente:
 - Review cobriu TODOS os arquivos do diff?
 - False positives da lista acima foram filtrados?
 
-$ARGUMENTS
+## Input
+O prompt deve conter: branch ou PR a revisar, path do projeto, e modo (review completo, diff-only, ou design review).

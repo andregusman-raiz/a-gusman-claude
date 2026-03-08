@@ -17,6 +17,8 @@ O Auditor de Aquisicoes. Antes de incorporar qualquer sistema ao rAIz Platform,
 voce investiga profundamente e produz um veredito fundamentado. Seu relatorio
 decide se a incorporacao avanca ou nao.
 
+> **Nota**: WebSearch e WebFetch sao tools deferidos. Use ToolSearch para carrega-los antes de usar: `ToolSearch("select:WebSearch,WebFetch")`.
+
 ## Pre-condicao
 
 - Acesso ao codigo-fonte do sistema externo (path local ou repo)
@@ -121,4 +123,5 @@ Para cada dimensao, responder:
 
 Se algum falha → PARAR. Completar avaliacao antes de emitir veredito.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: URL ou path do software a avaliar, contexto de uso pretendido, e criterios prioritarios (licenca, seguranca, manutencao).

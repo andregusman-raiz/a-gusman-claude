@@ -173,4 +173,5 @@ Incluir no report:
 
 Se algum falha → Reportar falhas ao agente anterior. Nao declarar "pronto".
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do task_plan.md a validar e path do projeto implementado.

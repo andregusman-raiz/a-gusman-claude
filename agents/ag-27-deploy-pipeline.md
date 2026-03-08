@@ -224,4 +224,5 @@ Usar `SendMessage` para comunicar progresso em cada etapa critica:
 
 Se algum falha → PARAR. Nao prosseguir sem corrigir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, ambiente-alvo (preview ou production), e branch a deployar.

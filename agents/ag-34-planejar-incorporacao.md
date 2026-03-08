@@ -190,4 +190,5 @@ Para cada fase, definir como reverter:
 
 Se algum falha → PARAR. Plano incompleto leva a incorporacao fragil.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do mapa de integracao (do ag-33), path do projeto destino, e estrategia preferida (Strangler Fig, ACL, Big Bang).

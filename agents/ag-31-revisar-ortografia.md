@@ -2,8 +2,8 @@
 name: ag-31-revisar-ortografia
 description: "Verificador e corretor ortografico para documentos Office, PDF, TXT e MD. Corrige silenciosamente erros de ortografia e acentuacao em PT-BR e EN. Use for spelling and grammar checks."
 model: haiku
-tools: Read, Write, Edit, Glob
-disallowedTools: Agent, Bash
+tools: Read, Write, Edit, Glob, Bash
+disallowedTools: Agent
 maxTurns: 30
 ---
 
@@ -162,4 +162,5 @@ Se algum falha → Reportar ao usuario com detalhes do que faltou.
 /ag31 *.pptx                     # Corrigir todos PPTX no diretorio
 ```
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do arquivo ou diretorio a revisar, idioma (pt-BR ou en-US), e modo (corrigir ou report-only).

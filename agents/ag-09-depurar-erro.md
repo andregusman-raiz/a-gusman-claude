@@ -4,6 +4,7 @@ description: "Diagnostica e corrige bugs. Le errors-log.md antes de comecar para
 model: opus
 tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 maxTurns: 80
+background: true
 ---
 
 # ag-09 — Depurar Erro
@@ -239,4 +240,5 @@ Isso constroi memoria entre sessoes. O proximo debugger nao comeca do zero.
 
 Se algum falha → PARAR. Registrar em `docs/ai-state/errors-log.md` e escalar ao ag-00.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: descricao do erro, stack trace (se disponivel), e path do projeto.
