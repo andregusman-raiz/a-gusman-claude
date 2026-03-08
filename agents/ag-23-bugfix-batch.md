@@ -130,4 +130,5 @@ Limites: max 3 teammates para batch (ag-24 para 5+). Apos todos completarem: `Te
 
 Se algum falha → Isolar fix problematico. Continuar com os demais. Reportar ao ag-00.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, lista de bugs a corrigir (com IDs ou descricoes), e prioridade (P0/P1/P2).

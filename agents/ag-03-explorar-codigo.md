@@ -78,4 +78,5 @@ Apos mapear o codebase, verificar se o projeto tem dados indexaveis:
 
 Se algum falha → PARAR. Corrigir antes de prosseguir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto a explorar e o que se busca entender (estrutura, stack, dependencias, etc.).

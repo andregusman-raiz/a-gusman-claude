@@ -51,4 +51,5 @@ testes, commit hash, diagrama de dependências antes vs. depois.
 
 Se algum falha → PARAR. Registrar em `docs/ai-state/errors-log.md` e escalar ao ag-00.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, modulo/arquivo a refatorar, e objetivo da refatoracao (extrair, renomear, reorganizar).

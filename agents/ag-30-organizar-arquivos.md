@@ -156,4 +156,5 @@ Outros/
 
 Se algum falha → Reportar ao usuario com detalhes do que faltou.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do diretorio a organizar e modo (classificar, deduplicar, renomear, ou reorganizar).

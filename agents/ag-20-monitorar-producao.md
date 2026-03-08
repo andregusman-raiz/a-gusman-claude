@@ -4,7 +4,6 @@ description: "Monitora saude pos-deploy, detecta degradacao e aciona rollback. U
 model: sonnet
 tools: Read, Bash, Glob, Grep
 disallowedTools: Write, Edit, Agent
-permissionMode: plan
 maxTurns: 30
 background: true
 ---
@@ -87,4 +86,5 @@ Configuracao de webhooks em `.env.local`:
 - **NUNCA monitorar sem thresholds definidos**
 - **NUNCA assumir que "deploy passou = esta tudo bem"**
 
-$ARGUMENTS
+## Input
+O prompt deve conter: URL da aplicacao em producao e modo (status, logs, alertas, ou diagnosticar incidente).

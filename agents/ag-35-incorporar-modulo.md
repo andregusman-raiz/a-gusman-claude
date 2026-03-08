@@ -162,4 +162,5 @@ CREATE POLICY "incorp_[nome]_select" ON [tabela]
 
 Se algum falha → PARAR. Nao avancar para proxima fase com pendencias.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do plano de incorporacao (do ag-34), fase atual a executar, e path do projeto destino.

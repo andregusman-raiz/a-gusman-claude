@@ -160,4 +160,5 @@ Se o app tem niveis de acesso (roles, permissions, access levels):
 
 Se algum falha → Reportar falhas ao agente anterior. Nao declarar "pronto".
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, modo (--from-spec para TDD Red phase ou pos-implementacao), e escopo dos testes a criar/rodar.

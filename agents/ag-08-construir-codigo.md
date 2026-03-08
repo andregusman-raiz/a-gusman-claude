@@ -228,4 +228,5 @@ Para remocao em massa de patterns repetitivos (ex: `.catch(() => false)` em 100+
 
 Se algum falha → PARAR. Registrar em `docs/ai-state/errors-log.md` e escalar ao ag-00.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, referencia ao plano (task_plan.md ou SPEC.md), e escopo da implementacao.

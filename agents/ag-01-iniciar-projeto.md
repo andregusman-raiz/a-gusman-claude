@@ -75,4 +75,5 @@ Ao criar o scaffolding, incluir automaticamente:
 
 Se algum falha → PARAR. Corrigir antes de prosseguir.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: tipo de projeto (web, api, cli), stack desejada (Next.js, Python, etc.), e nome do projeto.

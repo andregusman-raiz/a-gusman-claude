@@ -77,4 +77,5 @@ O Otimizador. Mede, identifica gargalo, otimiza, mede de novo.
 
 Se algum falha → PARAR. Registrar em `docs/ai-state/errors-log.md` e escalar ao ag-00.
 
-$ARGUMENTS
+## Input
+O prompt deve conter: path do projeto, metrica-alvo (bundle size, render time, latency, memoria), e area a otimizar.
