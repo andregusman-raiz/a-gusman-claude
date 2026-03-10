@@ -221,7 +221,7 @@ npx playwright show-report tests/e2e/report       # abrir HTML report
 
 ---
 
-## Modo 2: Playwright MCP (Teste Exploratorio com IA)
+## Modo 2: Playwright CLI (Teste Exploratorio com IA)
 
 ### Quando usar
 - Explorar app como usuario real sem escrever testes antes
@@ -230,37 +230,43 @@ npx playwright show-report tests/e2e/report       # abrir HTML report
 - Validar deploy Vercel visualmente
 
 ### Pre-requisito
-`.mcp.json` no projeto ou workspace com Playwright MCP:
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"]
-    }
-  }
-}
+`playwright-cli` instalado globalmente:
+```bash
+which playwright-cli || npm install -g @playwright/cli@latest
 ```
 
-### Workflow MCP
+### Workflow CLI
 
-1. **Navegue** usando MCP tools: `browser_navigate`, `browser_click`, `browser_type`
-2. **Observe** o que acontece — sem ler codigo, so browser
-3. **Capture** screenshots de problemas encontrados
-4. **Reporte** com evidencias visuais
-5. **Opcionalmente gere** testes Playwright a partir do que observou
+1. **Abra** browser: `playwright-cli -s=qa open [url]`
+2. **Capture snapshot** para obter refs: `playwright-cli -s=qa snapshot`
+3. **Interaja** usando refs: `playwright-cli -s=qa click <ref>`, `fill <ref> <text>`
+4. **Capture** screenshots: `playwright-cli -s=qa screenshot`
+5. **Reporte** com evidencias visuais
+6. **Feche** sessao: `playwright-cli -s=qa close`
 
-### Principios do teste MCP
+### Comandos essenciais
+```bash
+playwright-cli open [url]              # Abrir browser
+playwright-cli snapshot                # Capturar estado (obter refs)
+playwright-cli click <ref>             # Clicar
+playwright-cli fill <ref> <text>       # Preencher
+playwright-cli screenshot              # Screenshot
+playwright-cli resize 375 667          # Mobile viewport
+playwright-cli -s=nome <cmd>           # Sessao nomeada
+playwright-cli close                   # Fechar
+```
+
+### Principios do teste CLI
 - **Black-box**: NAO leia codigo fonte. Interaja APENAS pelo browser
 - **Como usuario**: Clique onde usuario clicaria, preencha o que usuario preencheria
 - **Edge cases**: Tente campos vazios, caracteres especiais, duplo clique, refresh
-- **Mobile**: Redimensione viewport para 375x667 e repita fluxos criticos
+- **Mobile**: `playwright-cli resize 375 667` e repita fluxos criticos
 - **Acessibilidade**: Observe se elementos tem labels, roles, contraste adequado
+- **Token-eficiente**: CLI consome menos tokens que MCP (sem schemas pesados)
 
-### Agentes MCP disponiveis
+### Agentes CLI disponiveis
 - `/ag36 [url]` — Teste exploratorio completo com relatorio (ag-36-testar-manual-mcp)
-- `/ag37 [fluxo]` — Gera testes Playwright a partir de fluxo MCP (ag-37-gerar-testes-mcp)
+- `/ag37 [fluxo]` — Gera testes Playwright a partir de fluxo CLI (ag-37-gerar-testes-mcp)
 - `/ag38 [url]` — Smoke tests contra URL Vercel (ag-38-smoke-vercel)
 
 ---
@@ -410,17 +416,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - run: npm ci && npm run dev &
+      - run: npm ci && npm install -g @playwright/cli@latest && npm run dev &
       - name: Claude QA
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: |
-            --mcp-config '{"mcpServers":{"playwright":{"type":"stdio","command":"npx","args":["@playwright/mcp@latest"]}}}'
           prompt: |
-            Use Playwright MCP to test this PR. Navigate the app at http://localhost:3000.
+            Use playwright-cli to test this PR. Navigate the app at http://localhost:3000.
+            Commands: playwright-cli open http://localhost:3000, snapshot, click, fill, screenshot.
             Focus on features mentioned in the PR description.
-            Test: happy path, error handling, mobile viewport (375x667), accessibility.
+            Test: happy path, error handling, mobile viewport (playwright-cli resize 375 667), accessibility.
             Post a detailed QA report as a PR comment.
 ```
 

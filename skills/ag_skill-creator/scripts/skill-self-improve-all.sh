@@ -21,10 +21,14 @@ fi
 
 # Projects to scan
 PROJECTS=(
-  # Add your project paths here, e.g.:
-  # "$HOME/projects/your-project-1"
-  # "$HOME/projects/your-project-2"
+  "$HOME/Claude/GitHub/raiz-platform"
+  "$HOME/Claude/GitHub/rAIz-AI-Prof"
 )
+
+if [ ${#PROJECTS[@]} -eq 0 ]; then
+  echo "No projects configured. Exiting."
+  exit 0
+fi
 
 # Skills to evaluate
 SKILLS=(

@@ -39,7 +39,37 @@ O SRE. Monitora a saude do sistema em producao e reage rapidamente a problemas.
 |-----------|-------------|----------------|
 | Vercel | `vercel logs --follow` | Erros de funcao, cold starts |
 | Supabase | Dashboard → Logs | Query errors, RLS denials |
-| Sentry | API | Erros agrupados por frequencia |
+| Sentry | `sentry-cli` + Sentry MCP | Erros agrupados por frequencia |
+
+## Sentry CLI — Monitoramento de Erros
+
+```bash
+# Listar issues nao resolvidas (mais recentes primeiro)
+sentry-cli issues list --project=[project-slug] --query="is:unresolved" | head -20
+
+# Filtrar por nivel critico
+sentry-cli issues list --project=[project-slug] --query="is:unresolved level:fatal OR level:error"
+
+# Ver eventos de uma issue especifica
+sentry-cli events list [issue-id] --project=[project-slug]
+
+# Verificar releases recentes
+sentry-cli releases list --project=[project-slug] | head -5
+```
+
+Projetos conhecidos:
+- raiz-platform: org `raiz-educacao-0r`, project `javascript-nextjs`
+- rAIz-AI-Prof: org `raiz-educacao-0r`, project `raiz-ai-prof`
+
+## Monitoramento de Recursos
+
+```bash
+# Verificar pressao de memoria do sistema
+memory_pressure
+
+# Monitor interativo de processos (CPU, RAM, rede)
+btop --utf-force
+```
 
 ## Protocolo de Incidente
 

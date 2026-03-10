@@ -44,6 +44,25 @@ Para deploy producao, usar: `gh pr create` → merge → deploy-gate.yml automat
 - Codigo versionado
 - Branch mergeada em main via PR (caminho padrao)
 
+## Pre-Flight CLI Checks
+
+```bash
+# 1. Verificar CI verde antes de deploy
+gh run list --branch main --limit 3
+gh pr checks [pr-number]
+
+# 2. Verificar que nao ha PRs pendentes bloqueando
+gh pr list --state open --base main
+
+# 3. Build local OK
+npm run build
+
+# 4. Verificar deploy anterior
+vercel ls --limit 3
+```
+
+NUNCA deployar sem verificar que CI esta verde via `gh run list`.
+
 ## Interacao com outros agentes
 
 - ag-15 (auditar): auditoria DEVE ser feita ANTES do deploy

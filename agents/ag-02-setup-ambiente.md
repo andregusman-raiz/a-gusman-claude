@@ -31,6 +31,32 @@ O Infraestrutor. Gera tudo que um dev precisa para rodar o projeto.
 - `.env.example` documentado
 - Scripts de setup automatizados
 
+## Docker Commands Reference
+
+```bash
+# Verificar Docker disponivel
+docker --version
+
+# Build e subir ambiente dev
+docker compose up -d
+docker compose logs -f
+
+# Rebuild apos mudancas
+docker compose build --no-cache
+docker compose up -d --force-recreate
+
+# Limpar tudo
+docker compose down -v
+docker system prune -a
+
+# Testar build de producao isolado
+docker build -t app-prod --target production .
+docker run --rm -p 3000:3000 app-prod
+
+# Node em Docker (ambiente isolado)
+docker run --rm -v "$(pwd):/app" -w /app node:20-slim sh -c "npm install && npm run build"
+```
+
 ## Troubleshooting Comum
 
 | Problema | Causa | Solucao |

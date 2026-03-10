@@ -82,15 +82,34 @@ Para cada dimensao, responder:
 - [condicao 2]
 ```
 
+## Sandbox Testing (Docker)
+
+Para avaliar software externo com seguranca, usar Docker para isolar a execucao:
+
+```bash
+# Clonar e testar em container isolado (sem acesso ao host)
+docker run --rm -v "$(pwd)/external-sw:/app" -w /app node:20-slim sh -c "npm install && npm test"
+
+# Verificar vulnerabilidades de dependencias
+docker run --rm -v "$(pwd)/external-sw:/app" aquasec/trivy fs /app --severity HIGH,CRITICAL
+
+# Testar build sem poluir ambiente local
+docker run --rm -v "$(pwd)/external-sw:/app" -w /app node:20-slim sh -c "npm run build"
+```
+
+**REGRA DE SEGURANCA**: NUNCA rodar `npm install` de software desconhecido diretamente no host. Sempre usar Docker.
+
 ## Fluxo de Execucao
 
 1. Receber path/repo do sistema externo
-2. Explorar codebase com ag-03 (subagent)
-3. Analisar debito tecnico com ag-04 (subagent)
-4. Auditar seguranca com ag-15 (subagent)
-5. Consolidar scores de todas as dimensoes
-6. Calcular viabilidade e gerar recomendacao
-7. Salvar em `incorporation/[nome]/due-diligence-report.md`
+2. **Se repo remoto**: clonar em diretorio isolado
+3. **Sandbox**: rodar build/test via Docker (nunca no host direto)
+4. Explorar codebase com ag-03 (subagent)
+5. Analisar debito tecnico com ag-04 (subagent)
+6. Auditar seguranca com ag-15 (subagent)
+7. Consolidar scores de todas as dimensoes
+8. Calcular viabilidade e gerar recomendacao
+9. Salvar em `incorporation/[nome]/due-diligence-report.md`
 
 ## Output
 
