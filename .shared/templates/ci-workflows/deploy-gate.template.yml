@@ -1,0 +1,66 @@
+# Deploy Gate Template
+# Pipeline completo: lint → typecheck → test → build → deploy → smoke
+# Roda em: merge para main (producao)
+#
+# --- CUSTOMIZAR: secrets, env vars, deploy command ---
+
+name: Deploy Gate
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  quality-check:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  deploy:
+    name: Deploy to Production
+    needs: [quality-check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # --- CUSTOMIZAR: deploy command ---
+      # Opcao A: Vercel
+      # - uses: amondnet/vercel-action@v25
+      #   with:
+      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+      #     vercel-args: '--prod'
+
+  smoke-test:
+    name: Smoke Tests
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # --- CUSTOMIZAR: URL de producao ---
+      - run: npx playwright test --project=smoke
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ secrets.PRODUCTION_URL }}
