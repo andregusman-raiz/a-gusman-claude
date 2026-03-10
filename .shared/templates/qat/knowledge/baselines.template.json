@@ -1,0 +1,24 @@
+{
+  "$schema": "QAT Baselines — Score esperado por cenario. Atualizado automaticamente pelo ciclo PDCA.",
+  "version": "1.0",
+  "lastUpdated": "YYYY-MM-DD",
+  "updatedBy": "PDCA-NNN",
+  "scenarios": {
+    "QAT-01": {
+      "baseline": 0,
+      "threshold": 6.0,
+      "tolerance": 1.0,
+      "category": "core-journey",
+      "lastUpdated": "YYYY-MM-DD",
+      "updatedBy": "initial",
+      "history": []
+    }
+  },
+  "_instructions": {
+    "baseline": "Media dos ultimos 3 runs estaveis. So atualiza para CIMA.",
+    "threshold": "Minimo aceitavel (fixo em 6.0 por padrao). So muda via decisao explicita.",
+    "tolerance": "Variacao aceitavel por nao-determinismo do LLM. Padrao 1.0.",
+    "category": "core-journey | quality-gate | regression | edge-case | comparative",
+    "history": "Array de { runId, score, date } para trend analysis"
+  }
+}

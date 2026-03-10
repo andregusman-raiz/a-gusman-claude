@@ -1,0 +1,77 @@
+# Quality Gates Template
+# Verificacoes de qualidade alem de lint/typecheck/test
+# Roda em: PRs
+#
+# --- CUSTOMIZAR: budgets, thresholds ---
+
+name: Quality Gates
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  typescript-budget:
+    name: TypeScript Error Budget
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: Count TS errors
+        run: |
+          # --- CUSTOMIZAR: budget maximo ---
+          MAX_ERRORS=0
+          ERRORS=$(npx tsc --noEmit 2>&1 | grep "error TS" | wc -l || echo "0")
+          echo "TypeScript errors: $ERRORS (budget: $MAX_ERRORS)"
+          if [ "$ERRORS" -gt "$MAX_ERRORS" ]; then
+            echo "::error::TypeScript error budget exceeded: $ERRORS > $MAX_ERRORS"
+            exit 1
+          fi
+
+  eslint-budget:
+    name: ESLint Warning Budget
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: Check warnings
+        run: |
+          # --- CUSTOMIZAR: budget maximo ---
+          MAX_WARNINGS=50
+          npm run lint -- --max-warnings=$MAX_WARNINGS
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm audit --audit-level=high
+
+  # --- OPCIONAL: bundle size check ---
+  # bundle-size:
+  #   name: Bundle Size
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - run: npm ci && npm run build
+  #     - name: Check bundle
+  #       run: |
+  #         MAX_SIZE_KB=500
+  #         SIZE=$(du -sk .next/ | cut -f1)
+  #         echo "Bundle size: ${SIZE}KB (max: ${MAX_SIZE_KB}KB)"
