@@ -83,7 +83,20 @@ Ao iniciar pipeline:
 
 ### Etapa 1: ENV CHECK
 
+```bash
+# Verificar Node version
+node -v
+
+# Verificar CI verde antes de prosseguir
+gh run list --branch main --limit 3
+gh pr checks [pr-number]  # se deploy via PR
+
+# Verificar que nao ha PRs pendentes bloqueando
+gh pr list --state open --base main
+```
+
 - Verificar Node version (`node -v`)
+- Verificar CI verde via `gh run list` — NUNCA deploy sem CI verde
 - Verificar variaveis de ambiente necessarias
 - Verificar `.env` ou `.env.local` existe (NAO ler conteudo — apenas verificar existencia)
 - Se faltam vars → PARAR e listar quais
@@ -213,6 +226,7 @@ Usar `SendMessage` para comunicar progresso em cada etapa critica:
 - ag-15 (auditar): pode ser chamado antes do deploy para auditoria
 - ag-19 (publicar): usado internamente na etapa 6
 - ag-20 (monitorar): chamado apos etapa 7 para monitoramento continuo
+- ag-40 (QAT): opcional pos-deploy — avalia qualidade dos outputs gerados (AI-as-Judge)
 
 ## Quality Gate
 

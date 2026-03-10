@@ -19,6 +19,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/pre-push-check.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/quality-trend-check.sh \"$TOOL_INPUT\" 2>/dev/null || true"
           }
         ]
       },
@@ -51,6 +55,14 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/secret-scan.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/otel-span-check.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/smart-test-suggest.sh 2>/dev/null || true"
           }
         ]
       },
@@ -60,6 +72,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/pre-commit-check.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/post-deploy-monitor.sh \"$TOOL_INPUT\" 2>/dev/null || true",
+            "timeout": 60000
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/error-context-enricher.sh \"$TOOL_OUTPUT\" 2>/dev/null || true"
           }
         ]
       }
@@ -70,6 +91,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/quality-check.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .shared/sync.sh 2>/dev/null || true"
           }
         ]
       }

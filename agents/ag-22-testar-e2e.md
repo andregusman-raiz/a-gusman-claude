@@ -34,6 +34,20 @@ Analisa a aplicacao e gera spec files `.spec.ts` com testes E2E.
 ### Modo 2: Executar testes
 Roda suite existente e reporta resultados.
 
+```bash
+# Via @playwright/test (suite automatizada)
+npx playwright test
+npx playwright test --reporter=html
+npx playwright test tests/e2e/auth/ --headed
+
+# Via playwright-cli (QA exploratorio com IA)
+playwright-cli navigate "http://localhost:3000"
+playwright-cli screenshot --url "http://localhost:3000/dashboard"
+playwright-cli click "Login button" --url "http://localhost:3000"
+```
+
+**@playwright/test** = suites automatizadas (.spec.ts). **playwright-cli** = QA exploratorio ad-hoc.
+
 ### Modo 3: Gap analysis
 Compara fluxos criticos com testes existentes e identifica gaps.
 

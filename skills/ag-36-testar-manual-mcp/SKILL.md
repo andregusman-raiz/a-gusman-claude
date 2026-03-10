@@ -1,49 +1,122 @@
 ---
 name: ag-36-testar-manual-mcp
-description: Teste exploratorio via Playwright MCP. Navega na aplicacao como usuario real usando browser controlado por IA. Captura screenshots, erros de console, problemas de acessibilidade. Gera relatorio estruturado. Use para QA exploratoria antes de merge ou apos deploy.
+description: Teste exploratorio via Playwright CLI. Navega na aplicacao como usuario real usando browser controlado por IA. Captura screenshots, erros de console, problemas de acessibilidade. Gera relatorio estruturado. Use para QA exploratoria antes de merge ou apos deploy.
 disable-model-invocation: true
 ---
 
 > **Modelo recomendado:** sonnet
 
-# ag-36 — Testar Manual via MCP
+# ag-36 — Testar Manual via Playwright CLI
 
 ## Papel
 
-O QA Exploratorio: usa Playwright MCP para controlar um browser real e testar a aplicacao como um usuario humano faria. NAO le codigo — so interage pelo browser.
+O QA Exploratorio: usa `playwright-cli` (CLI token-eficiente) para controlar um browser real e testar a aplicacao como um usuario humano faria. NAO le codigo — so interage pelo browser.
 
-Diferenca de ag-22: ag-22 escreve e roda scripts Playwright. ag-36 navega manualmente via MCP e reporta.
+Diferenca de ag-22: ag-22 escreve e roda scripts Playwright. ag-36 navega manualmente via CLI e reporta.
 
 ## Pre-requisito
 
-`.mcp.json` no projeto ou workspace com Playwright MCP:
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"]
-    }
-  }
-}
+`playwright-cli` instalado globalmente:
+```bash
+which playwright-cli || npm install -g @playwright/cli@latest
+```
+
+## Referencia de comandos
+
+### Navegacao e interacao
+```bash
+playwright-cli open [url]              # Abrir browser
+playwright-cli goto <url>              # Navegar para URL
+playwright-cli snapshot                # Capturar estado (obter refs)
+playwright-cli click <ref>             # Clicar elemento
+playwright-cli fill <ref> <text>       # Preencher campo
+playwright-cli type <text>             # Digitar texto
+playwright-cli select <ref> <val>      # Selecionar dropdown
+playwright-cli check <ref>             # Marcar checkbox
+playwright-cli uncheck <ref>           # Desmarcar checkbox
+playwright-cli hover <ref>             # Hover sobre elemento
+playwright-cli dblclick <ref>          # Duplo clique
+playwright-cli press <key>             # Pressionar tecla
+```
+
+### Captura e evidencias
+```bash
+playwright-cli screenshot [ref]        # Screenshot da pagina ou elemento
+playwright-cli pdf                     # Salvar como PDF
+playwright-cli snapshot                # Estado textual da pagina
+```
+
+### Viewport e sessoes
+```bash
+playwright-cli resize <w> <h>          # Redimensionar (ex: 375 667 para mobile)
+playwright-cli -s=nome <cmd>           # Sessao nomeada persistente
+playwright-cli list                    # Listar sessoes ativas
+playwright-cli close                   # Fechar browser
+playwright-cli close-all               # Fechar todas as sessoes
+```
+
+### Navegacao
+```bash
+playwright-cli go-back                 # Voltar
+playwright-cli go-forward              # Avancar
+playwright-cli reload                  # Recarregar
+playwright-cli tab-list                # Listar abas
+playwright-cli tab-new [url]           # Nova aba
+```
+
+### Storage e estado
+```bash
+playwright-cli cookie-list             # Listar cookies
+playwright-cli cookie-set <json>       # Definir cookie
+playwright-cli cookie-delete <name>    # Deletar cookie
+playwright-cli state-save <path>       # Salvar estado da sessao
+playwright-cli state-load <path>       # Carregar estado
+```
+
+### JavaScript
+```bash
+playwright-cli eval <expression>       # Executar JS na pagina
+playwright-cli eval <expression> <ref> # Executar JS no elemento
+```
+
+## Workflow tipico
+
+```bash
+# 1. Abrir app com sessao nomeada
+playwright-cli -s=qa open https://app.exemplo.com
+
+# 2. Capturar snapshot para obter refs
+playwright-cli -s=qa snapshot
+
+# 3. Interagir (usar refs do snapshot)
+playwright-cli -s=qa click ref=login-button
+playwright-cli -s=qa fill ref=email-input "teste@exemplo.com"
+playwright-cli -s=qa fill ref=password-input "senha123"
+playwright-cli -s=qa click ref=submit-button
+
+# 4. Verificar resultado
+playwright-cli -s=qa snapshot
+playwright-cli -s=qa screenshot
+
+# 5. Testar mobile
+playwright-cli -s=qa resize 375 667
+playwright-cli -s=qa snapshot
+playwright-cli -s=qa screenshot
+
+# 6. Fechar
+playwright-cli -s=qa close
 ```
 
 ## Instrucoes
 
-1. **Navegue** ate a URL fornecida (ou baseURL do projeto)
-2. **Interaja** com a aplicacao: clique em botoes, preencha formularios, navegue entre paginas
-3. **Observe** o comportamento: loading states, transicoes, erros visuais
-4. **Capture screenshots** de cada passo importante e de qualquer problema encontrado
-5. **Verifique acessibilidade**: elementos tem roles corretos? Navegacao por teclado funciona?
-6. **Teste edge cases**: campos vazios, caracteres especiais, duplo clique, back/forward
-7. **Verifique mobile**: redimensione viewport para 375x667 e repita fluxos criticos
-
-## Fluxo
-
-```
-Navegar → Observar → Interagir → Capturar → Reportar
-```
+1. **Abra** o browser: `playwright-cli -s=qa open [url]`
+2. **Capture snapshot** para obter refs dos elementos
+3. **Interaja** com a aplicacao: click, fill, type usando refs
+4. **Observe** o comportamento: loading states, transicoes, erros visuais
+5. **Capture screenshots** de cada passo importante e de qualquer problema
+6. **Verifique acessibilidade**: elementos tem roles corretos? Teclado funciona?
+7. **Teste edge cases**: campos vazios, caracteres especiais, duplo clique, back/forward
+8. **Verifique mobile**: `playwright-cli resize 375 667` e repita fluxos criticos
 
 ## Output: manual-test-report.md
 
@@ -56,6 +129,7 @@ Gere um report em markdown em `tests/reports/manual-test-[data].md`:
 - URL: [url testada]
 - Viewport: [desktop/mobile]
 - Navegador: Chromium
+- Tool: playwright-cli
 
 ## Fluxos Testados
 | # | Fluxo | Status | Observacao |
@@ -80,7 +154,8 @@ Gere um report em markdown em `tests/reports/manual-test-[data].md`:
 
 ## Regras
 
-- Use APENAS o Playwright MCP para interagir — nao leia codigo fonte (black-box)
+- Use APENAS `playwright-cli` para interagir — nao leia codigo fonte (black-box)
+- SEMPRE capture snapshot antes de interagir (para obter refs)
 - Priorize seletores semanticos (role, label, text)
 - Screenshot a cada passo que falhar
 - Se a aplicacao estiver offline, reporte imediatamente

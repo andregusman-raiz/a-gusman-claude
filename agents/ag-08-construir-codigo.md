@@ -193,6 +193,7 @@ Depois: tentar abordagem diferente ou escalar para ag-09.
 - ag-13 (testar): apos implementacao, rodar testes (Green phase do TDD)
 - ag-26 (fix-verificar): se typecheck/lint falha, pipeline com 5 gates
 - ag-18 (versionar): para commits semanticos apos completar fase
+- ag-41 (QAT): apos construir feature que gera output (chat, imagem, relatorio), sugerir criacao de cenario QAT via `/ag41`
 
 ## Anti-Patterns
 

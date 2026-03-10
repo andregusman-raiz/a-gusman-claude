@@ -541,20 +541,10 @@ TODOS os workflows que produzem codigo DEVEM seguir automaticamente:
 
 ---
 
-## 13. Knowledge Graph MCP (Persistencia de Conhecimento)
+## 13. Persistencia de Conhecimento
 
-Agentes DEVEM usar Knowledge Graph para persistir decisoes e aprendizados entre sessoes:
-
-| Momento | Entity Type | Agente |
-|---------|------------|--------|
-| Decisao arquitetural | ArchDecision | ag-06, ag-07 |
-| Bug resolvido | BugResolution | ag-09 |
-| Modulo criado | Module | ag-08 |
-| Tech debt encontrado | TechDebt | ag-04, ag-14 |
-| Deploy realizado | DeployEvent | ag-27 |
-
-**Consultar ANTES de decidir**: `search_nodes` antes de tomar decisao que pode ja ter sido tomada.
-**Regra completa**: `.claude/rules/knowledge-graph-ingestion.md`
+Agentes persistem decisoes e aprendizados via MEMORY.md (auto-memory) e session-state.json.
+Knowledge Graph MCP foi removido (2026-03-09) — overhead sem ROI comprovado.
 
 ---
 

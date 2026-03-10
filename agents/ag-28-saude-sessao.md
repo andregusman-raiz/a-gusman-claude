@@ -71,7 +71,23 @@ git worktree list
 - Se status "in_progress" → reportar trabalho pendente
 - Verificar `docs/ai-state/errors-log.md` → reportar erros conhecidos
 
-### Check 6: BACKUP CONFIG
+### Check 6: SYSTEM RESOURCES
+
+```bash
+# Verificar pressao de memoria do sistema
+memory_pressure
+
+# Monitor de processos (CPU, RAM)
+btop --utf-force
+
+# Verificar containers Docker ativos (se OrbStack/Docker instalado)
+docker ps 2>/dev/null || echo "Docker not available"
+```
+
+- Se memory_pressure = `warn` ou `critical` → **WARN: nao spawnar mais agents**
+- Se Docker containers orfaos → listar para usuario decidir
+
+### Check 7: BACKUP CONFIG
 
 - Criar backup timestamped de `.claude.json`:
   ```
@@ -131,7 +147,7 @@ Para parar: `CronList` → `CronDelete(id)`.
 
 ## Quality Gate
 
-- Todos os 6 checks foram executados (processos, config, stashes, worktrees, session, backup)?
+- Todos os 7 checks foram executados (processos, config, stashes, worktrees, session, resources, backup)?
 - Report gerado com status de cada check (OK/WARN/RESTORED)?
 - Nenhum processo concorrente ignorado?
 - Config corrupta restaurada (se detectada)?

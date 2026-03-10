@@ -419,6 +419,7 @@ Imprimir summary conciso com:
 - **ag-09 pattern**: Usar para root cause analysis em bugs obscuros (nao spawnar ag-09, usar o pattern internamente)
 - **ag-26 pattern**: Usar para quality gates (typecheck → lint → test → commit)
 - **ag-25 pattern**: Usar para classificacao/triage de falhas
+- **ag-40 (QAT)**: Complementar — ag-39 corrige testes de funcionalidade, ag-40 avalia qualidade dos outputs (camada diferente)
 
 NAO spawnar subagents a menos que haja 10+ fixes em modulos independentes.
 Se necessario, usar Agent Teams com max 3 teammates.
