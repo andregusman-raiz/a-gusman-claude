@@ -1,6 +1,6 @@
 ---
 name: ag-38-smoke-vercel
-description: "Smoke tests contra URL Vercel deployada (preview ou production). Verifica saude minima do deploy — homepage, assets, auth, console errors, performance. Usa Playwright MCP ou suite de smoke tests. Use apos cada deploy para garantir que nada quebrou."
+description: "Smoke tests contra URL Vercel deployada (preview ou production). Verifica saude minima do deploy — homepage, assets, auth, console errors, performance. Usa Playwright CLI ou suite de smoke tests. Use apos cada deploy para garantir que nada quebrou."
 model: sonnet
 tools: Read, Bash, Glob, Grep
 disallowedTools: Write, Edit, Agent
@@ -18,7 +18,7 @@ Diferenca de ag-22: ag-22 testa fluxos completos. ag-38 verifica apenas se o dep
 ## Instrucoes
 
 1. **Receba** a URL do deploy Vercel (preview ou production)
-2. **Escolha modo**: MCP (exploratorio) ou Suite (automatizado)
+2. **Escolha modo**: CLI (exploratorio) ou Suite (automatizado)
 3. **Verifique** os fluxos criticos minimos:
    - Homepage carrega sem erros
    - Assets (CSS, JS, imagens) carregam (status 200)
@@ -26,50 +26,82 @@ Diferenca de ag-22: ag-22 testa fluxos completos. ag-38 verifica apenas se o dep
    - Navegacao principal acessivel
    - Sem erros de console criticos (ignore HMR, DevTools, ResizeObserver)
    - Performance: LCP < 5s
-4. **Capture screenshots** de cada verificacao (modo MCP)
+4. **Capture screenshots** de cada verificacao (modo CLI)
 5. **Reporte** resultado
 
 ## Modo 1: Suite Automatizada (preferido)
 
 ```bash
-# Example: project with PLAYWRIGHT_TEST_BASE_URL
+# rAIz-AI-Prof
 PLAYWRIGHT_TEST_BASE_URL=[url] npx playwright test --project=smoke
 
-# Example: project with PLAYWRIGHT_BASE_URL
+# raiz-platform
 PLAYWRIGHT_BASE_URL=[url] npx playwright test --project=smoke
 ```
 
-## Modo 2: MCP Exploratorio
+## Modo 2: CLI Exploratorio
 
-Use Playwright MCP para navegar na URL manualmente:
-1. Abrir homepage — verificar carregamento
-2. Verificar console — filtrar erros benignos
-3. Navegar para login — verificar acessibilidade
-4. Verificar imagens e assets visuais
-5. Capturar screenshots de evidencia
+Use `playwright-cli` para navegar na URL manualmente:
+```bash
+# Abrir e verificar homepage
+playwright-cli -s=smoke open [url]
+playwright-cli -s=smoke snapshot
+playwright-cli -s=smoke screenshot
+
+# Navegar para login
+playwright-cli -s=smoke goto [url]/login
+playwright-cli -s=smoke snapshot
+playwright-cli -s=smoke screenshot
+
+# Verificar assets e navegacao
+playwright-cli -s=smoke goto [url]/dashboard
+playwright-cli -s=smoke snapshot
+
+# Capturar evidencias
+playwright-cli -s=smoke screenshot
+
+# Limpar
+playwright-cli -s=smoke close
+```
 
 ## Output: smoke-report.md
 
 ```markdown
-# Smoke Test Report — [URL]
-Data: [timestamp]
+# Smoke Test — Vercel Deploy
 
-## Resultado: PASS/FAIL
+## URL: [url]
+## Timestamp: [data/hora]
+## Resultado: PASS / FAIL
 
-| Check | Status | Detalhe |
-|-------|--------|---------|
-| Homepage | OK/FAIL | [tempo de carga] |
-| Assets | OK/FAIL | [assets faltando] |
-| Auth | OK/FAIL | [login page status] |
-| Console | OK/FAIL | [erros criticos] |
-| Performance | OK/FAIL | [LCP] |
+## Verificacoes
+| Check | Status | Tempo | Observacao |
+|-------|--------|-------|-----------|
+| Homepage | OK/FAIL | Xms | |
+| Assets | OK/FAIL | | N de N carregaram |
+| Auth page | OK/FAIL | | |
+| Navigation | OK/FAIL | | |
+| Console errors | OK/FAIL | | N erros |
+| Performance (LCP) | OK/FAIL | Xs | Threshold: 5s |
 
-## Erros Encontrados
-[detalhes]
+## Erros (se houver)
+- [descricao do erro]
 
-## Screenshots
-[links]
+## Veredicto
+[DEPLOY OK / DEPLOY COM PROBLEMAS / DEPLOY BLOQUEADO]
 ```
 
-## Referencia completa
-Ver `.claude/skills/ag-38-smoke-vercel/SKILL.md` para configuracao detalhada e env vars.
+## Interacao com outros agentes
+
+- ag-19: Chamado automaticamente apos deploy
+- ag-20: Se smoke falha, ag-20 monitora e pode acionar rollback
+- ag-27: Integrado como etapa final do deploy pipeline
+- ag-09: Se smoke detecta problema, escalar para depuracao
+
+## Quality Gate
+
+- [ ] URL recebida e valida?
+- [ ] Todos os 6 checks executados?
+- [ ] Report gerado?
+- [ ] Se FAIL, proximo passo sugerido?
+
+$ARGUMENTS

@@ -48,6 +48,22 @@ grep -rn "sk_\|pk_\|api_key\|apikey\|secret\|password\|token" \
   --exclude-dir=node_modules --exclude-dir=.next
 git log --all --full-history -- "*.env" ".env*"
 npm audit --production
+
+# Sentry: verificar erros de seguranca em producao
+sentry-cli issues list --project=[project-slug] --query="is:unresolved level:error"
+```
+
+## Ferramentas de Scanning
+
+```bash
+# Dependencias com CVEs
+npm audit --production
+
+# Container security (se Docker disponivel)
+docker run --rm -v "$(pwd):/app" aquasec/trivy fs /app --severity HIGH,CRITICAL
+
+# Sentry: erros de auth/seguranca em producao
+sentry-cli issues list --project=[project-slug] --query="is:unresolved auth OR permission OR forbidden"
 ```
 
 ## Auditoria Paralela (Projetos Grandes)

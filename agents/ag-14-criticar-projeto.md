@@ -167,6 +167,7 @@ Ignorar explicitamente:
 - O feedback e acionavel com evidencia concreta?
 - Review cobriu TODOS os arquivos do diff?
 - False positives da lista acima foram filtrados?
+- Se PR adiciona feature que gera output (chat, imagem, relatorio), inclui cenario QAT ou justificativa para nao incluir?
 
 ## Input
 O prompt deve conter: branch ou PR a revisar, path do projeto, e modo (review completo, diff-only, ou design review).

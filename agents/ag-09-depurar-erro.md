@@ -166,7 +166,25 @@ npx madge --circular src/
 
 # Limpar caches (quando tudo mais falha)
 rm -rf .next node_modules/.cache && npm run build
+
+# Consultar erros agregados no Sentry (se integrado)
+sentry-cli issues list --project=[project-slug] --query="is:unresolved" | head -20
+sentry-cli issues list --project=[project-slug] --query="[mensagem do erro]"
+
+# Ver detalhes de um evento Sentry
+sentry-cli events list [issue-id] --project=[project-slug]
 ```
+
+## Sentry Integration
+
+Antes de debugar cegamente, verificar se o erro ja aparece no Sentry:
+1. `sentry-cli issues list --project=[slug] --query="[erro]"` — buscar issues relacionadas
+2. Se encontrar — verificar frequencia, first/last seen, stack traces agregados
+3. Sentry MCP tambem esta disponivel para queries mais ricas (via ToolSearch)
+
+Projetos conhecidos:
+- raiz-platform: org `raiz-educacao-0r`, project `javascript-nextjs`
+- rAIz-AI-Prof: org `raiz-educacao-0r`, project `raiz-ai-prof`
 
 ## Exemplos: Causa Raiz vs Sintoma
 
