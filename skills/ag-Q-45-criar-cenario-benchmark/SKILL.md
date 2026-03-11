@@ -1,10 +1,11 @@
 ---
 name: ag-Q-45-criar-cenario-benchmark
 description: QAT-Benchmark Scenario Designer — cria cenarios de benchmark com dual-run, 8 dimensoes, anti-contaminacao e criterios L1-L4 por dimensao.
+model: sonnet
+argument-hint: "[capability]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
 ---
-
-> **Modelo recomendado:** sonnet
 
 # ag-Q-45 — QAT-Benchmark Scenario Designer
 

@@ -1,10 +1,12 @@
 ---
 name: ag-Q-44-benchmark-qualidade
 description: QAT-Benchmark PDCA Orchestrator — executa benchmark de qualidade AI com dual-run (app vs baseline), triple-scorer, 8 dimensoes, Parity Index e ciclo PDCA de melhoria continua.
+model: sonnet
+context: fork
+argument-hint: "[URL] [capability] [mode: smoke|standard|full]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
 ---
-
-> **Modelo recomendado:** sonnet
 
 # ag-Q-44 — QAT-Benchmark (Qualidade Comparativa)
 

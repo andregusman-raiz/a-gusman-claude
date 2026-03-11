@@ -2,6 +2,7 @@
 name: supabase-patterns
 description: Patterns para Supabase, PostgreSQL, RLS, migrations, e Zod schemas
 context: fork
+user-invocable: false
 ---
 
 # Skill: Supabase Patterns

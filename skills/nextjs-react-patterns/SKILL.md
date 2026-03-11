@@ -2,6 +2,7 @@
 name: nextjs-react-patterns
 description: Patterns e convencoes para projetos Next.js com React
 context: fork
+user-invocable: false
 ---
 
 # Skill: Next.js + React Patterns

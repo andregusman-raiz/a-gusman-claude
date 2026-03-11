@@ -1,9 +1,12 @@
 ---
 name: ag-P-01-iniciar-projeto
 description: Scaffolding completo: estrutura de pastas, configs, .env.example, CI base, README. Projeto nasce agent-ready.
+model: sonnet
+argument-hint: "[nome-do-projeto] [stack]"
 ---
 
-> **Modelo recomendado:** sonnet
+## Pre-check
+- **Templates disponiveis**: !`ls ~/.shared/templates/ 2>/dev/null | tr '\n' ', '`
 
 # ag-P-01 — Iniciar Projeto
 
