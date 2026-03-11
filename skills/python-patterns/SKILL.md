@@ -2,6 +2,7 @@
 name: python-patterns
 description: Patterns Python com venv, type hints, pytest, e estrutura de projeto
 context: fork
+user-invocable: false
 ---
 
 # Skill: Python Patterns

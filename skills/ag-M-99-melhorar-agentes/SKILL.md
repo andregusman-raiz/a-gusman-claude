@@ -1,10 +1,12 @@
 ---
 name: ag-M-99-melhorar-agentes
 description: Analisa reports dos outros agentes, identifica padrões de falha, propõe melhorias nos prompts. O meta-agente anti-frágil.
+model: opus
+context: fork
+argument-hint: "[agent-id ou 'all']"
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
 ---
-
-> **Modelo recomendado:** opus
 
 # ag-M-99 — Melhorar Agentes
 

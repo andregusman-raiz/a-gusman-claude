@@ -1,0 +1,58 @@
+---
+name: ag-P-04-analisar-contexto
+description: "Analisa padroes de codigo, debitos tecnicos, riscos arquiteturais. Produz diagnostico com prioridades P0-P3. Use when analyzing code quality, tech debt, or architectural risks."
+model: opus
+argument-hint: "[projeto-path]"
+disable-model-invocation: true
+---
+
+# ag-P-04 — Analisar Contexto
+
+Spawn the `ag-P-04-analisar-contexto` agent to diagnose code patterns, tech debt, and architectural risks.
+
+## Invocation
+
+Use the **Agent tool** with:
+- `subagent_type`: `ag-P-04-analisar-contexto`
+- `mode`: `auto`
+- `run_in_background`: `true`
+- `prompt`: Compose from template below + $ARGUMENTS
+
+## Prompt Template
+
+```
+Projeto: [CWD or user-provided path]
+
+$ARGUMENTS
+
+Analisar o codebase produzindo diagnostico com prioridades P0-P3:
+- Consistencia de padroes
+- Debito tecnico (TODOs, any, magic numbers)
+- Riscos arquiteturais (acoplamento, single points of failure)
+- Cobertura de testes
+- Seguranca superficial
+
+Salvar incrementalmente em docs/ai-state/findings.md.
+```
+
+## Important
+- ALWAYS spawn as Agent subagent — do NOT execute inline
+- After spawning, confirm to the user that the agent is running in background
+- Requires ag-P-03 output (project-profile.json, codebase-map.md) for best results
+
+## Output
+- findings.md em docs/ai-state/ com prioridades P0-P3
+- Inventario de tech debt: TODOs, tipos `any`, magic numbers, duplicacao, deps desatualizadas
+- Riscos arquiteturais: single points of failure, dependencias circulares, gaps de seguranca
+
+## Anti-Patterns
+- NUNCA diagnosticar sem ler codigo — findings do ag-P-03 sao ponto de partida, nao substituto
+- NUNCA classificar tudo como P0 — se tudo e critico, nada e critico; usar P0-P3 rigorosamente
+- NUNCA misturar diagnostico com prescricao — diagnostico e ag-P-04, solucao e ag-P-06
+
+## Quality Gate
+- [ ] Cada debt tem severidade (P0-P3)?
+- [ ] Riscos de seguranca verificados?
+- [ ] findings.md atualizado incrementalmente?
+
+$ARGUMENTS

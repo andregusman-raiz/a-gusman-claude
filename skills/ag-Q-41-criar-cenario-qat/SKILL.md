@@ -1,10 +1,11 @@
 ---
 name: ag-Q-41-criar-cenario-qat
 description: Cria cenarios QAT de alta qualidade seguindo metodologia User Story → QAT Scenario. Gera spec com 4 camadas (L1-L4), rubrica v2 especifica, golden sample e anti-patterns.
+model: sonnet
+argument-hint: "[nome-do-cenario]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
 ---
-
-> **Modelo recomendado:** sonnet
 
 # ag-Q-41 — Criar Cenario QAT
 

@@ -1,10 +1,12 @@
 ---
 name: ag-Q-40-testar-qualidade
 description: PDCA Orchestrator — executa Quality Acceptance Testing com ciclo Plan-Do-Check-Act. Carrega baselines e knowledge, executa cenarios 4 camadas (L1-L4), classifica falhas em 6 categorias, atualiza KB automaticamente.
+model: sonnet
+context: fork
+argument-hint: "[projeto-path] [--layers=L1,L2,L3,L4]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
 ---
-
-> **Modelo recomendado:** sonnet
 
 # ag-Q-40 — Quality Acceptance Testing (QAT)
 

@@ -1,10 +1,13 @@
 ---
 name: ag-D-38-smoke-vercel
 description: Smoke tests contra URL Vercel deployada (preview ou production). Verifica saude minima do deploy — homepage, assets, auth, console errors, performance. Usa Playwright CLI ou suite de smoke tests. Use apos cada deploy para garantir que nada quebrou.
+model: sonnet
+argument-hint: "[URL do deploy Vercel]"
 disable-model-invocation: true
 ---
 
-> **Modelo recomendado:** sonnet
+## Deploy Info
+- **Ultimo deploy**: !`vercel ls --limit 1 2>/dev/null | tail -1 || echo "vercel CLI not configured"`
 
 # ag-D-38 — Smoke Test Vercel
 

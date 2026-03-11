@@ -1,10 +1,11 @@
 ---
 name: ag-Q-43-criar-cenario-ux-qat
 description: Cria cenarios UX-QAT de alta qualidade. Mapeia telas, seleciona rubrics visuais, define interacoes criticas, captura golden screenshots e documenta anti-patterns visuais.
+model: sonnet
+argument-hint: "[nome-da-tela]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
 ---
-
-> **Modelo recomendado:** sonnet
 
 # ag-Q-43 — Criar Cenario UX-QAT
 

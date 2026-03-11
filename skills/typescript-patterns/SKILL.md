@@ -2,6 +2,7 @@
 name: typescript-patterns
 description: Patterns TypeScript strict mode, generics, utility types, e error handling
 context: fork
+user-invocable: false
 ---
 
 # Skill: TypeScript Patterns

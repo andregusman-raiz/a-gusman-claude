@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-03-11
+
+### Changed
+- **Commands eliminated**: All 50 command files removed (were 1-line wrappers duplicating skills)
+  - Agents now invoked exclusively via skills: `/ag-L-NN-nome` -> Skill tool -> SKILL.md
+  - `commands/` directory is empty
+- **22 skills enriched** with Quality Gate, Anti-Patterns, and Output sections:
+  - 10 critical skills (full QG+AP+Output): ag-B-08, ag-B-09, ag-Q-13, ag-Q-14, ag-Q-15, ag-D-18, ag-D-19, ag-P-04, ag-P-07, ag-W-21
+  - 12 additional skills (Output section): ag-B-10, ag-B-11, ag-B-24, ag-D-20, ag-D-27, ag-I-32, ag-I-33, ag-I-34, ag-I-35, ag-M-28, ag-P-05, ag-W-30
+- **ag-Q-13-testar-codigo** expanded from 61L to 128L with comprehensive test patterns:
+  - Test type table (Unit, Integration, Smoke, Error boundary, Access control)
+  - Template per function with minimum expects
+  - Theatrical detection grep commands
+  - Operation modes (--from-spec TDD, pos-implementacao Green)
+  - Agent interaction matrix
+- **ag-M-00 orchestrator catalog** updated: 48 skills | 0 commands
+  - Added ui-ux-pro-max and ag_skill-creator to Table 1.2
+  - Legend updated with `fork=context isolado`
+
+### Added
+- 36 new skill directories (from 20 to 56 total)
+- e2e-batch skill for batch E2E test execution
+- ag-Q-37-gerar-testes-mcp skill
+
+### Removed
+- 50 command wrapper files (ag-B-*.md, ag-D-*.md, ag-I-*.md, ag-M-*.md, ag-P-*.md, ag-Q-*.md, ag-W-*.md, ag-X-*.md, ag_skill-creator.md)
+
 ## [2.0.0] - 2026-03-11
 
 ### Changed
