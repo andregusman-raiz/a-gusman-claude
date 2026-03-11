@@ -6,7 +6,7 @@ Uso:
     python harvest_errors_log.py <errors-log-path> [--output <output-path>]
 
 Parseia o formato padrao do ag-09:
-    ## [Data] — ag-09-depurar-erro
+    ## [Data] — ag-B-09-depurar-erro
     ### Erro: [descricao]
     - **Sintoma:** ...
     - **Causa raiz:** ...
@@ -163,7 +163,7 @@ def classify_bug_type(entry: dict) -> str:
     return "unknown"
 
 
-def entries_to_evals(entries: list[dict], skill_name: str = "ag-09-depurar-erro") -> dict:
+def entries_to_evals(entries: list[dict], skill_name: str = "ag-B-09-depurar-erro") -> dict:
     """Convert harvested entries to evals.json format."""
     evals = []
     for i, entry in enumerate(entries):

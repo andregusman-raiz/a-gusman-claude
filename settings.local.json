@@ -143,6 +143,11 @@
             "type": "command",
             "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm run build'; then bash ~/.claude/hooks/webhook-build-alert.sh; fi",
             "statusMessage": "Build alert webhook..."
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'npm run build|npm run dev'; then bash ~/.claude/hooks/ux-qat-post-build.sh 2>/dev/null; fi",
+            "statusMessage": "UX-QAT screen detection..."
           }
         ]
       }
@@ -190,6 +195,11 @@
             "type": "command",
             "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'gh pr create|vercel deploy'; then BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); if [ \"$BRANCH\" = \"main\" ] || [ \"$BRANCH\" = \"master\" ]; then echo 'DEPLOY PREFLIGHT BLOCKED: Cannot deploy from main/master directly. Create a feature branch first.'; exit 2; fi; fi",
             "statusMessage": "Deploy preflight guard..."
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'vercel deploy|vercel --prod|npm run deploy'; then bash ~/.claude/hooks/ux-qat-pre-deploy.sh 2>/dev/null; fi",
+            "statusMessage": "UX-QAT pre-deploy check..."
           }
         ]
       },

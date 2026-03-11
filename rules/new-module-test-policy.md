@@ -64,6 +64,6 @@ Ao revisar PR que cria novo modulo, verificar:
 
 ## Enforcement
 
-- ag-14 (code review) deve verificar esta policy em PRs
-- ag-13 (testar) deve gerar estes testes ao criar modulo novo
-- ag-12 (validar) deve verificar que testes existem para modulos novos
+- ag-Q-14 (code review) deve verificar esta policy em PRs
+- ag-Q-13 (testar) deve gerar estes testes ao criar modulo novo
+- ag-Q-12 (validar) deve verificar que testes existem para modulos novos

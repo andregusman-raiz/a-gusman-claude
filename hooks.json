@@ -22,7 +22,11 @@
           },
           {
             "type": "command",
-            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/quality-trend-check.sh \"$TOOL_INPUT\" 2>/dev/null || true"
+            "command": "bash .claude/hooks/quality-trend-check.sh \"$TOOL_INPUT\" 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/ux-qat-pre-deploy.sh \"$TOOL_INPUT\" 2>/dev/null || true"
           }
         ]
       },
@@ -58,11 +62,15 @@
           },
           {
             "type": "command",
-            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/otel-span-check.sh 2>/dev/null || true"
+            "command": "bash .claude/hooks/otel-span-check.sh 2>/dev/null || true"
           },
           {
             "type": "command",
-            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/smart-test-suggest.sh 2>/dev/null || true"
+            "command": "bash .claude/hooks/smart-test-suggest.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/theatrical-scan.sh"
           }
         ]
       },
@@ -75,12 +83,28 @@
           },
           {
             "type": "command",
-            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/post-deploy-monitor.sh \"$TOOL_INPUT\" 2>/dev/null || true",
+            "command": "bash .claude/hooks/post-deploy-monitor.sh \"$TOOL_INPUT\" 2>/dev/null || true",
             "timeout": 60000
           },
           {
             "type": "command",
-            "command": "bash /Users/andregusmandeoliveira/Claude/.claude/hooks/error-context-enricher.sh \"$TOOL_OUTPUT\" 2>/dev/null || true"
+            "command": "bash .claude/hooks/error-context-enricher.sh \"$TOOL_OUTPUT\" 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/ux-qat-post-build.sh \"$TOOL_INPUT\" 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/webhook-build-alert.sh \"$TOOL_INPUT\" 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/webhook-git-audit.sh \"$TOOL_INPUT\" 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/webhook-test-metrics.sh \"$TOOL_INPUT\" 2>/dev/null || true"
           }
         ]
       }
@@ -95,6 +119,14 @@
           {
             "type": "command",
             "command": "bash .shared/sync.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-logger.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/self-improve-check.sh 2>/dev/null || true"
           }
         ]
       }

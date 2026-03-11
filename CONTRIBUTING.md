@@ -18,7 +18,7 @@
    Use the ag-XX-your-agent agent to [action]: $ARGUMENTS
    ```
 
-3. Add the agent to `skills/ag-00-orquestrar/SKILL.md` catalog
+3. Add the agent to `skills/ag-M-00-orquestrar/SKILL.md` catalog
 
 4. Run validation: `bash scripts/validate-framework.sh`
 
