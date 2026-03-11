@@ -154,6 +154,53 @@ def find_skill_file(skill_name: str) -> Path:
     )
 
 
+def _claude_env() -> dict:
+    """Return env dict with CLAUDECODE unset so claude -p can run from hooks."""
+    import os
+    env = os.environ.copy()
+    env.pop("CLAUDECODE", None)
+    return env
+
+
+def _extract_json_from_response(text: str) -> dict:
+    """Extract JSON from claude -p response.
+
+    Handles two formats:
+      1. --output-format json: returns {"type":"result","result":"..."} wrapper
+      2. Raw text with JSON embedded in markdown code fences or plain
+    """
+    # Try parsing as direct JSON first
+    try:
+        data = json.loads(text)
+        # If it's the wrapper format, extract the result text and re-parse
+        if isinstance(data, dict) and "result" in data:
+            inner = data["result"]
+            if isinstance(inner, str):
+                return _extract_json_from_response(inner)
+            return inner
+        return data
+    except json.JSONDecodeError:
+        pass
+
+    # Try extracting JSON from markdown code fences
+    m = re.search(r'```(?:json)?\s*\n?({.*?})\s*\n?```', text, re.DOTALL)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except json.JSONDecodeError:
+            pass
+
+    # Try finding first { ... } block
+    m = re.search(r'(\{.*\})', text, re.DOTALL)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except json.JSONDecodeError:
+            pass
+
+    return {}
+
+
 def run_grade(skill_name: str, evals_path: Path, iteration: int) -> dict:
     """Fase 2: Grade skill contra evals usando claude -p."""
     skill_path = find_skill_file(skill_name)
@@ -161,6 +208,7 @@ def run_grade(skill_name: str, evals_path: Path, iteration: int) -> dict:
     workspace.mkdir(parents=True, exist_ok=True)
 
     evals = json.loads(evals_path.read_text())
+    env = _claude_env()
 
     results = []
     for eval_item in evals.get("evals", []):
@@ -176,21 +224,28 @@ ASSERTIONS TO CHECK (does the skill provide guidance for each?):
 {json.dumps(eval_item.get('assertions', []), indent=2)}
 
 For each assertion, determine if the skill's instructions would lead a model to satisfy it.
-Respond with JSON: {{"expectations": [{{"text": "...", "passed": true/false, "evidence": "..."}}]}}
+Respond with ONLY valid JSON (no markdown, no explanation): {{"expectations": [{{"text": "...", "passed": true/false, "evidence": "..."}}]}}
 """
         # Run via claude -p
         try:
             result = subprocess.run(
                 ["claude", "-p", prompt, "--output-format", "json"],
-                capture_output=True, text=True, timeout=120
+                capture_output=True, text=True, timeout=180, env=env
             )
-            if result.returncode == 0:
-                grading = json.loads(result.stdout)
-                results.append({"eval_id": eval_item["id"], "grading": grading})
+            if result.returncode == 0 and result.stdout.strip():
+                grading = _extract_json_from_response(result.stdout)
+                if grading:
+                    results.append({"eval_id": eval_item["id"], "grading": grading})
+                else:
+                    print(f"  WARN: could not parse JSON for eval {eval_item['id']}")
+                    results.append({"eval_id": eval_item["id"], "error": "JSON parse failed"})
             else:
-                print(f"  WARN: claude -p falhou para eval {eval_item['id']}")
+                print(f"  WARN: claude -p falhou para eval {eval_item['id']}: {result.stderr[:200]}")
                 results.append({"eval_id": eval_item["id"], "error": result.stderr[:200]})
-        except (subprocess.TimeoutExpired, json.JSONDecodeError) as e:
+        except subprocess.TimeoutExpired:
+            print(f"  WARN: timeout no eval {eval_item['id']}")
+            results.append({"eval_id": eval_item["id"], "error": "timeout"})
+        except Exception as e:
             print(f"  WARN: erro no eval {eval_item['id']}: {e}")
             results.append({"eval_id": eval_item["id"], "error": str(e)})
 
@@ -206,8 +261,15 @@ def run_analyze(results: list[dict]) -> dict:
     total = 0
     passed = 0
     failed_assertions = []
+    errored_evals = 0
 
     for r in results:
+        if "error" in r:
+            # Eval that errored (claude -p failed, timeout, etc.) counts as 1 failed assertion
+            errored_evals += 1
+            total += 1
+            failed_assertions.append(f"[EVAL ERROR] {r['eval_id']}: {r['error'][:100]}")
+            continue
         grading = r.get("grading", {})
         for exp in grading.get("expectations", []):
             total += 1
@@ -224,6 +286,7 @@ def run_analyze(results: list[dict]) -> dict:
         "failed": total - passed,
         "pass_rate": pass_rate,
         "failed_assertions": failed_assertions,
+        "errored_evals": errored_evals,
     }
 
 
@@ -232,44 +295,83 @@ def run_improve(skill_name: str, analysis: dict, evals_path: Path) -> bool:
     skill_path = find_skill_file(skill_name)
     current_skill = skill_path.read_text()
 
-    prompt = f"""You are a skill improvement agent. A skill was evaluated and needs improvement.
+    # Only include failed assertion texts (not full evals) to keep prompt manageable
+    failed_list = "\n".join(f"  - {fa}" for fa in analysis["failed_assertions"][:15])
 
-CURRENT SKILL:
+    prompt = f"""You are a skill improvement agent. A skill was evaluated against real debugging scenarios and needs improvement.
+
+CURRENT SKILL (this is the full file you must improve):
 {current_skill}
 
 ANALYSIS:
-- Pass rate: {analysis['pass_rate']:.0%}
-- Failed assertions: {json.dumps(analysis['failed_assertions'], indent=2)}
+- Pass rate: {analysis['pass_rate']:.0%} ({analysis['passed']}/{analysis['total_assertions']} assertions passed)
+- Failed assertions:
+{failed_list}
 
-REAL EVAL CASES (from errors-log.md):
-{evals_path.read_text()}
+The failed assertions show gaps in the skill's guidance. The skill needs better coverage for:
+1. Multi-cause bugs (multiple independent root causes)
+2. Deploy-related issues (code deployed but old version still serving)
+3. Complex multi-layer bugs (frontend + backend + config combined)
+4. Permission/access control inconsistencies across layers
 
-Improve the SKILL.md to address the failed assertions. Keep everything that works (pass rate was {analysis['pass_rate']:.0%}).
-Focus on: decision trees, examples, checklists for the gaps found.
+Improve the skill to address these gaps. Keep everything that already works.
+Focus on adding: decision trees, checklists, examples for the failure patterns above.
 
-Output ONLY the improved SKILL.md content (full file, no markdown code fences).
+IMPORTANT: Output the COMPLETE improved skill file content. No markdown code fences. No explanations. Just the full improved file.
 """
 
+    env = _claude_env()
     try:
+        # Use shell to pipe prompt via stdin with cat, and use sonnet model for speed
+        prompt_file = Path("/tmp/self-improve-prompt.txt")
+        prompt_file.write_text(prompt)
         result = subprocess.run(
-            ["claude", "-p", prompt],
-            capture_output=True, text=True, timeout=300
+            'cat /tmp/self-improve-prompt.txt | claude -p --model sonnet',
+            capture_output=True, text=True, timeout=900, env=env, shell=True
         )
-        if result.returncode == 0 and len(result.stdout) > 500:
-            # Backup current
-            backup_path = WORKSPACE_DIR / skill_name / "skill-backups" / f"SKILL-{datetime.now().strftime('%Y%m%d-%H%M%S')}.md"
-            backup_path.parent.mkdir(parents=True, exist_ok=True)
-            backup_path.write_text(current_skill)
+        print(f"  claude -p returncode={result.returncode}, stdout={len(result.stdout)} chars, stderr={len(result.stderr)} chars")
+        if result.stderr.strip():
+            print(f"  stderr: {result.stderr[:500]}")
 
-            # Write improved
-            skill_path.write_text(result.stdout)
-            print(f"Skill melhorada. Backup em: {backup_path}")
-            return True
+        if result.returncode == 0 and result.stdout.strip():
+            # Extract text from JSON wrapper if present
+            improved_text = result.stdout
+            try:
+                wrapper = json.loads(improved_text)
+                if isinstance(wrapper, dict) and "result" in wrapper:
+                    improved_text = wrapper["result"]
+            except json.JSONDecodeError:
+                pass  # Not JSON-wrapped, use as-is
+
+            # Strip markdown code fences if present
+            stripped = improved_text.strip()
+            if stripped.startswith("```") and stripped.endswith("```"):
+                # Remove first line (```markdown or ```) and last line (```)
+                lines = stripped.split("\n")
+                stripped = "\n".join(lines[1:-1]).strip()
+                improved_text = stripped
+
+            if len(improved_text) > 500:
+                # Backup current
+                backup_path = WORKSPACE_DIR / skill_name / "skill-backups" / f"SKILL-{datetime.now().strftime('%Y%m%d-%H%M%S')}.md"
+                backup_path.parent.mkdir(parents=True, exist_ok=True)
+                backup_path.write_text(current_skill)
+
+                # Write improved
+                skill_path.write_text(improved_text)
+                print(f"Skill melhorada. Backup em: {backup_path}")
+                return True
+            else:
+                print(f"WARN: claude -p retornou output muito curto ({len(improved_text)} chars)")
+                print(f"  First 200 chars: {improved_text[:200]}")
+                return False
         else:
-            print(f"WARN: claude -p retornou output invalido ({len(result.stdout)} chars)")
+            print(f"WARN: claude -p retornou output invalido (rc={result.returncode}, stdout={len(result.stdout)} chars)")
+            if result.stdout:
+                print(f"  First 300 chars: {result.stdout[:300]}")
             return False
     except subprocess.TimeoutExpired:
-        print("WARN: timeout na melhoria")
+        print("WARN: timeout na melhoria (600s)")
         return False
 
 
@@ -368,23 +470,32 @@ def main():
             print(f"  - {fa}")
 
     # Phase 4: Improve (if needed)
+    action_taken = "no-action"
+    validation_analysis = None
     if analysis["pass_rate"] < args.threshold:
         print(f"\n--- FASE 4: IMPROVE (pass_rate {analysis['pass_rate']:.0%} < threshold {args.threshold:.0%}) ---")
         improved = run_improve(skill_name, analysis, evals_path)
         if improved:
+            action_taken = "improved"
             print("\n--- FASE 5: VALIDATE ---")
             grade_result_2 = run_grade(skill_name, evals_path, iteration=2)
             analysis_2 = run_analyze(grade_result_2["results"])
             print(f"Pass rate apos melhoria: {analysis_2['pass_rate']:.0%}")
 
+            validation_analysis = analysis_2
             if analysis_2["pass_rate"] <= analysis["pass_rate"]:
                 print("WARN: Melhoria nao melhorou pass rate. Revertendo.")
+                action_taken = "reverted"
                 # Find most recent backup and restore
                 backups = sorted((WORKSPACE_DIR / skill_name / "skill-backups").glob("SKILL-*.md"))
                 if backups:
                     find_skill_file(skill_name).write_text(backups[-1].read_text())
                     print("Revertido para versao anterior.")
+            else:
+                action_taken = "improved-validated"
+                print(f"Melhoria validada: {analysis['pass_rate']:.0%} -> {analysis_2['pass_rate']:.0%}")
         else:
+            action_taken = "improve-failed"
             print("Melhoria falhou. Skill mantida.")
     else:
         print(f"\nPass rate {analysis['pass_rate']:.0%} >= threshold {args.threshold:.0%}. Skill OK, nenhuma melhoria necessaria.")
@@ -397,8 +508,11 @@ def main():
         "evals_count": len(evals["evals"]),
         "analysis": analysis,
         "threshold": args.threshold,
-        "action": "improved" if analysis["pass_rate"] < args.threshold else "no-action",
+        "action": action_taken,
     }
+    # Include validation results if improvement was attempted
+    if action_taken in ("improved-validated", "reverted") and validation_analysis is not None:
+        report["validation"] = validation_analysis
     report_path = WORKSPACE_DIR / skill_name / "self-improve-reports" / f"report-{datetime.now().strftime('%Y%m%d')}.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False))

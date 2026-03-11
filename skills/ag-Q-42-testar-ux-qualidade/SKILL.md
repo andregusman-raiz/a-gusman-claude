@@ -1,10 +1,12 @@
 ---
 name: ag-Q-42-testar-ux-qualidade
 description: UX-QAT PDCA Orchestrator — executa Visual Quality Acceptance Testing com ciclo Plan-Do-Check-Act. Captura screenshots por breakpoint/tema, avalia com AI Judge multimodal, classifica falhas visuais, atualiza KB automaticamente.
+model: sonnet
+context: fork
+argument-hint: "[projeto-path] [--layers=L1,L2,L3,L4] [--calibrate]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
 ---
-
-> **Modelo recomendado:** sonnet
 
 # ag-Q-42 — UX-QAT Visual Quality Testing
 

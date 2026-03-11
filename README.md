@@ -1,12 +1,13 @@
 # Gusman Claude Agent System
 
 > Transform Claude Code from a passive assistant into an autonomous development platform.
-> 37 specialized agents. Battle-tested across 155+ real sessions. Self-improving.
+> 46 specialized agents. 56 skills. Battle-tested across 200+ real sessions. Self-improving.
 
 ## Why This Exists
 
 Claude Code is powerful but generic. This framework adds:
-- **37 specialized agents** that know exactly what to do at each phase of development
+- **46 specialized agents** that know exactly what to do at each phase of development
+- **56 skills** with Quality Gates, Anti-Patterns, and structured outputs
 - **Defense-in-depth safety** with 4 layers of protection (hooks, rules, permissions, governance)
 - **Self-improvement pipeline** that learns from failures and improves agent prompts
 - **Model routing** that uses the right model for the right task (haiku for scans, opus for debugging)
@@ -18,54 +19,68 @@ Claude Code is powerful but generic. This framework adds:
 # Clone and install
 git clone https://github.com/andregusman-raiz/a-gusman-claude.git
 cd your-project
-cp -r /path/to/claude-agent-system/{agents,commands,skills,rules,hooks,Playbooks,scripts} .claude/
-cp claude-agent-system/CLAUDE.md .
-cp claude-agent-system/hooks.json .claude/
+cp -r /path/to/a-gusman-claude/{agents,skills,rules,hooks,Playbooks,scripts} .claude/
+cp a-gusman-claude/CLAUDE.md .
+cp a-gusman-claude/hooks.json .claude/
 
 # Or use the installer
-bash /path/to/claude-agent-system/install.sh --tier full
+bash /path/to/a-gusman-claude/install.sh --tier full
 
 # Start Claude Code and orchestrate
 claude
-# Then type: /ag00 analyze this project
+# Then type: /ag-M-00-orquestrar analyze this project
 ```
 
 ## Architecture
 
 ```
-                        /ag00 (user command)
+                    /ag-M-00-orquestrar (user skill)
                               |
-                    ag-00 Orchestrator
-                    (classifies intent)
+                    ag-M-00 Orchestrator
+                    (classifies intent, selects workflow)
                               |
             +---------+-------+--------+---------+
             |         |       |        |         |
          Discover   Plan    Build   Validate   Deploy
-        ag-03/04   ag-06   ag-08   ag-12/13   ag-18/19
-        ag-05      ag-07   ag-09   ag-14/15   ag-20/27
-                           ag-10
-                           ag-11
+        ag-P-03    ag-P-06 ag-B-08 ag-Q-12    ag-D-18
+        ag-P-04    ag-P-07 ag-B-09 ag-Q-13    ag-D-19
+        ag-P-05            ag-B-10 ag-Q-14    ag-D-20
+                           ag-B-11 ag-Q-15    ag-D-27
 
     Safety Layers:
     [PreToolUse Hooks] -> [Rules] -> [Permissions] -> [CLAUDE.md]
 ```
 
+### Naming Convention: `ag-L-NN-nome`
+
+| Category | Letter | Agents |
+|----------|--------|--------|
+| Planning | P | ag-P-01 through ag-P-07 |
+| Build & Fix | B | ag-B-08 through ag-B-26 |
+| Quality & Testing | Q | ag-Q-12 through ag-Q-45 |
+| Deploy & Ops | D | ag-D-17 through ag-D-38 |
+| Writing & Docs | W | ag-W-21, ag-W-29 through ag-W-31 |
+| Integration | I | ag-I-32 through ag-I-35 |
+| Meta | M | ag-M-00, ag-M-28, ag-M-47, ag-M-99 |
+| External | X | ag-X-46 |
+
 ## Agents by Phase
 
 | Phase | Agents | What They Do |
 |-------|--------|-------------|
-| **Discover** | ag-03, ag-04, ag-05 | Map codebase, analyze tech debt, research solutions |
-| **Plan** | ag-06, ag-07 | Write technical specs, decompose into task plans |
-| **Build** | ag-08, ag-09, ag-10, ag-11 | Implement code, debug, refactor, optimize |
-| **Validate** | ag-12, ag-13, ag-14, ag-15 | Verify completeness, test, review, audit security |
-| **UX & Docs** | ag-16, ag-21, ag-29, ag-31 | Review UX, generate docs, create Office files |
-| **Data** | ag-17 | Database migrations with zero-downtime |
-| **Git & Deploy** | ag-18, ag-19, ag-20, ag-27 | Version control, deploy, monitor, full pipeline |
-| **E2E Testing** | ag-22, ag-36, ag-37, ag-38 | Playwright tests, exploratory QA, smoke tests |
-| **Bug Fixing** | ag-23, ag-24, ag-25, ag-26 | Batch fixes, parallel fixes, triage, verified fixes |
-| **Operations** | ag-28, ag-30 | Session health, file organization |
-| **Incorporation** | ag-32, ag-33, ag-34, ag-35 | Due diligence, integration mapping, module adoption |
-| **Meta** | ag-00, ag-M, ag_skill-creator | Orchestration, self-improvement, skill creation |
+| **Discover** | ag-P-03, ag-P-04, ag-P-05 | Map codebase, analyze tech debt, research solutions |
+| **Plan** | ag-P-06, ag-P-07 | Write technical specs, decompose into task plans |
+| **Build** | ag-B-08, ag-B-09, ag-B-10, ag-B-11 | Implement code, debug, refactor, optimize |
+| **Validate** | ag-Q-12, ag-Q-13, ag-Q-14, ag-Q-15 | Verify completeness, test, review, audit security |
+| **UX & Docs** | ag-Q-16, ag-W-21, ag-W-29, ag-W-31 | Review UX, generate docs, create Office files |
+| **Data** | ag-D-17 | Database migrations with zero-downtime |
+| **Git & Deploy** | ag-D-18, ag-D-19, ag-D-20, ag-D-27 | Version control, deploy, monitor, full pipeline |
+| **E2E Testing** | ag-Q-22, ag-Q-36, ag-D-38 | Playwright tests, exploratory QA, smoke tests |
+| **QAT** | ag-Q-39 through ag-Q-45 | Quality Acceptance Testing (PDCA cycles, benchmarks, UX-QAT) |
+| **Bug Fixing** | ag-B-23, ag-B-24, ag-B-25, ag-B-26 | Batch fixes, parallel fixes, triage, verified fixes |
+| **Operations** | ag-M-28, ag-W-30 | Session health, file organization |
+| **Incorporation** | ag-I-32, ag-I-33, ag-I-34, ag-I-35 | Due diligence, integration mapping, module adoption |
+| **Meta** | ag-M-00, ag-M-47, ag-M-99, ag_skill-creator | Orchestration, agent factory, self-improvement |
 
 ## Key Features
 
@@ -74,9 +89,9 @@ Each agent uses the optimal model for its task:
 
 | Model | Agents | Use Case |
 |-------|--------|----------|
-| **Haiku** | ag-03, 04, 05, 12, 25, 28, 31 | Fast scans, triage, health checks |
-| **Sonnet** | 28 agents | Building, testing, deploying |
-| **Opus** | ag-04, ag-09 | Deep analysis, complex debugging |
+| **Haiku** | ag-P-03, 05, Q-12, B-25, M-28, W-31 | Fast scans, triage, health checks |
+| **Sonnet** | ~38 agents | Building, testing, deploying |
+| **Opus** | ag-P-04, ag-B-09 | Deep analysis, complex debugging |
 
 ### Safety Hooks (Defense-in-Depth)
 
@@ -105,13 +120,22 @@ ag-24 (Team Lead)
 errors-log.md -> ag-M (analyze patterns) -> ag_skill-creator (eval + improve) -> better agents
 ```
 
+## Invocation
+
+All agents are invoked via skills (no commands needed):
+```
+User types /ag-B-08-construir-codigo → Skill tool → SKILL.md → Agent subprocess
+```
+
+Skills run in main context. Agents run as isolated subprocesses (200K tokens each).
+
 ## Installation Tiers
 
 | Tier | Files | Setup Time | What's Included |
 |------|-------|-----------|-----------------|
-| **Starter** | ~10 | 2 min | CLAUDE.md + core rules + safety hooks + orchestrator |
-| **Standard** | ~60 | 10 min | + 16 core agents + all rules + all hooks + pattern skills |
-| **Full** | 180+ | 20 min | + all 37 agents + all skills + playbooks + scripts |
+| **Starter** | ~15 | 2 min | CLAUDE.md + core rules + safety hooks + orchestrator |
+| **Standard** | ~80 | 10 min | + 16 core agents + all rules + all hooks + pattern skills |
+| **Full** | 250+ | 20 min | + all 46 agents + 56 skills + playbooks + .shared/ |
 
 ## Configuration
 
@@ -139,25 +163,25 @@ model: opus     # Powerful -- for complex analysis
 
 ### New Feature
 ```
-/ag03 explore the codebase    ->  understand structure
-/ag06 spec: user auth module  ->  technical specification
-/ag07 plan from spec          ->  task plan with phases
-/ag08 build from plan         ->  implementation
-/ag13 test the new module     ->  unit + integration tests
-/ag14 review the changes      ->  code review
-/ag18 commit and PR           ->  version control
+/ag-P-03-explorar-codigo      ->  understand structure
+/ag-P-06-especificar-solucao  ->  technical specification
+/ag-P-07-planejar-execucao    ->  task plan with phases
+/ag-B-08-construir-codigo     ->  implementation
+/ag-Q-13-testar-codigo        ->  unit + integration tests
+/ag-Q-14-criticar-projeto     ->  code review
+/ag-D-18-versionar-codigo     ->  commit and PR
 ```
 
 ### Bug Sprint
 ```
-/ag25 triage these 10 bugs    ->  classify by severity
-/ag24 fix in parallel         ->  parallel execution via Agent Teams
-/ag12 validate all fixes      ->  completeness check
+/ag-B-25-diagnosticar-bugs    ->  classify by severity
+/ag-B-24-bugfix-paralelo      ->  parallel execution via Agent Teams
+/ag-Q-12-validar-execucao     ->  completeness check
 ```
 
 ### Deploy
 ```
-/ag27 full pipeline           ->  typecheck -> lint -> test -> build -> deploy -> smoke
+/ag-D-27-deploy-pipeline      ->  typecheck -> lint -> test -> build -> deploy -> smoke
 ```
 
 ## Documentation
@@ -165,21 +189,20 @@ model: opus     # Powerful -- for complex analysis
 | Doc | Content |
 |-----|---------|
 | [Setup Guide](docs/01-SETUP-GUIDE.md) | Step-by-step installation |
-| [Agent Reference](docs/02-AGENT-REFERENCE.md) | All 37 agents with prompts |
-| [Skill Reference](docs/03-SKILL-REFERENCE.md) | All 14 skills |
+| [Agent Reference](docs/02-AGENT-REFERENCE.md) | All 46 agents with prompts |
+| [Skill Reference](docs/03-SKILL-REFERENCE.md) | All 56 skills |
 | [Hook Reference](docs/04-HOOK-REFERENCE.md) | Safety and quality hooks |
-| [Rule Reference](docs/05-RULE-REFERENCE.md) | 29 governance rules |
+| [Rule Reference](docs/05-RULE-REFERENCE.md) | 21 governance rules |
 | [Playbooks](docs/06-PLAYBOOKS.md) | 11 strategic methodologies |
-| [Best Practices](docs/07-BEST-PRACTICES.md) | Lessons from 155+ sessions |
+| [Best Practices](docs/07-BEST-PRACTICES.md) | Lessons from 200+ sessions |
 | [Decision Trees](docs/08-DECISION-TREES.md) | When to use each agent |
-| Examples | *(coming soon)* |
 
 ## FAQ
 
 **Works with Python/Go/Rust/Java?**
 Yes. Agents are language-agnostic. Adjust typecheck/lint/test commands in your CLAUDE.md.
 
-**Do I need all 37 agents?**
+**Do I need all 46 agents?**
 No. Start with Starter tier (orchestrator + rules + hooks). Add agents as needed.
 
 **Works on Windows?**
@@ -201,4 +224,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on adding agents, skills, 
 
 ---
 
-*Built by [Andre Gusman](https://github.com/andregusman-raiz). Battle-tested across 155+ development sessions.*
+*Built by [Andre Gusman](https://github.com/andregusman-raiz). Battle-tested across 200+ development sessions.*

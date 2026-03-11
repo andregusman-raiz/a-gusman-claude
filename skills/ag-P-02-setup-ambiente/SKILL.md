@@ -1,9 +1,14 @@
 ---
 name: ag-P-02-setup-ambiente
 description: Gera e mantém infraestrutura de desenvolvimento e CI/CD: Dockerfile, docker-compose, pipeline, env vars. Dev novo roda em 10 min.
+model: sonnet
+argument-hint: "[projeto-path]"
 ---
 
-> **Modelo recomendado:** sonnet
+## Ambiente Detectado
+- **Docker**: !`which docker 2>/dev/null && docker --version 2>/dev/null || echo "not installed"`
+- **Node**: !`node --version 2>/dev/null || echo "not installed"`
+- **Python**: !`python3 --version 2>/dev/null || echo "not installed"`
 
 # ag-P-02 — Setup Ambiente
 

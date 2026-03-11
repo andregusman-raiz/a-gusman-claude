@@ -67,8 +67,9 @@ while IFS= read -r log_path; do
     continue
   fi
 
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Running harvest for skill=$skill_name project=$project_path"
-  python3 "$SCRIPT" "$skill_name" --project "$project_path" --dry-run >> "$LOG" 2>&1 &
+  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Running self-improve for skill=$skill_name project=$project_path"
+  # Unset CLAUDECODE to allow claude -p subprocess (Stop hook still has it set)
+  CLAUDECODE="" python3 "$SCRIPT" "$skill_name" --project "$project_path" >> "$LOG" 2>&1 &
 
 done <<< "$MODIFIED_LOGS"
 

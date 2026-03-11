@@ -208,8 +208,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=\"$CLAUDE_TOOL_INPUT\"; for f in .env .mcp.json package.json tsconfig.json vercel.json playwright.config.ts; do if echo \"$INPUT\" | grep -q \"$f\"; then echo \"WARNING: Writing to config file $f. Use Edit tool for surgical changes instead of Write to avoid overwriting existing config.\"; break; fi; done",
-            "statusMessage": "Config protection..."
+            "command": "bash ~/.claude/hooks/config-guard.sh",
+            "statusMessage": "Config protection guard..."
           }
         ]
       }

@@ -1,10 +1,10 @@
 ---
 name: ag-Q-37-gerar-testes-mcp
 description: Gera testes Playwright production-grade a partir de fluxos reais observados via MCP. Explora o app pelo browser, documenta cada passo, gera codigo TypeScript, valida executando. Use para transformar fluxos explorados em testes automatizados.
+model: sonnet
+argument-hint: "[URL da aplicacao]"
 disable-model-invocation: true
 ---
-
-> **Modelo recomendado:** sonnet
 
 # ag-Q-37 — Gerar Testes via MCP
 

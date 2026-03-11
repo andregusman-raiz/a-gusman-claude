@@ -1,10 +1,14 @@
 ---
 name: ag-Q-22-testar-e2e
 description: QA automatizado com Playwright. Simula usuario real navegando na aplicacao - clica, preenche, navega, e captura tudo que quebra (erros de console, falhas de rede, UI inacessivel, fluxos interrompidos). Gera report visual com screenshots e logs. Use apos /construir e /validar para verificar que a aplicacao funciona de ponta a ponta.
+model: sonnet
+argument-hint: "[projeto-path ou URL]"
 disable-model-invocation: true
 ---
 
-> **Modelo recomendado:** sonnet
+## Ambiente E2E
+- **Playwright**: !`/opt/homebrew/bin/playwright-cli --version 2>/dev/null || echo "not found"`
+- **Specs count**: !`find . -name "*.spec.ts" -path "*/e2e/*" 2>/dev/null | wc -l | tr -d ' '`
 
 # ag-Q-22 — Testar E2E (Playwright)
 

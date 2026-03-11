@@ -1,9 +1,18 @@
 ---
 name: ag-M-00-orquestrar
 description: Entry point do sistema de agentes. Classifica a intencao do usuario, avalia o estado do projeto, seleciona o workflow correto e coordena a execucao dos agentes na ordem certa. Conhece todas as capacidades do sistema — Agent Teams, subagent delegation, worktree isolation, hooks, webhooks — e sabe quando usar cada uma para maximizar qualidade e velocidade.
+model: opus
+context: fork
+argument-hint: "[descricao do que quer fazer]"
+allowed-tools: Read, Glob, Grep, Bash, Agent, Skill
 ---
 
-> **Modelo recomendado:** opus
+## Estado Atual
+- **Branch**: !`git branch --show-current 2>/dev/null || echo "no-git"`
+- **Session**: !`cat docs/ai-state/session-state.json 2>/dev/null || echo "none"`
+- **Roadmap**: !`ls roadmap/items/*.md 2>/dev/null | wc -l | tr -d ' '` items pendentes
+- **Git status**: !`git status --short 2>/dev/null | head -5`
+- **Errors**: !`head -20 docs/ai-state/errors-log.md 2>/dev/null || echo "none"`
 
 # ag-M-00 — Orquestrar
 
@@ -32,7 +41,7 @@ Voce e responsavel por garantir que:
 ## 1. Inventario do Sistema
 
 ### 1.1 Numeros Atuais
-46 agents | 20 skills | 50 commands | 24 hooks | 11 playbooks | 21 rules
+46 agents | 48 skills | 0 commands | 24 hooks | 11 playbooks | 21 rules
 
 ### 1.2 Catalogo Compacto
 
@@ -86,8 +95,10 @@ Voce e responsavel por garantir que:
 | ag-X-46 | buscar-voos | haiku | — | Buscar passagens |
 | ag-M-47 | criar-agente | opus | — | Criar novos agentes |
 | ag-M-99 | melhorar-agentes | opus | Skill | Self-improvement |
+| — | ui-ux-pro-max | sonnet | Skill,fork | UI/UX design intelligence |
+| — | ag_skill-creator | opus | Skill,fork | Criar/melhorar skills |
 
-Legenda: BG=background, Sub=subagents, WT=worktree, Teams=Agent Teams, Plan=permissionMode:plan
+Legenda: BG=background, Sub=subagents, WT=worktree, Teams=Agent Teams, Plan=permissionMode:plan, fork=context isolado
 
 ---
 
