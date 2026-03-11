@@ -32,7 +32,7 @@ fi
 
 # Skills to evaluate
 SKILLS=(
-  "ag-09-depurar-erro"
+  "ag-B-09-depurar-erro"
 )
 
 echo "=== Skill Self-Improvement Run: $TIMESTAMP ===" | tee "$LOG_FILE"

@@ -29,7 +29,7 @@
 2. Identificar secoes que Claude pode descobrir sozinho (Estrutura, Estado Atual, Docs)
 3. Mover convencoes de naming para `D:/.claude/rules/naming-conventions.md`
 4. Remover duplicacao de Quality Gates — manter apenas em `D:/.claude/rules/quality-gate.md`
-5. Substituir tabela de "Sistema de Agentes" por referencia: `@.claude/skills/ag-00-orquestrar/SKILL.md`
+5. Substituir tabela de "Sistema de Agentes" por referencia: `@.claude/skills/ag-M-00-orquestrar/SKILL.md`
 6. Resultado: CLAUDE.md do projeto com ~80 linhas focadas em stack, comandos, e decisoes arquiteturais
 
 ---
@@ -124,7 +124,7 @@
 | 30 | Size gate enforcement no ag-00 (recusar M+ sem spec) | DONE | MEDIO |
 
 ### Passo a Passo — Item 30:
-1. Editar `D:/.claude/skills/ag-00-orquestrar/SKILL.md` — adicionar gate de size
+1. Editar `D:/.claude/skills/ag-M-00-orquestrar/SKILL.md` — adicionar gate de size
 
 ---
 

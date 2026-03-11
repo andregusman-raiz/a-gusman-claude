@@ -51,22 +51,22 @@ docs/claude-code-universal-playbook/03-AGENTS-REFERENCE.md
 ## Passo 3: Commands (16 arquivos)
 
 Para cada agent, crie o command correspondente em .claude/commands/:
-- ag00.md: "Use the ag-00-orquestrar agent to classify and direct: $ARGUMENTS"
-- ag01.md: "Use the ag-01-iniciar-projeto agent to scaffold: $ARGUMENTS"
-- ag02.md: "Use the ag-02-setup-ambiente agent to set up: $ARGUMENTS"
-- ag03.md: "Use the ag-03-construir-codigo agent to build: $ARGUMENTS"
-- ag04.md: "Use the ag-04-depurar-erro agent to debug: $ARGUMENTS"
-- ag05.md: "Use the ag-05-refatorar-codigo agent to refactor: $ARGUMENTS"
-- ag06.md: "Use the ag-06-validar-execucao agent to validate: $ARGUMENTS"
-- ag07.md: "Use the ag-07-testar-codigo agent to test: $ARGUMENTS"
-- ag08.md: "Use the ag-08-testar-e2e agent to E2E test: $ARGUMENTS"
-- ag09.md: "Use the ag-09-criticar-projeto agent to review: $ARGUMENTS"
-- ag10.md: "Use the ag-10-auditar-codigo agent to audit: $ARGUMENTS"
-- ag11.md: "Use the ag-11-revisar-ux agent to review UX: $ARGUMENTS"
-- ag12.md: "Use the ag-12-migrar-dados agent to migrate: $ARGUMENTS"
-- ag13.md: "Use the ag-13-publicar-deploy agent to deploy: $ARGUMENTS"
-- ag14.md: "Use the ag-14-documentar-projeto agent to document: $ARGUMENTS"
-- agM.md: "Use the ag-M-melhorar-agentes agent to analyze and improve: $ARGUMENTS"
+- ag00.md: "Use the ag-M-00-orquestrar agent to classify and direct: $ARGUMENTS"
+- ag01.md: "Use the ag-P-01-iniciar-projeto agent to scaffold: $ARGUMENTS"
+- ag02.md: "Use the ag-P-02-setup-ambiente agent to set up: $ARGUMENTS"
+- ag03.md: "Use the ag-B-03-construir-codigo agent to build: $ARGUMENTS"
+- ag04.md: "Use the ag-B-04-depurar-erro agent to debug: $ARGUMENTS"
+- ag05.md: "Use the ag-B-05-refatorar-codigo agent to refactor: $ARGUMENTS"
+- ag06.md: "Use the ag-Q-06-validar-execucao agent to validate: $ARGUMENTS"
+- ag07.md: "Use the ag-Q-07-testar-codigo agent to test: $ARGUMENTS"
+- ag08.md: "Use the ag-Q-08-testar-e2e agent to E2E test: $ARGUMENTS"
+- ag09.md: "Use the ag-Q-09-criticar-projeto agent to review: $ARGUMENTS"
+- ag10.md: "Use the ag-Q-10-auditar-codigo agent to audit: $ARGUMENTS"
+- ag11.md: "Use the ag-Q-11-revisar-ux agent to review UX: $ARGUMENTS"
+- ag12.md: "Use the ag-D-12-migrar-dados agent to migrate: $ARGUMENTS"
+- ag13.md: "Use the ag-D-13-publicar-deploy agent to deploy: $ARGUMENTS"
+- ag14.md: "Use the ag-W-14-documentar-projeto agent to document: $ARGUMENTS"
+- agM.md: "Use the ag-M-99-melhorar-agentes agent to analyze and improve: $ARGUMENTS"
 
 ## Passo 4: Rules (7 arquivos)
 

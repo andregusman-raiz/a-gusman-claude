@@ -211,9 +211,9 @@ Dar outputs A e B sem revelar qual e qual. Opcional — o review humano geralmen
 
 ## Interacao com Outros Agentes
 
-- **ag-M** (melhorar-agentes): ag_skill-creator fornece eval framework quantitativo; ag-M fornece diagnostico qualitativo
-- **ag-00** (orquestrar): registrado como workflow "Criar/Melhorar Skill"
-- **ag-14** (criticar): pode revisar o SKILL.md como se fosse code review
+- **ag-M-99** (melhorar-agentes): ag_skill-creator fornece eval framework quantitativo; ag-M-99 fornece diagnostico qualitativo
+- **ag-M-00** (orquestrar): registrado como workflow "Criar/Melhorar Skill"
+- **ag-Q-14** (criticar): pode revisar o SKILL.md como se fosse code review
 
 ## Output
 

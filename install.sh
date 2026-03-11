@@ -48,7 +48,7 @@ echo -e "${YELLOW}Installing Starter tier (CLAUDE.md + core rules + safety hooks
 # Core files list - these would be downloaded from the repo
 STARTER_RULES=(config-protection quality-gate root-cause-debugging gsd incremental-commits)
 STARTER_HOOKS=(security-gate secret-scan _env)
-STARTER_SKILLS=(ag-00-orquestrar)
+STARTER_SKILLS=(ag-M-00-orquestrar)
 STARTER_AGENTS=()
 STARTER_COMMANDS=(ag00)
 
@@ -84,9 +84,9 @@ install_file "hooks.json" "$DEST/hooks.json"
 echo -e "${GREEN}  hooks.json${NC}"
 
 # Install orchestrator skill
-mkdir -p "$DEST/skills/ag-00-orquestrar"
-install_file "skills/ag-00-orquestrar/SKILL.md" "$DEST/skills/ag-00-orquestrar/SKILL.md"
-echo -e "${GREEN}  skills/ag-00-orquestrar/SKILL.md${NC}"
+mkdir -p "$DEST/skills/ag-M-00-orquestrar"
+install_file "skills/ag-M-00-orquestrar/SKILL.md" "$DEST/skills/ag-M-00-orquestrar/SKILL.md"
+echo -e "${GREEN}  skills/ag-M-00-orquestrar/SKILL.md${NC}"
 
 # Install ag00 command
 install_file "commands/ag00.md" "$DEST/commands/ag00.md"
@@ -107,12 +107,12 @@ echo -e "${YELLOW}Installing Standard tier (core agents + all rules + all hooks)
 
 # Core agents (16)
 STANDARD_AGENTS=(
-  ag-01-iniciar-projeto ag-02-setup-ambiente ag-03-explorar-codigo
-  ag-04-analisar-contexto ag-05-pesquisar-referencia ag-06-especificar-solucao
-  ag-07-planejar-execucao ag-08-construir-codigo ag-09-depurar-erro
-  ag-10-refatorar-codigo ag-11-otimizar-codigo ag-12-validar-execucao
-  ag-13-testar-codigo ag-14-criticar-projeto ag-15-auditar-codigo
-  ag-18-versionar-codigo
+  ag-P-01-iniciar-projeto ag-P-02-setup-ambiente ag-P-03-explorar-codigo
+  ag-P-04-analisar-contexto ag-P-05-pesquisar-referencia ag-P-06-especificar-solucao
+  ag-P-07-planejar-execucao ag-B-08-construir-codigo ag-B-09-depurar-erro
+  ag-B-10-refatorar-codigo ag-B-11-otimizar-codigo ag-Q-12-validar-execucao
+  ag-Q-13-testar-codigo ag-Q-14-criticar-projeto ag-Q-15-auditar-codigo
+  ag-D-18-versionar-codigo
 )
 
 for agent in "${STANDARD_AGENTS[@]}"; do

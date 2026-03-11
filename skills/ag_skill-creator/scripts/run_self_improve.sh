@@ -4,7 +4,7 @@
 #
 # Uso:
 #   ./run_self_improve.sh --project /path/to/your-project
-#   ./run_self_improve.sh --project /path/to/your-project --skill ag-09-depurar-erro --dry-run
+#   ./run_self_improve.sh --project /path/to/your-project --skill ag-B-09-depurar-erro --dry-run
 #   ./run_self_improve.sh --all-skills --project /path/to/your-project
 #
 # Requisitos: python3, claude CLI no PATH
@@ -55,7 +55,7 @@ elif $ALL_SKILLS; then
   done
 else
   # Default: skills most relevant to debugging/building
-  SKILLS_TO_CHECK=("ag-09-depurar-erro" "ag-08-construir-codigo" "ag-13-testar-codigo")
+  SKILLS_TO_CHECK=("ag-B-09-depurar-erro" "ag-B-08-construir-codigo" "ag-Q-13-testar-codigo")
 fi
 
 echo "=== Self-Improvement Pipeline ==="

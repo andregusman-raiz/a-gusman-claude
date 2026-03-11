@@ -15,7 +15,9 @@ Pipeline:
 Requer: claude CLI no PATH
 """
 
+import glob as glob_module
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -26,7 +28,55 @@ from datetime import datetime
 SCRIPT_DIR = Path(__file__).parent
 CLAUDE_DIR = SCRIPT_DIR.parent.parent.parent  # .claude/
 SKILLS_DIR = CLAUDE_DIR / "skills"
+AGENTS_DIR = CLAUDE_DIR / "agents"
 WORKSPACE_DIR = CLAUDE_DIR / "skills-workspace"
+REGISTRY_PATH = SCRIPT_DIR / "agent_registry.json"
+
+
+def _load_agent_registry() -> dict:
+    """Load agent short-name -> full-name registry from JSON file."""
+    if REGISTRY_PATH.exists():
+        return json.loads(REGISTRY_PATH.read_text())
+    return {}
+
+
+def _resolve_agent_name(skill_name: str) -> str:
+    """
+    Resolve a skill/agent name to its canonical full name.
+
+    Handles three input styles:
+      1. Full name with category:   ag-B-09-depurar-erro  (already canonical)
+      2. Short name without category: ag-B-09-depurar-erro  (strip suffix, lookup)
+      3. Numeric short name only:   ag-09                 (lookup in registry)
+
+    Returns the full name (without .md) if found, or the original value unchanged.
+    """
+    # Style 1: already has category letter prefix (ag-X-NN-...)
+    if re.match(r'^ag-[A-Z]-\d+', skill_name):
+        return skill_name
+
+    registry = _load_agent_registry()
+
+    # Extract numeric part to build the short key "ag-NN"
+    m = re.match(r'^ag-(\d+)', skill_name)
+    if m:
+        short_key = f"ag-{m.group(1)}"
+        if short_key in registry:
+            return registry[short_key]
+
+    # Fallback: scan agents directory for any file matching the numeric part
+    m2 = re.search(r'(\d+)', skill_name)
+    if m2:
+        num = m2.group(1)
+        matches = list(AGENTS_DIR.glob(f"ag-*-{num}-*.md"))
+        if len(matches) == 1:
+            return matches[0].stem  # filename without .md
+        if len(matches) > 1:
+            print(f"  WARN: multiple agent files match numeric '{num}': {[m.name for m in matches]}")
+            return matches[0].stem
+
+    # Could not resolve — return as-is and let find_skill_file() surface the error
+    return skill_name
 
 
 def run_harvest(project_path: Path, skill_name: str) -> Path:
@@ -70,9 +120,43 @@ def run_harvest(project_path: Path, skill_name: str) -> Path:
     return output_path
 
 
+def find_skill_file(skill_name: str) -> Path:
+    """Find the skill/agent definition file (SKILL.md or agent .md).
+
+    Resolution order:
+      1. Skill directory: .claude/skills/<skill_name>/SKILL.md (exact)
+      2. Agent file exact: .claude/agents/<skill_name>.md
+      3. Resolve via registry/scan then retry agent file
+    """
+    # 1. Try skill directory first (exact match)
+    skill_md = SKILLS_DIR / skill_name / "SKILL.md"
+    if skill_md.exists():
+        return skill_md
+
+    # 2. Try exact agent file
+    agent_md = AGENTS_DIR / f"{skill_name}.md"
+    if agent_md.exists():
+        return agent_md
+
+    # 3. Resolve via registry / directory scan and retry
+    resolved = _resolve_agent_name(skill_name)
+    if resolved != skill_name:
+        resolved_md = AGENTS_DIR / f"{resolved}.md"
+        if resolved_md.exists():
+            print(f"  INFO: resolved '{skill_name}' -> '{resolved}'")
+            return resolved_md
+
+    raise FileNotFoundError(
+        f"Skill/agent not found for '{skill_name}'. Tried:\n"
+        f"  {skill_md}\n"
+        f"  {agent_md}\n"
+        f"  {AGENTS_DIR / (resolved + '.md')}"
+    )
+
+
 def run_grade(skill_name: str, evals_path: Path, iteration: int) -> dict:
     """Fase 2: Grade skill contra evals usando claude -p."""
-    skill_path = SKILLS_DIR / skill_name / "SKILL.md"
+    skill_path = find_skill_file(skill_name)
     workspace = WORKSPACE_DIR / skill_name / f"auto-iteration-{iteration}"
     workspace.mkdir(parents=True, exist_ok=True)
 
@@ -145,7 +229,7 @@ def run_analyze(results: list[dict]) -> dict:
 
 def run_improve(skill_name: str, analysis: dict, evals_path: Path) -> bool:
     """Fase 4: Melhorar skill se pass_rate < threshold."""
-    skill_path = SKILLS_DIR / skill_name / "SKILL.md"
+    skill_path = find_skill_file(skill_name)
     current_skill = skill_path.read_text()
 
     prompt = f"""You are a skill improvement agent. A skill was evaluated and needs improvement.
@@ -190,34 +274,75 @@ Output ONLY the improved SKILL.md content (full file, no markdown code fences).
 
 
 def find_errors_logs(project_path: Path) -> list[Path]:
-    """Find all errors-log.md files in project (all known locations)."""
+    """Find all errors-log.md files in project (all known locations).
+
+    Search order:
+      1. Hardcoded high-priority paths (fast, no filesystem walk)
+      2. Worktree paths via glob pattern
+      3. Recursive glob fallback across entire project tree
+    """
     candidates = [
+        # Original paths
         project_path / ".agents" / ".context" / "errors-log.md",
         project_path / "docs" / "ai-state" / "errors-log.md",
         project_path / "raiz-bugs" / "docs" / "ai-state" / "errors-log.md",
+        # Additional paths
+        project_path / "agents" / ".context" / "errors-log.md",
     ]
-    return [c for c in candidates if c.exists()]
+    found = [c for c in candidates if c.exists()]
+    found_set = {str(p) for p in found}
+
+    # Worktree paths: .claude/worktrees/*/errors-log.md
+    worktree_pattern = str(project_path / ".claude" / "worktrees" / "*" / "errors-log.md")
+    for p in glob_module.glob(worktree_pattern):
+        path = Path(p)
+        if str(path) not in found_set:
+            found.append(path)
+            found_set.add(str(path))
+
+    # Recursive fallback: find any errors-log.md under project (depth-limited by glob)
+    recursive_pattern = str(project_path / "**" / "errors-log.md")
+    for p in glob_module.glob(recursive_pattern, recursive=True):
+        path = Path(p)
+        if str(path) not in found_set:
+            found.append(path)
+            found_set.add(str(path))
+
+    return found
 
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Skill Self-Improvement Pipeline")
-    parser.add_argument("--skill", required=True, help="Skill name (e.g., ag-09-depurar-erro)")
-    parser.add_argument("--project", required=True, help="Project path with errors-log.md")
+    # Accept skill name as positional OR as --skill flag for backwards compatibility
+    parser.add_argument("skill_positional", nargs="?", default=None,
+                        metavar="SKILL", help="Skill/agent name (positional, e.g., ag-B-09-depurar-erro)")
+    parser.add_argument("--skill", default=None, help="Skill/agent name (flag form)")
+    parser.add_argument("--project", default=None, help="Project path with errors-log.md")
     parser.add_argument("--threshold", type=float, default=0.80, help="Pass rate threshold (default: 0.80)")
     parser.add_argument("--dry-run", action="store_true", help="Only harvest and analyze, don't improve")
     args = parser.parse_args()
 
-    project_path = Path(args.project).expanduser()
-    print(f"=== Skill Self-Improvement: {args.skill} ===")
+    # Resolve skill name: positional takes precedence over flag
+    skill_name = args.skill_positional or args.skill
+    if not skill_name:
+        parser.error("Skill name is required — provide it positionally or via --skill")
+
+    # Resolve project: default to current working directory if omitted (useful for dry-run tests)
+    project_path = Path(args.project).expanduser() if args.project else Path.cwd()
+
+    # Normalise: resolve via registry if needed
+    skill_name = _resolve_agent_name(skill_name)
+
+    print(f"=== Skill Self-Improvement: {skill_name} ===")
     print(f"Project: {project_path}")
     print(f"Threshold: {args.threshold:.0%}")
     print()
 
     # Phase 1: Harvest
     print("--- FASE 1: HARVEST ---")
-    evals_path = run_harvest(project_path, args.skill)
+    evals_path = run_harvest(project_path, skill_name)
 
     evals = json.loads(evals_path.read_text())
     if not evals.get("evals"):
@@ -230,7 +355,7 @@ def main():
 
     # Phase 2: Grade
     print("\n--- FASE 2: GRADE ---")
-    grade_result = run_grade(args.skill, evals_path, iteration=1)
+    grade_result = run_grade(skill_name, evals_path, iteration=1)
 
     # Phase 3: Analyze
     print("\n--- FASE 3: ANALYZE ---")
@@ -245,19 +370,19 @@ def main():
     # Phase 4: Improve (if needed)
     if analysis["pass_rate"] < args.threshold:
         print(f"\n--- FASE 4: IMPROVE (pass_rate {analysis['pass_rate']:.0%} < threshold {args.threshold:.0%}) ---")
-        improved = run_improve(args.skill, analysis, evals_path)
+        improved = run_improve(skill_name, analysis, evals_path)
         if improved:
             print("\n--- FASE 5: VALIDATE ---")
-            grade_result_2 = run_grade(args.skill, evals_path, iteration=2)
+            grade_result_2 = run_grade(skill_name, evals_path, iteration=2)
             analysis_2 = run_analyze(grade_result_2["results"])
             print(f"Pass rate apos melhoria: {analysis_2['pass_rate']:.0%}")
 
             if analysis_2["pass_rate"] <= analysis["pass_rate"]:
                 print("WARN: Melhoria nao melhorou pass rate. Revertendo.")
                 # Find most recent backup and restore
-                backups = sorted((WORKSPACE_DIR / args.skill / "skill-backups").glob("SKILL-*.md"))
+                backups = sorted((WORKSPACE_DIR / skill_name / "skill-backups").glob("SKILL-*.md"))
                 if backups:
-                    (SKILLS_DIR / args.skill / "SKILL.md").write_text(backups[-1].read_text())
+                    find_skill_file(skill_name).write_text(backups[-1].read_text())
                     print("Revertido para versao anterior.")
         else:
             print("Melhoria falhou. Skill mantida.")
@@ -267,14 +392,14 @@ def main():
     # Save report
     report = {
         "timestamp": datetime.now().isoformat(),
-        "skill": args.skill,
+        "skill": skill_name,
         "project": str(project_path),
         "evals_count": len(evals["evals"]),
         "analysis": analysis,
         "threshold": args.threshold,
         "action": "improved" if analysis["pass_rate"] < args.threshold else "no-action",
     }
-    report_path = WORKSPACE_DIR / args.skill / "self-improve-reports" / f"report-{datetime.now().strftime('%Y%m%d')}.json"
+    report_path = WORKSPACE_DIR / skill_name / "self-improve-reports" / f"report-{datetime.now().strftime('%Y%m%d')}.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False))
     print(f"\nReport salvo em: {report_path}")
