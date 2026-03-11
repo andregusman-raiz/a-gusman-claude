@@ -12,15 +12,15 @@ paths:
 Quer fazer deploy?
 ├── Preview (testar antes de producao)
 │   ├── Via PR → automatico (preview-deploy.yml dispara ao criar PR)
-│   └── Manual → /ag-19 preview
+│   └── Manual → /ag-D-19 preview
 │
 ├── Producao
 │   ├── Caminho padrao → merge PR em main (deploy-gate.yml automatico)
-│   ├── Validacao extra → /ag-27 (pipeline completo 8 etapas)
+│   ├── Validacao extra → /ag-D-27 (pipeline completo 8 etapas)
 │   └── PROIBIDO → vercel --prod manual sem pipeline
 │
 └── Rollback
-    └── /ag-19 rollback (SEMPRE com aprovacao do usuario)
+    └── /ag-D-19 rollback (SEMPRE com aprovacao do usuario)
 ```
 
 ## Caminho Padrao (RECOMENDADO para todo deploy)
@@ -31,7 +31,7 @@ Quer fazer deploy?
 5. deploy-gate.yml: lint → typecheck → test → build → deploy → smoke
 6. Se smoke falha → auto-rollback
 
-## Quando usar ag-27 (pipeline manual)
+## Quando usar ag-D-27 (pipeline manual)
 - Repo sem CI/CD configurado (ex: raiz-agent-dashboard)
 - Precisa de controle granular sobre cada etapa
 - Debug de falhas no pipeline automatico

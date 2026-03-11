@@ -28,11 +28,11 @@ ag-11 (UX Review)                     ag-M (Meta-Improver)
 
 **Funcao**: Classificar e direcionar. NUNCA executa.
 
-Crie o arquivo `.claude/agents/ag-00-orquestrar.md`:
+Crie o arquivo `.claude/agents/ag-M-00-orquestrar.md`:
 
 ```markdown
 ---
-name: ag-00-orquestrar
+name: ag-M-00-orquestrar
 description: "Classificar intencao do usuario, avaliar estado do projeto, sugerir fluxo de agentes. NAO executa — direciona."
 model: sonnet
 tools: Read, Glob, Grep
@@ -71,11 +71,11 @@ NAO execute pipeline automatizada completa.
 
 ## ag-01 — Scaffolder (Projeto Novo)
 
-Crie `.claude/agents/ag-01-iniciar-projeto.md`:
+Crie `.claude/agents/ag-P-01-iniciar-projeto.md`:
 
 ```markdown
 ---
-name: ag-01-iniciar-projeto
+name: ag-P-01-iniciar-projeto
 description: "Scaffolding completo: pastas, configs, .env.example, gitignore, CI base, README, docs/ai-state/, git init."
 model: sonnet
 tools: Bash, Read, Write, Edit, Glob
@@ -102,11 +102,11 @@ Sugerir: "Projeto criado. Proximo: ag-02 (ambiente) ou ag-03 (construir)."
 
 ## ag-02 — Ambiente
 
-Crie `.claude/agents/ag-02-setup-ambiente.md`:
+Crie `.claude/agents/ag-P-02-setup-ambiente.md`:
 
 ```markdown
 ---
-name: ag-02-setup-ambiente
+name: ag-P-02-setup-ambiente
 description: "Infraestrutura: Dockerfile multi-stage, docker-compose completo, CI pipeline, env vars, scripts de setup."
 model: sonnet
 tools: Bash, Read, Write, Edit, Glob
@@ -132,11 +132,11 @@ Sugerir: "Ambiente pronto. Proximo: design (skill) ou ag-03 para construir."
 
 ## ag-03 — Builder (Agent Principal)
 
-Crie `.claude/agents/ag-03-construir-codigo.md`:
+Crie `.claude/agents/ag-B-03-construir-codigo.md`:
 
 ```markdown
 ---
-name: ag-03-construir-codigo
+name: ag-B-03-construir-codigo
 description: "O Builder. Implementar codigo seguindo task_plan.md. Agente principal de construcao. Salva estado a cada 5 acoes, re-le plano a cada 10."
 model: opus
 tools: Bash, Read, Write, Edit, Glob, Grep
@@ -194,11 +194,11 @@ Sugerir: "Codigo pronto. Proximo: ag-06 (validar) ou ag-07 (testar)."
 
 ## ag-04 — Debugger
 
-Crie `.claude/agents/ag-04-depurar-erro.md`:
+Crie `.claude/agents/ag-B-04-depurar-erro.md`:
 
 ```markdown
 ---
-name: ag-04-depurar-erro
+name: ag-B-04-depurar-erro
 description: "O Detetive. Encontrar causa raiz, nao sintomas. Le errors-log.md ANTES para nao repetir tentativas falhas."
 model: opus
 tools: Bash, Read, Write, Edit, Glob, Grep
@@ -234,11 +234,11 @@ Sugerir: "Bug corrigido. Proximo: ag-07 (teste de regressao)."
 
 ## ag-05 — Refactorer
 
-Crie `.claude/agents/ag-05-refatorar-codigo.md`:
+Crie `.claude/agents/ag-B-05-refatorar-codigo.md`:
 
 ```markdown
 ---
-name: ag-05-refatorar-codigo
+name: ag-B-05-refatorar-codigo
 description: "Cirurgiao + Otimizador. Muda estrutura sem mudar comportamento. RECUSA sem testes. Medir antes/depois para otimizacao."
 model: opus
 tools: Bash, Read, Write, Edit, Glob, Grep
@@ -264,11 +264,11 @@ Sugerir: "Refatoracao completa. Proximo: ag-07 (re-test)."
 
 ## ag-06 — Validador
 
-Crie `.claude/agents/ag-06-validar-execucao.md`:
+Crie `.claude/agents/ag-Q-06-validar-execucao.md`:
 
 ```markdown
 ---
-name: ag-06-validar-execucao
+name: ag-Q-06-validar-execucao
 description: "Inspetor de Obra. Verifica se task_plan.md foi implementado por completo. Avalia COMPLETUDE, nao qualidade. Independente do builder."
 model: sonnet
 tools: Read, Glob, Grep
@@ -304,11 +304,11 @@ Sugerir: "Validacao concluida. [Y/X implementados]. Proximo: ag-03 para completa
 
 ## ag-07 — Tester
 
-Crie `.claude/agents/ag-07-testar-codigo.md`:
+Crie `.claude/agents/ag-Q-07-testar-codigo.md`:
 
 ```markdown
 ---
-name: ag-07-testar-codigo
+name: ag-Q-07-testar-codigo
 description: "Criar testes unitarios e de integracao. Happy path, error path, edge cases. Registra falhas em errors-log.md."
 model: sonnet
 tools: Bash, Read, Write, Edit, Glob, Grep
@@ -336,11 +336,11 @@ Sugerir: "Testes criados. Proximo: ag-08 (E2E) ou ag-09 (review)."
 
 ## ag-08 — E2E Tester
 
-Crie `.claude/agents/ag-08-testar-e2e.md`:
+Crie `.claude/agents/ag-Q-08-testar-e2e.md`:
 
 ```markdown
 ---
-name: ag-08-testar-e2e
+name: ag-Q-08-testar-e2e
 description: "Usuario Automatizado. Testa no browser com Playwright. APIs reais, nao mocks. Captura tudo."
 model: sonnet
 tools: Bash, Read, Write, Edit, Glob, Grep
@@ -362,11 +362,11 @@ Sugerir: "E2E completo. Proximo: ag-09 (review) ou ag-10 (seguranca)."
 
 ## ag-09 — Code Reviewer
 
-Crie `.claude/agents/ag-09-criticar-projeto.md`:
+Crie `.claude/agents/ag-Q-09-criticar-projeto.md`:
 
 ```markdown
 ---
-name: ag-09-criticar-projeto
+name: ag-Q-09-criticar-projeto
 description: "Revisor. Le diff e questiona DECISOES de design, nao apenas codigo. Classifica: blocking, suggestion, nit, question."
 model: opus
 tools: Read, Glob, Grep
@@ -393,11 +393,11 @@ Sugerir: "Review completo. Proximo: aplicar fixes blocking com ag-03."
 
 ## ag-10 — Auditor de Seguranca
 
-Crie `.claude/agents/ag-10-auditar-codigo.md`:
+Crie `.claude/agents/ag-Q-10-auditar-codigo.md`:
 
 ```markdown
 ---
-name: ag-10-auditar-codigo
+name: ag-Q-10-auditar-codigo
 description: "Auditor de seguranca. OWASP Top 10, secrets, deps vulneraveis, permissoes, auth bypass."
 model: sonnet
 tools: Bash, Read, Glob, Grep
@@ -417,11 +417,11 @@ Sugerir: "Auditoria concluida. Proximo: corrigir criticos com ag-03, ou ag-13 (d
 
 ## ag-11 — UX Reviewer
 
-Crie `.claude/agents/ag-11-revisar-ux.md`:
+Crie `.claude/agents/ag-Q-11-revisar-ux.md`:
 
 ```markdown
 ---
-name: ag-11-revisar-ux
+name: ag-Q-11-revisar-ux
 description: "Defensor do usuario. UX, acessibilidade, consistencia, fluxos, mobile. Usa Ralph Loop."
 model: sonnet
 tools: Read, Glob, Grep, Bash
@@ -439,11 +439,11 @@ Sugerir: "Review UX completo. Proximo: aplicar melhorias com ag-03."
 
 ## ag-12 — Migrator
 
-Crie `.claude/agents/ag-12-migrar-dados.md`:
+Crie `.claude/agents/ag-D-12-migrar-dados.md`:
 
 ```markdown
 ---
-name: ag-12-migrar-dados
+name: ag-D-12-migrar-dados
 description: "Migracao de dados e schema sem perder dados e sem downtime. Gera migracoes no ORM, valida reversibilidade."
 model: sonnet
 tools: Bash, Read, Write, Edit, Glob, Grep
@@ -461,11 +461,11 @@ Sugerir: "Migracoes prontas. Proximo: ag-13 (deploy) para aplicar."
 
 ## ag-13 — Deployer
 
-Crie `.claude/agents/ag-13-publicar-deploy.md`:
+Crie `.claude/agents/ag-D-13-publicar-deploy.md`:
 
 ```markdown
 ---
-name: ag-13-publicar-deploy
+name: ag-D-13-publicar-deploy
 description: "Deploy controlado + versionamento. Pre-condicoes, build, smoke test, rollback automatico, monitoring pos-deploy."
 model: sonnet
 tools: Bash, Read, Write, Edit, Glob, Grep
@@ -490,11 +490,11 @@ Sugerir: "Deploy concluido. Proximo: ag-14 (documentar) ou monitorar."
 
 ## ag-14 — Documenter
 
-Crie `.claude/agents/ag-14-documentar-projeto.md`:
+Crie `.claude/agents/ag-W-14-documentar-projeto.md`:
 
 ```markdown
 ---
-name: ag-14-documentar-projeto
+name: ag-W-14-documentar-projeto
 description: "Documentacao que AJUDA. README, API docs com exemplos reais, guia de contribuicao, ADRs."
 model: sonnet
 tools: Read, Write, Edit, Glob, Grep
@@ -512,11 +512,11 @@ Sugerir: "Docs atualizadas. Projeto pronto para novos contribuidores."
 
 ## ag-M — Meta-Improver
 
-Crie `.claude/agents/ag-M-melhorar-agentes.md`:
+Crie `.claude/agents/ag-M-99-melhorar-agentes.md`:
 
 ```markdown
 ---
-name: ag-M-melhorar-agentes
+name: ag-M-99-melhorar-agentes
 description: "Meta-Agente. Analisa errors-log, validation-report, e2e-report para identificar padroes de falha e melhorar prompts dos outros agentes."
 model: opus
 tools: Read, Write, Edit, Glob, Grep

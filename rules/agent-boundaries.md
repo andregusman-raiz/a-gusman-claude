@@ -61,7 +61,7 @@ MacBook Pro M5 com 36GB RAM — proteger contra memory overflow.
 - Max 4 teammates simultaneos (nao 5)
 - Cada teammate sem subagents proprios (flat, nao nested)
 - `TeamDelete` IMEDIATO apos teammates terminarem (liberar memoria)
-- Preferir sequencial (ag-23) quando < 6 tasks
+- Preferir sequencial (ag-B-23) quando < 6 tasks
 
 **MCP servers:**
 - Subagents herdam MCPs da sessao pai — NAO iniciar MCPs extras
