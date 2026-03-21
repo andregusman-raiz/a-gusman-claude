@@ -1,1 +1,4 @@
 timestamp,agent_id,model,status,duration_tokens,notes
+2026-03-14T17:33:57Z,Explore,auto,completed,0,rules
+2026-03-14T18:28:21Z,general,auto,completed,0,Claude
+2026-03-14T18:28:27Z,general,auto,completed,0,Claude

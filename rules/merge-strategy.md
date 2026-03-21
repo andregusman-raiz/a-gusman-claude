@@ -34,4 +34,4 @@ paths:
 ## Apos Merge
 - Branch remota: deletada automaticamente (GitHub auto-delete configurado)
 - Branch local: `git fetch --prune` ou `/clean_gone` para limpar
-- Verificar que deploy-gate.yml rodou com sucesso apos merge em main
+- Verificar que build Vercel passou (Vercel Git Integration + pre-deploy-gate.sh no buildCommand)

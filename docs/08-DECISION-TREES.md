@@ -10,47 +10,47 @@
 Voce quer...
 
 ├── ENTENDER algo
-│   ├── Codebase desconhecido → /discovery (skill) ou ag-00
-│   ├── Bug especifico → ag-04 (debugger)
-│   └── Decisoes de design → ag-09 (reviewer)
+│   ├── Codebase desconhecido → /discovery (skill) ou ag-M-00
+│   ├── Bug especifico → ag-P-04 (debugger)
+│   └── Decisoes de design → ag-B-09 (reviewer)
 │
 ├── PLANEJAR algo
 │   ├── Feature nova → /design (skill) → task_plan.md
 │   ├── Diagnosticar bugs → /diagnose-bugs (skill) → bug-fix-plan.md
-│   └── Projeto novo → ag-01 (scaffolder)
+│   └── Projeto novo → ag-P-01 (scaffolder)
 │
 ├── CONSTRUIR algo
-│   ├── Feature com spec → ag-03 (builder) seguindo SPEC.md
-│   ├── Task < 30 min → ag-03 (quick mode)
-│   └── Projeto do zero → ag-01 → ag-02 → ag-03
+│   ├── Feature com spec → ag-P-03 (builder) seguindo SPEC.md
+│   ├── Task < 30 min → ag-P-03 (quick mode)
+│   └── Projeto do zero → ag-P-01 → ag-P-02 → ag-P-03
 │
 ├── CORRIGIR algo
 │   ├── 1 bug simples → /fix-and-commit (skill)
 │   ├── 3-5 bugs → /batch-fix (skill)
 │   ├── 6+ bugs independentes → /parallel-fix (skill)
-│   └── Bug complexo → ag-04 (debugger) → ag-03 (fix)
+│   └── Bug complexo → ag-P-04 (debugger) → ag-P-03 (fix)
 │
 ├── TESTAR algo
-│   ├── Unit/integration → ag-07 ou /testing (skill)
-│   └── E2E no browser → ag-08 ou /e2e-testing (skill)
+│   ├── Unit/integration → ag-P-07 ou /testing (skill)
+│   └── E2E no browser → ag-B-08 ou /e2e-testing (skill)
 │
 ├── REVISAR algo
-│   ├── Codigo → ag-09 (reviewer)
-│   ├── Seguranca → ag-10 ou /security-audit (skill)
-│   └── UX → ag-11 ou /ux-review (skill)
+│   ├── Codigo → ag-B-09 (reviewer)
+│   ├── Seguranca → ag-B-10 ou /security-audit (skill)
+│   └── UX → ag-B-11 ou /ux-review (skill)
 │
 ├── REFATORAR algo
-│   └── ag-07 (testes primeiro) → ag-05 (refatorar) → ag-07 (re-testar)
+│   └── ag-P-07 (testes primeiro) → ag-P-05 (refatorar) → ag-P-07 (re-testar)
 │
 ├── MIGRAR dados
-│   └── ag-12 ou /migration (skill)
+│   └── ag-Q-12 ou /migration (skill)
 │
 ├── DEPLOYAR algo
 │   ├── Pipeline completo → /deploy-pipeline (skill)
-│   └── Deploy com monitoring → /deploy (skill) ou ag-13
+│   └── Deploy com monitoring → /deploy (skill) ou ag-Q-13
 │
 └── DOCUMENTAR algo
-    └── ag-14 ou /documentation (skill)
+    └── ag-Q-14 ou /documentation (skill)
 ```
 
 ---
@@ -62,7 +62,7 @@ Quantos bugs?
 
 ├── 1 bug
 │   ├── Simples (< 30 min) → /fix-and-commit
-│   └── Complexo (investigacao necessaria) → ag-04 → /fix-and-commit
+│   └── Complexo (investigacao necessaria) → ag-P-04 → /fix-and-commit
 │
 ├── 2-5 bugs
 │   ├── Mesmos arquivos → /batch-fix (mesmo sprint)
@@ -121,9 +121,9 @@ Mapeamento por agent:
 
 | Model | Agents |
 |-------|--------|
-| Haiku | ag-00 (orquestrador) |
-| Sonnet | ag-01, ag-02, ag-06, ag-07, ag-08, ag-10, ag-11, ag-12, ag-13, ag-14 |
-| Opus | ag-03 (builder), ag-04 (debugger), ag-05 (refactorer), ag-09 (reviewer), ag-M |
+| Haiku | ag-M-00 (orquestrador) |
+| Sonnet | ag-P-01, ag-P-02, ag-P-06, ag-P-07, ag-B-08, ag-B-10, ag-B-11, ag-Q-12, ag-Q-13, ag-Q-14 |
+| Opus | ag-P-03 (builder), ag-P-04 (debugger), ag-P-05 (refactorer), ag-B-09 (reviewer), ag-M-99 |
 
 ---
 
@@ -133,53 +133,53 @@ Mapeamento por agent:
 
 ```
 /design → SPEC.md
-  → ag-03 (builder) → codigo
-    → ag-06 (validador) → completude
-      → ag-07 (tester) → testes
-        → ag-09 (reviewer) → review
+  → ag-P-03 (builder) → codigo
+    → ag-P-06 (validador) → completude
+      → ag-P-07 (tester) → testes
+        → ag-B-09 (reviewer) → review
           → /fix-and-commit → commit final
 ```
 
 ### Bug Fix
 
 ```
-ag-04 (debugger) → causa raiz
-  → ag-03 (fix minimo)
-    → ag-07 (teste de regressao)
+ag-P-04 (debugger) → causa raiz
+  → ag-P-03 (fix minimo)
+    → ag-P-07 (teste de regressao)
       → /fix-and-commit
 ```
 
 ### Refatoracao
 
 ```
-ag-07 (testes existentes passam?) → se nao: CRIAR testes primeiro
-  → ag-05 (refatorar UMA coisa por vez)
-    → ag-07 (testes ainda passam?)
+ag-P-07 (testes existentes passam?) → se nao: CRIAR testes primeiro
+  → ag-P-05 (refatorar UMA coisa por vez)
+    → ag-P-07 (testes ainda passam?)
       → Repetir ate concluir
 ```
 
 ### Deploy
 
 ```
-ag-06 (validar completude)
-  → ag-07 (testes passam?)
-    → ag-10 (seguranca OK?)
-      → ag-12 (migrations prontas?)
+ag-P-06 (validar completude)
+  → ag-P-07 (testes passam?)
+    → ag-B-10 (seguranca OK?)
+      → ag-Q-12 (migrations prontas?)
         → /deploy-pipeline (pipeline completo)
-          → ag-14 (documentar release)
+          → ag-Q-14 (documentar release)
 ```
 
 ### Projeto Novo
 
 ```
-ag-01 (scaffold)
-  → ag-02 (ambiente)
+ag-P-01 (scaffold)
+  → ag-P-02 (ambiente)
     → /design (spec da primeira feature)
-      → ag-03 (builder)
-        → ag-07 (testes)
-          → ag-10 (seguranca)
-            → ag-13 (deploy)
-              → ag-14 (documentacao)
+      → ag-P-03 (builder)
+        → ag-P-07 (testes)
+          → ag-B-10 (seguranca)
+            → ag-Q-13 (deploy)
+              → ag-Q-14 (documentacao)
 ```
 
 ---
@@ -230,19 +230,19 @@ O que aconteceu?
 
 | Situacao | Acao |
 |----------|------|
-| "Nao sei por onde comecar" | `/ag00` (orquestrador) |
+| "Nao sei por onde comecar" | `/ag-M-00` (orquestrador) |
 | "Preciso entender esse codigo" | `/discovery` |
 | "Quero planejar uma feature" | `/design` |
-| "Implemente isso" | `ag-03` (builder) |
-| "Tem um bug aqui" | `ag-04` → `/fix-and-commit` |
+| "Implemente isso" | `ag-P-03` (builder) |
+| "Tem um bug aqui" | `ag-P-04` → `/fix-and-commit` |
 | "Corrige esses 5 bugs" | `/batch-fix` |
 | "Corrige esses 15 bugs" | `/parallel-fix` |
 | "Classifica esses bugs sem corrigir" | `/diagnose-bugs` |
-| "Crie testes" | `/testing` ou `ag-07` |
-| "Teste no browser" | `/e2e-testing` ou `ag-08` |
-| "Revise esse codigo" | `ag-09` (reviewer) |
-| "Verifique seguranca" | `/security-audit` ou `ag-10` |
-| "Revise a UX" | `/ux-review` ou `ag-11` |
-| "Refatore isso" | `ag-05` (precisa de testes antes) |
+| "Crie testes" | `/testing` ou `ag-P-07` |
+| "Teste no browser" | `/e2e-testing` ou `ag-B-08` |
+| "Revise esse codigo" | `ag-B-09` (reviewer) |
+| "Verifique seguranca" | `/security-audit` ou `ag-B-10` |
+| "Revise a UX" | `/ux-review` ou `ag-B-11` |
+| "Refatore isso" | `ag-P-05` (precisa de testes antes) |
 | "Faca o deploy" | `/deploy-pipeline` |
-| "Documente isso" | `/documentation` ou `ag-14` |
+| "Documente isso" | `/documentation` ou `ag-Q-14` |

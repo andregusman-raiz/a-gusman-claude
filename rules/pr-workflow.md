@@ -27,10 +27,10 @@ gh pr create --base main \
 - O que mudou e por que
 
 ## Checklist
-- [ ] Typecheck passa (`npm run typecheck`)
-- [ ] Lint passa (`npm run lint`)
-- [ ] Testes passam (`npm run test`)
-- [ ] Build funciona (`npm run build`)
+- [ ] Typecheck passa (`bun run typecheck`)
+- [ ] Lint passa (`bun run lint`)
+- [ ] Testes passam (`bun run test`)
+- [ ] Build funciona (`bun run build`)
 - [ ] Sem console.log/debugger residuais
 - [ ] Migrations incluem rollback (se aplicavel)
 
@@ -54,11 +54,12 @@ EOF
 
 ## Review
 - CODEOWNERS define reviewers automaticos
-- CI deve estar verde antes de mergear
+- ag-D-27 pre-flight deve ter sido executado na feature branch antes do PR
 - Pelo menos 1 approval quando branch protection exigir
-- Verificar preview deploy (se disponivel) antes de aprovar
+- Verificar preview URL da Vercel (gerada automaticamente por Git Integration)
 
 ## Apos Merge
 - Branch deletada automaticamente
-- Deploy em main dispara deploy-gate.yml
-- Verificar que deploy passou nos smoke tests
+- Deploy em master dispara Vercel Git Integration (pre-deploy-gate.sh no buildCommand)
+- Verificar que build/deploy passou no painel Vercel
+- pre-deploy-gate.sh: typecheck → lint → test — falha aborta build automaticamente

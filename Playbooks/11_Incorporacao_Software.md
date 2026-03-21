@@ -27,7 +27,7 @@ Fase 0: Due Diligence → Fase 1: Planejamento → Fase 2: Coexistencia
 → Fase 3: Federacao → Fase 4: Unificacao → Fase 5: Simbiose
 ```
 
-### Fase 0 — Due Diligence (ag-32)
+### Fase 0 — Due Diligence (ag-I-32)
 
 Avaliacao tecnica ANTES de decidir incorporar:
 
@@ -41,12 +41,12 @@ Avaliacao tecnica ANTES de decidir incorporar:
 
 **Output**: `incorporation/[nome]/due-diligence-report.md` com score e recomendacao Go/No-Go.
 
-### Fase 1 — Planejamento (ag-34)
+### Fase 1 — Planejamento (ag-I-34)
 
 Criar roadmap de incorporacao com fases e milestones:
 
 - [ ] Definir nivel-alvo de integracao (L1-L5)
-- [ ] Mapear dimensoes de integracao (ag-33)
+- [ ] Mapear dimensoes de integracao (ag-I-33)
 - [ ] Identificar modulos a incorporar (priorizar por valor)
 - [ ] Criar task_plan por modulo com dependencias
 - [ ] Definir feature flags para controle de rollout
@@ -61,7 +61,7 @@ Minimo viavel: ambos sistemas funcionam, usuario navega entre eles.
 - [ ] SSO/Auth compartilhado (Supabase Auth como source of truth)
 - [ ] Navegacao cruzada (links/redirects entre sistemas)
 - [ ] Feature flags configurados (sistema externo = off por padrao)
-- [ ] Monitoramento de ambos (ag-20)
+- [ ] Monitoramento de ambos (ag-D-20)
 - [ ] Zero mudancas no rAIz Platform core
 
 **Padrao**: Anti-Corruption Layer (ACL) entre sistemas.
@@ -139,8 +139,8 @@ incorporation/
 
 | Frequencia | Acao |
 |-----------|------|
-| A cada modulo migrado | Validacao (ag-12) + Testes (ag-13) |
-| A cada fase concluida | Code review (ag-14) + Audit (ag-15) |
+| A cada modulo migrado | Validacao (ag-Q-12) + Testes (ag-Q-13) |
+| A cada fase concluida | Code review (ag-Q-14) + Audit (ag-Q-15) |
 | Mensal | Progress review contra roadmap |
 | Apos conclusao | Postmortem com licoes |
 
@@ -149,7 +149,7 @@ incorporation/
 - **Cobertura de integracao**: % das dimensoes resolvidas por fase
 - **Incidentes**: Bugs introduzidos pela incorporacao
 - **Performance**: Tempo de resposta antes/depois
-- **Satisfacao**: UX review scores (ag-16)
+- **Satisfacao**: UX review scores (ag-Q-16)
 
 ## Arvore de Decisao
 
@@ -173,15 +173,15 @@ Nivel-alvo de integracao?
 
 | Agent | Fase | Funcao |
 |-------|------|--------|
-| ag-32 | 0 | Due diligence tecnica |
-| ag-33 | 1 | Mapeamento de dimensoes de integracao |
-| ag-34 | 1 | Planejamento do roadmap |
-| ag-35 | 2-5 | Execucao de incorporacao modulo a modulo |
-| ag-03 | 0 | Exploracao do codebase externo |
-| ag-04 | 0 | Analise de debito tecnico do externo |
-| ag-06 | 1 | SPEC de cada modulo a incorporar |
-| ag-17 | 3-4 | Migrations de schema |
-| ag-15 | 2-5 | Auditoria de seguranca pos-incorporacao |
+| ag-I-32 | 0 | Due diligence tecnica |
+| ag-I-33 | 1 | Mapeamento de dimensoes de integracao |
+| ag-I-34 | 1 | Planejamento do roadmap |
+| ag-I-35 | 2-5 | Execucao de incorporacao modulo a modulo |
+| ag-P-03 | 0 | Exploracao do codebase externo |
+| ag-P-04 | 0 | Analise de debito tecnico do externo |
+| ag-P-06 | 1 | SPEC de cada modulo a incorporar |
+| ag-D-17 | 3-4 | Migrations de schema |
+| ag-Q-15 | 2-5 | Auditoria de seguranca pos-incorporacao |
 
 ## Anti-Patterns
 

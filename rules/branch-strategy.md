@@ -8,7 +8,7 @@ paths:
 
 ## Regra Principal
 TODA mudanca funcional (feature, fix, refactor) DEVE ser feita em feature branch.
-Commits diretos em `main` ou `develop` sao BLOQUEADOS pelo hook branch-guard.sh.
+Commits diretos em `main` ou `develop` sao BLOQUEADOS por hooks em 2 camadas: branch-guard.sh (hooks.json) + bash-guards.sh (settings.local.json).
 
 ## Quando criar branch
 - Feature nova → `feat/nome-descritivo`
@@ -41,4 +41,4 @@ Commits diretos em `main` ou `develop` sao BLOQUEADOS pelo hook branch-guard.sh.
 ## Verificacao Automatica
 - Hook `branch-guard.sh` BLOQUEIA commits de codigo fonte em main/master
 - Hook `pre-push-check.sh` AVISA sobre push direto em main
-- Agentes ag-08 e ag-26 verificam branch ANTES de commitar
+- Agentes ag-B-08 e ag-B-23 verificam branch ANTES de commitar

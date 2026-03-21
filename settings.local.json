@@ -1,113 +1,8 @@
 {
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60"
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Agent",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/session-logger.sh",
-            "statusMessage": "Session logging..."
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "FILE=\"$CLAUDE_TOOL_INPUT\"; if echo \"$FILE\" | grep -q '\\.test\\.ts\\|\\.spec\\.ts'; then echo 'TEST QUALITY CHECK: Verify NO theatrical anti-patterns: .catch(() => false), || true, toBeGreaterThanOrEqual(0), conditional expects without else.'; fi",
-            "statusMessage": "Test theatrical detection..."
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git commit'; then COMMIT_MSG=$(git log -1 --pretty=%B 2>/dev/null); if echo \"$COMMIT_MSG\" | grep -qE '^(feat|fix|refactor|docs|test|chore|ci|perf|style|build)'; then true; else echo 'COMMIT-QUALITY WARNING: Message does not follow conventional commits (feat:|fix:|refactor:|docs:|test:|chore:).'; fi; fi",
-            "statusMessage": "Commit quality check..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git push'; then bash ~/.claude/hooks/webhook-git-audit.sh; fi",
-            "statusMessage": "Git audit webhook..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'npm test|npx vitest|npx playwright'; then bash ~/.claude/hooks/webhook-test-metrics.sh; fi",
-            "statusMessage": "Test metrics webhook..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'npm run build'; then bash ~/.claude/hooks/webhook-build-alert.sh; fi",
-            "statusMessage": "Build alert webhook..."
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "TeamCreate|TaskCreate",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/scripts/memory-guard.sh >/dev/null 2>&1; EXIT=$?; if [ $EXIT -eq 2 ]; then echo 'BLOCKED: Memory pressure CRITICAL. Fechar sessoes/terminais antes de spawnar novos agents. Rode: bash ~/.claude/scripts/memory-guard.sh para detalhes.'; exit 2; elif [ $EXIT -eq 1 ]; then echo 'WARNING: Memory pressure elevada. Considere aguardar agents atuais terminarem antes de spawnar novos.'; fi",
-            "statusMessage": "Memory guard check..."
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'vercel --prod'; then echo 'BLOCKED: Use CI/CD pipeline (gh pr create + merge) instead of direct vercel --prod'; exit 2; fi",
-            "statusMessage": "Deploy safety check..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git push.*--force'; then echo 'BLOCKED: Force push is dangerous. Use git push without --force, or discuss with user first.'; exit 2; fi",
-            "statusMessage": "Force push guard..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q -- '--no-verify'; then echo 'BLOCKED: --no-verify bypasses safety hooks. Fix the underlying issue instead.'; exit 2; fi",
-            "statusMessage": "No-verify guard..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'git stash'; then echo 'WARNING: git stash can cause issues with lint-staged. Consider git commit (WIP) instead.'; fi",
-            "statusMessage": "Stash warning..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -q 'supabase db push'; then echo 'WARNING: supabase db push applies migrations to remote DB. Verify target environment first.'; fi",
-            "statusMessage": "DB push safety..."
-          },
-          {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'gh pr create|vercel deploy'; then BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); if [ \"$BRANCH\" = \"main\" ] || [ \"$BRANCH\" = \"master\" ]; then echo 'DEPLOY PREFLIGHT BLOCKED: Cannot deploy from main/master directly. Create a feature branch first.'; exit 2; fi; fi",
-            "statusMessage": "Deploy preflight guard..."
-          }
-        ]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "INPUT=\"$CLAUDE_TOOL_INPUT\"; for f in .env .mcp.json package.json tsconfig.json vercel.json playwright.config.ts; do if echo \"$INPUT\" | grep -q \"$f\"; then echo \"WARNING: Writing to config file $f. Use Edit tool for surgical changes instead of Write to avoid overwriting existing config.\"; break; fi; done",
-            "statusMessage": "Config protection..."
-          }
-        ]
-      }
-    ]
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
+    "ENABLE_TOOL_SEARCH": "auto:5"
   },
   "permissions": {
     "allow": [
@@ -142,6 +37,8 @@
       "Bash(docker:*)",
       "Bash(docker-compose:*)",
       "Bash(brew:*)",
+      "Bash(tmux:*)",
+      "Bash(memory_pressure:*)",
       "Bash(claude --version:*)",
       "Bash(cd:*)",
       "Bash(PYTHONIOENCODING=utf-8 python3:*)",
@@ -153,6 +50,9 @@
       "Bash(awk:*)",
       "Bash(xargs:*)",
       "Bash(open:*)",
+      "Bash(gws:*)",
+      "Bash(playwright-cli:*)",
+      "Bash(sentry-cli:*)",
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.github.com)",
@@ -191,6 +91,105 @@
       "Bash(tail .env*)",
       "Bash(less .env*)",
       "Bash(more .env*)"
+    ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'pkill -f terminal-notifier 2>/dev/null; REPO=$(git rev-parse --show-toplevel 2>/dev/null | xargs basename 2>/dev/null || echo \"claude\"); BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"-\"); nohup terminal-notifier -title \"Claude Code\" -subtitle \"$REPO ($BRANCH)\" -message \"Needs your input\" -sender com.anthropic.claudefordesktop -sound Glass >/dev/null 2>&1 & disown; afplay /System/Library/Sounds/Glass.aiff 2>/dev/null &disown'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/scripts/cleanup-orphans.sh 2>/dev/null",
+            "statusMessage": "Cleaning orphaned processes..."
+          }
+        ]
+      }
+    ],
+    "Stop": [],
+    "SubagentStop": [],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'echo \"PRESERVE: modified files, current task, test commands, errors found\" >&2'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/secret-scan.sh 2>/dev/null || true",
+            "statusMessage": "Secret scan..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/parallel-agent-guard-cleanup.sh 2>/dev/null || true",
+            "statusMessage": "Release parallel agent lock..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "TeamCreate|TaskCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/scripts/memory-guard.sh >/dev/null 2>&1; EXIT=$?; if [ $EXIT -eq 2 ]; then echo 'BLOCKED: Memory pressure CRITICAL. Fechar sessoes/terminais antes de spawnar novos agents. Rode: bash ~/Claude/.claude/scripts/memory-guard.sh para detalhes.'; exit 2; elif [ $EXIT -eq 1 ]; then echo 'WARNING: Memory pressure elevada. Considere aguardar agents atuais terminarem antes de spawnar novos.'; fi",
+            "statusMessage": "Memory guard check..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/bash-guards.sh",
+            "statusMessage": "Bash safety guards..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/branch-guard.sh",
+            "statusMessage": "Branch protection guard..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/parallel-agent-guard.sh",
+            "statusMessage": "Parallel agent lock check..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/config-guard.sh",
+            "statusMessage": "Config protection guard..."
+          }
+        ]
+      }
     ]
   }
 }

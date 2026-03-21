@@ -1,3 +1,13 @@
+---
+description: "Testes obrigatorios ao criar novo modulo: smoke, error boundary, access control"
+paths:
+  - "src/lib/services/**"
+  - "src/app/api/**"
+  - "src/components/**"
+  - "tests/**"
+  - "__tests__/**"
+---
+
 # Policy: Testes Obrigatorios para Novos Modulos
 
 ## Regra Principal
@@ -64,6 +74,6 @@ Ao revisar PR que cria novo modulo, verificar:
 
 ## Enforcement
 
-- ag-14 (code review) deve verificar esta policy em PRs
-- ag-13 (testar) deve gerar estes testes ao criar modulo novo
-- ag-12 (validar) deve verificar que testes existem para modulos novos
+- ag-Q-14 (code review) deve verificar esta policy em PRs
+- ag-Q-13 (testar) deve gerar estes testes ao criar modulo novo
+- ag-Q-12 (validar) deve verificar que testes existem para modulos novos

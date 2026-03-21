@@ -9,17 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - 37 Custom Agents covering full development lifecycle
-  - Discovery: ag-03, ag-04, ag-05
-  - Planning: ag-06, ag-07
-  - Building: ag-08, ag-09, ag-10, ag-11
-  - Validation: ag-12, ag-13, ag-14, ag-15
-  - Deploy: ag-18, ag-19, ag-20, ag-27
-  - E2E Testing: ag-22, ag-36, ag-38
-  - Bug Fixing: ag-23, ag-24, ag-25, ag-26
-  - Incorporation: ag-32, ag-33, ag-34, ag-35
-  - Meta: ag-00, ag-M, ag_skill-creator
+  - Discovery: ag-P-03, ag-P-04, ag-P-05
+  - Planning: ag-P-06, ag-P-07
+  - Building: ag-B-08, ag-B-09, ag-B-10, ag-B-11
+  - Validation: ag-Q-12, ag-Q-13, ag-Q-14, ag-Q-15
+  - Deploy: ag-D-18, ag-D-19, ag-D-20, ag-D-27
+  - E2E Testing: ag-Q-22, ag-Q-36, ag-D-38
+  - Bug Fixing: ag-B-23, ag-B-24, ag-B-25, ag-B-26
+  - Incorporation: ag-I-32, ag-I-33, ag-I-34, ag-I-35
+  - Meta: ag-M-00, ag-M-99, ag-M-49-criar-skill
 - 14 Skills (orchestrator, patterns, testing, meta-improvement)
-- 41 Slash Commands (/ag00 through /ag38, /agM, /ag_skill-creator)
+- 41 Slash Commands (/ag-M-00 through /ag-D-38, /agM, /ag-M-49-criar-skill)
 - 29 Governance Rules
 - 13 Shell Hooks (5 safety + 8 quality)
 - 11 Strategic Playbooks (SDD, Security, QA, Incorporation, etc.)
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Agent Teams support for parallel execution
 - Task tracking in 9 agents
 - Worktree isolation for 5 build/refactor agents
-- Self-improvement pipeline (ag-M + ag_skill-creator)
+- Self-improvement pipeline (ag-M-99 + ag-M-49-criar-skill)
 - Install script with 3 tiers (starter/standard/full)
 - Framework validation script
 - GitHub Actions CI

@@ -8,6 +8,12 @@ paths:
 
 ## ANTES de declarar trabalho completo:
 
+### 0. Credential Preflight (para tarefas com testes)
+```bash
+bash ~/Claude/.claude/scripts/credential-preflight.sh [project-root]
+```
+Exit 2 → PARAR. Credenciais invalidas = resultados invalidos.
+
 ### 1. Re-ler Objetivo Original
 Abra o task_plan.md, SPEC.md, ou a mensagem original.
 

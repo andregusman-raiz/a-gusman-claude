@@ -25,7 +25,7 @@ mkdir -p seu-projeto/docs/ai-state
 cd seu-projeto && claude
 
 # 4. Teste: invoke o orquestrador
-# No Claude Code, digite: /ag00 analise este projeto
+# No Claude Code, digite: /ag-M-00 analise este projeto
 ```
 
 ## Estrutura dos Arquivos

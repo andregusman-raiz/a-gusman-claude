@@ -1,5 +1,5 @@
 ---
-description: "Regras de seguranca da cadeia de suprimentos npm"
+description: "Regras de seguranca da cadeia de suprimentos (npm/bun)"
 paths:
   - "**/package.json"
   - "**/package-lock.json"
@@ -8,8 +8,8 @@ paths:
 # Supply Chain Security
 
 ## Instalacao
-- Em CI: usar `npm ci` (nunca `npm install`) — respeita lockfile exato
-- Commitar `package-lock.json` sempre — faz parte do contrato de seguranca
+- Em CI: usar `bun install --frozen-lockfile` (nunca `bun install` sem flag) — respeita lockfile exato
+- Commitar `bun.lock` sempre — faz parte do contrato de seguranca
 - Antes de adotar pacote novo: verificar age (>30 dias), downloads, maintainers
 
 ## Atualizacoes
@@ -18,6 +18,6 @@ paths:
 - Verificar changelogs de major versions antes de atualizar
 
 ## Auditoria
-- `npm audit` antes de cada deploy
-- `npm audit signatures` para verificar assinaturas de pacotes
+- `bunx npm-audit` antes de cada deploy (bun nao tem audit nativo — usar wrapper)
+- Verificar integridade de pacotes via lockfile hash
 - Zero high/critical como gate de deploy

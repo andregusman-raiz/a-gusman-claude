@@ -12,9 +12,9 @@ Cada agente tem um modelo recomendado no seu SKILL.md. Ao delegar:
 
 | Complexidade | Modelo | Agentes Tipicos |
 |-------------|--------|-----------------|
-| Scans rapidos, lookups | haiku | ag-03 explore, ag-28 health |
-| Implementacao, debug, review | sonnet | ag-08 build, ag-13 test, ag-14 review |
-| Arquitetura, specs, analise profunda | opus | ag-00 orq, ag-04 analisar, ag-06 spec, ag-07 plan, ag-09 debug |
+| Scans rapidos, lookups | haiku | ag-P-03 explore, ag-M-28 health |
+| Implementacao, debug, review | sonnet | ag-B-08 build, ag-Q-13 test, ag-Q-14 review |
+| Arquitetura, specs, analise profunda | opus | ag-M-00 orq, ag-P-04 analisar, ag-P-06 spec, ag-P-07 plan, ag-B-09 debug |
 
 ## Default Model
 Para sessoes gerais, usar Sonnet como default (80% cost savings vs Opus).

@@ -6,32 +6,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/preflight-check.sh 2>/dev/null || true"
-          },
-          {
-            "type": "command",
             "command": "bash .claude/hooks/security-gate.sh"
           },
           {
             "type": "command",
             "command": "bash .claude/hooks/branch-guard.sh"
-          },
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/pre-push-check.sh 2>/dev/null || true"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/tdd-guard.sh 2>/dev/null || true"
-          },
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/sdd-enforcement.sh 2>/dev/null || true"
           }
         ]
       }
@@ -42,24 +21,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/auto-format.sh 2>/dev/null || true"
-          },
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/typecheck-after-edit.sh 2>/dev/null || true"
-          },
-          {
-            "type": "command",
             "command": "bash .claude/hooks/secret-scan.sh 2>/dev/null || true"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/pre-commit-check.sh 2>/dev/null || true"
           }
         ]
       }
@@ -69,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/quality-check.sh 2>/dev/null || true"
+            "command": "bash .shared/sync.sh 2>/dev/null || true"
           }
         ]
       }

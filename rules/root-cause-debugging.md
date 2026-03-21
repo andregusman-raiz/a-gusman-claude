@@ -1,3 +1,9 @@
+---
+description: "Corrigir CAUSA RAIZ, nunca sintoma — protocolo de debugging"
+paths:
+  - "**/*"
+---
+
 # Root Cause Debugging Protocol
 
 ## Principio
