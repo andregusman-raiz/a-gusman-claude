@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Como Eu Trabalho com Claude Code Todo Dia | Raiz Educacao</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --orange: #E8862A;
+    --orange-light: #F5A623;
+    --teal: #6DBFB8;
+    --teal-dark: #4BA89F;
+    --teal-light: #E8F6F4;
+    --dark: #2D3436;
+    --gray-900: #1a1a2e;
+    --gray-700: #4a4a5a;
+    --gray-500: #7a7a8a;
+    --gray-300: #d1d1d8;
+    --gray-100: #f4f4f7;
+    --white: #ffffff;
+    --bg: #fafbfc;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --card-shadow-hover: 0 10px 30px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  @media print {
+    html { font-size: 11px; }
+    nav { display: none !important; }
+    .hero { margin-top: 0; padding: 2rem 1rem 1.5rem; }
+    .hero h1 { font-size: 1.8rem; }
+    .hero .subtitle { font-size: 0.85rem; }
+    .hero .stats { gap: 1.5rem; margin-top: 1rem; }
+    .hero .stat-number { font-size: 1.4rem; }
+    .main { padding: 1rem 1rem 2rem; }
+    .toc { padding: 1rem 1.2rem; margin-bottom: 1.5rem; }
+    .toc ol { gap: 0.2rem 1rem; }
+    .section { margin-bottom: 1.5rem; }
+    .section-header { margin-bottom: 1rem; padding-bottom: 0.5rem; }
+    .section-header h2 { font-size: 1.2rem; }
+    .section-number { width: 28px; height: 28px; font-size: 0.75rem; border-radius: 6px; }
+    h3 { font-size: 0.95rem; margin: 1rem 0 0.4rem; }
+    h4 { font-size: 0.85rem; margin: 0.8rem 0 0.3rem; }
+    p, li, td { font-size: 0.82rem; line-height: 1.5; }
+    p { margin-bottom: 0.5rem; }
+    blockquote { padding: 0.6rem 0.8rem; font-size: 0.75rem; margin: 0.5rem 0 0.7rem; }
+    blockquote::before { font-size: 0.5rem; top: -7px; padding: 0px 5px; }
+    pre { padding: 0.6rem 0.8rem; font-size: 0.72rem; margin: 0.5rem 0 0.7rem; }
+    table { font-size: 0.8rem; }
+    thead th { font-size: 0.65rem; padding: 0.4rem 0.6rem; }
+    td { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
+    .callout { padding: 0.6rem 0.8rem; margin: 0.7rem 0; font-size: 0.8rem; }
+    .callout-icon { font-size: 1rem; }
+    .flow-step { padding: 0.3rem 0.8rem; font-size: 0.75rem; min-width: auto; }
+    .flow-arrow { font-size: 0.9rem; padding: 0.1rem 0; }
+    .agent-grid { gap: 0.4rem; }
+    .agent-card { padding: 0.4rem 0.6rem; }
+    .agent-tag { font-size: 0.55rem; padding: 0.1rem 0.4rem; }
+    .agent-name { font-size: 0.75rem; }
+    .agent-desc { font-size: 0.65rem; }
+    .shortcuts { gap: 0.3rem; }
+    .shortcut { padding: 0.3rem 0.6rem; font-size: 0.72rem; }
+    .stats-bar { gap: 0.5rem; }
+    .stats-bar .stat-card { padding: 0.6rem; }
+    .stats-bar .stat-card .num { font-size: 1.3rem; }
+    .stats-bar .stat-card .label { font-size: 0.6rem; }
+    .stats-bar .stat-card p { font-size: 0.65rem !important; }
+    .error-story { padding: 0.8rem; margin: 0.6rem 0; }
+    .error-story .title { font-size: 0.8rem; margin-bottom: 0.3rem; }
+    .error-story .what-happened { font-size: 0.75rem; margin-bottom: 0.4rem; }
+    .error-story .fix { padding: 0.5rem 0.6rem; font-size: 0.75rem; }
+    .cta-box { padding: 1.2rem; }
+    .cta-box h3 { font-size: 1rem; }
+    .cta-box p { font-size: 0.8rem; }
+    .timeline li { padding-left: 1.2rem; margin-bottom: 0.8rem; }
+    .timeline .week { font-size: 0.72rem; }
+    .timeline p { font-size: 0.78rem; }
+    footer { padding: 1rem; font-size: 0.7rem; }
+    section { page-break-inside: avoid; }
+    .error-story { page-break-inside: avoid; }
+    .callout { page-break-inside: avoid; }
+    .stats-bar { page-break-inside: avoid; }
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--dark);
+    background: var(--bg);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-300);
+    padding: 0 2rem; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  nav .logo img { height: 36px; }
+  nav .logo span { font-weight: 700; font-size: 0.85rem; color: var(--gray-500); letter-spacing: 0.5px; text-transform: uppercase; }
+  nav .nav-links { display: flex; gap: 1.5rem; }
+  nav .nav-links a { text-decoration: none; font-size: 0.85rem; font-weight: 500; color: var(--gray-700); transition: color 0.2s; }
+  nav .nav-links a:hover { color: var(--orange); }
+  @media(max-width:768px){ nav .nav-links { display: none; } }
+
+  /* ── HERO ── */
+  .hero {
+    margin-top: 64px;
+    background: linear-gradient(135deg, var(--gray-900) 0%, #16213e 100%);
+    color: white; padding: 6rem 2rem 5rem; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(109,191,184,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(232,134,42,0.1) 0%, transparent 50%);
+  }
+  .hero-content { position: relative; max-width: 800px; margin: 0 auto; }
+  .hero h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.15; margin-bottom: 1.2rem; }
+  .hero h1 .accent { color: var(--orange-light); }
+  .hero .subtitle { font-size: 1.15rem; color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto 2rem; font-weight: 400; line-height: 1.6; }
+  .hero .stats { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-top: 2.5rem; }
+  .hero .stat { text-align: center; }
+  .hero .stat-number { font-size: 2.2rem; font-weight: 800; color: var(--teal); }
+  .hero .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.2rem; }
+
+  /* ── MAIN ── */
+  .main { max-width: 860px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--white); border-radius: 16px; padding: 2rem 2.5rem;
+    box-shadow: var(--card-shadow); margin-bottom: 3rem;
+    border-left: 4px solid var(--teal);
+  }
+  .toc h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--teal-dark); margin-bottom: 1rem; font-weight: 700; }
+  .toc ol { list-style: none; counter-reset: toc; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 2rem; }
+  @media(max-width:600px){ .toc ol { grid-template-columns: 1fr; } }
+  .toc li { counter-increment: toc; }
+  .toc li a {
+    text-decoration: none; color: var(--gray-700); font-size: 0.92rem; font-weight: 500;
+    display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0;
+    transition: color 0.2s;
+  }
+  .toc li a::before { content: counter(toc, decimal-leading-zero); font-size: 0.75rem; font-weight: 700; color: var(--orange); min-width: 1.5rem; }
+  .toc li a:hover { color: var(--orange); }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 4rem; }
+  .section-header {
+    display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+    padding-bottom: 1rem; border-bottom: 2px solid var(--gray-100);
+  }
+  .section-number {
+    background: var(--orange); color: white; width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem; flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 1.6rem; font-weight: 700; color: var(--gray-900); }
+
+  h3 { font-size: 1.15rem; font-weight: 700; color: var(--gray-900); margin: 2rem 0 0.8rem; }
+  h4 { font-size: 1rem; font-weight: 600; color: var(--gray-700); margin: 1.5rem 0 0.6rem; }
+
+  p { margin-bottom: 1rem; color: var(--gray-700); }
+  strong { color: var(--gray-900); font-weight: 600; }
+
+  /* ── BLOCKQUOTES (prompts) ── */
+  blockquote {
+    background: var(--gray-900); color: #e0e0e0; border-radius: 10px;
+    padding: 1rem 1.4rem; margin: 1rem 0 1.2rem; font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.88rem; line-height: 1.6; border-left: 3px solid var(--teal);
+    position: relative;
+  }
+  blockquote::before {
+    content: 'PROMPT'; position: absolute; top: -9px; left: 12px;
+    background: var(--teal); color: white; font-size: 0.6rem; font-weight: 700;
+    padding: 1px 8px; border-radius: 4px; letter-spacing: 1px;
+    font-family: 'Inter', sans-serif;
+  }
+  blockquote p { color: #e0e0e0; margin: 0; }
+
+  /* ── CODE ── */
+  pre {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 10px;
+    padding: 1.2rem 1.4rem; margin: 1rem 0 1.2rem; overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.6;
+  }
+  code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.88em; }
+  p code, li code, td code {
+    background: var(--teal-light); color: var(--teal-dark); padding: 0.15em 0.5em;
+    border-radius: 5px; font-size: 0.85em;
+  }
+
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+  thead th {
+    text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--gray-500); font-weight: 600; padding: 0.7rem 1rem;
+    border-bottom: 2px solid var(--gray-300); background: var(--gray-100);
+  }
+  thead th:first-child { border-radius: 8px 0 0 0; }
+  thead th:last-child { border-radius: 0 8px 0 0; }
+  td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-size: 0.92rem; color: var(--gray-700); vertical-align: top; }
+  tr:hover td { background: rgba(109,191,184,0.04); }
+  td strong { color: var(--gray-900); }
+
+  /* ── LISTS ── */
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+  li { margin-bottom: 0.4rem; color: var(--gray-700); font-size: 0.95rem; }
+  li strong { color: var(--gray-900); }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-radius: 12px; padding: 1.2rem 1.5rem; margin: 1.5rem 0;
+    display: flex; gap: 0.8rem; align-items: flex-start;
+  }
+  .callout-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .callout p { margin: 0; }
+  .callout-tip { background: var(--teal-light); border: 1px solid rgba(109,191,184,0.3); }
+  .callout-warn { background: #FFF8E7; border: 1px solid rgba(232,134,42,0.3); }
+  .callout-error { background: #FFF0F0; border: 1px solid rgba(220,53,69,0.2); }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex; flex-direction: column; align-items: center; gap: 0; margin: 1.5rem 0;
+  }
+  .flow-step {
+    background: var(--white); border: 2px solid var(--gray-300); border-radius: 10px;
+    padding: 0.6rem 1.5rem; font-weight: 600; font-size: 0.9rem; text-align: center;
+    color: var(--gray-900); min-width: 260px;
+  }
+  .flow-step.active { border-color: var(--teal); background: var(--teal-light); }
+  .flow-arrow { color: var(--gray-300); font-size: 1.2rem; line-height: 1; padding: 0.2rem 0; }
+
+  /* ── AGENT CARD ── */
+  .agent-group { margin: 1.5rem 0; }
+  .agent-group-title { font-size: 0.95rem; font-weight: 700; color: var(--orange); margin-bottom: 0.8rem; }
+  .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  @media(max-width:600px){ .agent-grid { grid-template-columns: 1fr; } }
+  .agent-card {
+    background: var(--white); border: 1px solid var(--gray-300); border-radius: 10px;
+    padding: 0.8rem 1rem; display: flex; gap: 0.8rem; align-items: flex-start;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .agent-card:hover { border-color: var(--teal); box-shadow: var(--card-shadow-hover); }
+  .agent-tag {
+    background: var(--gray-900); color: white; font-size: 0.65rem; font-weight: 700;
+    padding: 0.2rem 0.5rem; border-radius: 5px; font-family: 'SF Mono', monospace;
+    white-space: nowrap; flex-shrink: 0; margin-top: 0.15rem;
+  }
+  .agent-info { flex: 1; }
+  .agent-name { font-weight: 600; font-size: 0.88rem; color: var(--gray-900); }
+  .agent-desc { font-size: 0.78rem; color: var(--gray-500); margin-top: 0.15rem; }
+
+  /* ── SHORTCUT PILLS ── */
+  .shortcuts { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+  .shortcut {
+    background: var(--white); border: 1px solid var(--gray-300); border-radius: 8px;
+    padding: 0.5rem 1rem; font-size: 0.85rem; display: flex; gap: 0.5rem; align-items: center;
+  }
+  .shortcut code { background: var(--gray-900); color: var(--teal); padding: 0.15em 0.5em; border-radius: 4px; font-size: 0.8em; }
+
+  /* ── TIMELINE ── */
+  .timeline { margin: 1.5rem 0; padding-left: 0; list-style: none; }
+  .timeline li {
+    position: relative; padding-left: 2rem; margin-bottom: 1.5rem;
+    border-left: 2px solid var(--gray-300); padding-bottom: 0.5rem;
+  }
+  .timeline li:last-child { border-left-color: transparent; }
+  .timeline li::before {
+    content: ''; position: absolute; left: -7px; top: 4px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--teal); border: 2px solid var(--white);
+  }
+  .timeline .week { font-weight: 700; color: var(--orange); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── ERROR STORY ── */
+  .error-story {
+    background: var(--white); border-radius: 12px; padding: 1.5rem;
+    margin: 1.2rem 0; box-shadow: var(--card-shadow);
+    border-left: 4px solid #dc3545;
+  }
+  .error-story .title { font-weight: 700; color: #dc3545; font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .error-story .what-happened { color: var(--gray-700); font-size: 0.9rem; margin-bottom: 0.8rem; }
+  .error-story .fix {
+    background: var(--teal-light); border-radius: 8px; padding: 0.8rem 1rem;
+    font-size: 0.88rem; color: var(--teal-dark);
+  }
+  .error-story .fix strong { color: var(--teal-dark); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.5rem 0;
+  }
+  @media(max-width:600px){ .stats-bar { grid-template-columns: 1fr 1fr; } }
+  .stats-bar .stat-card {
+    background: var(--white); border-radius: 10px; padding: 1rem; text-align: center;
+    box-shadow: var(--card-shadow); border-top: 3px solid var(--teal);
+  }
+  .stats-bar .stat-card .num { font-size: 1.8rem; font-weight: 800; color: var(--gray-900); }
+  .stats-bar .stat-card .label { font-size: 0.72rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.2rem; }
+
+  /* ── CTA ── */
+  .cta-box {
+    background: linear-gradient(135deg, var(--gray-900), #16213e);
+    border-radius: 16px; padding: 2.5rem; text-align: center; color: white; margin: 2rem 0;
+  }
+  .cta-box h3 { color: white; font-size: 1.4rem; margin-bottom: 0.8rem; }
+  .cta-box p { color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; }
+  .cta-btn {
+    display: inline-block; background: var(--orange); color: white; padding: 0.8rem 2rem;
+    border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.95rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(232,134,42,0.3); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 3rem 2rem; color: var(--gray-500); font-size: 0.85rem;
+    border-top: 1px solid var(--gray-300); margin-top: 2rem;
+  }
+  footer a { color: var(--teal-dark); text-decoration: none; }
+  footer img { height: 28px; margin-bottom: 0.8rem; opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <img src="raiz-logo.png" alt="Raiz Educacao">
+    <span>Claude Code Guide</span>
+  </a>
+  <div class="nav-links">
+    <a href="#s1">Rotina</a>
+    <a href="#s3">Issues</a>
+    <a href="#s6">Assistentes</a>
+    <a href="#s7">Orquestrador</a>
+    <a href="#s9">Casos Reais</a>
+    <a href="#s10">QAT</a>
+    <a href="#s13">Instalar</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Como Eu Trabalho com <span class="accent">Claude Code</span> Todo Dia</h1>
+    <p class="subtitle">Eu digo O QUE quero e ele faz. Este guia explica como montei esse sistema — e como voce pode fazer igual.</p>
+    <div class="stats">
+      <div class="stat"><div class="stat-number">13</div><div class="stat-label">Sessoes / dia</div></div>
+      <div class="stat"><div class="stat-number">464</div><div class="stat-label">Entregas em 15 dias</div></div>
+      <div class="stat"><div class="stat-number">46</div><div class="stat-label">Assistentes</div></div>
+      <div class="stat"><div class="stat-number">193</div><div class="stat-label">Sessoes analisadas</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- TOC -->
+<div class="toc">
+  <h2>Neste guia</h2>
+  <ol>
+    <li><a href="#s1">Minha rotina — como e um dia real</a></li>
+    <li><a href="#s2">Como eu peco as coisas</a></li>
+    <li><a href="#s3">Como eu gerencio o que precisa ser feito</a></li>
+    <li><a href="#s4">Como eu construo algo do zero</a></li>
+    <li><a href="#s5">Como eu corrijo problemas</a></li>
+    <li><a href="#s6">Meus assistentes — qual usar e quando</a></li>
+    <li><a href="#s7">O Orquestrador — meu assistente principal</a></li>
+    <li><a href="#s8">Como eu protejo meu trabalho</a></li>
+    <li><a href="#s9">Casos reais — Dossier e Automata</a></li>
+    <li><a href="#s10">QAT — testar a qualidade, nao so se funciona</a></li>
+    <li><a href="#s11">Projetos que duram semanas</a></li>
+    <li><a href="#s12">Como eu replico para qualquer projeto</a></li>
+    <li><a href="#s13">Como pegar o sistema pronto</a></li>
+    <li><a href="#s14">O que eu aprendi errando</a></li>
+    <li><a href="#s15">Como comecar</a></li>
+  </ol>
+</div>
+
+<!-- ═══════ SECTION 1 ═══════ -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <div class="section-number">01</div>
+    <h2>Minha rotina — como e um dia real</h2>
+  </div>
+
+  <h3>O ritmo</h3>
+  <p>Abro o Claude Code umas 13 vezes por dia. Cada sessao dura entre 10 minutos e 2 horas. Em media, dou 8-9 instrucoes por sessao. Em 15 dias, foram 464 entregas feitas.</p>
+  <p>Nao e que eu trabalho rapido. E que eu montei um sistema onde eu dou a direcao e o Claude executa. <strong>Meu trabalho e decidir O QUE fazer, nao COMO fazer.</strong></p>
+
+  <h3>Como comeca uma sessao</h3>
+  <p>Abro o terminal e digo algo assim:</p>
+  <blockquote><p>Continuar com o Grupo 2 do backlog. Issue #201. Repo em ~/Claude/GitHub/raiz-platform</p></blockquote>
+  <p>Ou:</p>
+  <blockquote><p>Tem um bug no modulo de contratos &mdash; campo businessUnitId nao reconhece camelCase. Issue #312. Diagnosticar antes de mexer.</p></blockquote>
+  <p>Eu nao explico como fazer. Digo o que quero e onde esta. O sistema decide qual assistente usar, qual abordagem seguir, e executa.</p>
+
+  <h3>O que eu faco enquanto ele trabalha</h3>
+  <p>Se e algo simples, fico olhando e corrijo se desviar. Se e algo grande, mando rodar em background e vou para outra sessao. Ja cheguei a ter 3-4 sessoes rodando ao mesmo tempo em projetos diferentes.</p>
+
+  <h3>Como termina uma sessao</h3>
+  <blockquote><p>Estou parando por hoje. Salva onde paramos, o que foi feito, o que falta.</p></blockquote>
+  <p>Na proxima vez:</p>
+  <blockquote><p>Continuando de ontem. Le o estado salvo e me diz onde paramos.</p></blockquote>
+  <p>E ele retoma exatamente de onde parou.</p>
+</section>
+
+<!-- ═══════ SECTION 2 ═══════ -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <div class="section-number">02</div>
+    <h2>Como eu peco as coisas</h2>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">&#128161;</div>
+    <p>A qualidade do que o Claude entrega depende 100% de como voce pede. Ele faz exatamente o que voce diz &mdash; e esse e o problema. Se voce pede errado, ele executa errado, rapido, e com confianca.</p>
+  </div>
+
+  <h3>Exemplos reais do que funciona</h3>
+
+  <p><strong>Para resolver uma issue do backlog:</strong></p>
+  <blockquote><p>Resolver issue #201. Ler a issue, criar uma especificacao, implementar, verificar contra a especificacao, rodar testes, criar PR linkada. Repo em ~/Claude/GitHub/raiz-platform</p></blockquote>
+
+  <p><strong>Para corrigir um bug:</strong></p>
+  <blockquote><p>Bug: quando clica em salvar no formulario de perfil, o telefone nao salva. Endpoint /api/profile. ANTES de mexer em codigo, investiga a causa. Me mostra o que encontrou antes de implementar.</p></blockquote>
+
+  <p><strong>Para construir algo novo:</strong></p>
+  <blockquote><p>Quero um endpoint que recebe uma lista de alunos e retorna quais estao presentes. Usar a tabela attendance do Supabase. Testar com dados reais.</p></blockquote>
+
+  <h3>O que NAO funciona</h3>
+  <div class="callout callout-error">
+    <div class="callout-icon">&#10060;</div>
+    <div>
+      <p><strong>&ldquo;Corrige o bug&rdquo;</strong> (qual bug? onde?)</p>
+      <p><strong>&ldquo;Melhora o codigo&rdquo;</strong> (qual parte? melhora como?)</p>
+      <p><strong>&ldquo;Implementa a feature&rdquo;</strong> (qual? como deve funcionar?)</p>
+      <p style="margin-top:0.5rem">Quanto mais vago, pior o resultado. Diga <strong>O QUE</strong>, <strong>ONDE</strong>, e <strong>COMO VERIFICAR</strong>.</p>
+    </div>
+  </div>
+
+  <h3>Quando interromper</h3>
+  <p>Se voce ve que ele esta indo na direcao errada, interrompa <strong>imediatamente</strong>:</p>
+  <blockquote><p>Para. Nao e isso. O problema nao e no endpoint, e no banco. Investiga a query.</p></blockquote>
+  <p>Cada minuto que voce espera ele seguir no caminho errado e um minuto de retrabalho.</p>
+
+  <h3>Pedidos com pontos de salvamento</h3>
+  <p>Para qualquer coisa que leve mais de 15 minutos:</p>
+  <blockquote><p>Implementar features A, B e C. Salvar o progresso depois de cada uma. Rodar testes antes de salvar. Se algo falhar, para e me avisa antes de tentar consertar.</p></blockquote>
+</section>
+
+<!-- ═══════ SECTION 3 ═══════ -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <div class="section-number">03</div>
+    <h2>Como eu gerencio o que precisa ser feito</h2>
+  </div>
+
+  <h3>GitHub Issues como meu backlog</h3>
+  <p>Tudo que precisa ser feito vira uma issue no GitHub. Cada issue tem um titulo claro, uma descricao do que precisa acontecer, e etiquetas de prioridade. Eu organizo em grupos por prioridade e tamanho. Um grupo tipico tem 5-20 issues.</p>
+
+  <h3>O fluxo de cada issue</h3>
+  <div class="flow">
+    <div class="flow-step">Issue no GitHub</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Especificacao (o que vai ser feito, escrito antes de codar)</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step active">Implementacao (o codigo em si)</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Verificacao (comparar com a especificacao)</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Testes (funciona? nao quebra nada?)</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">PR no GitHub (entrega linkada: &ldquo;closes #N&rdquo;)</div>
+  </div>
+
+  <p>Eu tenho um assistente especifico para isso &mdash; o <strong>ag-M-51</strong>. Eu digo:</p>
+  <blockquote><p>Resolver issue #201</p></blockquote>
+  <p>E ele faz tudo: le a issue, cria a especificacao, implementa, verifica, roda testes, cria a PR.</p>
+
+  <h3>Trabalhando em lotes</h3>
+  <blockquote><p>Grupo 2 do backlog: issues #201 a #215. Tamanho medio. Resolver em sequencia, salvar depois de cada uma.</p></blockquote>
+  <p>Se sao independentes, posso mandar em paralelo:</p>
+  <blockquote><p>Issues #201, #202, #203 &mdash; sao independentes, pode fazer as 3 ao mesmo tempo. Cada uma em area separada para nao conflitar.</p></blockquote>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">&#9888;&#65039;</div>
+    <p><strong>Labels:</strong> Antes de criar issues com etiquetas, SEMPRE verifico quais existem no repositorio. Parece bobo, mas ja perdi tempo recriando issues porque etiquetas que assumi existir nao existiam.</p>
+  </div>
+</section>
+
+<!-- ═══════ SECTION 4 ═══════ -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <div class="section-number">04</div>
+    <h2>Como eu construo algo do zero</h2>
+  </div>
+
+  <h4>Passo 1: Definir antes de construir</h4>
+  <blockquote><p>Quero construir um app de chamada escolar. Vai integrar com o sistema TOTVS da escola. Precisa: login do professor, lista de turmas, marcar presenca, sincronizar com o TOTVS. Me faz uma especificacao com: telas, dados, integracao, e o que pode dar errado.</p></blockquote>
+  <p>A especificacao e o contrato. Sem ela, o Claude vai inventando e voce termina com algo diferente do que queria.</p>
+
+  <h4>Passo 2: Montar a base</h4>
+  <blockquote><p>Agora cria o projeto seguindo a especificacao. Comeca pela estrutura: criar o projeto, instalar o que precisa, configurar o banco, criar as tabelas. Salvar depois de cada etapa.</p></blockquote>
+
+  <h4>Passo 3: Uma coisa de cada vez</h4>
+  <blockquote><p>Implementar o login do professor conforme a especificacao. Testar o fluxo completo.</p></blockquote>
+  <p>Uma funcionalidade por vez. Testar. Salvar. Proxima. Parece lento mas e mais rapido que &ldquo;faz tudo&rdquo; e depois horas cacando problemas.</p>
+
+  <h4>Passo 4: Conferir contra a especificacao</h4>
+  <blockquote><p>Compara o que foi feito com a especificacao original. Lista o que esta pronto, o que esta pela metade, e o que falta.</p></blockquote>
+
+  <h3>Para projetos maiores &mdash; o Orquestrador</h3>
+  <p>Se o projeto e grande, uso o <strong>ag-M-00</strong> (orquestrador). Ele e o maestro:</p>
+  <blockquote><p>/ag-M-00-orquestrar novo projeto: app de gestao de tarefas. Stack: Next.js, TypeScript, Supabase, Tailwind.</p></blockquote>
+  <p>Ele decide sozinho a sequencia: montar estrutura (ag-P-01) &rarr; configurar ambiente (ag-P-02) &rarr; especificar (ag-P-06) &rarr; planejar (ag-P-07) &rarr; construir (ag-B-08) &rarr; testar (ag-Q-13) &rarr; publicar (ag-D-27). Eu so dou a direcao e aprovo nos momentos-chave.</p>
+</section>
+
+<!-- ═══════ SECTION 5 ═══════ -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <div class="section-number">05</div>
+    <h2>Como eu corrijo problemas</h2>
+  </div>
+
+  <div class="callout callout-error">
+    <div class="callout-icon">&#128680;</div>
+    <p>Em 193 sessoes, <strong>71 vezes</strong> o problema foi: comecei a corrigir antes de entender o que estava errado.</p>
+  </div>
+
+  <h3>O que eu faco agora</h3>
+  <p>Antes de tocar em qualquer coisa, faco o Claude responder 3 perguntas:</p>
+  <blockquote><p>Bug: [descricao]. ANTES de implementar qualquer coisa, me responde:<br>1. O que deveria acontecer?<br>2. O que esta acontecendo?<br>3. Quais sao as 3 causas mais provaveis?</p></blockquote>
+  <p>So depois de revisar e concordar, digo <em>&ldquo;ok, corrige a causa #X&rdquo;</em>.</p>
+
+  <h3>Quando a primeira tentativa nao funciona</h3>
+  <blockquote><p>Nao resolveu. PARA. Nao tenta variacao do mesmo caminho. O diagnostico provavelmente esta errado. Reavalia.</p></blockquote>
+  <p><strong>Regra:</strong> Maximo 2 tentativas do mesmo tipo. Depois, muda a abordagem completamente.</p>
+
+  <h3>Muitos problemas de uma vez</h3>
+  <table>
+    <thead><tr><th>Quantidade</th><th>Como eu faco</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Peco direto com contexto claro</td></tr>
+      <tr><td>2-5</td><td>Peco em sequencia, salvando entre cada um</td></tr>
+      <tr><td>6+</td><td>Uso o <strong>ag-B-23</strong> no modo batch</td></tr>
+      <tr><td>20+</td><td>Uso o <strong>ag-B-23</strong> no modo triagem primeiro</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════ SECTION 6 ═══════ -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <div class="section-number">06</div>
+    <h2>Meus assistentes &mdash; qual usar e quando</h2>
+  </div>
+
+  <p>Eu criei 46 assistentes especializados. Cada um sabe fazer uma coisa muito bem. Em vez de explicar como fazer cada tarefa, chamo o assistente certo.</p>
+
+  <div class="agent-group">
+    <div class="agent-group-title">&#128296; Quero criar algo...</div>
+    <div class="agent-grid">
+      <div class="agent-card"><div class="agent-tag">ag-P-01</div><div class="agent-info"><div class="agent-name">Comecar projeto do zero</div><div class="agent-desc">Monta a estrutura toda</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-P-03</div><div class="agent-info"><div class="agent-name">Entender como funciona</div><div class="agent-desc">Explora e explica o codigo</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-P-06</div><div class="agent-info"><div class="agent-name">Escrever especificacao</div><div class="agent-desc">Cria a spec da feature</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-B-08</div><div class="agent-info"><div class="agent-name">Implementar codigo</div><div class="agent-desc">Constroi seguindo o plano</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-B-52</div><div class="agent-info"><div class="agent-name">Design visual</div><div class="agent-desc">Interface bonita com UI/UX</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-P-07</div><div class="agent-info"><div class="agent-name">Plano de execucao</div><div class="agent-desc">Divide em tarefas</div></div></div>
+    </div>
+  </div>
+
+  <div class="agent-group">
+    <div class="agent-group-title">&#128027; Quero corrigir algo...</div>
+    <div class="agent-grid">
+      <div class="agent-card"><div class="agent-tag">ag-B-09</div><div class="agent-info"><div class="agent-name">Investigar 1 bug a fundo</div><div class="agent-desc">Diagnostico profundo</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-B-23 --batch</div><div class="agent-info"><div class="agent-name">Corrigir 2-5 bugs</div><div class="agent-desc">Resolve em sequencia</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-B-23 --parallel</div><div class="agent-info"><div class="agent-name">Corrigir 6+ bugs</div><div class="agent-desc">Resolve em paralelo</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-B-23 --triage</div><div class="agent-info"><div class="agent-name">Classificar sem resolver</div><div class="agent-desc">Diagnostica e prioriza</div></div></div>
+    </div>
+  </div>
+
+  <div class="agent-group">
+    <div class="agent-group-title">&#9989; Quero garantir qualidade...</div>
+    <div class="agent-grid">
+      <div class="agent-card"><div class="agent-tag">ag-Q-13</div><div class="agent-info"><div class="agent-name">Criar testes</div><div class="agent-desc">Testes que pegam bugs de verdade</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-Q-22</div><div class="agent-info"><div class="agent-name">Testar como usuario</div><div class="agent-desc">Simula navegacao real</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-Q-14</div><div class="agent-info"><div class="agent-name">Revisar o codigo</div><div class="agent-desc">Review profundo</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-Q-12</div><div class="agent-info"><div class="agent-name">Conferir completude</div><div class="agent-desc">Compara com o plano</div></div></div>
+    </div>
+  </div>
+
+  <div class="agent-group">
+    <div class="agent-group-title">&#128640; Quero publicar...</div>
+    <div class="agent-grid">
+      <div class="agent-card"><div class="agent-tag">ag-D-27</div><div class="agent-info"><div class="agent-name">Pipeline completo</div><div class="agent-desc">8 etapas com verificacao</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-D-18</div><div class="agent-info"><div class="agent-name">Salvar versao</div><div class="agent-desc">Branches, PRs, releases</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-D-38</div><div class="agent-info"><div class="agent-name">Verificar pos-publicacao</div><div class="agent-desc">Testes na versao publicada</div></div></div>
+      <div class="agent-card"><div class="agent-tag">ag-D-17</div><div class="agent-info"><div class="agent-name">Ajustar banco de dados</div><div class="agent-desc">Migrations</div></div></div>
+    </div>
+  </div>
+
+  <div class="agent-group">
+    <div class="agent-group-title">&#127919; Issues do GitHub</div>
+    <div class="agent-grid">
+      <div class="agent-card" style="border-color:var(--orange);"><div class="agent-tag" style="background:var(--orange);">ag-M-51</div><div class="agent-info"><div class="agent-name">Pipeline completo de issue</div><div class="agent-desc">Issue &rarr; Spec &rarr; Build &rarr; Test &rarr; PR</div></div></div>
+      <div class="agent-card" style="border-color:var(--orange);"><div class="agent-tag" style="background:var(--orange);">ag-M-00</div><div class="agent-info"><div class="agent-name">O Maestro &mdash; Orquestrador</div><div class="agent-desc">Nao sei qual usar? Ele decide.</div></div></div>
+    </div>
+  </div>
+
+  <h3>Atalhos rapidos</h3>
+  <p>Para coisas simples que nao precisam do pipeline completo:</p>
+  <div class="shortcuts">
+    <div class="shortcut"><code>/code-review</code> Review rapido</div>
+    <div class="shortcut"><code>/commit</code> Salvar progresso</div>
+    <div class="shortcut"><code>/commit-push-pr</code> Salvar + enviar + PR</div>
+    <div class="shortcut"><code>/deploy</code> Publicar preview</div>
+    <div class="shortcut"><code>/clean_gone</code> Limpar branches</div>
+    <div class="shortcut"><code>/feature-dev</code> Feature simples</div>
+    <div class="shortcut"><code>/seer</code> Erros em producao</div>
+  </div>
+</section>
+
+<!-- ═══════ SECTION 7 — ORCHESTRATOR ═══════ -->
+<section class="section" id="s7">
+  <div class="section-header">
+    <div class="section-number">07</div>
+    <h2>O Orquestrador — meu assistente principal</h2>
+  </div>
+
+  <h3>O que e o ag-M-00</h3>
+  <p>O <strong>ag-M-00</strong> e o maestro de todo o sistema. Quando eu nao sei qual assistente usar, ou quando a tarefa e grande e envolve varios passos, eu chamo ele. Ele entende o que eu quero, decide quais assistentes usar, em que ordem, e coordena tudo.</p>
+  <p>E o assistente que eu mais uso. E tambem o mais inteligente — roda no modelo mais potente (Opus) porque precisa tomar decisoes complexas.</p>
+
+  <h3>Como eu uso no dia a dia</h3>
+
+  <p><strong>Quando eu tenho uma tarefa ampla:</strong></p>
+  <blockquote><p>/ag-M-00-orquestrar implementar sistema de notificacoes com email e push. Repo em ~/Claude/GitHub/raiz-platform</p></blockquote>
+  <p>Ele vai sozinho:</p>
+  <ol>
+    <li>Entender o que eu quero (classificar a intencao)</li>
+    <li>Avaliar o tamanho (pequeno? medio? grande?)</li>
+    <li>Decidir se precisa de especificacao primeiro</li>
+    <li>Montar o plano de execucao</li>
+    <li>Chamar os assistentes certos na ordem certa</li>
+    <li>Verificar qualidade no final</li>
+  </ol>
+
+  <p><strong>Quando eu quero resolver issues do backlog:</strong></p>
+  <blockquote><p>/ag-M-00-orquestrar resolver issues #201 a #210 do Grupo 2</p></blockquote>
+  <p>Ele analisa cada issue, decide se faz em sequencia ou paralelo, e para cada uma chama o <strong>ag-M-51</strong> (pipeline de issues).</p>
+
+  <p><strong>Quando eu nao sei por onde comecar:</strong></p>
+  <blockquote><p>/ag-M-00-orquestrar o app de chamada esta lento quando carrega a lista de turmas. O que fazer?</p></blockquote>
+  <p>Ele classifica como "otimizacao", chama o <strong>ag-P-03</strong> para investigar, depois o <strong>ag-B-11</strong> para otimizar.</p>
+
+  <h3>Como ele decide o que fazer</h3>
+  <p>O orquestrador classifica o que voce pede em categorias e escolhe o caminho:</p>
+  <table>
+    <thead><tr><th>Voce diz algo como...</th><th>Ele classifica como</th><th>E faz isso</th></tr></thead>
+    <tbody>
+      <tr><td>"Criar um projeto novo"</td><td>Projeto novo</td><td>ag-P-01 &rarr; ag-P-02 &rarr; ag-P-06 &rarr; ag-B-08</td></tr>
+      <tr><td>"Implementar feature X"</td><td>Feature nova</td><td>Spec (ag-P-06) &rarr; Plano (ag-P-07) &rarr; Build (ag-B-08) &rarr; Testes (ag-Q-13)</td></tr>
+      <tr><td>"Tem um bug"</td><td>Correcao</td><td>ag-B-09 (1 bug) ou ag-B-23 (varios)</td></tr>
+      <tr><td>"Resolver issue #N"</td><td>Issue pipeline</td><td>ag-M-51 (pipeline completo com spec obrigatoria)</td></tr>
+      <tr><td>"Fazer deploy"</td><td>Publicacao</td><td>ag-D-27 (pipeline de 8 etapas)</td></tr>
+      <tr><td>"Refatorar modulo X"</td><td>Refatoracao</td><td>Spec do que muda &rarr; ag-B-10 (refatorar)</td></tr>
+      <tr><td>"O app ta lento"</td><td>Otimizacao</td><td>ag-P-03 (investigar) &rarr; ag-B-11 (otimizar)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Tarefas grandes ele divide automaticamente</h3>
+  <p>Se a tarefa e grande, ele avalia o tamanho e decide se precisa de mais planejamento:</p>
+  <table>
+    <thead><tr><th>Tamanho</th><th>O que ele faz</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Pequeno</strong> (menos de 2h)</td><td>Vai direto, sem planejamento</td></tr>
+      <tr><td><strong>Medio</strong> (2-8h)</td><td>Exige especificacao antes de codar</td></tr>
+      <tr><td><strong>Grande</strong> (8-20h)</td><td>Exige especificacao + plano detalhado</td></tr>
+      <tr><td><strong>Extra grande</strong> (20h+)</td><td>Exige tudo + minha aprovacao antes de comecar</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Quando ele manda varios assistentes ao mesmo tempo</h3>
+  <p>Se tem 3 ou mais tarefas independentes (que nao mexem nos mesmos arquivos), ele monta um time:</p>
+  <blockquote><p>/ag-M-00-orquestrar corrigir bugs #100, #101, #102, #103, #104 — sao independentes</p></blockquote>
+  <p>Ele cria um time com ate 4 assistentes trabalhando simultaneamente, cada um numa copia isolada do projeto. Isso e 3-4x mais rapido que fazer um de cada vez.</p>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">&#128161;</div>
+    <p><strong>Na duvida, use o orquestrador.</strong> Voce nao precisa saber qual assistente chamar. Descreva o que quer e ele decide. E para isso que ele existe.</p>
+  </div>
+</section>
+
+<!-- ═══════ SECTION 8 — PROTECTION ═══════ -->
+<section class="section" id="s8">
+  <div class="section-header">
+    <div class="section-number">08</div>
+    <h2>Como eu protejo meu trabalho</h2>
+  </div>
+
+  <h3>Salvamentos frequentes</h3>
+  <p><strong>Salvar a cada avanco que funciona.</strong> Se voce acumula 2 horas sem salvar e algo quebra, perde 2 horas. Se salva a cada 15 minutos, perde no maximo 15 minutos.</p>
+
+  <h3>3 protecoes automaticas</h3>
+  <div class="stats-bar" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="stat-card">
+      <div class="num" style="font-size:1.3rem;">&#128274;</div>
+      <div class="label" style="font-size:0.78rem; margin-top:0.5rem;">Branch principal</div>
+      <p style="font-size:0.78rem; color:var(--gray-500); margin:0.3rem 0 0;">Impede salvar direto na branch principal</p>
+    </div>
+    <div class="stat-card">
+      <div class="num" style="font-size:1.3rem;">&#128196;</div>
+      <div class="label" style="font-size:0.78rem; margin-top:0.5rem;">Configs protegidos</div>
+      <p style="font-size:0.78rem; color:var(--gray-500); margin:0.3rem 0 0;">Impede sobrescrever arquivos de configuracao</p>
+    </div>
+    <div class="stat-card">
+      <div class="num" style="font-size:1.3rem;">&#128272;</div>
+      <div class="label" style="font-size:0.78rem; margin-top:0.5rem;">Deteccao de segredos</div>
+      <p style="font-size:0.78rem; color:var(--gray-500); margin:0.3rem 0 0;">Alerta se senha ou chave aparecer no codigo</p>
+    </div>
+  </div>
+
+  <h3>Permissoes &mdash; nao ficar aprovando cada acao</h3>
+  <p>Configurei para que o Claude possa executar ferramentas de desenvolvimento livremente, mas <strong>nunca</strong> possa ler arquivos de senha ou chaves privadas. Configure uma vez, esqueca para sempre.</p>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">&#128161;</div>
+    <p><strong>Antes de operacoes longas:</strong> Roda 1 teste primeiro para ver se o ambiente funciona. Ja perdi horas rodando suites inteiras com credenciais expiradas.</p>
+  </div>
+</section>
+
+<!-- ═══════ SECTION 9 — REAL CASES ═══════ -->
+<section class="section" id="s9">
+  <div class="section-header">
+    <div class="section-number">09</div>
+    <h2>Casos reais — quando eu construo maquinas, nao tarefas</h2>
+  </div>
+
+  <p>A diferenca entre usar o Claude Code para resolver UM problema e usar para construir uma MAQUINA que resolve todos os problemas daquele tipo. Dois exemplos reais.</p>
+
+  <h3>Caso 1: O Dossier — de caos para evidencia organizada</h3>
+
+  <p><strong>O problema:</strong> Eu tinha milhares de mensagens de WhatsApp, dezenas de emails, e 23 contratos em PDF. Precisava transformar tudo isso num documento juridico organizado que mostrasse, cronologicamente, quais clausulas contratuais foram descumpridas — com evidencias rastreaveis ate a mensagem original.</p>
+  <p>Se eu fizesse manualmente: semanas. Se eu pedisse para o Claude "analisa essas mensagens": resultado superficial, sem rastreabilidade, sem estrutura.</p>
+
+  <p><strong>O que eu fiz:</strong> Em vez de pedir a analise, eu pedi para o Claude construir um <strong>pipeline de 8 fases</strong> — uma maquina que processa qualquer volume de dados na mesma estrutura:</p>
+
+  <div class="flow">
+    <div class="flow-step">Fase 0: Processar os 23 contratos em 374 trechos buscaveis</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Fase 1: Converter WhatsApp (Android + iOS) em dados estruturados</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Fase 2: Converter emails em dados estruturados</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Fase 3: Identificar todas as pessoas (quem e quem, com apelidos)</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step active">Fase 4: Classificar problemas por categoria e gravidade</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Fase 5: Montar linha do tempo cronologica</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Fase 6: Cruzar problemas com clausulas contratuais</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Fase 7: Montar cadeias de evidencia rastreaveis</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">Fase 8: Gerar o documento final (Markdown + Word + PDF)</div>
+  </div>
+
+  <p><strong>O resultado:</strong> Um dossier profissional com capa, sumario, linha do tempo, e cada afirmacao rastreavel ate a mensagem original. Se chegar nova evidencia, basta adicionar na fase 1 ou 2 e rodar o pipeline de novo.</p>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">&#128161;</div>
+    <p><strong>A licao:</strong> Eu nao pedi "analisa essas mensagens". Eu pedi "constroi uma maquina que transforma dados brutos em evidencia organizada". A maquina serve para este caso e para qualquer caso futuro similar. Isso e escalavel.</p>
+  </div>
+
+  <h3>Caso 2: O Automata — automacao que se conserta sozinha</h3>
+
+  <p><strong>O problema:</strong> Eu precisava automatizar consultas em sites do governo e monitorar precos em lojas online. Qualquer automacao tradicional quebra em dias porque os sites mudam os botoes, campos, e layouts.</p>
+
+  <p><strong>O que eu fiz:</strong> Em vez de pedir "automatiza o site X", eu pedi para o Claude projetar uma <strong>plataforma inteira</strong> com 3 principios:</p>
+
+  <div class="stats-bar" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="stat-card">
+      <div class="num" style="font-size:1.3rem;">&#129504;</div>
+      <div class="label" style="font-size:0.78rem; margin-top:0.5rem;">Entender antes de agir</div>
+      <p style="font-size:0.78rem; color:var(--gray-500); margin:0.3rem 0 0;">O sistema primeiro mapeia o site completamente — como ele funciona, quais protecoes tem, quais botoes existem</p>
+    </div>
+    <div class="stat-card">
+      <div class="num" style="font-size:1.3rem;">&#128260;</div>
+      <div class="label" style="font-size:0.78rem; margin-top:0.5rem;">Adaptar quando falha</div>
+      <p style="font-size:0.78rem; color:var(--gray-500); margin:0.3rem 0 0;">Se um botao muda de lugar, o sistema reencontra sozinho usando AI em vez de quebrar</p>
+    </div>
+    <div class="stat-card">
+      <div class="num" style="font-size:1.3rem;">&#129302;</div>
+      <div class="label" style="font-size:0.78rem; margin-top:0.5rem;">Aprender com o tempo</div>
+      <p style="font-size:0.78rem; color:var(--gray-500); margin:0.3rem 0 0;">Cada execucao alimenta uma memoria que melhora as proximas — taxas de sucesso, padroes de sites</p>
+    </div>
+  </div>
+
+  <p>Cada automacao e descrita como uma "receita" — nao como um script linear que quebra, mas como um fluxo com ramificacoes, alternativas, e auto-reparo. Se o caminho A falha, tenta B. Se B falha, a AI reencontra o caminho.</p>
+
+  <p><strong>O resultado:</strong> Uma plataforma que qualquer pessoa pode usar para criar automacoes descrevendo em portugues o que quer ("consulta o CNPJ tal na Receita Federal"), sem precisar saber programar. E que se conserta sozinha quando os sites mudam.</p>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">&#128161;</div>
+    <p><strong>A licao:</strong> A diferenca entre "automatiza esse site" e "constroi uma plataforma de automacao inteligente" e a mesma diferenca entre pescar um peixe e construir uma rede. O segundo demora mais no inicio, mas resolve o problema para sempre.</p>
+  </div>
+
+  <h3>O padrao que eu uso</h3>
+  <p>Toda vez que tenho um problema que vai se repetir, eu me pergunto:</p>
+  <blockquote><p>Eu quero resolver ESTE problema, ou quero construir uma maquina que resolve TODOS os problemas desse tipo?</p></blockquote>
+  <p>Se a resposta e a segunda, eu começo com uma especificacao (ag-P-06), depois um plano (ag-P-07), e construo o sistema em fases — cada fase funcionando independente, testavel, e reutilizavel.</p>
+</section>
+
+<!-- ═══════ SECTION 10 — QAT ═══════ -->
+<section class="section" id="s10">
+  <div class="section-header">
+    <div class="section-number">10</div>
+    <h2>QAT — por que "funciona" nao e suficiente</h2>
+  </div>
+
+  <h3>O problema que testes normais nao resolvem</h3>
+  <p>Testes tradicionais verificam: <em>"O sistema funciona?"</em> — o botao clica? a pagina carrega? o dado salva?</p>
+  <p>Mas tem uma pergunta que eles nao respondem: <em>"O resultado e BOM?"</em></p>
+  <p>Exemplo: eu tenho um assistente educacional que gera planos de aula. O teste normal verifica que ele retorna um texto. Mas nao verifica se o plano e pedagogicamente adequado, se usa linguagem acessivel para o professor, se esta alinhado ao curriculo, ou se as atividades sao realmente praticaveis.</p>
+  <p><strong>Um sistema pode funcionar perfeitamente e produzir resultados terriveis.</strong> QAT existe para pegar isso.</p>
+
+  <h3>O que e QAT</h3>
+  <p>QAT (Quality Acceptance Testing) e uma camada de testes que avalia a <strong>qualidade da saida</strong>, nao so se o sistema funciona. Em vez de um teste automatico dizer "passou" ou "falhou", uma AI avalia o resultado como um ser humano avaliaria — dando nota de 1 a 10 em criterios especificos.</p>
+
+  <h3>Como funciona na pratica</h3>
+  <p>Cada cenario de teste simula um usuario real usando o produto. Exemplo:</p>
+
+  <div class="callout callout-tip" style="background: var(--white); border: 2px solid var(--teal);">
+    <div>
+      <p><strong>Cenario QAT-47: Coordenador pede atividades de alfabetizacao</strong></p>
+      <p style="margin-top:0.5rem"><strong>Quem:</strong> Coordenador pedagogico, escola publica, 3a serie</p>
+      <p><strong>O que pede:</strong> "Sugira 3 atividades de alfabetizacao para alunos que ainda nao leem fluentemente, alinhadas ao meu curriculo"</p>
+      <p style="margin-top:0.5rem"><strong>O que o QAT avalia (nota 1-10 em cada):</strong></p>
+      <ul style="margin-top:0.3rem">
+        <li><strong>Aplicabilidade:</strong> O professor consegue usar amanha na sala de aula?</li>
+        <li><strong>Adequacao:</strong> As atividades sao para o nivel certo (pre-fluente, nao avancado)?</li>
+        <li><strong>Diferenciacao:</strong> As 3 atividades sao realmente diferentes (nao variacoes da mesma)?</li>
+        <li><strong>Contextualizacao:</strong> Referencia o curriculo do professor (nao e generico)?</li>
+      </ul>
+      <p style="margin-top:0.5rem"><strong>Nota minima para passar:</strong> 6/10 em cada criterio</p>
+    </div>
+  </div>
+
+  <h3>As 4 camadas — economizando dinheiro</h3>
+  <p>Cada cenario passa por 4 verificacoes em sequencia. Se falha numa camada mais basica, nao precisa chamar a AI (que custa dinheiro) para avaliar:</p>
+
+  <table>
+    <thead><tr><th>Camada</th><th>O que verifica</th><th>Custo</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1. Basica</strong></td><td>A pagina carrega? Os elementos existem?</td><td>R$ 0 (automatico)</td></tr>
+      <tr><td><strong>2. Funcional</strong></td><td>A resposta existe? Nao esta vazia? E do tipo certo?</td><td>R$ 0 (automatico)</td></tr>
+      <tr><td><strong>3. Qualidade</strong></td><td>A resposta e BOA? (AI avalia com criterios)</td><td>~R$ 0,15 (1 chamada AI)</td></tr>
+      <tr><td><strong>4. Negocio</strong></td><td>Atende o objetivo do usuario?</td><td>~R$ 0,15 (mesma chamada)</td></tr>
+    </tbody>
+  </table>
+  <p>Se a camada 1 falha (pagina nao carrega), e um problema de infraestrutura — nao precisa gastar dinheiro avaliando qualidade. Isso economiza ~30% do custo.</p>
+
+  <h3>Por que "funciona" nao basta — um exemplo real</h3>
+
+  <div class="error-story" style="border-left-color: var(--orange);">
+    <div class="title" style="color: var(--orange);">Exemplo: Chat educacional respondendo em ingles</div>
+    <div class="what-happened">O teste tradicional verificava: "retornou texto?" Sim. "Tem mais de 100 caracteres?" Sim. "Status 200?" Sim. <strong>Teste passou.</strong><br><br>Mas o usuario perguntou em portugues e recebeu resposta em ingles. Um professor brasileiro recebendo plano de aula em ingles. <strong>Funcionou perfeitamente. Resultado inutilizavel.</strong></div>
+    <div class="fix"><strong>O QAT pegaria isso:</strong> O criterio "Linguagem adequada" daria nota 1/10, e o cenario falharia. O teste tradicional nunca teria percebido.</div>
+  </div>
+
+  <h3>O que o QAT me mostrou no meu projeto</h3>
+  <div class="stats-bar">
+    <div class="stat-card"><div class="num">173</div><div class="label">Cenarios criados</div></div>
+    <div class="stat-card"><div class="num">63</div><div class="label">Especificacoes</div></div>
+    <div class="stat-card"><div class="num">8</div><div class="label">Regras obrigatorias</div></div>
+    <div class="stat-card"><div class="num">6/10</div><div class="label">Nota minima</div></div>
+  </div>
+
+  <p>Cada modulo do meu sistema tem cenarios QAT que simulam usuarios reais. Quando faco uma mudanca, rodo os cenarios e vejo se a qualidade melhorou, piorou, ou se manteve. O valor principal e a <strong>tendencia</strong> — nao a nota absoluta.</p>
+
+  <h3>Como eu uso no dia a dia</h3>
+  <p><strong>Para criar um cenario novo:</strong></p>
+  <blockquote><p>/ag-Q-41 criar cenario QAT para o chat educacional — persona: coordenador pedagogico, 3a serie, escola publica</p></blockquote>
+
+  <p><strong>Para rodar os cenarios:</strong></p>
+  <blockquote><p>/ag-Q-40 rodar QAT no modulo de chat — URL: https://app.vercel.app</p></blockquote>
+
+  <p><strong>Para comparar com a qualidade esperada:</strong></p>
+  <blockquote><p>/ag-Q-44 benchmark do modulo de chat — comparar app com baseline</p></blockquote>
+
+  <h3>Quando usar QAT</h3>
+  <table>
+    <thead><tr><th>Situacao</th><th>Usar QAT?</th></tr></thead>
+    <tbody>
+      <tr><td>Sistema gera texto, imagens, ou conteudo</td><td><strong>Sim</strong> — qualidade do conteudo importa</td></tr>
+      <tr><td>Sistema e um CRUD simples (cadastro, lista, edita)</td><td>Nao — testes normais bastam</td></tr>
+      <tr><td>Mudei o modelo de AI ou o prompt</td><td><strong>Sim</strong> — verificar se qualidade se manteve</td></tr>
+      <tr><td>Fiz deploy de funcionalidade nova</td><td><strong>Sim</strong> — verificar qualidade pos-publicacao</td></tr>
+      <tr><td>Rotina semanal de monitoramento</td><td><strong>Sim</strong> — tendencia ao longo do tempo</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">&#9888;&#65039;</div>
+    <p><strong>QAT nao substitui testes normais.</strong> E uma camada ADICIONAL. Testes normais verificam se funciona. QAT verifica se o resultado e bom. Voce precisa dos dois.</p>
+  </div>
+</section>
+
+<!-- ═══════ SECTION 11 — LONG PROJECTS ═══════ -->
+<section class="section" id="s11">
+  <div class="section-header">
+    <div class="section-number">11</div>
+    <h2>Projetos que duram semanas</h2>
+  </div>
+
+  <h3>O desafio</h3>
+  <p>Cada sessao do Claude comeca do zero. Se voce esta construindo algo ao longo de dias, precisa de estrategias de continuidade.</p>
+
+  <h3>O arquivo de instrucoes como memoria permanente</h3>
+  <p>O CLAUDE.md e lido SEMPRE que voce abre uma sessao. Mantenho atualizado:</p>
+  <pre>## Estado atual do projeto
+- Login: PRONTO
+- Dashboard: EM ANDAMENTO (falta grafico de vendas)
+- Relatorios: NAO INICIADO
+
+## Decisoes tomadas
+- Usamos Clerk para autenticacao (mais simples para MVP)
+- Banco usa exclusao logica</pre>
+
+  <h3>Memoria entre sessoes</h3>
+  <blockquote><p>Salva na memoria: eu prefiro respostas curtas em portugues. Quando algo der errado, me diz o que aconteceu e o que vai fazer.</p></blockquote>
+  <p>Isso vale para todas as sessoes futuras, em qualquer projeto.</p>
+
+  <h3>Meu projeto principal &mdash; numeros reais</h3>
+  <div class="stats-bar">
+    <div class="stat-card"><div class="num">57</div><div class="label">Issues no backlog</div></div>
+    <div class="stat-card"><div class="num">48</div><div class="label">Implementadas</div></div>
+    <div class="stat-card"><div class="num">16</div><div class="label">PRs entregues</div></div>
+    <div class="stat-card"><div class="num">63</div><div class="label">Specs criadas</div></div>
+  </div>
+  <p>A chave nao e velocidade &mdash; e consistencia. Um pouco todo dia, bem organizado, acumula rapido.</p>
+</section>
+
+<!-- ═══════ SECTION 12 ═══════ -->
+<section class="section" id="s12">
+  <div class="section-header">
+    <div class="section-number">12</div>
+    <h2>Como eu replico para qualquer projeto</h2>
+  </div>
+
+  <h3>Tres camadas</h3>
+  <table>
+    <thead><tr><th>Camada</th><th>O que contem</th><th>Vale para</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Pessoal</strong></td><td>Idioma, estilo de trabalho</td><td>Tudo que voce faz</td></tr>
+      <tr><td><strong>Workspace</strong></td><td>Regras de git, qualidade, convencoes</td><td>Todos os projetos no workspace</td></tr>
+      <tr><td><strong>Projeto</strong></td><td>Stack, rotas, particularidades</td><td>So aquele projeto</td></tr>
+    </tbody>
+  </table>
+  <p>Cada camada herda as anteriores. Voce so escreve o especifico em cada uma.</p>
+
+  <h3>Licoes aprendidas</h3>
+  <p>Toda vez que algo inesperado me custa tempo, documento. Na proxima vez, o Claude ja sabe do risco.</p>
+  <div class="callout callout-warn">
+    <div class="callout-icon">&#128221;</div>
+    <p><strong>Exemplo real:</strong> &ldquo;O comando <code>bun test</code> e <code>bun run test</code> sao coisas DIFERENTES. O primeiro ignora configuracoes. Sempre usar <code>bun run test</code>.&rdquo; &mdash; Parece bobo. Me custou 2 horas.</p>
+  </div>
+</section>
+
+<!-- ═══════ SECTION 13 ═══════ -->
+<section class="section" id="s13">
+  <div class="section-header">
+    <div class="section-number">13</div>
+    <h2>Como pegar o sistema pronto</h2>
+  </div>
+
+  <p>Todo o meu sistema esta disponivel de graca:</p>
+
+  <div class="cta-box">
+    <h3>github.com/andregusman-raiz/a-gusman-claude</h3>
+    <p>46 assistentes, 56 habilidades, 21 regras, 26 protecoes, 11 guias estrategicos.</p>
+    <a href="https://github.com/andregusman-raiz/a-gusman-claude" class="cta-btn" target="_blank">Ver no GitHub &rarr;</a>
+  </div>
+
+  <h3>3 niveis de instalacao</h3>
+  <table>
+    <thead><tr><th>Nivel</th><th>Arquivos</th><th>Tempo</th><th>O que inclui</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Iniciante</strong></td><td>~7</td><td>2 min</td><td>Regras basicas, protecoes, orquestrador, modelo CLAUDE.md</td></tr>
+      <tr><td><strong>Padrao</strong></td><td>~50</td><td>10 min</td><td>+ 16 assistentes principais + modelos de projeto</td></tr>
+      <tr><td><strong>Completo</strong></td><td>180+</td><td>20 min</td><td>Sistema completo: tudo</td></tr>
+    </tbody>
+  </table>
+
+  <pre>git clone https://github.com/andregusman-raiz/a-gusman-claude
+cd a-gusman-claude
+bash install.sh --tier starter   # ou standard, ou full</pre>
+</section>
+
+<!-- ═══════ SECTION 14 ═══════ -->
+<section class="section" id="s14">
+  <div class="section-header">
+    <div class="section-number">14</div>
+    <h2>O que eu aprendi errando</h2>
+  </div>
+
+  <p>Cada erro aqui me custou horas reais.</p>
+
+  <div class="error-story">
+    <div class="title">&ldquo;Faz tudo de uma vez&rdquo;</div>
+    <div class="what-happened">Pedi 7 funcionalidades sem pontos de salvamento. Na 5a, algo quebrou. Perdi tudo.</div>
+    <div class="fix"><strong>Agora:</strong> Salvar depois de cada funcionalidade. Sempre.</div>
+  </div>
+
+  <div class="error-story">
+    <div class="title">Assistentes pisando um no outro</div>
+    <div class="what-happened">3 assistentes no mesmo projeto ao mesmo tempo. Corromperam o historico. 4 horas perdidas.</div>
+    <div class="fix"><strong>Agora:</strong> Cada assistente trabalha numa copia isolada. Se nao der, faco um de cada vez.</div>
+  </div>
+
+  <div class="error-story">
+    <div class="title">Substituicao em massa sem conferir</div>
+    <div class="what-happened">Trocar um texto em todos os arquivos. 28 quebraram &mdash; significados diferentes em contextos diferentes.</div>
+    <div class="fix"><strong>Agora:</strong> Lotes de 5 arquivos. Testo entre cada lote.</div>
+  </div>
+
+  <div class="error-story">
+    <div class="title">Corrigir sem entender</div>
+    <div class="what-happened">&ldquo;Corrige esse erro&rdquo; &mdash; 4 tentativas, nenhuma funcionou. Diagnostico errado desde o inicio.</div>
+    <div class="fix"><strong>Agora:</strong> 3 perguntas antes: O que deveria? O que esta? Quais as causas?</div>
+  </div>
+
+  <div class="error-story">
+    <div class="title">Credenciais vencidas</div>
+    <div class="what-happened">200 testes com API expirada. 45 minutos perdidos.</div>
+    <div class="fix"><strong>Agora:</strong> 1 teste rapido antes da suite toda.</div>
+  </div>
+
+  <div class="error-story">
+    <div class="title">Config sobrescrito</div>
+    <div class="what-happened">O Claude substituiu o package.json inteiro. Dependencias sumiram.</div>
+    <div class="fix"><strong>Agora:</strong> Protecao automatica que so permite edicoes pontuais.</div>
+  </div>
+
+  <div class="error-story">
+    <div class="title">106 protecoes = computador travou</div>
+    <div class="what-happened">Cada acao disparava dezenas de verificacoes. 200GB de memoria.</div>
+    <div class="fix"><strong>Agora:</strong> Poucas protecoes, todas essenciais. Nada que so &ldquo;avisa&rdquo;.</div>
+  </div>
+
+  <h3>O padrao por tras dos erros</h3>
+  <table>
+    <thead><tr><th>Categoria</th><th>% dos problemas</th><th>Prevencao</th></tr></thead>
+    <tbody>
+      <tr><td>Trabalho acumulado sem salvar</td><td><strong>30%</strong></td><td>Salvar a cada funcionalidade</td></tr>
+      <tr><td>Diagnostico errado</td><td><strong>37%</strong></td><td>3 perguntas antes de corrigir</td></tr>
+      <tr><td>Assistentes se atrapalhando</td><td><strong>15%</strong></td><td>Isolamento obrigatorio</td></tr>
+      <tr><td>Ambiente invalido</td><td><strong>18%</strong></td><td>Verificacao antes de comecar</td></tr>
+    </tbody>
+  </table>
+  <div class="callout callout-tip">
+    <div class="callout-icon">&#127919;</div>
+    <p>Resolva esses 4 e voce elimina <strong>80% dos problemas</strong>.</p>
+  </div>
+</section>
+
+<!-- ═══════ SECTION 15 ═══════ -->
+<section class="section" id="s15">
+  <div class="section-header">
+    <div class="section-number">15</div>
+    <h2>Como comecar</h2>
+  </div>
+
+  <ul class="timeline">
+    <li>
+      <div class="week">Semana 1 &mdash; O basico</div>
+      <p>Instale o Claude Code. Crie um CLAUDE.md com sua stack + 3 regras. Configure permissoes. Faca uma tarefa simples. Adicione regras conforme erros acontecem. Comece a salvar frequentemente.</p>
+    </li>
+    <li>
+      <div class="week">Semana 2 &mdash; Pegando o ritmo</div>
+      <p>Instale o nivel iniciante do repositorio. Experimente o ag-M-00. Configure protecao de branch. Organize issues no GitHub. Experimente o ag-M-51 para resolver uma issue completa.</p>
+    </li>
+    <li>
+      <div class="week">Semana 3 &mdash; Escalando</div>
+      <p>Instale o nivel padrao. Crie regras separadas. Salve preferencias na memoria. Experimente assistentes em paralelo (com isolamento!).</p>
+    </li>
+    <li>
+      <div class="week">Mes 1 &mdash; Produtividade alta</div>
+      <p>CLAUDE.md maduro com regras reais. 3 protecoes automaticas. Fluxo de issue &rarr; spec &rarr; build &rarr; entrega. Licoes documentadas. Assistentes para tarefas comuns.</p>
+    </li>
+  </ul>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">&#11088;</div>
+    <p><strong>O conselho mais importante:</strong> Nao tente montar tudo de uma vez. Comece com o CLAUDE.md e va adicionando conforme sente necessidade. O ciclo e: <strong>usar &rarr; errar &rarr; documentar &rarr; nao repetir</strong>.</p>
+  </div>
+
+  <div class="cta-box" style="margin-top:3rem;">
+    <h3>Pronto para comecar?</h3>
+    <p>Pegue o sistema completo no GitHub &mdash; de graca, aberto, com instalador automatico.</p>
+    <a href="https://github.com/andregusman-raiz/a-gusman-claude" class="cta-btn" target="_blank">github.com/andregusman-raiz/a-gusman-claude &rarr;</a>
+  </div>
+</section>
+
+</div><!-- /main -->
+
+<!-- FOOTER -->
+<footer>
+  <img src="raiz-logo.png" alt="Raiz"><br>
+  Feito por quem usa 13 vezes por dia, erra frequentemente, e documenta cada erro.<br>
+  <a href="https://github.com/andregusman-raiz/a-gusman-claude">Repositorio</a> &middot; Andre Gusman &middot; Raiz Educacao
+</footer>
+
+</body>
+</html>

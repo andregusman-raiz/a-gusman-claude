@@ -1,3 +1,12 @@
+---
+description: "Anti-teatralidade — cada expect() DEVE poder falhar em cenario real"
+paths:
+  - "**/*.test.ts"
+  - "**/*.spec.ts"
+  - "**/*.test.tsx"
+  - "tests/**"
+---
+
 # Test Quality Enforcement — Anti-Teatralidade
 
 ## Regra de Ouro

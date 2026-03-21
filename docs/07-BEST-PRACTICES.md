@@ -132,7 +132,7 @@ ESLint com `--max-warnings=0`. Warnings viram erros em producao.
 
 ### 3.3 Testes Antes de Refatorar
 
-ag-05 (Refactorer) RECUSA refatorar sem testes existentes. Isso previne regressoes silenciosas.
+ag-P-05 (Refactorer) RECUSA refatorar sem testes existentes. Isso previne regressoes silenciosas.
 
 ### 3.4 Codigo Minimo
 
@@ -159,10 +159,10 @@ CERTO:  "Adicione autenticacao JWT usando bcrypt para hash, com refresh token de
 ### 4.3 Use Commands
 
 ```
-/ag00 analise este projeto              ← Orquestrador classifica
-/ag03 implemente a feature X            ← Builder executa
-/ag04 debug o erro em auth.ts           ← Debugger investiga
-/ag07 crie testes para services/        ← Tester cria testes
+/ag-M-00 analise este projeto              ← Orquestrador classifica
+/ag-P-03 implemente a feature X            ← Builder executa
+/ag-P-04 debug o erro em auth.ts           ← Debugger investiga
+/ag-P-07 crie testes para services/        ← Tester cria testes
 ```
 
 ### 4.4 Execucao vs Planejamento
@@ -183,11 +183,11 @@ CERTO:  "Adicione autenticacao JWT usando bcrypt para hash, com refresh token de
 docs/ai-state/
 ├── session-state.json     ← Progresso da sessao atual
 ├── errors-log.md          ← Erros encontrados + solucoes
-├── validation-report.md   ← Output do ag-06
-├── e2e-report.md          ← Output do ag-08
-├── security-report.md     ← Output do ag-10
+├── validation-report.md   ← Output do ag-P-06
+├── e2e-report.md          ← Output do ag-B-08
+├── security-report.md     ← Output do ag-B-10
 ├── bug-fix-plan.md        ← Output do /diagnose-bugs
-└── improvements-log.md    ← Output do ag-M
+└── improvements-log.md    ← Output do ag-M-99
 ```
 
 ### 5.2 CLAUDE.md Hierarquico
@@ -260,7 +260,7 @@ SEMPRE confirmar com usuario antes de:
 ### 7.2 Refatoracao Durante Debug
 
 **Problema**: Enquanto debugga um bug, "melhora" codigo ao redor. Introduz novos bugs.
-**Solucao**: ag-04 faz fix MINIMO. Refatoracao e tarefa separada com ag-05.
+**Solucao**: ag-P-04 faz fix MINIMO. Refatoracao e tarefa separada com ag-P-05.
 
 ### 7.3 Otimizar Sem Medir
 
@@ -275,4 +275,4 @@ SEMPRE confirmar com usuario antes de:
 ### 7.5 Ignorar errors-log.md
 
 **Problema**: Bug ja foi diagnosticado antes, mas o agente nao leu o log e tentou as mesmas solucoes falhas.
-**Solucao**: ag-04 SEMPRE le errors-log.md ANTES de comecar.
+**Solucao**: ag-P-04 SEMPRE le errors-log.md ANTES de comecar.

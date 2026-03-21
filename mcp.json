@@ -1,10 +1,5 @@
 {
   "mcpServers": {
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"]
-    },
     "context7": {
       "type": "stdio",
       "command": "npx",

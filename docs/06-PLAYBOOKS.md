@@ -99,7 +99,7 @@ Se SPEC > 200 linhas → dividir em SPEC_1.md, SPEC_2.md, etc.
 8 fases para iniciar um projeto completo:
 
 1. **Modelo de Negocio**: definir problema, persona, metricas
-2. **Estrutura**: scaffolding com ag-01
+2. **Estrutura**: scaffolding com ag-P-01
 3. **Database**: diagrama → aprovacao → schema → migrations (Playbook 03)
 4. **Backend**: APIs, services, repositories
 5. **Frontend**: componentes, pages, hooks

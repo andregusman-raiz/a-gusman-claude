@@ -9,6 +9,11 @@ paths:
 ## Principio
 Quando multiplos agents trabalham em paralelo, CADA agent tem ownership exclusivo.
 
+## Regra Zero: Path Absoluto Obrigatorio
+Ao spawnar QUALQUER agent (especialmente cross-repo), SEMPRE especificar o path absoluto do repo-alvo no prompt.
+NUNCA confiar que o CWD herdado e correto — agents herdam o diretorio da sessao pai, que pode ser outro repo.
+Exemplo: "Trabalhe no repo em ~/Claude/GitHub/raiz-platform/" (nao apenas "no raiz-platform")
+
 ## Regras de Ownership
 
 ### 1. Declarar Escopo Antes de Executar
@@ -41,7 +46,7 @@ Antes de merge:
 - Commit com mensagem descritiva
 
 ### 6. Limites de Paralelismo
-- Max 5 agents paralelos
+- Max 4 agents paralelos
 - Max 8 arquivos por agent
 - Se total < 6 tasks → usar sequencial
 
@@ -61,7 +66,7 @@ MacBook Pro M5 com 36GB RAM — proteger contra memory overflow.
 - Max 4 teammates simultaneos (nao 5)
 - Cada teammate sem subagents proprios (flat, nao nested)
 - `TeamDelete` IMEDIATO apos teammates terminarem (liberar memoria)
-- Preferir sequencial (ag-23) quando < 6 tasks
+- Preferir sequencial (ag-B-23) quando < 6 tasks
 
 **MCP servers:**
 - Subagents herdam MCPs da sessao pai — NAO iniciar MCPs extras
@@ -80,6 +85,15 @@ memory_pressure  # macOS: normal/warn/critical
 - Fechar panes/sessoes inativas — tmux e iTerm2 mantém processos vivos
 - Usar `tmux ls` para verificar sessoes ativas antes de spawnar novos agents
 - Prefix `Ctrl+A` (nao `Ctrl+B`) — remapeado para evitar conflito com Claude Code
+
+## Enforcement por ag-M-00
+
+ag-M-00 DEVE recusar paralelismo se:
+1. Agents modificam codigo SEM `isolation: "worktree"`
+2. Overlap de arquivos > 0
+3. Memory pressure em warn/critical
+
+Acao: "Executando sequencialmente por seguranca."
 
 ## Anti-Patterns
 - NUNCA agents sem escopo definido

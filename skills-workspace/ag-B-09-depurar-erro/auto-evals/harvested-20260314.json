@@ -1,0 +1,251 @@
+{
+  "skill_name": "ag-B-09-depurar-erro",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Ao clicar para aplicar um preset na tela \"Controle de Acesso > Criar Perfil\", o console mostra `Failed to execute 'json' on 'Response': Unexpected end of JSON input` e `405 Method Not Allowed` em `/api/admin/access-levels/{id}`",
+      "expected_output": "Diagnostico com causa raiz: O frontend (`useAccessControl.ts:178`) enviava `PATCH` mas a API route (`api/admin/access-levels/[id]/route.ts`) só exporta handlers para `GET`, `PUT` e `DELETE`. O Next.js retorna 405 sem body, e o código tentava parsear JSON de um response vazio.. Solucao: Alterado `method: 'PATCH'` para `method: 'PUT'` em `useAccessControl.ts:179`. Adicionada proteção de parse com `res.text()` antes de `JSON.parse()` para evitar crash em responses sem body.",
+      "files": [],
+      "bug_type": "crash",
+      "source": "errors-log.md [2026-02-09]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: O frontend (`useAccessControl.ts:178`) enviava `PATCH` mas a API route (`api/admin/access-levels/[id]/route.ts`) só exporta handlers para `GET`, `PUT` e `DELETE`. O Next.js retorna 405 sem body, e o código tentava parsear JSON de um response vazio.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Console de producao mostra multiplos `405 Method Not Allowed` e `SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input` em `/api/admin/access-levels/0e04dffe-...`",
+      "expected_output": "Diagnostico com causa raiz: O deploy de producao (`dpl_H4SEr1hKRPERYL6UM6pevsqeG6ip`) ainda contém o código antigo (PATCH) que foi corrigido no commit anterior. O fix no `useAccessControl.ts` (PATCH→PUT) não foi deployado. SWR retry amplifica os erros.. Solucao: Fazer novo deploy para Vercel para que o fix do PATCH→PUT entre em producao.",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-10]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: O deploy de producao (`dpl_H4SEr1hKRPERYL6UM6pevsqeG6ip`) ainda contém o código antigo (PATCH) que foi corrigido no commit anterior. O fix no `useAccessControl.ts` (PATCH→PUT) não foi deployado. SWR retry amplifica os erros.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Todos cards e graficos do /admin mostram 0 (tokens, custos, requests, error rate, latencia)",
+      "expected_output": "Diagnostico com causa raiz: 1. Chat principal (agent.service.ts → providers) nao loga em ai_usage_logs (FORA DO ESCOPO - tratar em PR separado). Solucao: Fixes 2-5 neste PR; causa 1 sera tratada em PR separado",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-10]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: 1. Chat principal (agent.service.ts → providers) nao loga em ai_usage_logs (FORA DO ESCOPO - tratar em PR separado)",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Usuarios convidados via admin/access nao recebem email de convite. A interface mostra \"Convite criado\" mas email nao chega.",
+      "expected_output": "Diagnostico com causa raiz: Duas causas independentes:. Solucao: 1. Adicionadas env vars via `vercel env add`: `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `INVITE_CC_EMAIL`",
+      "files": [],
+      "bug_type": "config",
+      "source": "errors-log.md [2026-02-10]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: Duas causas independentes:",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        },
+        {
+          "text": "Verificou env vars e configuracao",
+          "type": "completeness"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Ao tentar criar perfil \"TESTE TOTVS\" na tela Controle de Acesso, erro \"Failed to create access profile\". Console mostra GET `/api/admin/access-levels` retornando 500.",
+      "expected_output": "Diagnostico com causa raiz: Tres problemas combinados:. Solucao: 1. **Migration 218**: `ALTER COLUMN level DROP NOT NULL` + DROP constraints residuais. Aplicada com `supabase db push`.",
+      "files": [],
+      "bug_type": "crash",
+      "source": "errors-log.md [2026-02-10]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: Tres problemas combinados:",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Usuarios com perfil \"usuario\" veem todos os 16+ modulos no menu lateral, inclusive modulos que nao tem acesso (admin, social-media, clm, etc).",
+      "expected_output": "Diagnostico com causa raiz: `src/app/page.tsx:97-103` chamava `createNavItems()` sem passar `allowedModules`. Em `navigation.tsx:117`: `if (!allowedModules) return true` → mostra TUDO por backwards compatibility. Bug secundario: `usePermissions.ts` tinha lista hardcoded incompleta para `has_full_access` (faltavam 6 modulos).. Solucao: 1. `page.tsx`: Adicionado `usePermissions()` no AppSidebar, passa `allowedModules` e `isAdmin` ao `createNavItems()`",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-10]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: `src/app/page.tsx:97-103` chamava `createNavItems()` sem passar `allowedModules`. Em `navigation.tsx:117`: `if (!allowedModules) return true` → mostra TUDO por backwards compatibility. Bug secundario: `usePermissions.ts` tinha lista hardcoded incompleta para `has_full_access` (faltavam 6 modulos).",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Email convidado como `Yago.Monte@raizeducacao.com.br` pode gerar convites duplicados, nao detectar usuario existente, e falhar no accept do convite.",
+      "expected_output": "Diagnostico com causa raiz: Quatro problemas combinados:. Solucao: 1. `invite/route.ts`: Adicionado `.transform(val => val.toLowerCase())` ao Zod schema do email",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-11]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: Quatro problemas combinados:",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Ao clicar \"Gerar Codigo de Conexao\" em /settings/tools?tab=cli, nada acontece (codigo nao aparece na UI). Nenhum erro visivel para o usuario.",
+      "expected_output": "Diagnostico com causa raiz: `ConnectComputerCard.tsx:79-87` nao desembrulhava o envelope `{ success, data }` retornado por `apiSuccess()`. A API retorna `{ success: true, data: { code, expiresAt, commands } }` mas o componente acessava `data.code` diretamente (que era `undefined`) em vez de `data.data.code`.. Solucao: Ajustada interface `SetupCodeResponse` para incluir wrapper `data`, e desestruturado `json.data` antes de setar estados.",
+      "files": [],
+      "bug_type": "crash",
+      "source": "errors-log.md [2026-02-11]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: `ConnectComputerCard.tsx:79-87` nao desembrulhava o envelope `{ success, data }` retornado por `apiSuccess()`. A API retorna `{ success: true, data: { code, expiresAt, commands } }` mas o componente acessava `data.code` diretamente (que era `undefined`) em vez de `data.data.code`.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "3 test suites falhando: invite/accept, invite (consolidated), google-workspace/callback. 11 testes falhando no total.",
+      "expected_output": "Diagnostico com causa raiz: Duas causas independentes:. Solucao: Todos os 3 files corrigidos. Auth tests: 13/13 suites, 135/135 testes passando.",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-11]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: Duas causas independentes:",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Ao abrir uma conversa DM, o endpoint `/api/chat-rooms/{id}/messages` retornava 500. O frontend nao mostrava mensagem de erro ao usuario (falha silenciosa).",
+      "expected_output": "Diagnostico com causa raiz: Quatro problemas combinados:. Solucao: 1. `chat-message.service.ts`: Substituido `getUserById()` por query direta com `getAdminClient()` (service role, bypassa RLS)",
+      "files": [],
+      "bug_type": "crash",
+      "source": "errors-log.md [2026-02-25]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: Quatro problemas combinados:",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Ao clicar \"Excluir sala\" na sidebar do chat, o canal permanece na interface apos confirmar a exclusao.",
+      "expected_output": "Diagnostico com causa raiz: Inconsistencia entre o check de permissao do frontend e do backend.. Solucao: `src/lib/services/chat-room.service.ts` — expandido o `deleteRoom` para verificar AMBOS os criterios em paralelo:",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-25]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: Inconsistencia entre o check de permissao do frontend e do backend.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    }
+  ]
+}

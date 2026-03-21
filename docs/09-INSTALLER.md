@@ -51,22 +51,22 @@ docs/claude-code-universal-playbook/03-AGENTS-REFERENCE.md
 ## Passo 3: Commands (16 arquivos)
 
 Para cada agent, crie o command correspondente em .claude/commands/:
-- ag00.md: "Use the ag-00-orquestrar agent to classify and direct: $ARGUMENTS"
-- ag01.md: "Use the ag-01-iniciar-projeto agent to scaffold: $ARGUMENTS"
-- ag02.md: "Use the ag-02-setup-ambiente agent to set up: $ARGUMENTS"
-- ag03.md: "Use the ag-03-construir-codigo agent to build: $ARGUMENTS"
-- ag04.md: "Use the ag-04-depurar-erro agent to debug: $ARGUMENTS"
-- ag05.md: "Use the ag-05-refatorar-codigo agent to refactor: $ARGUMENTS"
-- ag06.md: "Use the ag-06-validar-execucao agent to validate: $ARGUMENTS"
-- ag07.md: "Use the ag-07-testar-codigo agent to test: $ARGUMENTS"
-- ag08.md: "Use the ag-08-testar-e2e agent to E2E test: $ARGUMENTS"
-- ag09.md: "Use the ag-09-criticar-projeto agent to review: $ARGUMENTS"
-- ag10.md: "Use the ag-10-auditar-codigo agent to audit: $ARGUMENTS"
-- ag11.md: "Use the ag-11-revisar-ux agent to review UX: $ARGUMENTS"
-- ag12.md: "Use the ag-12-migrar-dados agent to migrate: $ARGUMENTS"
-- ag13.md: "Use the ag-13-publicar-deploy agent to deploy: $ARGUMENTS"
-- ag14.md: "Use the ag-14-documentar-projeto agent to document: $ARGUMENTS"
-- agM.md: "Use the ag-M-melhorar-agentes agent to analyze and improve: $ARGUMENTS"
+- ag00.md: "Use the ag-M-00-orquestrar agent to classify and direct: $ARGUMENTS"
+- ag01.md: "Use the ag-P-01-iniciar-projeto agent to scaffold: $ARGUMENTS"
+- ag02.md: "Use the ag-P-02-setup-ambiente agent to set up: $ARGUMENTS"
+- ag03.md: "Use the ag-P-03-construir-codigo agent to build: $ARGUMENTS"
+- ag04.md: "Use the ag-P-04-depurar-erro agent to debug: $ARGUMENTS"
+- ag05.md: "Use the ag-P-05-refatorar-codigo agent to refactor: $ARGUMENTS"
+- ag06.md: "Use the ag-P-06-validar-execucao agent to validate: $ARGUMENTS"
+- ag07.md: "Use the ag-P-07-testar-codigo agent to test: $ARGUMENTS"
+- ag08.md: "Use the ag-B-08-testar-e2e agent to E2E test: $ARGUMENTS"
+- ag09.md: "Use the ag-B-09-criticar-projeto agent to review: $ARGUMENTS"
+- ag10.md: "Use the ag-B-10-auditar-codigo agent to audit: $ARGUMENTS"
+- ag11.md: "Use the ag-B-11-revisar-ux agent to review UX: $ARGUMENTS"
+- ag12.md: "Use the ag-Q-12-migrar-dados agent to migrate: $ARGUMENTS"
+- ag13.md: "Use the ag-Q-13-publicar-deploy agent to deploy: $ARGUMENTS"
+- ag14.md: "Use the ag-Q-14-documentar-projeto agent to document: $ARGUMENTS"
+- agM.md: "Use the ag-M-99-melhorar-agentes agent to analyze and improve: $ARGUMENTS"
 
 ## Passo 4: Rules (7 arquivos)
 
@@ -140,10 +140,10 @@ No Claude Code, teste cada tipo de invocacao:
 
 ```
 # Teste orquestrador
-/ag00 analise o estado deste projeto
+/ag-M-00 analise o estado deste projeto
 
 # Teste builder
-/ag03 crie um arquivo hello-world de teste
+/ag-P-03 crie um arquivo hello-world de teste
 
 # Teste skill
 /fix-and-commit (depois de fazer uma mudanca)
@@ -188,7 +188,7 @@ Se nao quiser instalar tudo de uma vez:
 - Rules: gsd, commit-conventions, incremental-commits
 
 ### Nivel 2: Intermediario (15 min)
-- + Agents: ag-00, ag-03, ag-04, ag-07
+- + Agents: ag-M-00, ag-P-03, ag-P-04, ag-P-07
 - + Commands: ag00, ag03, ag04, ag07
 - + Skills: fix-and-commit, batch-fix, testing
 
@@ -210,13 +210,13 @@ Se nao quiser instalar tudo de uma vez:
 R: Sim. Os agents e skills sao agnsoticos de linguagem. Ajuste os comandos de typecheck/lint/test para sua stack.
 
 **P: Preciso de todos os 16 agents?**
-R: Nao. Comece com ag-00 (orquestrador), ag-03 (builder), ag-04 (debugger), ag-07 (tester). Adicione conforme necessidade.
+R: Nao. Comece com ag-M-00 (orquestrador), ag-P-03 (builder), ag-P-04 (debugger), ag-P-07 (tester). Adicione conforme necessidade.
 
 **P: Funciona no Windows?**
 R: Sim. Os hooks .sh precisam de Git Bash ou WSL. O restante funciona nativo.
 
 **P: Posso personalizar os agents?**
-R: Sim. Os agents sao arquivos .md — edite livremente. O ag-M (meta-improver) ajuda a melhorar agents com base em erros recorrentes.
+R: Sim. Os agents sao arquivos .md — edite livremente. O ag-M-99 (meta-improver) ajuda a melhorar agents com base em erros recorrentes.
 
 **P: Como atualizar?**
 R: Copie os arquivos novos. Os agents, skills e rules sao independentes — voce pode atualizar um sem afetar os outros.
