@@ -288,23 +288,26 @@ No. Uses standard .claude/ directory structure. Compatible with other tools and 
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on adding agents, skills, rules, and hooks.
 
-## Brand Assets
+## Brand Assets & Design System
 
-Logo vetorial da rAIz Educação em `assets/logos/`:
+Logo vetorial + Design System oficial em `assets/`:
 
-| File | Format | Use |
-|------|--------|-----|
-| `raiz-educacao-logo.svg` | SVG (pure paths, no fonts) | Web, design tools, any scale |
-| `raiz-logo-transparente.png` | PNG 900px, transparent bg | General use |
-| `RaizLogo.tsx` | React/Next.js component | Import directly in code |
+| File | What |
+|------|------|
+| `assets/logos/raiz-educacao-logo.svg` | SVG logo (pure paths, no fonts, any scale) |
+| `assets/logos/raiz-logo-transparente.png` | PNG 900px, transparent background |
+| `assets/logos/RaizLogo.tsx` | React/Next.js component |
+| **[`assets/raiz-educacao-design-system.md`](assets/raiz-educacao-design-system.md)** | **UX/UI Design System (1045 lines, 13 sections)** |
 
 **Brand colors** (sampled from official logo):
 
-| Element | Hex |
-|---------|-----|
-| Leaves | `#77c6be` |
-| RAIZ | `#f0870b` |
-| educação | `#70c3bb` |
+| Element | Hex | UI Token |
+|---------|-----|----------|
+| Leaves | `#77c6be` | `--raiz-teal` |
+| RAIZ | `#f0870b` | `--raiz-orange` |
+| educação | `#70c3bb` | `--raiz-teal-light` |
+
+**Design System contents**: Identity, Color palette (30+ tokens), Typography (IBM Plex Sans), Spacing/Grid, Components (Card, KPI, Table, Button, Input, Badge), Layout Patterns (AppShell, Sidebar, Topbar), Dark Mode tokens, Motion, Charts, Accessibility (WCAG AA), CSS Tokens, and a 25-item delivery checklist.
 
 ## License
 
