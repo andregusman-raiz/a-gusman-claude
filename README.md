@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logos/raiz-educacao-logo.svg" alt="rAIz Educação" width="180" />
+</p>
+
 # Gusman Claude Agent System
 
 > Transform Claude Code from a passive assistant into an autonomous development platform.
@@ -283,6 +287,24 @@ No. Uses standard .claude/ directory structure. Compatible with other tools and 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on adding agents, skills, rules, and hooks.
+
+## Brand Assets
+
+Logo vetorial da rAIz Educação em `assets/logos/`:
+
+| File | Format | Use |
+|------|--------|-----|
+| `raiz-educacao-logo.svg` | SVG (pure paths, no fonts) | Web, design tools, any scale |
+| `raiz-logo-transparente.png` | PNG 900px, transparent bg | General use |
+| `RaizLogo.tsx` | React/Next.js component | Import directly in code |
+
+**Brand colors** (sampled from official logo):
+
+| Element | Hex |
+|---------|-----|
+| Leaves | `#77c6be` |
+| RAIZ | `#f0870b` |
+| educação | `#70c3bb` |
 
 ## License
 
