@@ -1,0 +1,213 @@
+[
+  {
+    "eval_id": 1,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill has an explicit section 'Pre-condicao: Ler errors-log.md' that states 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md' and instructs to check what was already tried and what worked/failed, with 'NAO repita tentativas que ja falharam'."
+        },
+        {
+          "text": "Identificou causa raiz: O frontend (`useAccessControl.ts:178`) enviava `PATCH` mas a API route (`api/admin/access-levels/[id]/route.ts`) só exporta handlers para `GET`, `PUT` e `DELETE`. O Next.js retorna 405 sem body, e o código tentava parsear JSON de um response vazio.",
+          "passed": true,
+          "evidence": "The skill's decision tree has a 'CRASH' branch covering HTTP 500/stack traces and explicitly mentions checking HTTP methods. The 'Ferramentas Uteis' section includes `grep -r 'PATCH\\|PUT\\|DELETE\\|POST' src/ --include='*.ts' | grep -v test # verificar metodos HTTP`. Example 4 directly matches this scenario: 'Causa 2 (Codigo): useAccessControl.ts usava PATCH em vez de PUT' and Example 6 shows 'Causa 1: Frontend usa metodo HTTP errado (PATCH vs PUT)'. The skill also emphasizes multi-causa investigation, checking Network tab for 'metodo HTTP correto', and the 405 error + empty JSON body pattern is well-covered by the systematic investigation flow (Reproduzir → Isolar → Diagnosticar)."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill has a dedicated section 'Registrar no errors-log.md (SEMPRE)' with a specific markdown template including Date, Erro, Sintoma, Causa raiz (with numbered causes for multi-causa), Tentativas, Solucao, Deploy Gap, and Licao. The Quality Gate also checks 'docs/ai-state/errors-log.md atualizado com TODAS as causas?' and the Anti-Patterns section lists 'Debugar sem registrar' as forbidden."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 2,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill has an explicit 'Pre-condicao: Ler errors-log.md' section that states: 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md.' It also lists checking what was already tried and what worked/failed, with the anti-pattern 'Repetir tentativa que ja falhou — ler errors-log.md ANTES.'"
+        },
+        {
+          "text": "Identificou causa raiz: O deploy de producao (`dpl_H4SEr1hKRPERYL6UM6pevsqeG6ip`) ainda contém o código antigo (PATCH) que foi corrigido no commit anterior. O fix no `useAccessControl.ts` (PATCH→PUT) não foi deployado. SWR retry amplifica os erros.",
+          "passed": true,
+          "evidence": "The skill has extensive guidance for this exact multi-causa + deploy gap scenario. The Decision Tree includes a 'DEPLOY GAP' branch with steps to verify SHA of active deploy vs latest commit. Example 4 is nearly identical: 'Erro 405 Method Not Allowed persiste apos fix' with Causa 1 (Deploy Gap: deploy ativo ainda tem codigo antigo PATCH), Causa 2 (useAccessControl.ts usava PATCH em vez de PUT), Causa 3 (SWR retry amplificava os erros). The Multi-Causa section instructs to not stop at first cause and investigate all independent causes. The permission/access checklist includes 'grep PATCH|PUT|DELETE|POST' to verify HTTP methods."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill has a dedicated 'Registrar no errors-log.md (SEMPRE)' section with a specific markdown template including fields for Sintoma, Numero de causas, Causa raiz 1/2/3, Tentativas, Solucao, Deploy Gap, and Licao. The Quality Gate also checks 'docs/ai-state/errors-log.md atualizado com TODAS as causas?' The anti-pattern 'Debugar sem registrar' reinforces this requirement."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 3,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states under 'Pre-condicao: Ler errors-log.md': 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md. Se o mesmo erro (ou similar) ja foi encontrado antes: Veja o que ja foi tentado, Veja o que funcionou/falhou, NAO repita tentativas que ja falharam.' This is a mandatory pre-condition."
+        },
+        {
+          "text": "Identificou causa raiz: 1. Chat principal (agent.service.ts → providers) nao loga em ai_usage_logs (FORA DO ESCOPO - tratar em PR separado)",
+          "passed": true,
+          "evidence": "The skill provides strong guidance for multi-causa investigation. Section 'Multi-Causa' says: 'Ao encontrar uma causa, NAO pare. Perguntar sempre: Ha outras causas independentes que contribuem para este bug?' The 'Silent Fail' branch of the decision tree guides checking if 'Dados nao aparecem → verificar: API retorna dados? RLS bloqueia? Query filtra demais?' and the multi-causa examples (e.g., Exemplo 6) show frontend+backend causes with separate PRs: 'Corrigir metodo no frontend (P0) + adicionar logging no backend (P1, PR separado)'. The skill also instructs documenting causes by priority and considering 'se causas diferentes merecem PRs separados'. This would lead to identifying that data isn't being logged to ai_usage_logs and recommending a separate PR for it."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill has an explicit section 'Registrar no errors-log.md (SEMPRE)' with a specific markdown template format including fields for Data, Erro, Sintoma, Numero de causas, Causa raiz 1/2/3, Tentativas, Solucao, Deploy Gap, and Licao. The Quality Gate also checks: 'docs/ai-state/errors-log.md atualizado com TODAS as causas?' This makes registration mandatory and format-specific."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 4,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states under 'Pre-condicao: Ler errors-log.md': 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md. Se o mesmo erro (ou similar) ja foi encontrado antes: Veja o que ja foi tentado, Veja o que funcionou/falhou, NAO repita tentativas que ja falharam'"
+        },
+        {
+          "text": "Identificou causa raiz: Duas causas independentes:",
+          "passed": true,
+          "evidence": "The skill has extensive multi-causa guidance: 'Bugs complexos frequentemente tem MULTIPLAS causas independentes. Nao pare ao encontrar a primeira causa — continue investigando ate ter certeza de que todas as causas foram identificadas.' It includes a Multi-Causa section with checklist ('Ha causas no frontend E no backend?', 'Ha causas em configuracao E em codigo?') and examples like 'Causa 1: Frontend usa metodo HTTP errado / Causa 2: Backend nao tem logging'. For the email invite bug, the skill would guide investigating both the invite creation logic and the email sending mechanism as potentially independent causes."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill has a dedicated section 'Registrar no errors-log.md (SEMPRE)' with an explicit markdown template including fields for Sintoma, Numero de causas, Causa raiz 1/2/3, Tentativas, Solucao, Deploy Gap, and Licao. The anti-patterns also reinforce: 'Debugar sem registrar — cada tentativa vai no errors-log.md.'"
+        },
+        {
+          "text": "Verificou env vars e configuracao",
+          "passed": true,
+          "evidence": "The skill's Checklist de Investigacao table includes 'Env vars | Valores faltando, malformados | grep SUPABASE .env*, verificar \\r\\n'. The Ferramentas Uteis section includes 'grep -r \"SUPABASE_URL\\|NEXT_PUBLIC\" .env* | cat -A  # mostra \\r\\n invisivel'. Example 1 also demonstrates an env var root cause (SUPABASE_URL with \\r\\n). For an email not sending bug, the skill would guide checking SMTP/email service env vars and configuration."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 5,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states in 'Pre-condicao: Ler errors-log.md': 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md. Se o mesmo erro (ou similar) ja foi encontrado antes: Veja o que ja foi tentado, Veja o que funcionou/falhou, NAO repita tentativas que ja falharam.' This is marked as a pre-condition before the main flow begins."
+        },
+        {
+          "text": "Identificou causa raiz: Tres problemas combinados:",
+          "passed": true,
+          "evidence": "The skill has extensive guidance on multi-causa bugs. Section 'Multi-Causa: Bugs com Multiplas Causas Independentes' explicitly states 'Muitos bugs de producao nao tem uma unica causa raiz — tem 2, 3 ou ate 4 causas que se combinam.' It includes examples with 2, 3, and 4 combined causes, a checklist ('Ha causas no frontend E no backend? Ha causas em configuracao E em codigo?'), and the diagnostic step says 'Ao encontrar uma causa, NAO pare. Perguntar sempre: Ha outras causas independentes que contribuem para este bug?' The anti-patterns also warn against 'Parar ao encontrar a primeira causa'. For a 500 error on GET /api/admin/access-levels, the skill's decision tree (CRASH branch for HTTP 500) and permission investigation checklist would guide thorough multi-layer investigation."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill has a dedicated section 'Registrar no errors-log.md (SEMPRE)' with an explicit markdown template format including fields for Erro, Sintoma, Numero de causas, Causa raiz 1/2/3, Tentativas, Solucao, Deploy Gap, and Licao. It states 'Ao resolver (ou ao desistir), registrar' and the Quality Gate also checks 'docs/ai-state/errors-log.md atualizado com TODAS as causas?'"
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 6,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill has an explicit section 'Pre-condicao: Ler errors-log.md' that states: 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md'. This is marked as a prerequisite before the main flow begins."
+        },
+        {
+          "text": "Identificou causa raiz: `src/app/page.tsx:97-103` chamava `createNavItems()` sem passar `allowedModules`. Em `navigation.tsx:117`: `if (!allowedModules) return true` → mostra TUDO por backwards compatibility. Bug secundario: `usePermissions.ts` tinha lista hardcoded incompleta para `has_full_access` (faltavam 6 modulos).",
+          "passed": true,
+          "evidence": "The skill has a dedicated 'PERMISSAO' branch in the Decision Tree that matches this bug exactly: 'Verificar lista de modulos no frontend — esta completa?', 'Verificar se has_full_access tem todos os modulos mapeados', 'Verificar fallback permissivo (if (!param) return true)', 'Verificar se funcao de navegacao recebe parametros corretos'. Furthermore, the 'Permission/Access Control' section explicitly covers fallback permissivo with code example (`if (!allowedModules) return true`), lista hardcoded incompleta, and the fix patterns. Example 5 in the skill is literally this exact bug scenario with the same 3 causes (createNavItems without allowedModules, fallback permissivo in navigation.tsx, incomplete hardcoded list in usePermissions.ts). The multi-causa emphasis throughout ensures the agent wouldn't stop at the first cause."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill has an explicit section 'Registrar no errors-log.md (SEMPRE)' with a structured markdown template including fields for multiple causes (Causa raiz 1, 2, 3), tentativas, solucao, deploy gap, and licao. The Quality Gate also checks 'docs/ai-state/errors-log.md atualizado com TODAS as causas?' as a blocking requirement."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 7,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill has an explicit 'Pre-condicao: Ler errors-log.md' section stating 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md' with detailed instructions on checking previous attempts."
+        },
+        {
+          "text": "Identificou causa raiz: Quatro problemas combinados:",
+          "passed": true,
+          "evidence": "The skill has extensive multi-causa guidance: 'Bugs complexos frequentemente tem MULTIPLAS causas independentes. Nao pare ao encontrar a primeira causa', a 'Multi-Causa: Bugs com Multiplas Causas Independentes' section with examples of 2, 3, and 4 combined causes, a checklist ('Ha causas no frontend E no backend?'), and the anti-pattern 'Parar ao encontrar a primeira causa — investigar se ha causas adicionais independentes.' The email case (duplicates, existing user detection, accept failure) maps to the Permission/Access Control and Silent Fail patterns in the decision tree."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill has an explicit 'Registrar no errors-log.md (SEMPRE)' section with a markdown template including fields for multiple causes (Causa raiz 1, 2, 3), tentativas, solucao, and licao. The Quality Gate also checks 'docs/ai-state/errors-log.md atualizado com TODAS as causas?'"
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 8,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states under 'Pre-condicao: Ler errors-log.md': 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md.' This is a mandatory pre-condition clearly documented before the main flow begins."
+        },
+        {
+          "text": "Identificou causa raiz: `ConnectComputerCard.tsx:79-87` nao desembrulhava o envelope `{ success, data }` retornado por `apiSuccess()`. A API retorna `{ success: true, data: { code, expiresAt, commands } }` mas o componente acessava `data.code` diretamente (que era `undefined`) em vez de `data.data.code`.",
+          "passed": true,
+          "evidence": "The skill's flow (Reproduzir → Isolar → Diagnosticar → Corrigir → Verificar) and decision tree under 'SILENT FAIL' specifically covers 'Dados nao aparecem → verificar: API retorna dados? RLS bloqueia? Query filtra demais?' and 'Funcionalidade nao responde → verificar: event handler conectado? Condicional impedindo render?'. The skill instructs to trace the full chain from symptom to root cause, verify actual property names ('Verificar nomes reais — nao assumir'), and explicitly warns against treating symptoms. The 'nada acontece' scenario maps to Silent Fail, which would lead to checking Network tab (API response structure) and then tracing how the response is consumed in the component, which would reveal the envelope unwrapping issue."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill has a dedicated section 'Registrar no errors-log.md (SEMPRE)' with an explicit markdown template format including Erro, Sintoma, Causa raiz, Tentativas, Solucao, Deploy Gap, and Licao fields. It also states 'Ao resolver (ou ao desistir), registrar' making this mandatory. The Quality Gate also checks 'docs/ai-state/errors-log.md atualizado com TODAS as causas?'"
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 9,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill has an explicit 'Pre-condicao: Ler errors-log.md' section stating: 'ANTES de comecar a debugar, leia docs/ai-state/errors-log.md. Se o mesmo erro (ou similar) ja foi encontrado antes: Veja o que ja foi tentado, Veja o que funcionou/falhou, NAO repita tentativas que ja falharam.' This is a mandatory pre-condition before any debugging begins."
+        },
+        {
+          "text": "Identificou causa raiz: Duas causas independentes:",
+          "passed": true,
+          "evidence": "The skill has extensive guidance on multi-causa bugs. Section 'Multi-Causa: Bugs com Multiplas Causas Independentes' states: 'Muitos bugs de producao nao tem uma unica causa raiz — tem 2, 3 ou ate 4 causas que se combinam.' Step 3 (Diagnosticar) explicitly says: 'Regra critica: Ao encontrar uma causa, NAO pare. Perguntar sempre: Ha outras causas independentes que contribuem para este bug?' The anti-patterns section also lists 'Parar ao encontrar a primeira causa — investigar se ha causas adicionais independentes.' Multiple examples show 2, 3, and 4 independent causes being identified."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill has an explicit 'Registrar no errors-log.md (SEMPRE)' section with a specific markdown template format including: Data, Erro, Sintoma, Numero de causas, Causa raiz 1/2/3, Tentativas, Solucao, Deploy Gap, and Licao. The Quality Gate also checks 'docs/ai-state/errors-log.md atualizado com TODAS as causas?' and the anti-patterns list 'Debugar sem registrar — cada tentativa vai no errors-log.md.'"
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 10,
+    "error": ""
+  },
+  {
+    "eval_id": 11,
+    "error": ""
+  }
+]

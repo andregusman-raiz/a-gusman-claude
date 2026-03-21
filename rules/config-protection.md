@@ -1,3 +1,14 @@
+---
+description: "NUNCA sobrescrever configs — edicoes cirurgicas obrigatorias"
+paths:
+  - "**/.env*"
+  - "**/package.json"
+  - "**/tsconfig*.json"
+  - "**/*.config.*"
+  - "**/vercel.json"
+  - "**/.mcp.json"
+---
+
 # Config File Protection
 
 ## Regra Principal

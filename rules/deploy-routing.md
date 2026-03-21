@@ -11,31 +11,44 @@ paths:
 ```
 Quer fazer deploy?
 ├── Preview (testar antes de producao)
-│   ├── Via PR → automatico (preview-deploy.yml dispara ao criar PR)
-│   └── Manual → /ag-19 preview
+│   ├── Via feature branch push → automatico (Vercel Git Integration)
+│   └── Manual → ag-D-27 --preview
 │
 ├── Producao
-│   ├── Caminho padrao → merge PR em main (deploy-gate.yml automatico)
-│   ├── Validacao extra → /ag-27 (pipeline completo 8 etapas)
+│   ├── Caminho padrao → ag-D-27 (pipeline completo 8 etapas + canary)
+│   ├── Deploy automatico → git push origin master → Vercel Git Integration
+│   │   (pre-deploy-gate.sh no buildCommand executa typecheck + lint + test)
 │   └── PROIBIDO → vercel --prod manual sem pipeline
 │
 └── Rollback
-    └── /ag-19 rollback (SEMPRE com aprovacao do usuario)
+    └── ag-D-19 rollback (SEMPRE com aprovacao do usuario)
 ```
 
 ## Caminho Padrao (RECOMENDADO para todo deploy)
 1. Feature branch com commits limpos
-2. `gh pr create` → preview deploy automatico (se configurado)
-3. Verificar preview URL no comentario do PR
-4. Merge PR em main → deploy-gate.yml automatico
-5. deploy-gate.yml: lint → typecheck → test → build → deploy → smoke
-6. Se smoke falha → auto-rollback
+2. `gh pr create` → preview deploy automatico (Vercel Git Integration)
+3. Verificar preview URL gerada automaticamente pela Vercel
+4. Merge PR em master → Vercel Git Integration dispara build automatico
+5. Build executa: `bash scripts/pre-deploy-gate.sh && npm run build`
+6. pre-deploy-gate.sh: typecheck → lint → test (falha = build abortado)
 
-## Quando usar ag-27 (pipeline manual)
-- Repo sem CI/CD configurado (ex: raiz-agent-dashboard)
+## Quando usar ag-D-27 (pipeline manual)
+- Deploy com pipeline completo (8 etapas: env-check → typecheck → lint → test → build → deploy → smoke → canary)
+- Repo sem Vercel Git Integration configurado
 - Precisa de controle granular sobre cada etapa
 - Debug de falhas no pipeline automatico
 - Primeiro deploy de um projeto novo
+- Deploy com notificacao n8n + Sentry release
+
+## Credential Preflight (antes de ag-D-27 ou ag-D-18 com modo pr/release)
+```bash
+bash ~/Claude/.claude/scripts/credential-preflight.sh [path-do-projeto]
+```
+Exit 2 = PARAR. Credenciais invalidas = deploy vai falhar.
+
+```bash
+vercel whoami   # Verificar autenticacao CLI
+```
 
 ## NUNCA
 - `vercel --prod` direto sem nenhum pipeline
@@ -43,3 +56,4 @@ Quer fazer deploy?
 - Deploy sem preview primeiro (quando possivel)
 - Deploy sem saber como fazer rollback
 - Deploy sexta a noite ou fim de semana (a menos que seja hotfix critico)
+- Referenciar deploy-gate.yml, preview-deploy.yml, ci.yml como gate de deploy (removidos)

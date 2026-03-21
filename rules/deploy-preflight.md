@@ -1,14 +1,23 @@
+---
+description: "Checklist obrigatorio antes de qualquer deploy"
+paths:
+  - "**/vercel.json"
+  - "**/.github/workflows/*.yml"
+  - "**/deploy*"
+---
+
 # Deploy Preflight Checklist
 
 ## Antes de QUALQUER Deploy
 Executar na ordem — PARAR se algum falhar:
 
 1. **Git status limpo**: `git status` — sem arquivos uncommitted
-2. **Build local**: `npm run build` — sem erros de prerender/SSR
-3. **TypeCheck**: `npm run typecheck` — 0 erros
+2. **Build local**: `bun run build` — sem erros de prerender/SSR
+3. **TypeCheck**: `bun run typecheck` — 0 erros
 4. **Env vars**: verificar que nao ha valores corrompidos (literal \r\n, chaves erradas)
-5. **Branch correta**: confirmar que esta na branch certa (nunca deploy de main direto)
-6. **CI verde**: verificar que workflows do CI passaram
+5. **Branch correta**: confirmar que esta na branch certa (nunca deploy de master direto)
+6. **Credenciais**: `bash ~/Claude/.claude/scripts/credential-preflight.sh [path]` — exit 2 = PARAR
+7. **Vercel CLI autenticado**: `vercel whoami` — confirmar conta correta
 
 ## NUNCA
 - Fazer deploy com build falhando

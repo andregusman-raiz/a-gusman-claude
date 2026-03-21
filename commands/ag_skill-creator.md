@@ -1,1 +1,0 @@
-Use the ag_skill-creator skill to create, improve, evaluate, or benchmark skills: $ARGUMENTS

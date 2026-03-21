@@ -18,7 +18,7 @@
    Use the ag-XX-your-agent agent to [action]: $ARGUMENTS
    ```
 
-3. Add the agent to `skills/ag-00-orquestrar/SKILL.md` catalog
+3. Add the agent to `skills/ag-M-00-orquestrar/SKILL.md` catalog
 
 4. Run validation: `bash scripts/validate-framework.sh`
 
@@ -26,7 +26,7 @@
 
 1. Create `skills/your-skill/SKILL.md`
 2. Follow the SKILL.md format (see existing skills for reference)
-3. Add to ag-00 catalog if it's a workflow skill
+3. Add to ag-M-00 catalog if it's a workflow skill
 
 ## How to Add a Rule
 

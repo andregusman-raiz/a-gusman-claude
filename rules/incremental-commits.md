@@ -32,3 +32,9 @@ ANTES de cada git commit:
 2. Lint → zero warnings
 3. Se lint-staged rejeitar → corrigir e retry (max 3x)
 4. NUNCA usar --no-verify
+
+## Auto-Fix de Imports (Hook Automatico)
+
+O hook bash-guards.sh executa auto-fix de eslint em staged .ts/.tsx antes de commit.
+Corrige automaticamente unused imports (causa #1 de lint-staged rejection).
+Se eslint nao disponivel, commit prossegue normalmente.

@@ -1,0 +1,163 @@
+{
+  "skill_name": "ag-09-depurar-erro",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "`validateSelection(0, 20, 5, 10)` esperava `false` mas retornou `true`",
+      "expected_output": "Diagnostico com causa raiz: A função aceita seleções com >= 80% de sobreposição. `(0,20)` cobre 100% do erro `(5,10)`.. Solucao: Alterado teste para usar `(15,20)` que tem 0% de sobreposição — retorna `false` corretamente.",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-24]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: A função aceita seleções com >= 80% de sobreposição. `(0,20)` cobre 100% do erro `(5,10)`.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "`validateSelection(4, 10, 5, 10, 0)` esperava `false` mas retornou `true`",
+      "expected_output": "Diagnostico com causa raiz: `endMatch = |10-10| = 0 <= 0 = true`, mas overlap ratio = 100% >= 80% → retorna `true` pela segunda condição.. Solucao: Alterado para usar seleção completamente fora do erro: `validateSelection(20, 30, 5, 10, 0)` que retorna `false`.",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-24]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: `endMatch = |10-10| = 0 <= 0 = true`, mas overlap ratio = 100% >= 80% → retorna `true` pela segunda condição.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "`TypeError: Cannot read properties of undefined (reading '0')`",
+      "expected_output": "Diagnostico com causa raiz: Passou `[[1,2],[3,4]]` (2x2) para função que loop até `gridSize=9` sem early return após detectar tamanho errado.. Solucao: Alterado para usar grade de 9 linhas mas com uma linha de comprimento incorreto.",
+      "files": [],
+      "bug_type": "crash",
+      "source": "errors-log.md [2026-02-24]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: Passou `[[1,2],[3,4]]` (2x2) para função que loop até `gridSize=9` sem early return após detectar tamanho errado.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "`detectProvider('sk-ant-api03-...')` esperava `'anthropic'` mas retornou `'openai'`",
+      "expected_output": "Diagnostico com causa raiz: O objeto `PROVIDER_DETECTION_PATTERNS` itera em ordem de inserção. O padrão `openai` (`/^sk-(?:proj-)?/`) aparece antes de `anthropic` (`/^sk-ant-/`) e ambos correspondem a `sk-ant-`. A implementação atual captura o OpenAI antes de chegar no Anthropic.. Solucao: Teste atualizado para documentar o comportamento real — o padrão OpenAI vence. É um bug conhecido na implementação (ordem de detecção), mas não é regressão.",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-27]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: O objeto `PROVIDER_DETECTION_PATTERNS` itera em ordem de inserção. O padrão `openai` (`/^sk-(?:proj-)?/`) aparece antes de `anthropic` (`/^sk-ant-/`) e ambos correspondem a `sk-ant-`. A implementação atual captura o OpenAI antes de chegar no Anthropic.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "`encryptApiKey('AIzaSyTestKey123')` não retornava `enc:v1:...` mas sim a plain key",
+      "expected_output": "Diagnostico com causa raiz: Em Node.js 20+, `Uint8Array.buffer` retorna um `ArrayBuffer` detached/SharedArrayBuffer que o `PBKDF2 salt` de `crypto.subtle.importKey` não aceita. O módulo captura a exceção e faz fallback retornando a plain key.. Solucao: Testes reescritos para aceitar ambos os comportamentos (enc:v1:... ou fallback para plain key). Roundtrip tests ainda provam que a garantia central (decrypt(encrypt(x)) === x) se mantém em ambos os casos.",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-27]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: Em Node.js 20+, `Uint8Array.buffer` retorna um `ArrayBuffer` detached/SharedArrayBuffer que o `PBKDF2 salt` de `crypto.subtle.importKey` não aceita. O módulo captura a exceção e faz fallback retornando a plain key.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "`vi.advanceTimersByTime(2500)` antes de `await promise` não disparava o setTimeout interno de 1500ms",
+      "expected_output": "Diagnostico com causa raiz: O setTimeout de 1500ms é registrado DENTRO do callback do `await new Promise(resolve => setTimeout(resolve, 800))`. Avançar os timers antes do `await` não captura o timer interno.. Solucao: Separado em dois passes: primeiro `advanceTimersByTime(1000)` + `await promise`, depois `advanceTimersByTime(1500)` + `await Promise.resolve()` para o auto-reset.",
+      "files": [],
+      "bug_type": "silent-fail",
+      "source": "errors-log.md [2026-02-27]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: O setTimeout de 1500ms é registrado DENTRO do callback do `await new Promise(resolve => setTimeout(resolve, 800))`. Avançar os timers antes do `await` não captura o timer interno.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        },
+        {
+          "text": "Investigou silent failure sem assumir que 'nao ha erro'",
+          "type": "completeness"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "52 vulnerabilidades npm (44 high, 7 moderate, 1 low, 0 critical)",
+      "expected_output": "Diagnostico com causa raiz: Dependencias transitivas desatualizadas em pacotes dev e uma dependencia de producao (jspdf) sem fix disponivel.. Solucao: Adicionados 4 overrides no package.json:",
+      "files": [],
+      "bug_type": "unknown",
+      "source": "errors-log.md [2026-02-24]",
+      "assertions": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "type": "process"
+        },
+        {
+          "text": "Identificou causa raiz: Dependencias transitivas desatualizadas em pacotes dev e uma dependencia de producao (jspdf) sem fix disponivel.",
+          "type": "correctness"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "type": "process"
+        }
+      ]
+    }
+  ]
+}

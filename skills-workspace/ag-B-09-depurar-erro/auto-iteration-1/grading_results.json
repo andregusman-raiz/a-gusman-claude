@@ -1,0 +1,213 @@
+[
+  {
+    "eval_id": 1,
+    "error": "timeout"
+  },
+  {
+    "eval_id": 2,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states in the Prompt Template: 'Ler errors-log.md ANTES de comecar (nao repetir tentativas falhadas)' and in Anti-Patterns: 'NUNCA repetir tentativa que ja falhou — ler errors-log.md ANTES'. The Dynamic Context section also pre-loads errors-log.md via `head -30 docs/ai-state/errors-log.md`."
+        },
+        {
+          "text": "Identificou causa raiz: O deploy de producao (`dpl_H4SEr1hKRPERYL6UM6pevsqeG6ip`) ainda contém o código antigo (PATCH) que foi corrigido no commit anterior. O fix no `useAccessControl.ts` (PATCH→PUT) não foi deployado. SWR retry amplifica os erros.",
+          "passed": true,
+          "evidence": "The skill has a dedicated 'Deploy Gap Checklist' section that explicitly covers this scenario: 'Fix aplicado mas bug persiste? → DEPLOY GAP' with checks for 'git log --oneline -5 → commit do fix esta no historico?', 'CI/CD pipeline → build passou? deploy completou?', 'curl -I <url> → headers mostram versao/timestamp atualizado?'. The Decision Tree classifies this as a DEPLOY GAP when 'Fix aplicado mas bug persiste'. The 405 Method Not Allowed (PATCH vs PUT mismatch) combined with the multi-layer investigation protocol (API layer verification) would guide the agent to trace PATCH→PUT issue and identify the undeployed fix as root cause."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill's Output section explicitly requires 'docs/ai-state/errors-log.md atualizado (sintoma, causas, tentativas, solucao)'. The Multi-Cause Investigation Protocol also states 'Documentar no errors-log.md como causa separada'. The Quality Gate includes '[ ] errors-log.md atualizado com TODAS as causas?'"
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 3,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly instructs 'Ler errors-log.md ANTES de comecar (nao repetir tentativas falhadas)' in the Prompt Template, lists it in the Important section ('Reads errors-log.md to avoid repeating failed attempts'), and includes 'NUNCA repetir tentativa que ja falhou — ler errors-log.md ANTES' in Anti-Patterns. The Dynamic Context section also pre-loads errors-log.md content."
+        },
+        {
+          "text": "Identificou causa raiz: 1. Chat principal (agent.service.ts → providers) nao loga em ai_usage_logs (FORA DO ESCOPO - tratar em PR separado)",
+          "passed": false,
+          "evidence": "The skill provides strong guidance for root cause analysis (Multi-Layer Bug tracing from UI to database, Multi-Cause Investigation Protocol, decision tree) and instructs to find root cause not symptoms. However, it does NOT provide guidance on scoping decisions — specifically, it never instructs the agent to determine when a root cause is OUT OF SCOPE and should be deferred to a separate PR. The skill's philosophy is to fix ALL causes found ('corrigir TODAS as camadas', 'NUNCA parar na primeira causa'). There is no mechanism for triaging a discovered root cause as out-of-scope."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill explicitly requires updating errors-log.md in the Output section: 'docs/ai-state/errors-log.md atualizado (sintoma, causas, tentativas, solucao)'. The Multi-Cause Investigation Protocol also states 'Documentar no errors-log.md como causa separada'. The format (sintoma, causas, tentativas, solucao) is specified."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 4,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states in the Prompt Template: 'Ler errors-log.md ANTES de comecar (nao repetir tentativas falhadas)' and in Anti-Patterns: 'NUNCA repetir tentativa que ja falhou — ler errors-log.md ANTES'. The Dynamic Context section also pre-loads errors-log.md content."
+        },
+        {
+          "text": "Identificou causa raiz: Duas causas independentes:",
+          "passed": true,
+          "evidence": "The skill has a dedicated 'Multi-Cause Investigation Protocol' that instructs: 'Apos corrigir a primeira causa raiz, SEMPRE executar' a check for additional independent causes. It also says 'NUNCA parar na primeira causa — investigar se existem causas independentes adicionais' and provides steps to map all code paths that could produce the same symptom."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The Output section states: 'docs/ai-state/errors-log.md atualizado (sintoma, causas, tentativas, solucao)'. The Multi-Cause Investigation Protocol adds: 'Documentar no errors-log.md como causa separada'. The Multi-Layer Bug section also says 'Documentar cada camada no errors-log.md separadamente'."
+        },
+        {
+          "text": "Verificou env vars e configuracao",
+          "passed": true,
+          "evidence": "The Multi-Layer Bug section includes 'CAMADA CONFIG: Variaveis de ambiente corretas? printenv | grep <VAR> → confirmar valores reais vs esperados'. The Decision Tree also lists 'Config: variavel de ambiente ausente ou errada?' as a check. The Deploy Gap Checklist includes 'Environment correto? (VERCEL_ENV, NODE_ENV, APP_ENV)'."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 5,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states in the Prompt Template: 'Ler errors-log.md ANTES de comecar (nao repetir tentativas falhadas)' and in Anti-Patterns: 'NUNCA repetir tentativa que ja falhou — ler errors-log.md ANTES'. The Dynamic Context section also pre-loads errors-log.md content."
+        },
+        {
+          "text": "Identificou causa raiz: Tres problemas combinados:",
+          "passed": true,
+          "evidence": "The skill has a dedicated 'Multi-Cause Investigation Protocol' that instructs to always check for additional independent causes after fixing the first one, map all code paths that could produce the same symptom, and only consider fix complete when no alternative path to the bug exists. The Decision Tree also classifies MULTI-LAYER BUGs and instructs to 'Rastrear da UI ate banco — corrigir TODAS as camadas'. Anti-pattern: 'NUNCA parar na primeira causa — investigar se existem causas independentes adicionais'."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The Output section requires 'docs/ai-state/errors-log.md atualizado (sintoma, causas, tentativas, solucao)'. The Multi-Cause protocol says 'Documentar no errors-log.md como causa separada'. The Multi-Layer section says 'Documentar cada camada no errors-log.md separadamente'. The Prompt Template also says 'Registrar diagnostico e resolucao em errors-log.md'."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 6,
+    "error": "timeout"
+  },
+  {
+    "eval_id": 7,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states in multiple places: 'Ler errors-log.md ANTES de comecar (nao repetir tentativas falhadas)' in the Prompt Template, 'Reads errors-log.md to avoid repeating failed attempts' in the Important section, and 'NUNCA repetir tentativa que ja falhou — ler errors-log.md ANTES' in Anti-Patterns. The Dynamic Context section also includes 'head -30 docs/ai-state/errors-log.md' to inject known errors into the prompt."
+        },
+        {
+          "text": "Identificou causa raiz: Quatro problemas combinados:",
+          "passed": true,
+          "evidence": "The skill has a comprehensive Multi-Cause Investigation Protocol that instructs: 'Apos corrigir a primeira causa raiz, SEMPRE executar' a check for additional independent causes. It maps all code paths that could produce the same symptom (Caminho A, B, C). The Decision Tree classifies bugs including MULTI-LAYER BUG with instructions to 'Rastrear da UI ate banco — corrigir TODAS as camadas'. The anti-pattern 'NUNCA parar na primeira causa — investigar se existem causas independentes adicionais' reinforces this. The email invite scenario involves duplicates, existing user detection, and accept failure — the skill's Permission/ACL Protocol and Multi-Layer tracing would guide investigation of all four combined problems."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The Output section requires 'docs/ai-state/errors-log.md atualizado (sintoma, causas, tentativas, solucao)'. The Multi-Cause Investigation Protocol states 'Documentar no errors-log.md como causa separada' for each cause. The Multi-Layer Bug section adds 'Documentar cada camada no errors-log.md separadamente'. The Quality Gate includes '[ ] errors-log.md atualizado com TODAS as causas?' as a mandatory check."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 8,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states in the Prompt Template: 'Ler errors-log.md ANTES de comecar (nao repetir tentativas falhadas)' and in Anti-Patterns: 'NUNCA repetir tentativa que ja falhou — ler errors-log.md ANTES'. The Dynamic Context section also pre-loads errors-log.md content via `head -30 docs/ai-state/errors-log.md`."
+        },
+        {
+          "text": "Identificou causa raiz: `ConnectComputerCard.tsx:79-87` nao desembrulhava o envelope `{ success, data }` retornado por `apiSuccess()`. A API retorna `{ success: true, data: { code, expiresAt, commands } }` mas o componente acessava `data.code` diretamente (que era `undefined`) em vez de `data.data.code`.",
+          "passed": false,
+          "evidence": "The skill provides a strong methodology for root cause analysis (Decision Tree, Multi-Layer Bug tracing from UI to database, 'Encontrar causa raiz, NAO apenas sintoma') and the agent has full code access tools to find this specific bug. However, the skill itself contains no specific guidance about API response envelope unwrapping patterns or checking data shape mismatches between API responses and frontend consumption. Whether the agent finds this exact root cause depends on the agent's general debugging ability, not skill-specific guidance. The Multi-Layer Bug protocol does instruct to check 'O componente recebe o dado correto?' and 'O endpoint retorna o valor correto?' which would likely lead to discovering the mismatch, but the skill doesn't specifically guide toward envelope/wrapper pattern issues."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill explicitly requires in Output section: 'docs/ai-state/errors-log.md atualizado (sintoma, causas, tentativas, solucao)' and in the Multi-Cause Investigation Protocol: 'Documentar no errors-log.md como causa separada'. The Prompt Template also states: 'Registrar diagnostico e resolucao em errors-log.md'."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 9,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states in multiple places: 'Ler errors-log.md ANTES de comecar (nao repetir tentativas falhadas)' in the Prompt Template, 'Reads errors-log.md to avoid repeating failed attempts' in the Important section, and 'NUNCA repetir tentativa que ja falhou — ler errors-log.md ANTES' in Anti-Patterns."
+        },
+        {
+          "text": "Identificou causa raiz: Duas causas independentes:",
+          "passed": true,
+          "evidence": "The skill has a dedicated 'Multi-Cause Investigation Protocol' that instructs: 'O fix eliminou completamente o erro ou apenas reduziu? Se apenas reduziu: existe causa adicional independente', 'Mapear todos os caminhos de codigo que poderiam produzir o mesmo sintoma', and 'NUNCA parar na primeira causa — investigar se existem causas independentes adicionais' in Anti-Patterns. The Decision Tree also includes a 'MULTI-LAYER BUG' branch and the Quality Gate checks 'Investigou se existem multiplas causas independentes?'"
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill's Output section states 'docs/ai-state/errors-log.md atualizado (sintoma, causas, tentativas, solucao)'. The Prompt Template includes 'Registrar diagnostico e resolucao em errors-log.md'. The Multi-Cause Investigation Protocol specifies 'Documentar no errors-log.md como causa separada'. The Quality Gate includes 'errors-log.md atualizado com TODAS as causas?'"
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 10,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states in the Prompt Template: 'Ler errors-log.md ANTES de comecar (nao repetir tentativas falhadas)' and in Anti-Patterns: 'NUNCA repetir tentativa que ja falhou — ler errors-log.md ANTES'. The Dynamic Context section also pre-loads errors-log.md content via '!head -30 docs/ai-state/errors-log.md'."
+        },
+        {
+          "text": "Identificou causa raiz: Quatro problemas combinados:",
+          "passed": true,
+          "evidence": "The skill has a comprehensive Multi-Cause Investigation Protocol that instructs to 'Mapear todos os caminhos de codigo que poderiam produzir o mesmo sintoma' with multiple paths (A, B, C), and explicitly states 'NUNCA parar na primeira causa — investigar se existem causas independentes adicionais'. The Decision Tree includes 'Bug aparece em camadas diferentes? → MULTI-LAYER BUG' which maps to this scenario (API 500 + frontend silent failure = multi-layer). The Multi-Layer Bug section traces through UI, API, Business, Data, and Config layers. The fix is only complete when 'Nenhum caminho alternativo para o bug existe'."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The Output section explicitly requires 'docs/ai-state/errors-log.md atualizado (sintoma, causas, tentativas, solucao)'. The Multi-Cause Investigation Protocol states 'Documentar no errors-log.md como causa separada' for each cause. The Multi-Layer Bug section adds 'Documentar cada camada no errors-log.md separadamente'."
+        }
+      ]
+    }
+  },
+  {
+    "eval_id": 11,
+    "grading": {
+      "expectations": [
+        {
+          "text": "Leu errors-log.md ANTES de comecar a debugar",
+          "passed": true,
+          "evidence": "The skill explicitly states in the Prompt Template: 'Ler errors-log.md ANTES de comecar (nao repetir tentativas falhadas)' and in Anti-Patterns: 'NUNCA repetir tentativa que ja falhou — ler errors-log.md ANTES'. The Dynamic Context section also includes a command to read errors-log.md."
+        },
+        {
+          "text": "Identificou causa raiz: Inconsistencia entre o check de permissao do frontend e do backend.",
+          "passed": false,
+          "evidence": "The skill provides general debugging methodology (Reproduzir → Isolar → Diagnosticar → Corrigir → Verificar) and has a Decision Tree, but it cannot guarantee the model will identify this specific root cause. The bug described ('canal permanece na interface apos confirmar exclusao') is most likely a UI state management issue (frontend not removing the item after successful delete, or not calling the API at all), not necessarily a permission inconsistency. The skill's Decision Tree would classify this as a 'SINGLE-CAUSE BUG' or possibly 'MULTI-LAYER BUG', and guide investigation from UI to backend, but it doesn't specifically lead to identifying a frontend/backend permission inconsistency as the root cause — that diagnosis depends on actual code inspection, not skill guidance."
+        },
+        {
+          "text": "Registrou no errors-log.md com formato correto",
+          "passed": true,
+          "evidence": "The skill explicitly requires in the Output section: 'docs/ai-state/errors-log.md atualizado (sintoma, causas, tentativas, solucao)' and in the Multi-Cause Investigation Protocol: 'Documentar no errors-log.md como causa separada'. The Prompt Template also states: 'Registrar diagnostico e resolucao em errors-log.md'."
+        }
+      ]
+    }
+  }
+]

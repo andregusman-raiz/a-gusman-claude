@@ -29,7 +29,7 @@
 2. Identificar secoes que Claude pode descobrir sozinho (Estrutura, Estado Atual, Docs)
 3. Mover convencoes de naming para `D:/.claude/rules/naming-conventions.md`
 4. Remover duplicacao de Quality Gates — manter apenas em `D:/.claude/rules/quality-gate.md`
-5. Substituir tabela de "Sistema de Agentes" por referencia: `@.claude/skills/ag-00-orquestrar/SKILL.md`
+5. Substituir tabela de "Sistema de Agentes" por referencia: `@.claude/skills/ag-M-00-orquestrar/SKILL.md`
 6. Resultado: CLAUDE.md do projeto com ~80 linhas focadas em stack, comandos, e decisoes arquiteturais
 
 ---
@@ -57,7 +57,7 @@
 
 | # | Oportunidade | Status | Impacto |
 |---|-------------|--------|---------|
-| 10 | SDD→TDD pipeline: ag-07 gera specs → ag-13 testes da spec → ag-08 implementa | DONE | ALTO |
+| 10 | SDD→TDD pipeline: ag-P-07 gera specs → ag-Q-13 testes da spec → ag-B-08 implementa | DONE | ALTO |
 | 11 | TDD Guard hook — bloquear Write em *.ts se nao existe *.test.ts | DONE | ALTO |
 | 12 | Comando de teste focado no CLAUDE.md: "Prefer npx vitest run path/to/test" | DONE | MEDIO |
 | 13 | Test debt sprint plan — docs/plans/TEST-DEBT-SPRINT-PLAN.md | DONE | ALTO |
@@ -120,11 +120,11 @@
 | # | Oportunidade | Status | Impacto |
 |---|-------------|--------|---------|
 | 28 | SDD enforcement hook (verificar spec antes de edits em dominio) | DONE | ALTO |
-| 29 | Spec-to-Test generator em ag-13 (--from-spec) | DONE | ALTO |
-| 30 | Size gate enforcement no ag-00 (recusar M+ sem spec) | DONE | MEDIO |
+| 29 | Spec-to-Test generator em ag-Q-13 (--from-spec) | DONE | ALTO |
+| 30 | Size gate enforcement no ag-M-00 (recusar M+ sem spec) | DONE | MEDIO |
 
 ### Passo a Passo — Item 30:
-1. Editar `D:/.claude/skills/ag-00-orquestrar/SKILL.md` — adicionar gate de size
+1. Editar `D:/.claude/skills/ag-M-00-orquestrar/SKILL.md` — adicionar gate de size
 
 ---
 
@@ -134,7 +134,7 @@
 |---|-------------|--------|---------|
 | 31 | Vercel Preview Deployments — vercel.json + workflow + docs | DONE | MEDIO |
 | 32 | Feature flags plan + README — docs/plans/FEATURE-FLAGS-PLAN.md | DONE | MEDIO |
-| 33 | ag-27 enhanced com preview URL | DONE | BAIXO |
+| 33 | ag-D-27 enhanced com preview URL | DONE | BAIXO |
 
 ---
 
@@ -143,7 +143,7 @@
 | # | Oportunidade | Status | Impacto |
 |---|-------------|--------|---------|
 | 34 | ADRs implementados (0001-0006 em docs/adr/) | DONE | MEDIO |
-| 35 | ag-21 com template e comando ADR | DONE | BAIXO |
+| 35 | ag-W-21 com template e comando ADR | DONE | BAIXO |
 
 ---
 
@@ -200,7 +200,7 @@
 - [37] Playwright MCP
 
 ### Batch 5: Agent Routing — DONE
-- [30] Size gate no ag-00
+- [30] Size gate no ag-M-00
 
 ### Batch 6: Cost Optimization — DONE
 - [20] Modelo recomendado em cada ag-XX (30 skills atualizadas)
@@ -209,16 +209,16 @@
 - [23] Status line com tokens e custo
 
 ### Batch 7: Code Hooks — DONE
-- [10] SDD→TDD pipeline (ag-07 Phase 0 + ag-13 --from-spec)
+- [10] SDD→TDD pipeline (ag-P-07 Phase 0 + ag-Q-13 --from-spec)
 - [11] TDD Guard hook (advisory mode)
 - [14] Metrics snapshot pos-commit
 - [28] SDD enforcement hook (advisory mode)
-- [29] Spec-to-Test generator em ag-13
+- [29] Spec-to-Test generator em ag-Q-13
 
 ### Batch 8: Documentation — DONE
-- [33] ag-27 enhanced com preview URL
+- [33] ag-D-27 enhanced com preview URL
 - [34] ADRs (0001-0006 criados em docs/adr/)
-- [35] ag-21 com template ADR
+- [35] ag-W-21 com template ADR
 
 ### Batch 9: Plans & Infra — DONE
 - [13] Test debt sprint plan → `docs/plans/TEST-DEBT-SPRINT-PLAN.md`

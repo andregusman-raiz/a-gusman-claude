@@ -59,22 +59,22 @@ Os 16 agents necessarios:
 
 | Arquivo | Funcao |
 |---------|--------|
-| `ag-00-orquestrar.md` | Classificar e direcionar (nunca executa) |
-| `ag-01-iniciar-projeto.md` | Scaffolding de projeto novo |
-| `ag-02-setup-ambiente.md` | Docker, CI, env vars |
-| `ag-03-construir-codigo.md` | **Builder principal** — implementar codigo |
-| `ag-04-depurar-erro.md` | Debugger — causa raiz, nao sintomas |
-| `ag-05-refatorar-codigo.md` | Refatoracao — recusa sem testes |
-| `ag-06-validar-execucao.md` | Validador — checa completude |
-| `ag-07-testar-codigo.md` | Tester — unit + integration |
-| `ag-08-testar-e2e.md` | E2E — Playwright, APIs reais |
-| `ag-09-criticar-projeto.md` | Code reviewer — questiona decisoes |
-| `ag-10-auditar-codigo.md` | Security — OWASP Top 10 |
-| `ag-11-revisar-ux.md` | UX — acessibilidade, mobile |
-| `ag-12-migrar-dados.md` | Migrations — zero downtime |
-| `ag-13-publicar-deploy.md` | Deploy + versionamento |
-| `ag-14-documentar-projeto.md` | Documentacao com exemplos reais |
-| `ag-M-melhorar-agentes.md` | Meta — melhora os outros agents |
+| `ag-M-00-orquestrar.md` | Classificar e direcionar (nunca executa) |
+| `ag-P-01-iniciar-projeto.md` | Scaffolding de projeto novo |
+| `ag-P-02-setup-ambiente.md` | Docker, CI, env vars |
+| `ag-P-03-construir-codigo.md` | **Builder principal** — implementar codigo |
+| `ag-P-04-depurar-erro.md` | Debugger — causa raiz, nao sintomas |
+| `ag-P-05-refatorar-codigo.md` | Refatoracao — recusa sem testes |
+| `ag-P-06-validar-execucao.md` | Validador — checa completude |
+| `ag-P-07-testar-codigo.md` | Tester — unit + integration |
+| `ag-B-08-testar-e2e.md` | E2E — Playwright, APIs reais |
+| `ag-B-09-criticar-projeto.md` | Code reviewer — questiona decisoes |
+| `ag-B-10-auditar-codigo.md` | Security — OWASP Top 10 |
+| `ag-B-11-revisar-ux.md` | UX — acessibilidade, mobile |
+| `ag-Q-12-migrar-dados.md` | Migrations — zero downtime |
+| `ag-Q-13-publicar-deploy.md` | Deploy + versionamento |
+| `ag-Q-14-documentar-projeto.md` | Documentacao com exemplos reais |
+| `ag-M-99-melhorar-agentes.md` | Meta — melhora os outros agents |
 
 ---
 
@@ -84,25 +84,25 @@ Para cada agent, crie um command shortcut em `.claude/commands/`:
 
 ```bash
 # Para cada agente (ag00 ate ag14 + agM), crie um arquivo simples:
-echo 'Use the ag-00-orquestrar agent to classify and direct: $ARGUMENTS' > .claude/commands/ag00.md
-echo 'Use the ag-01-iniciar-projeto agent to scaffold: $ARGUMENTS' > .claude/commands/ag01.md
-echo 'Use the ag-02-setup-ambiente agent to set up: $ARGUMENTS' > .claude/commands/ag02.md
-echo 'Use the ag-03-construir-codigo agent to build: $ARGUMENTS' > .claude/commands/ag03.md
-echo 'Use the ag-04-depurar-erro agent to debug: $ARGUMENTS' > .claude/commands/ag04.md
-echo 'Use the ag-05-refatorar-codigo agent to refactor: $ARGUMENTS' > .claude/commands/ag05.md
-echo 'Use the ag-06-validar-execucao agent to validate: $ARGUMENTS' > .claude/commands/ag06.md
-echo 'Use the ag-07-testar-codigo agent to test: $ARGUMENTS' > .claude/commands/ag07.md
-echo 'Use the ag-08-testar-e2e agent to E2E test: $ARGUMENTS' > .claude/commands/ag08.md
-echo 'Use the ag-09-criticar-projeto agent to review: $ARGUMENTS' > .claude/commands/ag09.md
-echo 'Use the ag-10-auditar-codigo agent to audit: $ARGUMENTS' > .claude/commands/ag10.md
-echo 'Use the ag-11-revisar-ux agent to review UX: $ARGUMENTS' > .claude/commands/ag11.md
-echo 'Use the ag-12-migrar-dados agent to migrate: $ARGUMENTS' > .claude/commands/ag12.md
-echo 'Use the ag-13-publicar-deploy agent to deploy: $ARGUMENTS' > .claude/commands/ag13.md
-echo 'Use the ag-14-documentar-projeto agent to document: $ARGUMENTS' > .claude/commands/ag14.md
-echo 'Use the ag-M-melhorar-agentes agent to analyze and improve: $ARGUMENTS' > .claude/commands/agM.md
+echo 'Use the ag-M-00-orquestrar agent to classify and direct: $ARGUMENTS' > .claude/commands/ag-M-00.md
+echo 'Use the ag-P-01-iniciar-projeto agent to scaffold: $ARGUMENTS' > .claude/commands/ag-P-01.md
+echo 'Use the ag-P-02-setup-ambiente agent to set up: $ARGUMENTS' > .claude/commands/ag-P-02.md
+echo 'Use the ag-P-03-construir-codigo agent to build: $ARGUMENTS' > .claude/commands/ag-P-03.md
+echo 'Use the ag-P-04-depurar-erro agent to debug: $ARGUMENTS' > .claude/commands/ag-P-04.md
+echo 'Use the ag-P-05-refatorar-codigo agent to refactor: $ARGUMENTS' > .claude/commands/ag-P-05.md
+echo 'Use the ag-P-06-validar-execucao agent to validate: $ARGUMENTS' > .claude/commands/ag-P-06.md
+echo 'Use the ag-P-07-testar-codigo agent to test: $ARGUMENTS' > .claude/commands/ag-P-07.md
+echo 'Use the ag-B-08-testar-e2e agent to E2E test: $ARGUMENTS' > .claude/commands/ag-B-08.md
+echo 'Use the ag-B-09-criticar-projeto agent to review: $ARGUMENTS' > .claude/commands/ag-B-09.md
+echo 'Use the ag-B-10-auditar-codigo agent to audit: $ARGUMENTS' > .claude/commands/ag-B-10.md
+echo 'Use the ag-B-11-revisar-ux agent to review UX: $ARGUMENTS' > .claude/commands/ag-B-11.md
+echo 'Use the ag-Q-12-migrar-dados agent to migrate: $ARGUMENTS' > .claude/commands/ag-Q-12.md
+echo 'Use the ag-Q-13-publicar-deploy agent to deploy: $ARGUMENTS' > .claude/commands/ag-Q-13.md
+echo 'Use the ag-Q-14-documentar-projeto agent to document: $ARGUMENTS' > .claude/commands/ag-Q-14.md
+echo 'Use the ag-M-99-melhorar-agentes agent to analyze and improve: $ARGUMENTS' > .claude/commands/agM.md
 ```
 
-Agora voce pode invocar agents com `/ag03 implemente a feature X`.
+Agora voce pode invocar agents com `/ag-P-03 implemente a feature X`.
 
 ---
 
@@ -248,7 +248,7 @@ Adicione mais permissoes conforme sua stack (vercel, supabase, gh, docker, etc.)
 No Claude Code, rode:
 
 ```
-/ag00 analise o estado deste projeto e verifique se o sistema de agents esta configurado
+/ag-M-00 analise o estado deste projeto e verifique se o sistema de agents esta configurado
 ```
 
 O orquestrador deve:
