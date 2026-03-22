@@ -25,6 +25,12 @@ paths:
 - **6+ bugs** → ag-B-23 --parallel (bugfix paralelo com Teams)
 - **Triagem sem executar** → ag-B-23 --triage (diagnosticar)
 
+### Corrigir erros TypeScript
+- **Diagnosticar erros TS** → ag-B-53 --scan (categorizar, priorizar)
+- **1-50 erros TS** → ag-B-53 --fix (batch incremental, 5/batch)
+- **50+ erros TS / sweep** → ag-B-53 --sweep (por categoria, ratchet threshold)
+- **Erros pos-upgrade** → ag-B-09 (causa raiz) → ag-B-53 --fix
+
 ### Construir (avancado)
 - **Builder + Validator concorrente** → ag-B-50 (construir-validado)
 - **Design UI/UX** → ag-B-52 (design-ui-ux)
@@ -68,6 +74,7 @@ paths:
 - **Next.js/React patterns** → ag-R-53 | **TypeScript** → ag-R-54 | **Python** → ag-R-55
 - **Supabase/PostgreSQL** → ag-R-56 | **Quality gates** → ag-R-57
 - **SDD methodology** → ag-R-58 | **Security rules** → ag-R-59
+- **Mock-First methodology** → ag-R-60 (frontends de integracao com ERP/API externa)
 
 ### Plugins (atalhos rapidos)
 - **Code review rapido** → `/code-review` ou `/review-pr`
