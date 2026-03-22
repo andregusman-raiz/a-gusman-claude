@@ -473,3 +473,66 @@ FOR EACH ROW EXECUTE FUNCTION update_comment_count();
 - [ ] Cache layer com TTL e invalidacao
 - [ ] Batch operations para > 10 records
 - [ ] Slow query monitoring ativo
+
+---
+
+## Event Sourcing
+
+### Conceito
+Armazenar sequencia de eventos (fatos imutaveis) em vez de estado atual.
+
+```typescript
+interface DomainEvent {
+  eventId: string;
+  aggregateId: string;
+  type: string;
+  data: Record<string, unknown>;
+  timestamp: Date;
+  version: number;  // para ordering e optimistic concurrency
+}
+
+// Reconstruir estado a partir de eventos
+function rehydrate(events: DomainEvent[]): Order {
+  return events.reduce((order, event) => applyEvent(order, event), Order.empty());
+}
+```
+
+### Snapshots
+Salvar estado materializado a cada N eventos para evitar replay longo.
+```
+Eventos: [1, 2, 3, ..., 100] → Snapshot em 100 → [101, 102, ...]
+Rebuild: carregar snapshot(100) + replay(101...)
+```
+
+### Quando Usar
+- Auditoria obrigatoria (financeiro, legal, compliance)
+- Undo/redo, time-travel queries
+- Dominio temporal (o que aconteceu quando?)
+- CQRS avancado (projecoes em DBs diferentes)
+
+### Quando NAO Usar
+- CRUD simples sem necessidade de historico
+- Time sem experiencia em event sourcing
+- Dominio com muitas atualizacoes por segundo no mesmo aggregate
+
+## CQRS — 3 Niveis
+
+| Nivel | Read | Write | DB | Quando |
+|-------|------|-------|----|--------|
+| Simples | DTO/View Model | Aggregate/Entity | Mesmo | Leituras com joins complexos |
+| Medio | Read Replica | Primary DB | Separados | Carga de leitura alta |
+| Avancado | Projecoes (Elasticsearch, etc) | Event Store | Diferentes | Auditoria + busca + escala |
+
+## Migracao Segura de Coluna (Zero-Downtime)
+
+```
+1. ALTER TABLE ADD nova_coluna (nullable)        -- nao quebra nada
+2. Deploy: codigo escreve em AMBAS colunas       -- dual-write
+3. UPDATE SET nova_coluna = coluna_antiga         -- backfill
+4. Deploy: codigo LE da nova coluna              -- cutover de leitura
+5. Deploy: codigo PARA de escrever na antiga     -- cleanup de escrita
+6. ALTER TABLE DROP coluna_antiga                -- cleanup final
+```
+
+> **NUNCA** renomear coluna diretamente (`ALTER TABLE RENAME COLUMN`) — cria downtime entre deploy e migracao.
+> **NUNCA** fazer DROP e ADD na mesma migracao — se o deploy falhar no meio, dados sao perdidos.

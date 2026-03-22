@@ -40,3 +40,22 @@
 ## Rate Limiting
 - Upstash Redis tem rate limits — 429 em producao = verificar dashboard
 - Deploy roda muitas API calls (npm ci, git, Vercel API) — stagger se rate limited
+
+## Pipeline Local (sem GitHub Actions)
+
+O deploy nao depende mais de deploy-gate.yml/ci.yml. O gate e local:
+
+- **ag-D-27**: pipeline principal com 8 etapas (env-check → typecheck → lint → test → build → deploy → smoke → canary)
+- **Vercel Git Integration + pre-deploy-gate.sh**: gate automatico em todo `git push origin master`
+  - buildCommand: `bash scripts/pre-deploy-gate.sh && npm run build`
+  - pre-deploy-gate.sh executa typecheck + lint + test -- --passWithNoTests
+  - Falha em qualquer etapa aborta o build na Vercel automaticamente
+
+- **`vercel rollback` pode falhar silenciosamente** — sempre verificar URL apos rollback
+- **Credential preflight obrigatorio** antes de ag-D-27 ou ag-D-18 com modo pr/release:
+  ```bash
+  bash ~/Claude/.claude/scripts/credential-preflight.sh [path]
+  vercel whoami
+  ```
+- **Workflows removidos** (nao referenciar): deploy-gate.yml, preview-deploy.yml, ci.yml, smoke-on-deploy.yml, auto-rollback.yml, canary-monitor.yml
+- **Workflows mantidos** (autonomos): gitleaks.yml, codeql.yml, dora-metrics.yml, a11y.yml, lighthouse-ci.yml

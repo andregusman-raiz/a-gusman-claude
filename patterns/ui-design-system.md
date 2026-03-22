@@ -222,6 +222,23 @@ function DataList<T>({ data, renderItem, emptyState }: DataListProps<T>) {
 .decorative { animation: bounce 1s infinite; }
 ```
 
+## Extended Component Libraries
+
+Alem do shadcn/ui (base), usar libs especializadas por necessidade:
+
+| Necessidade | Lib | Install |
+|-------------|-----|---------|
+| AI text/chat rendering | AI Elements | `npx ai-elements@latest` |
+| Animacoes premium, marketing UI | Cult UI | Registry (copy-paste) |
+| Tool call rendering em chat | Tool UI | `npm install tool-ui` |
+| Blocks compostos, temas alternativos | HextaUI | Registry (copy-paste) |
+| Agent runtime UI | Inference.sh UI | Registry |
+| LLM offline no browser | WebLLM | `npm install @mlc-ai/web-llm` |
+
+> Detalhes completos: `.shared/patterns/ai-ui-component-stack.md`
+
+---
+
 ## NUNCA
 - `animate-pulse` ou `animate-bounce` em elementos de conteudo
 - Gradientes decorativos sem funcao informacional

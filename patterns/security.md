@@ -228,3 +228,43 @@ function decrypt(ciphertext: string): string {
 # Detectar secrets hardcoded
 grep -rn "sk-\|eyJ\|password\s*=\s*[\"']" --include="*.ts" --include="*.tsx" src/
 ```
+
+---
+
+## OAuth 2.0 Flows
+
+| Flow | Quando Usar | Exemplo |
+|------|-------------|---------|
+| Authorization Code + PKCE | SPAs, mobile apps | Login de usuario em app web |
+| Client Credentials | Machine-to-machine | API interna chamando outra API |
+| Device Code | Smart TVs, CLIs, IoT | Login em dispositivo sem browser |
+
+> **NUNCA** usar Implicit Flow — deprecated desde OAuth 2.1, vulneravel a token leakage.
+
+## JWT Best Practices
+
+- **Algoritmo**: RS256 (assimetrico) — NUNCA HS256 em producao distribuida
+- **Access Token**: max 15 minutos
+- **Refresh Token**: max 7 dias, com rotacao (novo refresh a cada uso)
+- **Deteccao de reuso**: se refresh token usado 2x → revogar TODA a familia de tokens
+- **Claims minimos**: `sub`, `iat`, `exp`, `iss`, `aud` — dados de negocio ficam no banco, NAO no token
+- **Storage**: httpOnly cookie para ambos (access + refresh) — NUNCA localStorage
+
+## RBAC vs ABAC
+
+| Criterio | RBAC | ABAC |
+|----------|------|------|
+| Complexidade | Baixa | Alta |
+| Granularidade | Por role | Por atributo |
+| Quando usar | < 10 roles, permissoes estaticas | Regras contextuais (horario, IP, departamento) |
+| Exemplo | admin, editor, viewer | "pode editar SE mesmo departamento E horario comercial" |
+
+> **Recomendacao**: comece com RBAC. Migre para ABAC apenas quando RBAC se tornar insuficiente.
+
+## MFA (Multi-Factor Authentication)
+
+| Metodo | Seguranca | UX | Recomendacao |
+|--------|-----------|-----|-------------|
+| WebAuthn/Passkeys | Alta (sem phishing) | Boa | PREFERIDO |
+| TOTP (Authenticator) | Media-Alta | Media | PADRAO |
+| SMS | Baixa (SIM swap) | Boa | ULTIMO RECURSO |

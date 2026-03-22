@@ -406,3 +406,58 @@ async function safeOperation<T>(
 - [ ] Sentry configurado com PII scrubbing
 - [ ] Nenhum `console.log` em producao
 - [ ] Nenhum catch-and-swallow no codebase
+
+---
+
+## Retry com Backoff Exponencial
+
+```typescript
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  opts: { maxRetries?: number; baseMs?: number; maxMs?: number } = {}
+): Promise<T> {
+  const { maxRetries = 3, baseMs = 1000, maxMs = 30_000 } = opts;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (attempt === maxRetries) throw error;
+      if (isClientError(error)) throw error;  // 4xx: nao retry (exceto 429)
+
+      const delay = Math.min(
+        baseMs * Math.pow(2, attempt) + Math.random() * 1000,  // jitter
+        maxMs
+      );
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+  throw new Error('unreachable');
+}
+```
+
+- **Jitter**: SEMPRE adicionar randomizacao para evitar thundering herd
+- **Quando NAO retry**: erros 4xx (exceto 429), validacao, autenticacao
+
+## Idempotencia em Consumers
+
+Todo consumer de eventos/webhooks DEVE ser idempotente:
+
+```typescript
+async function handleEvent(event: IntegrationEvent): Promise<void> {
+  // Dedup por event ID
+  const already = await processedEvents.exists(event.id);
+  if (already) return;  // ja processado
+
+  await processEvent(event);
+  await processedEvents.markDone(event.id, { ttl: '7d' });
+}
+```
+
+## Dead Letter Queue (DLQ)
+
+Mensagens que falham apos N retries → DLQ para analise.
+
+- Monitorar tamanho da DLQ (**alerta se > 0**)
+- Incluir contexto do erro na DLQ para debugging
+- Processar DLQ: retry manual, corrigir e reprocessar, ou descartar com justificativa

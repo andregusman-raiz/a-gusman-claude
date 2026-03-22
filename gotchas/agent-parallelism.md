@@ -34,6 +34,14 @@
 - iTerm2 scrollback max 10.000 linhas (Settings → Profiles → Terminal)
 - Usar `tmux kill-session -t nome` para limpar sessoes travadas
 
+## cleanup-orphans.sh mata worktrees e tsc (CRITICO)
+- Cron roda a cada 5 min: `bash ~/.claude/scripts/cleanup-orphans.sh`
+- Mata TODOS os processos `tsc --noEmit` — incluindo o intencional
+- Remove TODOS os worktrees em `.claude/worktrees/agent-*` — destroi trabalho de agents em paralelo
+- Fix aplicado (2026-03-15): worktree cleanup desabilitado, tsc so mata se > 1 instancia
+- Sintoma: agents completam mas arquivos modificados desaparecem, tsc retorna exit 144 (SIGTERM)
+- Se precisar rodar tsc manualmente: usar `--pretty` flag para evitar pattern match do cleanup
+
 ## Orquestracao
 - Preferir sequencial (ag-23) quando < 6 tasks — overhead de paralelismo nao compensa
 - Flat hierarchy: teammates NAO devem ter subagents proprios (evitar nesting)

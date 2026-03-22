@@ -240,3 +240,67 @@ expect(element).toBeInTheDocument();
 - Coverage alta NAO garante testes bons (pode ser teatral)
 - Coverage baixa GARANTE que ha codigo nao testado
 - Combinar coverage com mutation testing para avaliacao real
+
+---
+
+## Property-Based Testing (fast-check)
+
+Testar propriedades universais em vez de exemplos especificos.
+
+```typescript
+import fc from 'fast-check';
+
+// Round-trip: encode/decode preserva dados
+test('JSON round-trip preserves data', () => {
+  fc.assert(
+    fc.property(fc.record({ name: fc.string(), age: fc.nat() }), (user) => {
+      expect(JSON.parse(JSON.stringify(user))).toEqual(user);
+    })
+  );
+});
+
+// Idempotencia: aplicar 2x = aplicar 1x
+test('sort is idempotent', () => {
+  fc.assert(
+    fc.property(fc.array(fc.integer()), (arr) => {
+      const sorted = [...arr].sort((a, b) => a - b);
+      expect([...sorted].sort((a, b) => a - b)).toEqual(sorted);
+    })
+  );
+});
+```
+
+**Quando usar:** funcoes puras com dominio definido (encode/decode, serialize, sort, filter).
+**Quando NAO usar:** interacoes com IO, side effects, UI components.
+**Ferramenta:** `fast-check` (TS/JS), `hypothesis` (Python).
+
+## Contract Testing (Pact)
+
+Consumer-Driven Contracts: consumer define expectativas, provider verifica.
+
+```typescript
+// Consumer test (no servico que consome a API)
+const interaction = {
+  state: 'user exists',
+  uponReceiving: 'a request for user by ID',
+  withRequest: { method: 'GET', path: '/api/users/1' },
+  willRespondWith: {
+    status: 200,
+    body: { id: integer(1), name: like('John'), email: like('john@example.com') }
+  }
+};
+```
+
+- Rodar em CI para detectar breaking changes antes de deploy
+- Pact Broker centraliza contratos entre times
+- **Quando usar:** APIs consumidas por outros servicos ou times
+
+## TDD com IA — Divisao de Responsabilidades
+
+| Fase | Quem | O que |
+|------|------|-------|
+| RED | Dev/Spec | Escreve teste com valor esperado hard-coded da spec |
+| GREEN | IA (ag-Q-13) | Implementa minimo para teste passar |
+| REFACTOR | IA + Dev | IA sugere refactoring, dev aprova |
+
+> **REGRA CRITICA**: NUNCA deixar IA escrever teste E implementacao. Cria circularidade — bug no codigo = bug no teste.

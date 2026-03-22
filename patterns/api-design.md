@@ -217,3 +217,77 @@ async function withAuth(req: NextRequest) {
 - Expor IDs internos de sistema (usar UUIDs publicos)
 - Logar request bodies com dados sensiveis
 - Misturar versoes de API no mesmo handler
+
+---
+
+## GraphQL Best Practices
+
+### Connection Pattern (Relay)
+```typescript
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+```
+
+### DataLoader (OBRIGATORIO para N+1)
+```typescript
+import DataLoader from 'dataloader';
+
+const userLoader = new DataLoader(async (ids: readonly string[]) => {
+  const users = await db.users.findMany({ where: { id: { in: [...ids] } } });
+  return ids.map(id => users.find(u => u.id === id) ?? null);
+});
+
+// No resolver
+const resolvers = {
+  Post: {
+    author: (post) => userLoader.load(post.authorId)  // batched automaticamente
+  }
+};
+```
+
+### Schema Design Rules
+- Tipos coesos — evitar campos nullable sem motivo
+- Enums para valores fixos (status, role)
+- Input types separados para mutations
+- **Depth Limiting**: max 5-7 niveis de aninhamento
+- **Complexity Analysis**: calcular custo da query antes de executar
+
+## API Gateway
+
+### Responsabilidades do Gateway
+- Rate limiting (Token Bucket, Sliding Window)
+- Autenticacao (JWT validation, API key check)
+- Routing (path-based, header-based)
+- Transformacao (request/response mapping)
+- Caching (GET requests, TTL-based)
+
+### NAO colocar no Gateway
+- Logica de negocio
+- Validacao de dominio
+- Transformacoes complexas de dados
+
+## OpenAPI / Swagger
+
+| Abordagem | Quando | Vantagem |
+|-----------|--------|----------|
+| Code-first | Projetos existentes | Spec gerada do codigo, sempre sincronizada |
+| Spec-first | APIs publicas, design-first | Contrato definido antes da implementacao |
+
+- **Validacao**: `spectral` para lint da spec OpenAPI
+- **Geracao de tipos**: `openapi-typescript` para gerar tipos TS do spec
+- **Documentacao**: Swagger UI ou Redoc para documentacao interativa

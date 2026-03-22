@@ -195,3 +195,48 @@ for (const { url, expectedStatus } of endpoints) {
 - Desabilitar monitoring em producao
 - Usar sample rate 100% em producao (custo + performance)
 - Health check com side effects (deve ser read-only)
+
+---
+
+## Tres Pilares da Observabilidade
+
+### 1. Logs Estruturados (JSON)
+```typescript
+logger.info('order.created', {
+  orderId: order.id,
+  userId: order.userId,
+  total: order.total,
+  items: order.items.length,
+  traceId: span.traceId,
+  duration_ms: elapsed
+});
+```
+- Formato JSON SEMPRE — nunca texto livre em producao
+- Campos obrigatorios: `timestamp`, `level`, `message`, `traceId`
+- Niveis: ERROR (acionar alerta), WARN (investigar), INFO (auditar), DEBUG (apenas dev)
+
+### 2. Metricas RED
+- **R**ate: requests/segundo por endpoint
+- **E**rrors: taxa de erro (5xx / total)
+- **D**uration: latencia p50, p95, p99
+- Implementar via OpenTelemetry Metrics SDK ou Prometheus
+
+### 3. Traces Distribuidos
+- Cada request gera um `traceId` propagado entre servicos
+- Spans representam operacoes individuais (DB query, API call, processing)
+- Ferramentas: OpenTelemetry SDK → Grafana Tempo / Jaeger / Datadog
+- **Sampling**: 100% em dev/staging, 1-10% em producao (controle de custo)
+
+## Service Mesh (quando considerar)
+
+| Criterio | Threshold |
+|----------|-----------|
+| Numero de servicos | > 5 |
+| Comunicacao entre servicos | Frequente |
+| Requisito de seguranca | Zero-trust (mTLS) |
+| Observabilidade sem instrumentacao | Sim |
+
+- **mTLS automatico** entre servicos
+- **Traffic management**: canary deploys, circuit breaker no mesh
+- **Observabilidade**: metricas de sidecar sem instrumentar codigo
+- **Ferramentas**: Istio, Linkerd, Consul Connect
