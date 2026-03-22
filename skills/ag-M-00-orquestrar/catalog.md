@@ -56,6 +56,7 @@
 | ag-B-50 | construir-validado | sonnet | fork | Builder+Validator concorrente |
 | ag-Q-51 | testar-e2e-batch | sonnet | — | E2E em batches com auto-fix |
 | ag-B-52 | design-ui-ux | sonnet | Skill,fork | UI/UX design intelligence |
+| ag-B-53 | fix-typescript (--scan/--fix/--sweep) | sonnet | BG | Corrigir erros TS (scan/batch/sweep) |
 | ag-R-53 | patterns-nextjs | — | fork | Ref: Next.js + React patterns |
 | ag-R-54 | patterns-typescript | — | fork | Ref: TypeScript strict mode |
 | ag-R-55 | patterns-python | — | fork | Ref: Python patterns |
@@ -138,6 +139,7 @@ Legenda: BG=background, Sub=subagents, WT=worktree, Teams=Agent Teams, Plan=perm
 | "review grande" (10+ arquivos) | ag-Q-14 Teams: paired review+audit |
 | "testar tudo" | ag-Q-13 Teams: unit + integ + E2E paralelo |
 | "retrospectiva" / "retro" | ag-M-48: analise de sessao |
+| "fix tipos" / "typecheck" / "erros TS" / "sweep" | ag-B-53: scan/fix/sweep TypeScript |
 | "issue #N" / "resolver issue" / "implementar ticket" | ag-M-51: Issue→SPEC→Build→Verify→Test |
 
 ## QAT-Benchmark Workflow Details

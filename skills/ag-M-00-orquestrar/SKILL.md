@@ -27,7 +27,7 @@ usando o MAXIMO POTENCIAL de cada capacidade do sistema.
 ## 1. Inventario do Sistema
 
 ### 1.1 Numeros Atuais
-43 agents | 58 skills | 0 commands | 26 hooks | 11 playbooks | 26 rules | 24 plugins
+44 agents | 59 skills | 0 commands | 26 hooks | 11 playbooks | 26 rules | 24 plugins
 
 ### 1.2 Top 15 Agents (mais usados)
 
@@ -36,6 +36,7 @@ usando o MAXIMO POTENCIAL de cada capacidade do sistema.
 | ag-B-08 | construir-codigo | sonnet | Teams,Sub,WT |
 | ag-B-09 | depurar-erro | opus | Sub |
 | ag-B-23 | bugfix (--triage/--fix/--batch/--parallel) | sonnet | Teams,Sub,WT |
+| ag-B-53 | fix-typescript (--scan/--fix/--sweep) | sonnet | BG |
 | ag-Q-13 | testar-codigo | sonnet | Teams,Sub,BG |
 | ag-Q-14 | criticar-projeto | sonnet | Teams,Sub,BG,Plan |
 | ag-D-18 | versionar-codigo | sonnet | — |
@@ -115,6 +116,7 @@ docs/ai-state/session-state.json existe?
 | **Feature nova** | "adicionar", "implementar" | Feature |
 | **Bug fix (unico)** | "erro", "bug", "quebrou" (1 bug) | Debug Single |
 | **Bug fix (batch)** | lista de bugs, "corrigir todos" | Debug Batch |
+| **TypeScript errors** | "erros de tipo", "typecheck", "TS errors", "limpar tipos" | TypeScript Fix |
 | **Refatoracao** | "renomear", "mover", "extrair" | Refactor |
 | **Otimizacao** | "lento", "performance" | Optimize |
 | **Deploy** | "deploy", "publicar" | Deploy Simple/Full |
@@ -134,6 +136,9 @@ docs/ai-state/session-state.json existe?
 | **Criar/Melhorar Skill** | "criar skill", "melhorar skill" | ag-M-49 |
 | **E2E Batch** | "rodar E2E", "suite E2E completa" | ag-Q-51 |
 | **Build Validado** | "construir com validacao", "builder+validator" | ag-B-50 |
+| **Protótipo Mock-First** | "prototipar", "mock data", "UI antes de API" | Mock-First |
+| **Preparar Integração** | "preparar para integrar", "adapter layer", "feature flags" | Pre-Integration |
+| **Auditoria UX** | "auditar UX", "screenshots todas telas", "análise visual" | UX Audit |
 
 ---
 
@@ -225,6 +230,38 @@ ag-D-18 branch → ag-B-08 (quick) → ag-B-23 --fix → ag-D-18 pr
 ### Office / Organizar / Spell
 Office: ag-W-29 (Design Brief obrigatorio) | Organizar: ag-W-30 (aprovacao obrigatoria) | Spell: ag-W-31
 
+### Protótipo Mock-First (Metodologia ag-R-60)
+```
+Fase 1 — Mock Data:
+  ag-P-06 (spec módulos/rotas) → criar mock-data com seed determinístico
+  → criar mock-store (Map mutável) → criar schemas Zod
+
+Fase 2 — UI Completa:
+  ag-B-52 (design system) → ag-B-08 (implementar páginas com mock)
+  → ag-Q-16 (UX review rápido)
+
+Fase 3 — Auditoria UX:
+  Playwright CLI (screenshots todas as rotas) → análise visual
+  → classificar P0/P1/P2/P3 → corrigir em sprints
+
+Fase 4 — Preparação Integração:
+  Error boundaries + Loading states (rápido, 30min)
+  → API contracts (interfaces TypeScript do shape externo)
+  → Adapters (ExternalType → AppType)
+  → Providers (flag → mock | API)
+  → Feature flags (toggle mock/real por módulo)
+  → REST/SOAP clients com gotchas documentadas
+
+Fase 5 — Validação:
+  Smoke test script → Consistência dados → Build gate
+  → Checklist pré-requisitos → Data flow diagram
+
+Fase 6 — Integração:
+  Por módulo: adapter → provider → flag on → testar → deploy
+  Rollback: flag off = volta ao mock instantaneamente
+```
+Referência: `/ag-R-60-metodologia-mock-first`
+
 ---
 
 ## 5. Apresentar o Plano
@@ -284,7 +321,7 @@ Falha em agente?
 ├── Erro de codigo → ag-B-09 (subagents se multi-layer)
 ├── Plano incompleto → ag-P-07 (replanejar)
 ├── Spec ambigua → ag-P-06 (reespecificar)
-├── Typecheck/Lint → ag-B-23 --fix
+├── Typecheck/Lint → ag-B-53 (fix-typescript) ou ag-B-23 --fix (se bug funcional)
 ├── Team member falha → coordinator retenta 1x; 2+ falham → sequencial
 └── Falha repetida (2x) → PARAR e escalar ao usuario
 ```
@@ -302,6 +339,7 @@ Falha em agente?
 | "deploy seguro" | ag-D-27: pipeline completo |
 | "health check" | ag-M-28 |
 | "batch fix" / "sprint de bugs" | ag-B-23: worktree + Teams |
+| "fix tipos" / "typecheck" / "erros TS" | ag-B-53: scan/fix/sweep |
 | "avaliar UX" / "UX-QAT" | ag-Q-42 |
 | "benchmark" / "parity" | ag-Q-44 |
 | "incorporar" / "due diligence" | ag-I-32 primeiro |

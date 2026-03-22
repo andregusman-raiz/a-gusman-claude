@@ -348,6 +348,66 @@ These are frequently overlooked issues that make UI look unprofessional:
 
 ---
 
+## Extended Component Libraries
+
+Beyond shadcn/ui (base), reference these libraries for specialized needs:
+
+### AI Elements (elements.ai-sdk.dev) — MANDATORY for AI text
+- **Install**: `npx ai-elements@latest`
+- **Chat (19)**: Message, Conversation, PromptInput, Reasoning, Chain of Thought, Tool, Sources, Suggestion, Confirmation, etc.
+- **Code (13)**: CodeBlock, Terminal, FileTree, StackTrace, TestResults, Sandbox, JSXPreview, etc.
+- **Voice (6)**: AudioPlayer, SpeechInput, Transcription, VoiceSelector, etc.
+- **Workflow (7)**: Canvas, Node, Edge, Connection, Controls, Panel, Toolbar
+- **When**: Any AI-generated text, chat UI, tool call rendering, workflow visualization
+
+### Cult UI (cult-ui.com) — Animated Components
+- **Install**: Registry-based (copy-paste like shadcn)
+- **67+ components** drop-in for shadcn/ui projects
+- **AI-specific**: AI Instructions, Prompt Library
+- **Effects**: Hero Dithering, Liquid Metal, Fractal Grid, Shader Lens Blur, LightBoard
+- **Interactions**: Dynamic Island, Expandable Card/Screen, Direction Aware Tabs, Family Drawer
+- **Marketing**: Logo Carousel, Tweet Grid, Gradient Heading, 3D Carousel
+- **Animation**: Text Animate, Typewriter, Animated Number, Terminal Animation
+- **When**: Landing pages, marketing UI, micro-animations, AI instruction panels, premium visual effects
+
+### Tool UI (tool-ui.com) — AI Tool Call Rendering
+- **Install**: `npm install tool-ui` (MIT, assistant-ui org)
+- **25+ components** with Zod schemas + preset data
+- **Decision/Confirmation**: Approval cards, order summaries, message drafts, option lists
+- **Input/Config**: Parameter sliders, preference panels, question flows
+- **Display/Artifacts**: Tables, charts, code blocks, terminals, citations
+- **Media**: Image galleries, video players, social media previews
+- **Progress**: Plan trackers, progress widgets, weather displays
+- **When**: Chat interfaces with tool calling — renders tool payloads as interactive UI instead of raw JSON
+
+### HextaUI (hextaui.com) — Extended Blocks for shadcn/ui
+- **Install**: Registry-based
+- **Pre-composed blocks**: Complex form sections, dashboard panels, landing blocks
+- **6 themes**: Default, Retro Blue, Purple, Night Wind, Orbiter, Soft Orange (OKLCH)
+- **When**: Rapid prototyping of composed layouts, alternative themes
+
+### Inference.sh UI (ui.inference.sh) — Agent Runtime Components
+- **Agent component**: Full runtime with tools, streaming, approvals, widgets
+- **Tool UI**: Lifecycle management (pending → progress → approval → results)
+- **Widgets**: Declarative UI from JSON (forms, buttons, cards)
+- **Markdown renderer**: Syntax highlighting + embeds
+- **When**: Agent interfaces that need durable execution, human-in-the-loop approval flows
+
+### Decision Matrix — Which Library When
+
+| Need | Library | Why |
+|------|---------|-----|
+| Any AI text rendering | AI Elements (mandatory) | Handles streaming, markdown, parts |
+| Chat with tool calls | AI Elements + Tool UI | Tool UI renders payloads beautifully |
+| Animated landing page | Cult UI | 67+ effects, drop-in shadcn |
+| AI instruction panel | Cult UI (AI Instructions) | Purpose-built component |
+| Dashboard blocks | HextaUI | Pre-composed, themed |
+| Agent with approval flow | Inference.sh UI | Runtime + approval UI built-in |
+| Workflow visualization | AI Elements (Workflow) | Canvas + Node + Edge |
+| Offline AI features | WebLLM + custom UI | Browser-side LLM, zero API cost |
+
+---
+
 ## Pre-Delivery Checklist
 
 Before delivering UI code, verify these items:
