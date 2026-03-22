@@ -1110,9 +1110,69 @@ bash install.sh --tier starter   # ou standard, ou full</pre>
     <p><strong>O conselho mais importante:</strong> Nao tente montar tudo de uma vez. Comece com o CLAUDE.md e va adicionando conforme sente necessidade. O ciclo e: <strong>usar &rarr; errar &rarr; documentar &rarr; nao repetir</strong>.</p>
   </div>
 
+  <h3>Instalacao rapida (1 comando)</h3>
+
+  <pre><code>curl -fsSL https://raw.githubusercontent.com/andregusman-raiz/a-gusman-claude/main/install.sh | bash</code></pre>
+
+  <p>Isso faz 3 coisas automaticamente:</p>
+  <ol>
+    <li><strong>Clona</strong> o repositorio em <code>~/.gusman-claude/</code> (a fonte da verdade)</li>
+    <li><strong>Cria symlinks</strong> em <code>.claude/</code> &mdash; <code>agents/</code>, <code>skills/</code>, <code>rules/</code>, <code>hooks/</code>, <code>shared/</code></li>
+    <li><strong>Instala hook de auto-update</strong> que atualiza a cada inicio de sessao (~1h de throttle)</li>
+  </ol>
+
+  <h3>O que vem do repositorio (atualizado automaticamente)</h3>
+  <table>
+    <thead><tr><th>Diretorio</th><th>Conteudo</th><th>Qtd</th></tr></thead>
+    <tbody>
+      <tr><td><code>agents/</code></td><td>Agentes especializados</td><td>46</td></tr>
+      <tr><td><code>skills/</code></td><td>Skills (workflows + patterns)</td><td>60</td></tr>
+      <tr><td><code>rules/</code></td><td>Regras de governanca</td><td>31</td></tr>
+      <tr><td><code>hooks/</code></td><td>Hooks de seguranca + auto-update</td><td>7</td></tr>
+      <tr><td><code>shared/</code></td><td>Patterns, gotchas, templates</td><td>42 patterns + 13 templates</td></tr>
+      <tr><td><code>Playbooks/</code></td><td>Guias estrategicos</td><td>12</td></tr>
+    </tbody>
+  </table>
+
+  <h3>O que e SEU (nunca sobrescrito)</h3>
+  <table>
+    <thead><tr><th>Arquivo</th><th>O que e</th></tr></thead>
+    <tbody>
+      <tr><td><code>settings.local.json</code></td><td>Suas permissoes pessoais</td></tr>
+      <tr><td><code>projects/</code></td><td>Memoria por projeto (persiste entre sessoes)</td></tr>
+      <tr><td><code>CLAUDE.md</code></td><td>Instrucoes do seu projeto</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Auto-update: como funciona</h3>
+  <p>Toda vez que voce inicia o Claude Code, um hook <code>SessionStart</code> roda em background:</p>
+  <ul>
+    <li>Executa <code>git pull --ff-only</code> silenciosamente</li>
+    <li>Maximo 1 vez por hora (nao sobrecarrega o GitHub)</li>
+    <li>Nunca bloqueia o inicio da sessao</li>
+    <li>Para desativar: <code>bash install.sh --no-auto-update</code> ou delete <code>.claude/hooks/auto-update.sh</code></li>
+  </ul>
+
+  <h3>Comandos uteis</h3>
+  <table>
+    <thead><tr><th>Acao</th><th>Comando</th></tr></thead>
+    <tbody>
+      <tr><td>Atualizar manualmente</td><td><code>cd ~/.gusman-claude &amp;&amp; git pull</code></td></tr>
+      <tr><td>Desinstalar</td><td><code>bash ~/.gusman-claude/install.sh --uninstall</code></td></tr>
+      <tr><td>Instalar sem auto-update</td><td><code>curl ... | bash -s -- --no-auto-update</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Primeiro uso</h3>
+  <pre><code># Apos instalar, abra o Claude Code
+claude
+
+# O orquestrador analisa seu projeto e escolhe os agents certos
+/ag-M-00-orquestrar analyze this project</code></pre>
+
   <div class="cta-box" style="margin-top:3rem;">
     <h3>Pronto para comecar?</h3>
-    <p>Pegue o sistema completo no GitHub &mdash; de graca, aberto, com instalador automatico.</p>
+    <p>1 comando. Auto-update. 46 agentes + 60 skills + 31 regras. De graca.</p>
     <a href="https://github.com/andregusman-raiz/a-gusman-claude" class="cta-btn" target="_blank">github.com/andregusman-raiz/a-gusman-claude &rarr;</a>
   </div>
 </section>
