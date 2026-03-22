@@ -14,7 +14,7 @@ Voce esta criando um cenario UX-QAT para avaliacao continua de qualidade visual.
 ### Phase 1: Rubric
 1. Verificar se rubric do tipo existe em `tests/ux-qat/rubrics/`
 2. Se existe → usar
-3. Se nao → copiar de `~/.shared/templates/ux-qat/rubrics/[type].rubric.ts`
+3. Se nao → copiar de `~/.claude/shared/templates/ux-qat/rubrics/[type].rubric.ts`
 4. Customizar pesos se necessario (ex: fintech prioriza seguranca)
 
 ### Phase 2: Interacoes L2

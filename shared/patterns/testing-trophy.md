@@ -112,12 +112,12 @@ QAT v2 evolui de medicao passiva para melhoria continua com ciclo PDCA:
 **Rubricas v2**: Especificas por dominio com 5 criterios ponderados, escalas de 6 niveis, penalidades.
 7 rubricas disponiveis: chat-educacional, extended-thinking, rag-query, plano-de-aula, relatorio-executivo, geracao-codigo, imagem-educacional.
 
-- Pattern QAT: `~/.shared/patterns/quality-acceptance-testing.md`
-- Pattern KB: `~/.shared/patterns/qat-knowledge-base.md`
-- Pattern PDCA: `~/.shared/patterns/qat-pdca-cycle.md`
-- Pattern Rubric Design: `~/.shared/patterns/qat-rubric-design.md`
-- Pattern Scenario Design: `~/.shared/patterns/qat-scenario-design.md`
-- Templates: `~/.shared/templates/qat/`
+- Pattern QAT: `~/.claude/shared/patterns/quality-acceptance-testing.md`
+- Pattern KB: `~/.claude/shared/patterns/qat-knowledge-base.md`
+- Pattern PDCA: `~/.claude/shared/patterns/qat-pdca-cycle.md`
+- Pattern Rubric Design: `~/.claude/shared/patterns/qat-rubric-design.md`
+- Pattern Scenario Design: `~/.claude/shared/patterns/qat-scenario-design.md`
+- Templates: `~/.claude/shared/templates/qat/`
 - Agent: ag-40 (`/ag40`)
 
 ## Measurement

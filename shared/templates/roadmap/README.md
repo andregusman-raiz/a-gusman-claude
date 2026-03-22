@@ -4,7 +4,7 @@ Copie esta pasta para `<projeto>/roadmap/` ao iniciar um novo projeto.
 
 ## Uso
 ```bash
-cp -r ~/.shared/templates/roadmap/ ./roadmap/
+cp -r ~/.claude/shared/templates/roadmap/ ./roadmap/
 ```
 
 ## Personalizacao

@@ -204,4 +204,4 @@ const JudgeEvaluationSchema = z.object({
 
 - Pattern pai: `qat-benchmark.md`
 - Pattern relacionado: `qat-rubric-design.md`
-- Template: `~/.shared/templates/qat-benchmark/scorers/`
+- Template: `~/.claude/shared/templates/qat-benchmark/scorers/`

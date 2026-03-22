@@ -37,7 +37,7 @@ ls tests/ux-qat/knowledge/ 2>/dev/null || echo "KNOWLEDGE_MISSING"
 ls tests/ux-qat/design-tokens.json 2>/dev/null || echo "DESIGN_TOKENS_MISSING"
 ```
 
-Se `UX_QAT_NOT_CONFIGURED` → copiar templates de `~/.shared/templates/ux-qat/` e configurar.
+Se `UX_QAT_NOT_CONFIGURED` → copiar templates de `~/.claude/shared/templates/ux-qat/` e configurar.
 
 ### 0.2 Ler contexto do projeto
 
@@ -66,7 +66,7 @@ ls tests/ux-qat/rubrics/*.rubric.ts 2>/dev/null
 ```
 
 Se rubric do tipo existe → usar existente.
-Se NAO existe → copiar de `~/.shared/templates/ux-qat/rubrics/[type].rubric.ts`.
+Se NAO existe → copiar de `~/.claude/shared/templates/ux-qat/rubrics/[type].rubric.ts`.
 Se tipo e custom → criar rubric nova seguindo estrutura das existentes.
 
 ### 1.2 Customizar rubric (se necessario)

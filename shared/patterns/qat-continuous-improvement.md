@@ -231,6 +231,6 @@ Run N+1 → PLAN:
 
 - Agent: `~/.claude/agents/ag-Q-40-testar-qualidade.md` (PDCA Orchestrator)
 - Agent: `~/.claude/agents/ag-Q-41-criar-cenario-qat.md` (Scenario Designer)
-- Pattern: `~/.shared/patterns/qat-pdca-cycle.md`
-- Pattern: `~/.shared/patterns/qat-knowledge-base.md`
-- Templates: `~/.shared/templates/qat/helpers/`
+- Pattern: `~/.claude/shared/patterns/qat-pdca-cycle.md`
+- Pattern: `~/.claude/shared/patterns/qat-knowledge-base.md`
+- Templates: `~/.claude/shared/templates/qat/helpers/`

@@ -146,7 +146,7 @@ Legenda: BG=background, Sub=subagents, WT=worktree, Teams=Agent Teams, Plan=perm
 
 ```
 Primeiro uso no projeto?
-├── SIM → copiar templates: cp -r ~/.shared/templates/qat-benchmark/ tests/qat-benchmark/
+├── SIM → copiar templates: cp -r ~/.claude/shared/templates/qat-benchmark/ tests/qat-benchmark/
 │   → configurar adapters + API keys
 │   → ag-Q-45 (criar cenarios iniciais — 5 fixed + 10 rotatable)
 │   → ag-Q-44 (PDCA benchmark completo)

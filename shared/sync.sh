@@ -1,6 +1,6 @@
 #!/bin/bash
 # sync.sh — Propaga templates .shared/ para projetos
-# Uso: bash ~/.shared/sync.sh [projeto1] [projeto2] ...
+# Uso: bash ~/.claude/shared/sync.sh [projeto1] [projeto2] ...
 # Sem argumentos: sincroniza todos os projetos conhecidos
 
 set -euo pipefail

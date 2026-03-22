@@ -5,7 +5,7 @@ Templates reutilizaveis para testes end-to-end com Playwright.
 ## Uso
 ```bash
 # Copiar para pasta de E2E do projeto
-cp -r ~/.shared/templates/e2e/ ./tests/e2e/shared/
+cp -r ~/.claude/shared/templates/e2e/ ./tests/e2e/shared/
 ```
 
 ## Arquivos

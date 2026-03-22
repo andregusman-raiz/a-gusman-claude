@@ -68,5 +68,5 @@ tests/ux-qat/
 ## Referencia
 
 - SPEC: `~/Claude/docs/specs/SPEC-UX-QAT.md`
-- Templates: `~/.shared/templates/ux-qat/`
+- Templates: `~/.claude/shared/templates/ux-qat/`
 - Agents: `~/.claude/agents/ag-Q-42-*.md`, `ag-Q-43-*.md`

@@ -26,7 +26,7 @@ Diferenca de ag-Q-13: ag-Q-13 cria testes unitarios/integracao. ag-Q-41 cria tes
 
 ## Pre-requisitos
 
-1. Estrutura `tests/qat/` no projeto (copiar de `~/.shared/templates/qat/`)
+1. Estrutura `tests/qat/` no projeto (copiar de `~/.claude/shared/templates/qat/`)
 2. `tests/qat/qat.config.ts` existente
 3. `tests/qat/rubrics/v2/` com rubricas disponiveis
 
@@ -60,7 +60,7 @@ Phase 6: Validacao (typecheck, completude, report)
 ## Referencia
 
 - Agent completo: `~/.claude/agents/ag-Q-41-criar-cenario-qat.md`
-- Pattern: `~/.shared/patterns/qat-scenario-design.md`
-- KB Pattern: `~/.shared/patterns/qat-knowledge-base.md`
-- Templates: `~/.shared/templates/qat/`
+- Pattern: `~/.claude/shared/patterns/qat-scenario-design.md`
+- KB Pattern: `~/.claude/shared/patterns/qat-knowledge-base.md`
+- Templates: `~/.claude/shared/templates/qat/`
 

@@ -158,7 +158,7 @@ Ciclo PDCA
 
 ## Referencia
 
-- PDCA Engine: `~/.shared/templates/qat/helpers/pdca.template.ts`
-- Failure Classification: `~/.shared/templates/qat/helpers/diagnostics.template.ts`
-- Rubric Design: `~/.shared/patterns/qat-rubric-design.md`
-- Scenario Design: `~/.shared/patterns/qat-scenario-design.md`
+- PDCA Engine: `~/.claude/shared/templates/qat/helpers/pdca.template.ts`
+- Failure Classification: `~/.claude/shared/templates/qat/helpers/diagnostics.template.ts`
+- Rubric Design: `~/.claude/shared/patterns/qat-rubric-design.md`
+- Scenario Design: `~/.claude/shared/patterns/qat-scenario-design.md`

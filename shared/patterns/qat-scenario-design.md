@@ -218,8 +218,8 @@ Antes de adicionar um cenario QAT:
 
 ## Referencia
 
-- Pattern PDCA: `~/.shared/patterns/qat-pdca-cycle.md`
-- Pattern Rubricas: `~/.shared/patterns/qat-rubric-design.md`
-- Templates: `~/.shared/templates/qat/`
+- Pattern PDCA: `~/.claude/shared/patterns/qat-pdca-cycle.md`
+- Pattern Rubricas: `~/.claude/shared/patterns/qat-rubric-design.md`
+- Templates: `~/.claude/shared/templates/qat/`
 - Agent: `~/.claude/agents/ag-Q-40-testar-qualidade.md`
 - Scenario Designer: `~/.claude/agents/ag-Q-41-criar-cenario-qat.md`

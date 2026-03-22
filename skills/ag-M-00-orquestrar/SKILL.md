@@ -145,7 +145,7 @@ docs/ai-state/session-state.json existe?
 ## 4. Workflows Predefinidos
 
 ### Projeto Novo
-ag-P-01 (templates de ~/.shared/) → ag-P-02 → ag-P-03 → ag-P-06 → ag-P-07 → ag-B-08 → ag-Q-12 → ag-Q-13 → ag-Q-16 → ag-D-19 → ag-D-20 → ag-Q-22
+ag-P-01 (templates de ~/.claude/shared/) → ag-P-02 → ag-P-03 → ag-P-06 → ag-P-07 → ag-B-08 → ag-Q-12 → ag-Q-13 → ag-Q-16 → ag-D-19 → ag-D-20 → ag-Q-22
 
 ### Feature Nova
 ```

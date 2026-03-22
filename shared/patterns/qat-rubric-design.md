@@ -261,6 +261,6 @@ export interface QatRubricV2 {
 
 ## Referencia
 
-- Scenario Design: `~/.shared/patterns/qat-scenario-design.md`
-- PDCA Cycle: `~/.shared/patterns/qat-pdca-cycle.md`
-- Templates: `~/.shared/templates/qat/`
+- Scenario Design: `~/.claude/shared/patterns/qat-scenario-design.md`
+- PDCA Cycle: `~/.claude/shared/patterns/qat-pdca-cycle.md`
+- Templates: `~/.claude/shared/templates/qat/`
