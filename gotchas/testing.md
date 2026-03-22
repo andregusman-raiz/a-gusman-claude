@@ -25,6 +25,13 @@
 - Usar MSW para HTTP mocking (intercepta, nao substitui)
 - Preferir fake-indexeddb para offline testing (comportamento real)
 
+## bun test vs bun run test (CRITICO)
+- `bun test` = runner NATIVO do Bun. Ignora jest.config.js, jsdom, moduleNameMapper
+- `bun run test` = executa o script "test" do package.json (que roda Jest)
+- raiz-platform usa Jest (jsdom, @swc/jest, path aliases). SEMPRE usar `bun run test`
+- Sintoma: `bun test` reporta milhares de falhas falsas ("document is not defined", export not found)
+- Diagnosticado em 2026-03-15: reportou 4888 falhas vs 115 reais com Jest
+
 ## Test Organization
 - Unit tests: co-locados ou em `test/` (por projeto)
 - E2E tests: sempre em pasta dedicada (`tests/e2e/` ou `test/e2e/`)

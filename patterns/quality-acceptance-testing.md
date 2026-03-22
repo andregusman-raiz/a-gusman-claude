@@ -211,7 +211,7 @@ tests/qat/
 
 ## Referencia
 
-- Agent: `~/.claude/agents/ag-40-testar-qualidade.md`
-- Skill: `~/.claude/skills/ag40/SKILL.md`
-- Command: `~/.claude/commands/ag40.md`
+- Agent: `~/.claude/agents/ag-Q-40-testar-qualidade.md`
+- Skill: `~/.claude/skills/ag-Q-40/SKILL.md`
+- Command: `~/.claude/commands/ag-Q-40.md`
 - Templates: `~/.shared/templates/qat/`

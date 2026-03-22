@@ -200,12 +200,12 @@ tests/qat/
 - `~/.shared/patterns/qat-continuous-improvement.md` — Auto-refinamento, deteccao, cost intelligence
 
 ### Agent & Skill
-- Agent: `~/.claude/agents/ag-40-testar-qualidade.md` (PDCA Orchestrator)
-- Agent: `~/.claude/agents/ag-41-criar-cenario-qat.md` (Scenario Designer)
-- Skill: `~/.claude/skills/ag40/SKILL.md`
-- Skill: `~/.claude/skills/ag41/SKILL.md`
-- Command: `~/.claude/commands/ag40.md`
-- Command: `~/.claude/commands/ag41.md`
+- Agent: `~/.claude/agents/ag-Q-40-testar-qualidade.md` (PDCA Orchestrator)
+- Agent: `~/.claude/agents/ag-Q-41-criar-cenario-qat.md` (Scenario Designer)
+- Skill: `~/.claude/skills/ag-Q-40/SKILL.md`
+- Skill: `~/.claude/skills/ag-Q-41/SKILL.md`
+- Command: `~/.claude/commands/ag-Q-40.md`
+- Command: `~/.claude/commands/ag-Q-41.md`
 
 ### Evolution Plan
 - `~/Claude/docs/specs/QAT-EVOLUTION-PLAN.md` — Plano completo de evolucao (5 sprints)

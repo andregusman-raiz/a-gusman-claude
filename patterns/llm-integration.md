@@ -444,3 +444,172 @@ async function withRateLimit<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T
 - [ ] Rate limit handling com retry
 - [ ] AbortController no client para cancelamento
 - [ ] Usage tracking para billing/monitoring
+
+---
+
+## RAG Pipeline Completo
+
+```
+Query → Embedding → Vector Search → Re-ranking → Context Assembly → LLM → Response
+```
+
+### 1. Chunking
+- **Tamanho**: 500-1000 tokens por chunk
+- **Overlap**: 10-15% entre chunks adjacentes
+- **Limites semanticos**: respeitar paragrafos, secoes, headers
+- **Metadata**: incluir fonte, pagina, secao em cada chunk
+
+### 2. Embedding
+- **Modelo**: text-embedding-3-small (custo) ou text-embedding-3-large (qualidade)
+- **Batch processing**: embeddings em lotes de 100-500
+- **Dimensoes**: 1536 (small) ou 3072 (large) — verificar limite do vector DB
+
+### 3. Indexacao
+- **HNSW**: rapido, aproximado, bom para producao (pgvector, Pinecone)
+- **IVFFlat**: mais preciso, mais lento, bom para datasets menores
+- **Hybrid**: combinar vector index + full-text index (GIN) na mesma tabela
+
+### 4. Busca Hibrida
+```
+score_final = alpha * vector_score + (1 - alpha) * keyword_score
+```
+- Vector search: captura semantica (sinonimos, contexto)
+- Full-text search: captura exata (nomes, codigos, termos tecnicos)
+- **Re-ranking**: cross-encoder para reordenar top-N resultados
+
+### 5. Context Assembly
+- Ordenar chunks por relevancia
+- Limitar contexto total (70-80% do token budget para context, 20-30% para resposta)
+- Incluir metadata para o LLM (fonte, data, tipo)
+
+## Prompt Management (Versionamento)
+
+```
+prompts/
+├── order-summary/
+│   ├── v1.0.md    # versao original
+│   ├── v1.1.md    # ajuste de tom
+│   └── v2.0.md    # reestruturacao
+└── config.json    # versao ativa, % de trafego
+```
+
+- Cada prompt tem versao semantica
+- **A/B testing**: 10% trafego para nova versao, comparar metricas (qualidade, latencia, custo)
+- **Rollback imediato** se metricas degradarem
+- **Armazenar fora do codigo**: DB, config service, ou arquivo versionado separado
+- **Template variables** com validacao — nao aceitar template sem variavel obrigatoria
+
+## Model Serving Strategies
+
+| Estrategia | Descricao | Risco | Quando |
+|-----------|-----------|-------|--------|
+| Canary | 5-10% trafego no novo modelo | Baixo | Default para mudancas |
+| Shadow | Novo modelo processa em paralelo, sem servir | Zero | Avaliar qualidade sem risco |
+| Blue/Green | Switch instantaneo entre versoes | Medio | Mudancas com rollback rapido |
+
+## Otimizacao de Custos (Consolidado)
+
+| Tecnica | Economia | Implementacao |
+|---------|----------|---------------|
+| Roteamento por complexidade | 40-60% | Classificador haiku/sonnet/opus |
+| Cache semantico | 20-40% | Redis + similarity threshold 0.95 |
+| Compressao de contexto | 10-30% | Sumarizar chunks antigos do historico |
+| Batch requests | 10-20% | Agrupar requests similares em janela de tempo |
+| Client-side inference (WebLLM) | 100% | Tasks leves no browser, zero API calls |
+
+---
+
+## Client-Side Inference (WebLLM)
+
+### Quando Usar
+- Autocomplete, classificacao, extracao de entidades — tasks leves
+- PWAs que precisam funcionar offline
+- Privacidade: dados nunca saem do browser
+- Custo: zero tokens de API
+
+### Quando NAO Usar
+- Raciocinio complexo, analise profunda, codigo
+- Contexto > 4K tokens (modelos pequenos tem janela limitada)
+- Dispositivos sem WebGPU (fallback necessario)
+
+### Setup Basico
+```typescript
+// src/lib/llm/webllm.ts
+import { CreateMLCEngine } from '@mlc-ai/web-llm';
+
+let engine: any = null;
+
+export async function initWebLLM() {
+  if (engine) return engine;
+  engine = await CreateMLCEngine('Phi-3.5-mini-instruct-q4f16_1-MLC', {
+    initProgressCallback: (progress) => {
+      console.log(`Loading model: ${(progress.progress * 100).toFixed(0)}%`);
+    },
+  });
+  return engine;
+}
+
+export async function classifyLocal(text: string, categories: string[]): Promise<string> {
+  const llm = await initWebLLM();
+  const response = await llm.chat.completions.create({
+    messages: [
+      { role: 'system', content: `Classify into one of: ${categories.join(', ')}. Reply with ONLY the category.` },
+      { role: 'user', content: text },
+    ],
+    temperature: 0,
+    max_tokens: 50,
+  });
+  return response.choices[0].message.content.trim();
+}
+```
+
+### Modelos Recomendados por Caso
+
+| Caso | Modelo | Tamanho | Requisito |
+|------|--------|---------|-----------|
+| Classificacao, autocomplete | Phi-3.5-mini | ~2GB VRAM | WebGPU (Chrome 113+) |
+| Embeddings simples | Gemma-2B | ~1.5GB | WebGPU |
+| Conversacao basica | Llama-3.2-1B | ~1GB | WebGPU |
+
+### Fallback Pattern
+```typescript
+async function smartClassify(text: string, categories: string[]) {
+  // Tentar client-side primeiro (gratis, rapido)
+  if ('gpu' in navigator) {
+    try {
+      return await classifyLocal(text, categories);
+    } catch { /* fallback to API */ }
+  }
+  // Fallback para API (custo, mas funciona em qualquer browser)
+  return await classifyViaAPI(text, categories);
+}
+```
+
+---
+
+## Inference.sh Runtime (Agent Execution)
+
+### O Que E
+Runtime de producao para agents AI com execucao duravel, observabilidade, e 150+ integracoes pre-prontas. Alternativa/complemento ao Vercel Workflow DevKit.
+
+### Quando Considerar
+- Agents que precisam de durabilidade (checkpoint, retry, replay)
+- Multi-agent systems com orquestracao complexa
+- Precisa de 150+ tools pre-prontas (sem implementar cada integracao)
+- Observabilidade de agent steps nativa
+
+### Diferenca vs Vercel Workflow DevKit
+
+| Aspecto | Inference.sh | Vercel WDK |
+|---------|-------------|------------|
+| Vendor | inference.sh | Vercel |
+| Lock-in | API-based, portavel | Tight Vercel integration |
+| Tools pre-prontas | 150+ | Voce cria as suas |
+| Deploy | Workers (cloud/self-hosted) | Vercel Functions |
+| UI Components | ui.inference.sh | AI Elements |
+| Custo | Free tier + paid | Vercel pricing |
+
+### Recomendacao
+- **Projetos Vercel-first** → Workflow DevKit (melhor integracao)
+- **Multi-cloud / self-hosted** → Inference.sh (mais portavel)
+- **UI components de agent** → Usar os de ambos conforme necessidade

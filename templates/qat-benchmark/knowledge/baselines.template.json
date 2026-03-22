@@ -1,0 +1,10 @@
+{
+  "_comment": "QAT-Benchmark Baselines — Historical scores by scenario and dimension",
+  "_instructions": "Updated automatically by ag-44 PDCA ACT phase. Do NOT edit manually.",
+  "metadata": {
+    "lastUpdated": null,
+    "totalRuns": 0,
+    "baselineModel": "claude-opus-4-6"
+  },
+  "scenarios": {}
+}

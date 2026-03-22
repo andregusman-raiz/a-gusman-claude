@@ -151,6 +151,15 @@ for project in "${PROJECTS[@]}"; do
     sync_dir "$SHARED_DIR/templates/scripts" "$project/scripts/templates" "script templates"
   fi
 
+  # 10. UX-QAT templates → ux-qat/ (tipos, rubrics, config, cenario templates)
+  if [ -d "$SHARED_DIR/templates/ux-qat" ]; then
+    sync_dir "$SHARED_DIR/templates/ux-qat/types" "$project/ux-qat/types" "UX-QAT types"
+    sync_dir "$SHARED_DIR/templates/ux-qat/config" "$project/ux-qat/config" "UX-QAT config"
+    sync_dir "$SHARED_DIR/templates/ux-qat/rubrics" "$project/ux-qat/rubrics" "UX-QAT rubrics"
+    sync_dir "$SHARED_DIR/templates/ux-qat/scenarios/_template" "$project/ux-qat/scenarios/_template" "UX-QAT scenario templates"
+    sync_dir "$SHARED_DIR/templates/ux-qat/runtime" "$project/ux-qat/runtime" "UX-QAT runtime engine"
+  fi
+
   log_ok "Projeto $project_name sincronizado."
 done
 
