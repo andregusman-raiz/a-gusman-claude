@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logos/raiz-educacao-logo.svg" alt="rAIz Educação" width="180" />
+</p>
+
 # Gusman Claude Agent System
 
 > Transform Claude Code from a passive assistant into an autonomous development platform.
@@ -283,6 +287,27 @@ No. Uses standard .claude/ directory structure. Compatible with other tools and 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on adding agents, skills, rules, and hooks.
+
+## Brand Assets & Design System
+
+Logo vetorial + Design System oficial em `assets/`:
+
+| File | What |
+|------|------|
+| `assets/logos/raiz-educacao-logo.svg` | SVG logo (pure paths, no fonts, any scale) |
+| `assets/logos/raiz-logo-transparente.png` | PNG 900px, transparent background |
+| `assets/logos/RaizLogo.tsx` | React/Next.js component |
+| **[`assets/raiz-educacao-design-system.md`](assets/raiz-educacao-design-system.md)** | **UX/UI Design System (1045 lines, 13 sections)** |
+
+**Brand colors** (sampled from official logo):
+
+| Element | Hex | UI Token |
+|---------|-----|----------|
+| Leaves | `#77c6be` | `--raiz-teal` |
+| RAIZ | `#f0870b` | `--raiz-orange` |
+| educação | `#70c3bb` | `--raiz-teal-light` |
+
+**Design System contents**: Identity, Color palette (30+ tokens), Typography (IBM Plex Sans), Spacing/Grid, Components (Card, KPI, Table, Button, Input, Badge), Layout Patterns (AppShell, Sidebar, Topbar), Dark Mode tokens, Motion, Charts, Accessibility (WCAG AA), CSS Tokens, and a 25-item delivery checklist.
 
 ## License
 
