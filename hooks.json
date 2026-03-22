@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/auto-update.sh 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -31,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .shared/sync.sh 2>/dev/null || true"
+            "command": "bash .claude/shared/sync.sh 2>/dev/null || true"
           }
         ]
       }

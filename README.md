@@ -21,18 +21,39 @@ Claude Code is powerful but generic. This framework adds:
 ## Quick Start
 
 ```bash
-# Clone the system
-git clone https://github.com/andregusman-raiz/a-gusman-claude.git
+# One-line install (clones repo + symlinks into .claude/ + auto-update hook)
+curl -fsSL https://raw.githubusercontent.com/andregusman-raiz/a-gusman-claude/main/install.sh | bash
 
-# Install to your .claude/ directory (3 tiers available)
-cd a-gusman-claude
-bash install.sh --tier starter   # Starter: core rules + safety + orchestrator (~7 files, 2 min)
-bash install.sh --tier standard  # Standard: + 16 core agents + patterns (~50 files, 10 min)
-bash install.sh --tier full      # Full: all 46 agents, 60 skills, everything (180+ files, 20 min)
+# Or clone manually
+git clone https://github.com/andregusman-raiz/a-gusman-claude.git ~/.gusman-claude
+bash ~/.gusman-claude/install.sh
 
 # Start Claude Code and orchestrate
 claude
 # Then type: /ag-M-00-orquestrar [describe what you want]
+```
+
+### What install.sh does
+
+1. **Clones** the repo to `~/.gusman-claude/` (the source of truth)
+2. **Symlinks** `agents/`, `skills/`, `rules/`, `hooks/`, `shared/` into your `.claude/`
+3. **Installs auto-update hook** that `git pull`s latest on every session start (~1h throttle)
+
+**Your files are never touched**: `settings.local.json`, `projects/`, memory — all yours.
+
+### Auto-update
+
+Every time you start Claude Code, a SessionStart hook checks for updates:
+- Runs `git pull --ff-only` in background (never blocks startup)
+- Throttled to max once per hour
+- To disable: `bash install.sh --no-auto-update` or delete `.claude/hooks/auto-update.sh`
+- To update manually: `cd ~/.gusman-claude && git pull`
+
+### Uninstall
+
+```bash
+bash ~/.gusman-claude/install.sh --uninstall
+# Removes symlinks and repo. Your settings/memory preserved.
 ```
 
 ## Architecture
@@ -147,13 +168,10 @@ Every issue gets a specification before code. Every delivery is verified against
 errors-log.md → ag-M-99 (analyze patterns) → ag-M-49 (eval + improve) → better agents
 ```
 
-## Installation Tiers
+## Installation
 
-| Tier | Files | Setup Time | What's Included |
-|------|-------|-----------|-----------------|
-| **Starter** | ~7 | 2 min | CLAUDE.md + core rules + safety hooks + orchestrator |
-| **Standard** | ~50 | 10 min | + 16 core agents + all rules + all hooks + pattern skills |
-| **Full** | 180+ | 20 min | All 46 agents + 60 skills + 12 playbooks + 31 rules + scripts |
+One command installs everything via symlinks. No tiers — you get the full system.
+Auto-updates keep it current. See [Quick Start](#quick-start) above.
 
 ## Common Workflows
 
