@@ -140,7 +140,7 @@ O principal valor do QAT nao e o score absoluto, mas a **tendencia** ao longo do
 ### 1. Copiar templates
 
 ```bash
-cp -r ~/.shared/templates/qat/ tests/qat/
+cp -r ~/.claude/shared/templates/qat/ tests/qat/
 ```
 
 ### 2. Configurar `qat.config.ts`
@@ -214,4 +214,4 @@ tests/qat/
 - Agent: `~/.claude/agents/ag-Q-40-testar-qualidade.md`
 - Skill: `~/.claude/skills/ag-Q-40/SKILL.md`
 - Command: `~/.claude/commands/ag-Q-40.md`
-- Templates: `~/.shared/templates/qat/`
+- Templates: `~/.claude/shared/templates/qat/`

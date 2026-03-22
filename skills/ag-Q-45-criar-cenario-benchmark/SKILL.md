@@ -51,6 +51,6 @@ Diferenca de ag-Q-44: ag-Q-44 EXECUTA cenarios. ag-Q-45 CRIA cenarios para ag-Q-
 ## Referencia
 
 - Agent completo: `~/.claude/agents/ag-Q-45-criar-cenario-benchmark.md`
-- Patterns: `~/.shared/patterns/qat-benchmark.md`
-- Templates: `~/.shared/templates/qat-benchmark/scenarios/`
+- Patterns: `~/.claude/shared/patterns/qat-benchmark.md`
+- Templates: `~/.claude/shared/templates/qat-benchmark/scenarios/`
 

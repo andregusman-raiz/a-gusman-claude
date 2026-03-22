@@ -249,4 +249,4 @@ Manter historico dos ultimos 20 runs por cenario fixo:
 
 - Pattern pai: `qat-benchmark.md`
 - Pattern scoring: `qat-benchmark-scoring.md`
-- Template: `~/.shared/templates/qat-benchmark/`
+- Template: `~/.claude/shared/templates/qat-benchmark/`
