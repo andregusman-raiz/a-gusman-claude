@@ -23,7 +23,7 @@ A v2 evolui o QAT de medicao passiva para melhoria continua:
 
 ```bash
 # Copiar toda a estrutura
-cp -r ~/.shared/templates/qat/ tests/qat/
+cp -r ~/.claude/shared/templates/qat/ tests/qat/
 
 # Renomear arquivos removendo .template
 cd tests/qat/
@@ -90,7 +90,7 @@ Para cada funcionalidade, seguir o framework User Story → QAT Scenario:
 6. Implementar 4 camadas: L1 Smoke → L2 Functional → L3 Quality → L4 Business
 7. Registrar cenario em `qat.config.ts` com `category`, `persona`, `userInput`
 
-Ver pattern completo: `~/.shared/patterns/qat-scenario-design.md`
+Ver pattern completo: `~/.claude/shared/patterns/qat-scenario-design.md`
 
 ### 6. Adicionar ao playwright.config.ts
 
@@ -192,12 +192,12 @@ tests/qat/
 ## Referencia
 
 ### Patterns (metodologia)
-- `~/.shared/patterns/quality-acceptance-testing.md` — Pattern QAT original
-- `~/.shared/patterns/qat-scenario-design.md` — User Story → QAT Scenario
-- `~/.shared/patterns/qat-pdca-cycle.md` — Ciclo PDCA completo
-- `~/.shared/patterns/qat-rubric-design.md` — Como criar rubricas especificas
-- `~/.shared/patterns/qat-knowledge-base.md` — Como estruturar e manter a Knowledge Base
-- `~/.shared/patterns/qat-continuous-improvement.md` — Auto-refinamento, deteccao, cost intelligence
+- `~/.claude/shared/patterns/quality-acceptance-testing.md` — Pattern QAT original
+- `~/.claude/shared/patterns/qat-scenario-design.md` — User Story → QAT Scenario
+- `~/.claude/shared/patterns/qat-pdca-cycle.md` — Ciclo PDCA completo
+- `~/.claude/shared/patterns/qat-rubric-design.md` — Como criar rubricas especificas
+- `~/.claude/shared/patterns/qat-knowledge-base.md` — Como estruturar e manter a Knowledge Base
+- `~/.claude/shared/patterns/qat-continuous-improvement.md` — Auto-refinamento, deteccao, cost intelligence
 
 ### Agent & Skill
 - Agent: `~/.claude/agents/ag-Q-40-testar-qualidade.md` (PDCA Orchestrator)

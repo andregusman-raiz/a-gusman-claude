@@ -171,7 +171,7 @@ Identico ao QAT, com adicao do Parity Engine no CHECK:
 ### 1. Copiar templates
 
 ```bash
-cp -r ~/.shared/templates/qat-benchmark/ tests/qat-benchmark/
+cp -r ~/.claude/shared/templates/qat-benchmark/ tests/qat-benchmark/
 ```
 
 ### 2. Configurar `qat-benchmark.config.ts`
@@ -259,5 +259,5 @@ tests/qat-benchmark/
 - Agent Scenario: `~/.claude/agents/ag-Q-45-criar-cenario-benchmark.md`
 - Skills: `~/.claude/skills/ag-Q-44/SKILL.md`, `~/.claude/skills/ag-Q-45/SKILL.md`
 - Commands: `~/.claude/commands/ag-Q-44.md`, `~/.claude/commands/ag-Q-45.md`
-- Templates: `~/.shared/templates/qat-benchmark/`
+- Templates: `~/.claude/shared/templates/qat-benchmark/`
 - Related patterns: `quality-acceptance-testing.md`, `qat-pdca-cycle.md`, `qat-rubric-design.md`

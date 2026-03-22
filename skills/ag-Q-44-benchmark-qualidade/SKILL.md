@@ -29,7 +29,7 @@ Diferenca de ag-Q-45: ag-Q-45 CRIA cenarios. ag-Q-44 EXECUTA e orquestra PDCA.
 
 ## Pre-requisitos
 
-1. Estrutura `tests/qat-benchmark/` no projeto (copiar de `~/.shared/templates/qat-benchmark/`)
+1. Estrutura `tests/qat-benchmark/` no projeto (copiar de `~/.claude/shared/templates/qat-benchmark/`)
 2. `QAT_BENCHMARK_BASE_URL` ou URL no argumento
 3. `QAT_BENCHMARK_ANTHROPIC_KEY` configurado (baseline + judge)
 4. `playwright-cli` disponivel (app adapter)
@@ -89,6 +89,6 @@ ACT:   Atualizar baselines, registrar failure patterns, adicionar learnings
 ## Referencia
 
 - Agent completo: `~/.claude/agents/ag-Q-44-benchmark-qualidade.md`
-- Patterns: `~/.shared/patterns/qat-benchmark.md`, `qat-benchmark-scoring.md`, `qat-benchmark-parity.md`
-- Templates: `~/.shared/templates/qat-benchmark/`
+- Patterns: `~/.claude/shared/patterns/qat-benchmark.md`, `qat-benchmark-scoring.md`, `qat-benchmark-parity.md`
+- Templates: `~/.claude/shared/templates/qat-benchmark/`
 

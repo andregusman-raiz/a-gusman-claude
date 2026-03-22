@@ -6,7 +6,7 @@ Camada 2 da arquitetura de 3 camadas para compartilhar conhecimento entre projet
 
 ```
 Camada 1: WORKSPACE (~/.claude/)     → Agents, hooks, rules, playbooks (universais)
-Camada 2: SHARED    (~/.shared/)     → Templates, patterns, ADRs, gotchas (reutilizaveis)
+Camada 2: SHARED    (~/.claude/shared/)     → Templates, patterns, ADRs, gotchas (reutilizaveis)
 Camada 3: PROJECT   (GitHub/<proj>/) → CLAUDE.md, skills, overrides (especificos)
 ```
 
@@ -70,10 +70,10 @@ Camada 3: PROJECT   (GitHub/<proj>/) → CLAUDE.md, skills, overrides (especific
 ### Sincronizacao manual
 ```bash
 # Propagar atualizacoes para todos os projetos
-bash ~/.shared/sync.sh
+bash ~/.claude/shared/sync.sh
 
 # Propagar para um projeto especifico
-bash ~/.shared/sync.sh ~/Claude/GitHub/raiz-platform
+bash ~/.claude/shared/sync.sh ~/Claude/GitHub/raiz-platform
 ```
 
 ### Auto-sync (via hook)
@@ -81,7 +81,7 @@ O hook `Stop` do workspace roda `sync.sh` automaticamente ao final de cada sessa
 
 ### Consultar patterns e gotchas
 Arquivos em `patterns/` e `gotchas/` sao referencia — nao sao copiados para projetos.
-Agents e skills referenciam diretamente via path `~/.shared/patterns/`.
+Agents e skills referenciam diretamente via path `~/.claude/shared/patterns/`.
 
 ## Principios
 

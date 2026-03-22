@@ -6,7 +6,7 @@ Templates replicaveis para benchmark de qualidade AI vs baseline de mercado.
 
 ```bash
 # 1. Copiar templates para o projeto
-cp -r ~/.shared/templates/qat-benchmark/ tests/qat-benchmark/
+cp -r ~/.claude/shared/templates/qat-benchmark/ tests/qat-benchmark/
 
 # 2. Configurar
 # Editar tests/qat-benchmark/qat-benchmark.config.ts
@@ -75,7 +75,7 @@ qat-benchmark/
 
 ## Patterns Relacionados
 
-- `~/.shared/patterns/qat-benchmark.md` — Metodologia completa
-- `~/.shared/patterns/qat-benchmark-scoring.md` — Triple-scorer
-- `~/.shared/patterns/qat-benchmark-parity.md` — Parity Index
-- `~/.shared/patterns/quality-acceptance-testing.md` — QAT (base)
+- `~/.claude/shared/patterns/qat-benchmark.md` — Metodologia completa
+- `~/.claude/shared/patterns/qat-benchmark-scoring.md` — Triple-scorer
+- `~/.claude/shared/patterns/qat-benchmark-parity.md` — Parity Index
+- `~/.claude/shared/patterns/quality-acceptance-testing.md` — QAT (base)

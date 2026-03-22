@@ -6,7 +6,7 @@ argument-hint: "[nome-do-projeto] [stack]"
 ---
 
 ## Pre-check
-- **Templates disponiveis**: !`ls ~/.shared/templates/ 2>/dev/null | tr '\n' ', '`
+- **Templates disponiveis**: !`ls ~/.claude/shared/templates/ 2>/dev/null | tr '\n' ', '`
 
 # ag-P-01 — Iniciar Projeto
 
@@ -24,33 +24,33 @@ prettier, tsconfig), .env.example, gitignore, CI base, README.
 
 ## Shared Layer (OBRIGATORIO)
 
-Antes de gerar qualquer scaffolding, copiar templates de `~/.shared/`:
+Antes de gerar qualquer scaffolding, copiar templates de `~/.claude/shared/`:
 
 ```bash
 # 1. Templates de roadmap
-cp -r ~/.shared/templates/roadmap/ <project>/roadmap/templates/
+cp -r ~/.claude/shared/templates/roadmap/ <project>/roadmap/templates/
 
 # 2. Templates de E2E (se projeto tem testes)
 mkdir -p <project>/tests/e2e/shared/
-cp -r ~/.shared/templates/e2e/ <project>/tests/e2e/shared/
+cp -r ~/.claude/shared/templates/e2e/ <project>/tests/e2e/shared/
 
 # 3. Templates de CI
-cp -r ~/.shared/templates/ci-workflows/ <project>/.github/workflows/
+cp -r ~/.claude/shared/templates/ci-workflows/ <project>/.github/workflows/
 
 # 4. Templates de database (se Supabase)
-cp -r ~/.shared/templates/database/ <project>/supabase/templates/
+cp -r ~/.claude/shared/templates/database/ <project>/supabase/templates/
 
 # 5. Templates de projeto
-cp ~/.shared/templates/project-init/CLAUDE.template.md <project>/CLAUDE.md
-cp ~/.shared/templates/project-init/.env.template <project>/.env.example
-cp ~/.shared/templates/project-init/tsconfig.template.json <project>/tsconfig.json
+cp ~/.claude/shared/templates/project-init/CLAUDE.template.md <project>/CLAUDE.md
+cp ~/.claude/shared/templates/project-init/.env.template <project>/.env.example
+cp ~/.claude/shared/templates/project-init/tsconfig.template.json <project>/tsconfig.json
 
 # 6. Roadmap inicial
-cp ~/.shared/templates/roadmap/backlog.template.md <project>/roadmap/backlog.md
+cp ~/.claude/shared/templates/roadmap/backlog.template.md <project>/roadmap/backlog.md
 ```
 
 Apos copiar, customizar cada arquivo para o projeto especifico.
-Patterns em `~/.shared/patterns/` e gotchas em `~/.shared/gotchas/` sao referencia (nao copiados).
+Patterns em `~/.claude/shared/patterns/` e gotchas em `~/.claude/shared/gotchas/` sao referencia (nao copiados).
 
 ## O que gera
 

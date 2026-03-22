@@ -42,7 +42,7 @@ ls tests/qat-benchmark/dimensions/ 2>/dev/null || echo "DIMENSIONS_MISSING"
 ls tests/qat-benchmark/knowledge/ 2>/dev/null || echo "KNOWLEDGE_MISSING"
 ```
 
-Se `QAT_BENCHMARK_NOT_CONFIGURED` → informar usuario que precisa copiar templates de `~/.shared/templates/qat-benchmark/` e PARAR.
+Se `QAT_BENCHMARK_NOT_CONFIGURED` → informar usuario que precisa copiar templates de `~/.claude/shared/templates/qat-benchmark/` e PARAR.
 
 ### P.2 Verificar adapters + API keys
 

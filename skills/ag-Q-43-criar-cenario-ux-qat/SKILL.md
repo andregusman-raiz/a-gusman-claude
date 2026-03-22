@@ -28,7 +28,7 @@ Diferenca de ag-Q-16: ag-Q-16 review pontual. ag-Q-43 cenario permanente e siste
 
 ## Pre-requisitos
 
-1. Estrutura `tests/ux-qat/` no projeto (copiar de `~/.shared/templates/ux-qat/`)
+1. Estrutura `tests/ux-qat/` no projeto (copiar de `~/.claude/shared/templates/ux-qat/`)
 2. `tests/ux-qat/design-tokens.json` configurado
 3. `tests/ux-qat/rubrics/` com rubrics disponiveis
 
@@ -66,7 +66,7 @@ Phase 7: Validacao (completude, report)
 ## Referencia
 
 - Agent completo: `~/.claude/agents/ag-Q-43-criar-cenario-ux-qat.md`
-- Patterns: `~/.shared/patterns/ux-qat-*.md`
-- Templates: `~/.shared/templates/ux-qat/`
+- Patterns: `~/.claude/shared/patterns/ux-qat-*.md`
+- Templates: `~/.claude/shared/templates/ux-qat/`
 - SPEC: `~/Claude/docs/specs/SPEC-UX-QAT.md`
 

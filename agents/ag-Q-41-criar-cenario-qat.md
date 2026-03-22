@@ -35,7 +35,7 @@ ls tests/qat/rubrics/v2/ 2>/dev/null || echo "RUBRICS_V2_MISSING"
 ls tests/qat/knowledge/ 2>/dev/null || echo "KNOWLEDGE_MISSING"
 ```
 
-Se `QAT_NOT_CONFIGURED` → informar que precisa copiar templates de `~/.shared/templates/qat/` e PARAR.
+Se `QAT_NOT_CONFIGURED` → informar que precisa copiar templates de `~/.claude/shared/templates/qat/` e PARAR.
 
 ### 0.2 Determinar proximo ID
 

@@ -237,7 +237,7 @@ tests/qat/
 
 ## Referencia
 
-- Scenario Design: `~/.shared/patterns/qat-scenario-design.md`
-- Rubric Design: `~/.shared/patterns/qat-rubric-design.md`
-- Templates: `~/.shared/templates/qat/`
-- QAT Pattern: `~/.shared/patterns/quality-acceptance-testing.md`
+- Scenario Design: `~/.claude/shared/patterns/qat-scenario-design.md`
+- Rubric Design: `~/.claude/shared/patterns/qat-rubric-design.md`
+- Templates: `~/.claude/shared/templates/qat/`
+- QAT Pattern: `~/.claude/shared/patterns/quality-acceptance-testing.md`

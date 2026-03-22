@@ -29,7 +29,7 @@ Diferenca de ag-Q-16: ag-Q-16 review pontual. ag-Q-42 avaliacao CONTINUA com PDC
 
 ## Pre-requisitos
 
-1. Estrutura `tests/ux-qat/` no projeto (copiar de `~/.shared/templates/ux-qat/`)
+1. Estrutura `tests/ux-qat/` no projeto (copiar de `~/.claude/shared/templates/ux-qat/`)
 2. `tests/ux-qat/design-tokens.json` configurado
 3. `playwright-cli` instalado
 4. URL da app acessivel
@@ -72,7 +72,7 @@ ACT:   Atualizar baselines, registrar failure patterns, adicionar learnings
 ## Referencia
 
 - Agent completo: `~/.claude/agents/ag-Q-42-testar-ux-qualidade.md`
-- Patterns: `~/.shared/patterns/ux-qat-*.md`
-- Templates: `~/.shared/templates/ux-qat/`
+- Patterns: `~/.claude/shared/patterns/ux-qat-*.md`
+- Templates: `~/.claude/shared/templates/ux-qat/`
 - SPEC: `~/Claude/docs/specs/SPEC-UX-QAT.md`
 

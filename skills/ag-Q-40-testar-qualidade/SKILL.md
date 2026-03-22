@@ -28,7 +28,7 @@ Diferenca de ag-Q-41: ag-Q-41 CRIA cenarios. ag-Q-40 EXECUTA e orquestra PDCA.
 
 ## Pre-requisitos
 
-1. Estrutura `tests/qat/` no projeto (copiar de `~/.shared/templates/qat/`)
+1. Estrutura `tests/qat/` no projeto (copiar de `~/.claude/shared/templates/qat/`)
 2. Auth state valido (`tests/e2e/.auth/user.json`)
 3. `QAT_JUDGE_API_KEY` ou `ANTHROPIC_API_KEY` configurado
 4. URL da app acessivel
@@ -65,7 +65,7 @@ ACT:   Atualizar baselines, registrar failure patterns, adicionar learnings
 ## Referencia
 
 - Agent completo: `~/.claude/agents/ag-Q-40-testar-qualidade.md`
-- Pattern: `~/.shared/patterns/quality-acceptance-testing.md`
-- Templates: `~/.shared/templates/qat/`
+- Pattern: `~/.claude/shared/patterns/quality-acceptance-testing.md`
+- Templates: `~/.claude/shared/templates/qat/`
 - SPEC original: `/tmp/raiz-platform-git/docs/specs/QAT-SPEC.md`
 

@@ -44,7 +44,7 @@ ls tests/ux-qat/rubrics/ 2>/dev/null || echo "RUBRICS_MISSING"
 ls tests/ux-qat/knowledge/ 2>/dev/null || echo "KNOWLEDGE_MISSING"
 ```
 
-Se `UX_QAT_NOT_CONFIGURED` → informar usuario que precisa copiar templates de `~/.shared/templates/ux-qat/` e PARAR.
+Se `UX_QAT_NOT_CONFIGURED` → informar usuario que precisa copiar templates de `~/.claude/shared/templates/ux-qat/` e PARAR.
 
 ### P.2 Verificar URL + ferramentas
 
