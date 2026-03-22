@@ -1,0 +1,139 @@
+{
+  "$schema": "QAT Failure Patterns — Padroes de falha catalogados para diagnostico automatico.",
+  "version": "1.0",
+  "patterns": [
+    {
+      "id": "FP-001",
+      "name": "stub-response",
+      "description": "Sistema promete criar algo mas retorna apenas frase introdutoria sem conteudo real",
+      "category": "FEATURE",
+      "severity": "P1",
+      "indicators": [
+        "Output < 100 caracteres quando esperado > 500",
+        "Contem 'vou criar' ou 'aqui esta' sem conteudo subsequente",
+        "Score de completude < 3"
+      ],
+      "scenarios_affected": [],
+      "root_cause": "Timeout no LLM, resposta truncada, ou feature nao implementada",
+      "fix_suggestion": "Verificar se feature esta implementada. Se sim, aumentar timeout e validar streaming",
+      "first_detected": "YYYY-MM-DD",
+      "status": "open",
+      "resolved_in": null
+    },
+    {
+      "id": "FP-002",
+      "name": "language-mismatch",
+      "description": "Resposta em idioma diferente do prompt do usuario",
+      "category": "QUALITY",
+      "severity": "P1",
+      "indicators": [
+        "Prompt em PT-BR, resposta em EN (ou vice-versa)",
+        "Penalidade de idioma aplicada pelo judge",
+        "Score de utilidade < 4"
+      ],
+      "scenarios_affected": [],
+      "root_cause": "System prompt nao especifica idioma ou modelo ignora contexto de idioma",
+      "fix_suggestion": "Adicionar deteccao de idioma ao system prompt. Incluir idioma no contexto da mensagem",
+      "first_detected": "YYYY-MM-DD",
+      "status": "open",
+      "resolved_in": null
+    },
+    {
+      "id": "FP-003",
+      "name": "false-positive-pass",
+      "description": "Cenario marca PASS para output que claramente nao atende o objetivo (ex: 'feature not supported' recebe score 7+)",
+      "category": "RUBRIC",
+      "severity": "P0",
+      "indicators": [
+        "Score >= 6 mas output contem 'not supported', 'nao disponivel', 'em breve'",
+        "Score >= 6 mas output < 200 caracteres para cenario que exige resposta longa",
+        "Score >= 6 mas nenhum criterio de negocio atendido"
+      ],
+      "scenarios_affected": [],
+      "root_cause": "Rubrica generica nao penaliza outputs que parecem corretos mas nao atendem o objetivo",
+      "fix_suggestion": "Criar rubrica especifica com golden sample. Adicionar penalidade para outputs stub/placeholder",
+      "first_detected": "YYYY-MM-DD",
+      "status": "open",
+      "resolved_in": null
+    },
+    {
+      "id": "FP-004",
+      "name": "timeout-silent-pass",
+      "description": "Cenario atinge timeout mas .catch(() => false) mascara a falha como skip/pass",
+      "category": "INFRA",
+      "severity": "P0",
+      "indicators": [
+        "Duration proxima ao timeout configurado",
+        "Score 0 ou skipped mas nao contabilizado como falha",
+        "Nenhum output capturado"
+      ],
+      "scenarios_affected": [],
+      "root_cause": "Anti-pattern .catch(() => false) em cenarios antigos. Playwright timeout nao reportado corretamente",
+      "fix_suggestion": "Remover TODOS os .catch(() => false). Implementar L1 Smoke explicitamente. Short-circuit se L1 falha",
+      "first_detected": "YYYY-MM-DD",
+      "status": "open",
+      "resolved_in": null
+    },
+    {
+      "id": "FP-005",
+      "name": "generic-response",
+      "description": "Output e generico (poderia ser resposta para qualquer pergunta) e nao especifico ao contexto do usuario",
+      "category": "QUALITY",
+      "severity": "P2",
+      "indicators": [
+        "Score de contextualizacao < 5",
+        "Nenhuma referencia a dados especificos do usuario (turma, escola, disciplina)",
+        "Output parece template pre-fabricado"
+      ],
+      "scenarios_affected": [],
+      "root_cause": "Sistema nao injeta contexto do usuario no prompt do LLM, ou LLM ignora contexto",
+      "fix_suggestion": "Verificar que perfil do usuario (disciplina, nivel, escola) esta sendo enviado no system prompt",
+      "first_detected": "YYYY-MM-DD",
+      "status": "open",
+      "resolved_in": null
+    },
+    {
+      "id": "FP-006",
+      "name": "hallucination-in-rag",
+      "description": "RAG query retorna informacoes que NAO estao nos documentos carregados",
+      "category": "QUALITY",
+      "severity": "P0",
+      "indicators": [
+        "Citacoes de paginas que nao existem no documento",
+        "Dados quantitativos nao presentes nos uploads",
+        "Score de fidelidade < 3 no judge"
+      ],
+      "scenarios_affected": [],
+      "root_cause": "Retrieval falhou (chunks errados ou nenhum chunk), LLM confabulou resposta",
+      "fix_suggestion": "Validar que retrieval retornou chunks relevantes. Adicionar instrucao anti-hallucination no system prompt. Comparar output com documento fonte",
+      "first_detected": "YYYY-MM-DD",
+      "status": "open",
+      "resolved_in": null
+    },
+    {
+      "id": "FP-007",
+      "name": "score-variance-high",
+      "description": "Mesmo cenario, mesmo input, scores variam > 2 pontos entre runs consecutivos",
+      "category": "FLAKY",
+      "severity": "P2",
+      "indicators": [
+        "Delta > 2.0 entre ultimos 3 runs",
+        "Nenhuma mudanca no codigo entre runs",
+        "Output diferente a cada execucao"
+      ],
+      "scenarios_affected": [],
+      "root_cause": "Nao-determinismo do LLM (temperature > 0) ou nao-determinismo da rubrica (criterios ambiguos)",
+      "fix_suggestion": "1) Verificar temperature do LLM (ideal: 0.3-0.5). 2) Refinar rubrica com escalas mais explicitas. 3) Usar golden sample para calibrar judge",
+      "first_detected": "YYYY-MM-DD",
+      "status": "open",
+      "resolved_in": null
+    }
+  ],
+  "_instructions": {
+    "id": "FP-NNN sequencial",
+    "category": "INFRA | FEATURE | QUALITY | BUSINESS | RUBRIC | FLAKY",
+    "severity": "P0 (critico) | P1 (alto) | P2 (medio) | P3 (baixo)",
+    "status": "open | investigating | resolved | wont-fix",
+    "resolved_in": "PR ou commit que resolveu. null se aberto"
+  }
+}
