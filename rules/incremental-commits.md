@@ -17,6 +17,13 @@ Quando trabalhando em batch de bugs/fixes/mudancas:
 5. Se falham → corrija ANTES de continuar
 6. NUNCA acumule mais de 5 mudancas sem commit
 
+## Verificacao de Persistencia (Prevenir Perda de Edicoes)
+
+Apos cada batch de 2-3 edicoes, ANTES de continuar:
+1. `git diff --stat` — confirmar que edicoes estao no disco
+2. Se output vazio → edicoes foram perdidas (compaction/interrupcao). Re-executar.
+3. NUNCA acumular mais de 3 edicoes sem `git diff --stat`
+
 ## Em Caso de Instabilidade
 
 Se detectar API error, rate limit, ou qualquer instabilidade:
