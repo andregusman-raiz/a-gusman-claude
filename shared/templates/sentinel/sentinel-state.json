@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "phase": "PRE_FLIGHT",
+  "cycle": 0,
+  "sss": 0,
+  "threshold": 80,
+  "mode": null,
+  "input": "",
+  "recon": {
+    "base_url": null,
+    "framework": null,
+    "auth_provider": null,
+    "database": null,
+    "total_endpoints": 0,
+    "public_endpoints": 0,
+    "auth_endpoints": 0,
+    "admin_endpoints": 0,
+    "attack_surface": {}
+  },
+  "siege_results": {
+    "scores": {
+      "S1_SHIELD": 0,
+      "S2_GATES": 0,
+      "S3_WALLS": 0,
+      "S4_VAULT": 0,
+      "S5_STRESS": 0,
+      "S6_GUARD": 0
+    },
+    "findings": [],
+    "load_results": {}
+  },
+  "convergence_history": [],
+  "fixes_applied": [],
+  "baselines": {},
+  "started_at": null,
+  "last_checkpoint": null,
+  "dev_server_pid": null
+}

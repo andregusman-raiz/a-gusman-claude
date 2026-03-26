@@ -41,4 +41,4 @@ Commits diretos em `main` ou `develop` sao BLOQUEADOS por hooks em 2 camadas: br
 ## Verificacao Automatica
 - Hook `branch-guard.sh` BLOQUEIA commits de codigo fonte em main/master
 - Hook `pre-push-check.sh` AVISA sobre push direto em main
-- Agentes ag-B-08 e ag-B-23 verificam branch ANTES de commitar
+- Agentes ag-implementar-codigo e ag-corrigir-bugs verificam branch ANTES de commitar

@@ -11,17 +11,17 @@ Issue → SPEC → [Plan] → Build → Verify vs SPEC → Test → PR (closes #
 ## Quando aplicar
 
 - Usuario diz "implementar issue #N", "resolver issue #N", "trabalhar na issue #N"
-- ag-M-00 classifica intent como trabalho baseado em issue
-- ag-M-50 criou uma issue que agora sera resolvida
+- ag-0-orquestrador classifica intent como trabalho baseado em issue
+- ag-registrar-issue criou uma issue que agora sera resolvida
 - Qualquer referencia a "issue", "ticket", "#N" seguida de intent de implementacao
 
 ## Como aplicar
 
-Spawnar ag-M-51-issue-pipeline. Ele orquestra tudo.
+Spawnar ag-pipeline-issue-issue-pipeline. Ele orquestra tudo.
 
 ```
 Agent({
-  subagent_type: "ag-M-51-issue-pipeline",
+  subagent_type: "ag-pipeline-issue-issue-pipeline",
   mode: "auto",
   run_in_background: false,
   prompt: "Issue: #[number]\nRepo: [owner/repo]\nProjeto path: [path]"

@@ -1,94 +1,93 @@
 ---
-description: "Guia rapido de decisao — qual agent usar para cada situacao"
+description: "Guia rapido de decisao — qual machine ou agent usar para cada situacao"
 paths:
   - "**/*"
 ---
 
 # Agent Decision Guide — Quick Reference
 
-## Eu quero...
+## Eu quero... (use a MACHINE)
 
-### Comecar algo novo
-- **Projeto novo** → ag-P-01 (scaffold) → ag-P-02 (ambiente)
-- **Entender codebase** → ag-P-03 (explorar)
-- **Pesquisar alternativas** → ag-P-05 (referencia)
-- **Escrever spec** → ag-P-06 (especificar) → ag-P-07 (planejar)
+### Construir algo
+- **Feature nova** → `/ag-1-construir feature X`
+- **Resolver issue** → `/ag-1-construir issue #N`
+- **Refatorar** → `/ag-1-construir refatorar X`
+- **Otimizar performance** → `/ag-1-construir otimizar X`
+- **UI/UX design + build** → `/ag-1-construir ui X`
+- **Integrar sistema externo** → `/ag-1-construir integrar X`
+- **Build + review concorrente** → `/ag-1-construir --validado X`
 
-### Construir
-- **Implementar feature** → ag-B-08 (construir)
-- **Refatorar** → ag-B-10 (refatorar)
-- **Otimizar performance** → ag-B-11 (otimizar)
+### Corrigir algo
+- **1 bug** → `/ag-2-corrigir [descricao]`
+- **Varios bugs** → `/ag-2-corrigir lista: [bugs]`
+- **Erros TypeScript** → `/ag-2-corrigir tipos`
+- **Tech debt** → `/ag-2-corrigir debt [area]`
+- **So diagnosticar** → `/ag-2-corrigir --triage-only [area]`
 
-### Corrigir bugs
-- **1 bug** → ag-B-09 (depurar) ou ag-B-23 --fix (fix + verificar)
-- **2-5 bugs** → ag-B-23 --batch (bugfix em sprints)
-- **6+ bugs** → ag-B-23 --parallel (bugfix paralelo com Teams)
-- **Triagem sem executar** → ag-B-23 --triage (diagnosticar)
+### Entregar
+- **Preview** → `/ag-3-entregar`
+- **Producao** → `/ag-3-entregar producao`
+- **Rollback** → `/ag-3-entregar rollback`
 
-### Corrigir erros TypeScript
-- **Diagnosticar erros TS** → ag-B-53 --scan (categorizar, priorizar)
-- **1-50 erros TS** → ag-B-53 --fix (batch incremental, 5/batch)
-- **50+ erros TS / sweep** → ag-B-53 --sweep (por categoria, ratchet threshold)
-- **Erros pos-upgrade** → ag-B-09 (causa raiz) → ag-B-53 --fix
-
-### Construir (avancado)
-- **Builder + Validator concorrente** → ag-B-50 (construir-validado)
-- **Design UI/UX** → ag-B-52 (design-ui-ux)
-
-### Testar e validar
-- **Testes unitarios** → ag-Q-13
-- **Testes E2E** → ag-Q-22
-- **E2E suite completa em batches** → ag-Q-51 (testar-e2e-batch)
-- **Teste exploratorio** → ag-Q-36
-- **Ciclo completo test-fix-retest** → ag-Q-39
-- **Validar que tudo foi implementado** → ag-Q-12
-- **Code review** → ag-Q-14
-- **Security audit** → ag-Q-15
-- **UX review rapido** → ag-Q-16
-
-### Deploy
-- **Deploy simples** → ag-D-19
-- **Pipeline completo** → ag-D-27
-- **Smoke test pos-deploy** → ag-D-38
-- **Monitorar producao** → ag-D-20
-- **Migration de banco** → ag-D-17
+### Testar qualidade
+- **QAT textual** → `/ag-4-teste-final qat [path]`
+- **UX-QAT visual** → `/ag-4-teste-final ux-qat [url]`
+- **Benchmark** → `/ag-4-teste-final benchmark [url]`
+- **Ciclo test-fix-retest** → `/ag-4-teste-final ciclo [path]`
+- **E2E completo** → `/ag-4-teste-final e2e [path]`
 
 ### Documentar
-- **Docs do projeto** → ag-W-21
-- **Gerar documentos Office** → ag-W-29
-- **Organizar arquivos** → ag-W-30
+- **Docs projeto** → `/ag-5-documentos projeto [path]`
+- **Slides/Office** → `/ag-5-documentos office [desc]`
+- **Organizar arquivos** → `/ag-5-documentos organizar [path]`
+- **Spell check** → `/ag-5-documentos ortografia [path]`
 
-### Incorporar software externo
-- **Avaliar** → ag-I-32 → ag-I-33 → ag-I-34 → ag-I-35 (pipeline sequencial)
+### Comecar algo novo
+- **Projeto novo** → `/ag-6-iniciar projeto [desc]`
+- **Setup ambiente** → `/ag-6-iniciar ambiente [path]`
+- **Explorar codebase** → `/ag-6-iniciar explorar [path]`
+- **Pesquisar alternativas** → `/ag-6-iniciar pesquisar [tema]`
 
-### Trabalhar em GitHub Issue
-- **Resolver issue #N** → ag-M-51 (issue-pipeline): Issue→SPEC→Build→Verify→Test→PR
+### Validar / Auditar
+- **QA completo autonomo (5D)** → `/ag-7-qualidade [url/path]`
+- **Security + load + LGPD** → `/ag-8-seguranca [url/path]`
+- **Laudo completo (5 machines)** → `/ag-9-auditar [url/path]`
+- **Benchmark SaaS (crawl + SPEC)** → `/ag-10-benchmark-software [nome] [url]`
+- **Design UI/UX (componentes, paletas, layouts)** → `/ag-11-desenhar [action] [element]`---
+- **Otimizar SQL (TOTVS RM / PostgreSQL)** → `/ag-12-sql-totvs [query ou contexto]`
+## Plugins (atalhos rapidos, sem pipeline)
 
-### Meta / Skills
-- **Criar/melhorar skill** → ag-M-49 (criar-skill)
-- **Melhorar agentes existentes** → ag-M-99
-- **Registrar issue para problema nao resolvido** → ag-M-50 (registrar-issue)
-- **Pipeline issue completo** → ag-M-51 (issue-pipeline)
+| Sinal | Plugin |
+|-------|--------|
+| Review rapido < 10 arquivos | `/code-review` ou `/review-pr` |
+| Commit rapido (sem branch-guard) | `/commit` ou `/commit-push-pr` |
+| Feature self-contained | `/feature-dev` |
+| Deploy rapido | `/deploy` |
+| Limpar branches | `/clean_gone` |
+| Erros em producao | `/seer` |
+| Resumo Slack | `/summarize-channel`, `/standup` |
+| Design Figma | `implement-design` |
 
-### Referencia (on-demand, context-only)
-- **Next.js/React patterns** → ag-R-53 | **TypeScript** → ag-R-54 | **Python** → ag-R-55
-- **Supabase/PostgreSQL** → ag-R-56 | **Quality gates** → ag-R-57
-- **SDD methodology** → ag-R-58 | **Security rules** → ag-R-59
-- **Mock-First methodology** → ag-R-60 (frontends de integracao com ERP/API externa)
+---
 
-### Plugins (atalhos rapidos)
-- **Code review rapido** → `/code-review` ou `/review-pr`
-- **Commit rapido** (sem branch-guard) → `/commit` ou `/commit-push-pr`
-- **Feature self-contained** → `/feature-dev`
-- **Deploy rapido** → `/deploy` (vercel plugin)
-- **Limpar branches** → `/clean_gone`
-- **Auditar CLAUDE.md** → `/revise-claude-md`
-- **Criar hooks ad-hoc** → `/hookify`
-- **Erros em producao** → `/seer` (sentry)
-- **Resumo Slack** → `/summarize-channel`, `/standup`
-- **Scaffold Agent SDK** → `/new-sdk-app`
-- **Design de Figma** → `implement-design` (figma skill)
+## Agents individuais (power user)
+
+Agents fora de machines, uteis para tarefas ad-hoc:
+
+| Agent | Para que |
+|-------|---------|
+| ag-saude-sessao | Health check antes de comecar |
+| ag-analisar-contexto | Tech debt, riscos arquiteturais |
+| ag-testar-manual | QA exploratorio via Playwright |
+| ag-migrar-dados | Database migrations |
+| ag-criar-agente | Criar novos agents |
+| ag-criar-skill | Criar/melhorar skills |
+| ag-retrospectiva | Analise pos-sessao |
+| ag-referencia-* | Carregar expertise (8 skills) |
+
+---
 
 ## Regra de ouro
-Na duvida, use `/ag-M-00-orquestrar` — ele classifica a intencao e seleciona o agent certo.
-Plugins para atalhos rapidos. Agents para pipelines com quality gates.
+
+Na duvida: `/ag-0-orquestrador [o que quer fazer]` — ele classifica e roteia.
+Plugin para acao rapida. Machine para pipeline com convergencia.

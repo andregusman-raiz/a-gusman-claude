@@ -20,10 +20,10 @@ paths:
 | GREEN | IA | Implementa o minimo para o teste passar |
 | REFACTOR | IA + Dev | IA sugere refactoring, dev aprova |
 
-## Ao Usar ag-Q-13 (testar-codigo)
+## Ao Usar ag-testar-codigo (testar-codigo)
 - Se `mode: red` -> agent escreve APENAS testes, nunca implementacao
 - Se `mode: green` -> agent implementa APENAS para testes existentes passarem
-- NUNCA rodar ag-Q-13 em modo que gera ambos simultaneamente
+- NUNCA rodar ag-testar-codigo em modo que gera ambos simultaneamente
 
 ## Property-Based Testing (quando usar)
 - Funcoes puras com dominio definido (ex: serialize/deserialize, encode/decode)
