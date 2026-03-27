@@ -54,7 +54,7 @@ EOF
 
 ## Review
 - CODEOWNERS define reviewers automaticos
-- ag-D-27 pre-flight deve ter sido executado na feature branch antes do PR
+- ag-pipeline-deploy pre-flight deve ter sido executado na feature branch antes do PR
 - Pelo menos 1 approval quando branch protection exigir
 - Verificar preview URL da Vercel (gerada automaticamente por Git Integration)
 

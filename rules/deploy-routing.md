@@ -12,16 +12,16 @@ paths:
 Quer fazer deploy?
 ├── Preview (testar antes de producao)
 │   ├── Via feature branch push → automatico (Vercel Git Integration)
-│   └── Manual → ag-D-27 --preview
+│   └── Manual → ag-pipeline-deploy --preview
 │
 ├── Producao
-│   ├── Caminho padrao → ag-D-27 (pipeline completo 8 etapas + canary)
+│   ├── Caminho padrao → ag-pipeline-deploy (pipeline completo 8 etapas + canary)
 │   ├── Deploy automatico → git push origin master → Vercel Git Integration
 │   │   (pre-deploy-gate.sh no buildCommand executa typecheck + lint + test)
 │   └── PROIBIDO → vercel --prod manual sem pipeline
 │
 └── Rollback
-    └── ag-D-19 rollback (SEMPRE com aprovacao do usuario)
+    └── ag-publicar-deploy rollback (SEMPRE com aprovacao do usuario)
 ```
 
 ## Caminho Padrao (RECOMENDADO para todo deploy)
@@ -32,7 +32,7 @@ Quer fazer deploy?
 5. Build executa: `bash scripts/pre-deploy-gate.sh && npm run build`
 6. pre-deploy-gate.sh: typecheck → lint → test (falha = build abortado)
 
-## Quando usar ag-D-27 (pipeline manual)
+## Quando usar ag-pipeline-deploy (pipeline manual)
 - Deploy com pipeline completo (8 etapas: env-check → typecheck → lint → test → build → deploy → smoke → canary)
 - Repo sem Vercel Git Integration configurado
 - Precisa de controle granular sobre cada etapa
@@ -40,7 +40,7 @@ Quer fazer deploy?
 - Primeiro deploy de um projeto novo
 - Deploy com notificacao n8n + Sentry release
 
-## Credential Preflight (antes de ag-D-27 ou ag-D-18 com modo pr/release)
+## Credential Preflight (antes de ag-pipeline-deploy ou ag-versionar-codigo com modo pr/release)
 ```bash
 bash ~/Claude/.claude/scripts/credential-preflight.sh [path-do-projeto]
 ```

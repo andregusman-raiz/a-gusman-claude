@@ -17,7 +17,7 @@ Dependencias SEMPRE apontam para dentro (Presentation -> Application -> Domain).
 - Domain entity importando framework (Next.js, Express) -> isolar dominio
 - Infrastructure retornando tipos do framework para Application -> usar DTOs
 
-## Checklist para ag-Q-14
+## Checklist para ag-revisar-codigo
 
 ### Estrutura
 - [ ] Dependency rule respeitada? (grep imports de cada camada)
