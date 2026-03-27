@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "phase": "PRE_FLIGHT",
+  "cycle": 0,
+  "mqs": 0,
+  "threshold": 85,
+  "mode": "full",
+  "input": "",
+  "discovery": {
+    "mode": null,
+    "base_url": null,
+    "framework": null,
+    "total_routes": 0,
+    "routes": [],
+    "api_routes": [],
+    "auth": null
+  },
+  "siege_results": {
+    "scores": {
+      "D1_ALIVE": 0,
+      "D2_REAL": 0,
+      "D3_WORKS": 0,
+      "D4_LOOKS": 0,
+      "D5_FEELS": 0
+    },
+    "findings": [],
+    "client_narrative": ""
+  },
+  "convergence_history": [],
+  "fixes_applied": [],
+  "baselines": {},
+  "kb_updates": [],
+  "started_at": null,
+  "last_checkpoint": null,
+  "dev_server_pid": null
+}
