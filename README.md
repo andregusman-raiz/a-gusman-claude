@@ -141,7 +141,7 @@ Every machine follows the same pattern:
 
 ### Design UI/UX
 ```
-/ag-11-desenhar landing page minimalist dark mode
+/ag-11-ux-ui landing page minimalist dark mode
 → Design system selection, palette, typography, components, implementation
 ```
 
@@ -172,7 +172,7 @@ Every machine follows the same pattern:
 | 8 | `/ag-8-seguranca` | — | ag-sentinel (SENTINEL engine) |
 | 9 | `/ag-9-auditar` | — | ag-fortress (FORTRESS engine) |
 | 10 | `/ag-10-benchmark-software` | — | Playwright crawl + AI analysis |
-| 11 | `/ag-11-desenhar` | plan, build, review | 67 styles, 96 palettes, 13 stacks |
+| 11 | `/ag-11-ux-ui` | plan, build, review | 67 styles, 96 palettes, 13 stacks |
 | 12 | `/ag-12-sql-totvs` | — | SQL Server + PostgreSQL patterns |
 
 ## Plugins (Shortcuts — No Pipeline)

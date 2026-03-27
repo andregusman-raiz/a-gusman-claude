@@ -52,8 +52,18 @@ ASSESS → SPEC → PLAN → BUILD → VERIFY → REVIEW → SHIP
 | issue | "issue #N", "ticket" | gh fetch → ag-especificar-solucao → ag-planejar-execucao → ag-implementar-codigo |
 | refactor | "refatorar", "renomear", "extrair" | ag-especificar-solucao minimal → ag-refatorar-codigo |
 | optimize | "otimizar", "performance", "lento" | ag-especificar-solucao minimal → ag-otimizar-codigo |
-| ui | "ui", "design", "tela", "layout" | ag-11-desenhar → ag-planejar-execucao → ag-implementar-codigo |
+| ui | "ui", "design", "tela", "layout" | ag-11-ux-ui → ag-planejar-execucao → ag-implementar-codigo |
 | integrate | "integrar", "incorporar", "due diligence" | ag-avaliar-software → ag-mapear-integracao → ag-planejar-incorporacao → ag-incorporar-modulo |
+
+## Pre-Load: TOTVS RM Knowledge Base
+
+Quando o objetivo menciona TOTVS, RM, educacional, matricula, turma, aluno, professor, coligada, frequencia, nota, contrato, parcela, bolsa, disciplina, grade, habilitacao, ou qualquer tabela S*/G*/P*/F*:
+
+1. **ANTES de SPEC**: Ler `~/Claude/assets/knowledge-base/totvs/generated/quick-reference.md` (mapa completo)
+2. **Durante SPEC**: Buscar campos em `generated/all-fields-flat.json` (grep nome do campo)
+3. **Durante BUILD**: Importar tipos de `generated/typescript-types.ts` (nunca criar interfaces manuais para tabelas TOTVS)
+4. **Para queries SQL**: Consultar `sql-metadata/tables.json` (9950 tabelas, row count) + `docs/DOC-9` (armadilhas)
+5. **Para SOAP calls**: Consultar `soap/dataservers-catalog.json` (29 DataServers com campos e operacoes)
 
 ## Propriedades MERIDIAN
 

@@ -61,7 +61,7 @@ Phase 7: Validacao (completude, report)
 - ag-implementar-codigo: Pos-build — quando ag-implementar-codigo constroi tela nova, ag-criar-cenario-ux-qat cria cenario UX-QAT
 - ag-revisar-codigo: Code review — ag-revisar-codigo verifica se PR com tela nova inclui cenario UX-QAT
 - ag-revisar-ux: Complementar — ag-revisar-ux review pontual, ag-criar-cenario-ux-qat cenario permanente
-- ag-11-desenhar: Knowledge source para guidelines e rubric design
+- ag-11-ux-ui: Knowledge source para guidelines e rubric design
 
 ## Referencia
 

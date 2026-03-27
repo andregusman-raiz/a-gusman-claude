@@ -53,8 +53,8 @@ paths:
 - **Security + load + LGPD** → `/ag-8-seguranca [url/path]`
 - **Laudo completo (5 machines)** → `/ag-9-auditar [url/path]`
 - **Benchmark SaaS (crawl + SPEC)** → `/ag-10-benchmark-software [nome] [url]`
-- **Design UI/UX (componentes, paletas, layouts)** → `/ag-11-desenhar [action] [element]`---
-- **Otimizar SQL (TOTVS RM / PostgreSQL)** → `/ag-12-sql-totvs [query ou contexto]`
+- **Design UI/UX (componentes, paletas, layouts)** → `/ag-11-ux-ui [action] [element]`---
+- **Otimizar SQL / consultar dados (TOTVS RM / Zeev / PostgreSQL)** → `/ag-12-sql-totvs-zeev [query ou contexto]`
 ## Plugins (atalhos rapidos, sem pipeline)
 
 | Sinal | Plugin |

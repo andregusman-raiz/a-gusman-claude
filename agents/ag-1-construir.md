@@ -141,7 +141,7 @@ Ler a SPEC gerada. Se incompleta (sem criterios de aceite claros) → regenerar 
 | FEATURE/ISSUE | ag-planejar-execucao (task_plan.md com tarefas atomicas) |
 | REFACTOR | Plano simples: antes → depois, passos de migracao |
 | OPTIMIZE | Plano: baseline medido → mudancas → benchmark A/B |
-| UI | ag-11-desenhar (design intelligence) → ag-planejar-execucao |
+| UI | ag-11-ux-ui (design intelligence) → ag-planejar-execucao |
 | INTEGRATE | ag-planejar-incorporacao (roadmap de incorporacao com feature flags) |
 
 ### Como invocar ag-planejar-execucao
@@ -176,7 +176,7 @@ Agent({
 | ISSUE | ag-implementar-codigo | worktree | Se 3+ modulos independentes |
 | REFACTOR | ag-refatorar-codigo | worktree | Nao (sequencial por seguranca) |
 | OPTIMIZE | ag-otimizar-codigo | worktree | Nao |
-| UI | ag-11-desenhar (design) → ag-implementar-codigo (impl) | worktree | Se 3+ telas independentes |
+| UI | ag-11-ux-ui (design) → ag-implementar-codigo (impl) | worktree | Se 3+ telas independentes |
 | INTEGRATE | ag-incorporar-modulo | worktree | Nao (modulo por vez) |
 
 ### Como invocar ag-implementar-codigo
@@ -408,9 +408,9 @@ Falha em qual fase?
 | SPEC | ag-especificar-solucao | opus | subagent |
 | SPEC (integrate) | ag-avaliar-software + ag-mapear-integracao | sonnet | subagent sequencial |
 | PLAN | ag-planejar-execucao | opus | subagent |
-| PLAN (ui) | ag-11-desenhar + ag-planejar-execucao | sonnet → opus | sequencial |
+| PLAN (ui) | ag-11-ux-ui + ag-planejar-execucao | sonnet → opus | sequencial |
 | PLAN (integrate) | ag-planejar-incorporacao | sonnet | subagent |
-| BUILD | ag-implementar-codigo / ag-refatorar-codigo / ag-otimizar-codigo / ag-11-desenhar / ag-incorporar-modulo | sonnet | worktree, Teams se 3+ |
+| BUILD | ag-implementar-codigo / ag-refatorar-codigo / ag-otimizar-codigo / ag-11-ux-ui / ag-incorporar-modulo | sonnet | worktree, Teams se 3+ |
 | VERIFY | ag-validar-execucao + ag-testar-codigo | haiku + sonnet | paralelo |
 | REVIEW | ag-revisar-codigo (+ag-verificar-seguranca, +ag-revisar-ux) | sonnet | paralelo se 10+ arquivos |
 | SHIP | ag-versionar-codigo (logica de branch/PR) | sonnet | subagent |

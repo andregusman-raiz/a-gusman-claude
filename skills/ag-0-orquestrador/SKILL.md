@@ -96,11 +96,18 @@ Input do usuario:
 ├─ DESENHAR UI/UX?
 │  "design" "ui" "ux" "componente" "landing page" "dashboard layout"
 │  "paleta" "tipografia" "responsive" "dark mode" "shadcn"
-│  └─→ Skill("ag-11-desenhar", args: "[action] [element]")
+│  └─→ Skill("ag-11-ux-ui", args: "[action] [element]")
 │
-├─ OTIMIZAR SQL?
+├─ OTIMIZAR SQL / DADOS TOTVS / ZEEV?
 │  "sql" "query lenta" "otimizar query" "relatorio" "TOTVS RM" "PostgreSQL"
-│  └─→ Skill("ag-12-sql-totvs", args: "[query ou contexto]")│
+│  "matricula" "turma" "aluno" "professor" "coligada" "frequencia"
+│  "nota" "contrato" "parcela" "bolsa" "disciplina" "grade"
+│  "zeev" "bpm" "solicitação" "tarefa" "assignment" "instance" "fluxo"
+│  └─→ Skill("ag-12-sql-totvs-zeev", args: "[query ou contexto]")
+│  NOTA: ag-12 DEVE consultar KB unificada MECE antes:
+│    ~/Claude/assets/knowledge-base/totvs/unified/ (schema, glossary, queries, rules)
+│    ~/Claude/assets/knowledge-base/zeev/unified/ (apis, integration, rules)
+│
 ├─ PLUGIN RAPIDO?
 │  "review PR" → /code-review | "commit" → /commit
 │  "deploy rapido" → /deploy | "sentry" → /seer

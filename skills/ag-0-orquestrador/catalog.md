@@ -76,7 +76,7 @@ Todos os 52 agents originais continuam disponiveis via `/ag-X-NN-nome`.
 | ag-otimizar-codigo | otimizar-codigo | ag-1-construir (optimize) |
 | ag-corrigir-bugs | bugfix | ag-2-corrigir |
 | ag-construir-validado | construir-validado | ag-1-construir (advanced) |
-| ag-11-desenhar | design-ui-ux | ag-1-construir (ui) |
+| ag-11-ux-ui | design-ui-ux | ag-1-construir (ui) |
 | ag-corrigir-tipos | fix-typescript | ag-2-corrigir (tipos) |
 
 ### Q — Quality
