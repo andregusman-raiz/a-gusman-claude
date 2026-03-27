@@ -7,7 +7,7 @@ paths:
 # Agent Invocation — When to Use What
 
 ## Skill (load context on-demand)
-- Pattern/reference skills: `/ag-R-53-patterns-nextjs`, `/ag-R-56-patterns-supabase`, etc.
+- Pattern/reference skills: `/ag-referencia-nextjs-patterns-nextjs`, `/ag-referencia-supabase-patterns-supabase`, etc.
 - When you need domain expertise loaded into current context
 - context: fork — isolates from main conversation
 
@@ -15,7 +15,7 @@ paths:
 - Single tasks that don't need coordination
 - Use `run_in_background: true` for independent work
 - Use `isolation: "worktree"` for code changes that might conflict
-- subagent_type: use the specific agent type (e.g., `ag-B-08-construir-codigo`)
+- subagent_type: use the specific agent type (e.g., `ag-implementar-codigo-construir-codigo`)
 
 ## Agent Teams (3+ parallel coordinated tasks)
 - 3+ independent tasks that need coordination
@@ -26,7 +26,7 @@ paths:
 ## Worktree Isolation (code changes with rollback safety)
 - Use `isolation: "worktree"` when code changes might conflict or need rollback
 - Agent gets isolated git copy — main branch unaffected
-- Best for: ag-B-08 (build), ag-B-10 (refactor), ag-B-11 (optimize), ag-B-23 (bugfix), ag-I-35 (incorporate)
+- Best for: ag-implementar-codigo (build), ag-refatorar-codigo (refactor), ag-otimizar-codigo (optimize), ag-corrigir-bugs (bugfix), ag-incorporar-modulo (incorporate)
 - Worktree auto-cleaned if no changes; branch returned if changes made
 
 ## Decision Matrix

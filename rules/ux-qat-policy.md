@@ -1,5 +1,5 @@
 ---
-description: "Quando e como usar UX-QAT visual — ag-Q-42/43 vs ag-Q-16 vs ag-Q-40"
+description: "Quando e como usar UX-QAT visual — ag-testar-ux-qualidade/43 vs ag-revisar-ux vs ag-testar-qualidade-qat"
 paths:
   - "tests/ux-qat/**"
   - "src/app/**/*.tsx"
@@ -12,28 +12,28 @@ paths:
 
 | Cenario | Agente | Camadas |
 |---------|--------|---------|
-| Tela nova criada | ag-Q-43 (criar cenario) | - |
-| Deploy em producao | ag-Q-42 (L1+L2+L4) | L1, L2, L4 |
-| Review semanal | ag-Q-42 (full) | L1, L2, L3, L4 |
-| PR com mudancas visuais | ag-Q-42 (affected) | L1, L2, L3 |
-| Regressao visual reportada | ag-Q-42 (tela especifica) | L1, L2, L3, L4 |
+| Tela nova criada | ag-criar-cenario-ux-qat (criar cenario) | - |
+| Deploy em producao | ag-testar-ux-qualidade (L1+L2+L4) | L1, L2, L4 |
+| Review semanal | ag-testar-ux-qualidade (full) | L1, L2, L3, L4 |
+| PR com mudancas visuais | ag-testar-ux-qualidade (affected) | L1, L2, L3 |
+| Regressao visual reportada | ag-testar-ux-qualidade (tela especifica) | L1, L2, L3, L4 |
 
 ## Regras
 
-1. **Toda tela nova** deve ter cenario UX-QAT criado via ag-Q-43
+1. **Toda tela nova** deve ter cenario UX-QAT criado via ag-criar-cenario-ux-qat
 2. **L1+L2+L4** rodam em cada deploy (custo zero, programatico)
 3. **L3 (AI Judge)** roda semanalmente ou on-demand (~$2-4/run)
 4. **Design tokens** sao source of truth — NUNCA avaliar sem eles
 5. **Short-circuit** obrigatorio — L1 falha, skip L2-L4
 6. **Baselines** so atualizam para cima — regressao nao reseta baseline
 
-## Diferenca de ag-Q-16 e ag-Q-40
+## Diferenca de ag-revisar-ux e ag-testar-qualidade-qat
 
-- **ag-Q-16**: Review UX pontual (Nielsen heuristics) — rapido, sem PDCA
-- **ag-Q-40**: QAT de conteudo/texto — dominio diferente
-- **ag-Q-42**: UX-QAT visual com PDCA — avaliacao CONTINUA de qualidade visual
+- **ag-revisar-ux**: Review UX pontual (Nielsen heuristics) — rapido, sem PDCA
+- **ag-testar-qualidade-qat**: QAT de conteudo/texto — dominio diferente
+- **ag-testar-ux-qualidade**: UX-QAT visual com PDCA — avaliacao CONTINUA de qualidade visual
 
-ag-Q-16 continua valido para reviews rapidos. ag-Q-42 substitui ag-Q-16 para avaliacao sistematica.
+ag-revisar-ux continua valido para reviews rapidos. ag-testar-ux-qualidade substitui ag-revisar-ux para avaliacao sistematica.
 
 ## Estrutura no Projeto
 
@@ -61,6 +61,6 @@ tests/ux-qat/
 
 - Rodar L3 em CI automatico por PR (custo)
 - Avaliar screenshots mockados (UX-QAT avalia telas REAIS)
-- Misturar cenarios UX-QAT com QAT (ag-Q-40/41) — dominios diferentes
+- Misturar cenarios UX-QAT com QAT (ag-testar-qualidade-qat/41) — dominios diferentes
 - Ignorar short-circuit — desperdicio de custo
 - Atualizar baseline para baixo — regressao e sinal

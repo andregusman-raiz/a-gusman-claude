@@ -34,8 +34,8 @@ Quando agent precisa validar tipos DURANTE implementacao (nao no gate final):
 1. Usar LSP tool (`hover`, `documentSymbol`) nos arquivos modificados — instantaneo, sem custo de memoria
 2. LSP ja esta configurado (`typescript-lsp`) e mantém indice do projeto em memoria
 3. **NÃO substitui** o `tsc --noEmit` do quality gate final
-4. Usar para: ag-B-08, ag-B-50, ag-B-23 durante execucao iterativa
-5. NAO usar para: ag-Q-12, ag-D-27, quality gate final (esses precisam de garantia completa)
+4. Usar para: ag-implementar-codigo, ag-construir-validado, ag-corrigir-bugs durante execucao iterativa
+5. NAO usar para: ag-validar-execucao, ag-pipeline-deploy, quality gate final (esses precisam de garantia completa)
 
 ### Quando usar cada um
 

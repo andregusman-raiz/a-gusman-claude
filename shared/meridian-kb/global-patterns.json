@@ -1,0 +1,114 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-03-25",
+  "patterns": [
+    {
+      "id": "PAT-001",
+      "category": "MOCK_DATA",
+      "indicators": ["Lorem ipsum", "John Doe", "Jane Doe", "Jane Smith", "test@test.com", "foo", "bar", "baz", "example.com", "placeholder"],
+      "severity": "P1",
+      "fix_strategy": "Replace with data binding from API or proper empty state",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-002",
+      "category": "HARDCODED_VALUES",
+      "indicators": ["http:// in source code (not .env)", "strings > 20 chars resembling tokens", "hardcoded emails in components", "hardcoded phone numbers", "sequential IDs (123, 456)"],
+      "severity": "P1",
+      "fix_strategy": "Extract to env vars or config constants",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-003",
+      "category": "API_ERRORS",
+      "indicators": ["4xx/5xx in network requests", "empty response body", "CORS errors", "timeout errors", "connection refused"],
+      "severity": "P0",
+      "fix_strategy": "Fix API route, verify DB connection, check env vars, add error boundary",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-004",
+      "category": "DEAD_FILTERS",
+      "indicators": ["filter interaction does not change data", "select options exist but selection has no effect", "search returns all results regardless of query"],
+      "severity": "P1",
+      "fix_strategy": "Fix query params propagation, verify server-side filtering logic, check API endpoint accepts filter params",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-005",
+      "category": "INCOMPLETE_SPEC",
+      "indicators": ["TODO comments in UI", "stub functions returning null", "missing edge case handling", "features partially implemented"],
+      "severity": "P2",
+      "fix_strategy": "Complete implementation per spec, add missing edge cases",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-006",
+      "category": "BLANK_SCREEN",
+      "indicators": ["page renders < 5 DOM elements", "loading spinner > 5s", "white page with no content", "SSR hydration failure"],
+      "severity": "P0",
+      "fix_strategy": "Fix data fetching, add loading states, check SSR/client boundary, add error boundaries",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-007",
+      "category": "TYPESCRIPT_ERRORS",
+      "indicators": ["tsc --noEmit failures", "type 'X' is not assignable to type 'Y'", "Property does not exist on type"],
+      "severity": "P1",
+      "fix_strategy": "Use ag-B-53 --scan then --fix, batch 5 at a time",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-008",
+      "category": "ENV_CORRUPTION",
+      "indicators": ["literal \\n in env values", "wrong project env vars", "expired tokens", "missing required env vars"],
+      "severity": "P0",
+      "fix_strategy": "Re-pull env vars, verify against .env.example, use credential-preflight.sh",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-009",
+      "category": "NON_RESPONSIVE",
+      "indicators": ["horizontal scrollbar on mobile", "touch targets < 44px", "text overflow on small screens", "overlapping elements"],
+      "severity": "P2",
+      "fix_strategy": "Fix CSS breakpoints, add responsive classes, verify 4 viewports",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-010",
+      "category": "CONSOLE_ERRORS",
+      "indicators": ["Unhandled runtime error", "Cannot read properties of undefined", "ChunkLoadError", "hydration mismatch"],
+      "severity": "P1",
+      "fix_strategy": "Trace to source component, fix undefined access, add null checks at boundaries",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-011",
+      "category": "MISSING_EMPTY_STATE",
+      "indicators": ["empty list with no message", "table with 0 rows and no feedback", "dashboard cards showing 0 without context"],
+      "severity": "P2",
+      "fix_strategy": "Add empty state component with icon, message, and CTA",
+      "occurrences": 0,
+      "success_rate": null
+    },
+    {
+      "id": "PAT-012",
+      "category": "BROKEN_NAVIGATION",
+      "indicators": ["sidebar link leads to 404", "breadcrumb links broken", "back button loses state", "menu items not linked"],
+      "severity": "P1",
+      "fix_strategy": "Fix href/Link paths, verify route exists, add 404 page",
+      "occurrences": 0,
+      "success_rate": null
+    }
+  ]
+}
