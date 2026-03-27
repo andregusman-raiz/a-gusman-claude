@@ -33,7 +33,7 @@ Executa QA completo AUTONOMO em 5 fases:
    - D1-ALIVE: Carrega sem erros?
    - D2-REAL: Dados sao reais (nao mock)?
    - D3-WORKS: Features funcionam?
-   - D4-LOOKS: Visual correto em 4 viewports?
+   - D4-LOOKS: Visual correto em 4 viewports? (usa ag-capturar-tela para apps desktop/nativos)
    - D5-FEELS: Cliente aceitaria? (narrativa)
 3. **FORGE** — Corrige bugs encontrados em sprints
 4. **CONVERGE** — Calcula MQS, loop ate >= threshold

@@ -29,7 +29,7 @@ metadata:
 | Modo | Agent interno | O que faz |
 |------|--------------|-----------|
 | qat | ag-testar-qualidade-qat + ag-criar-cenario-qat | QAT textual PDCA (L1-L4, dual-score) |
-| ux-qat | ag-testar-ux-qualidade + ag-criar-cenario-ux-qat | UX-QAT visual PDCA (screenshots, AI judge) |
+| ux-qat | ag-testar-ux-qualidade + ag-criar-cenario-ux-qat + ag-capturar-tela (apps nativos) | UX-QAT visual PDCA (screenshots, AI judge) |
 | benchmark | ag-benchmark-qualidade + ag-criar-cenario-benchmark | Benchmark comparativo (dual-run, parity index) |
 | ciclo | ag-ciclo-testes | Test-fix-retest completo (max 3 ciclos) |
 | e2e | ag-testar-e2e-batch | E2E em batches com auto-fix |

@@ -17,6 +17,13 @@ disable-model-invocation: true
 O QA Exploratorio: usa Playwright MCP (ou CLI como fallback) para controlar um browser real e testar a aplicacao como um usuario humano faria. NAO le codigo — so interage pelo browser.
 
 Diferenca de ag-testar-e2e: ag-testar-e2e escreve e roda scripts Playwright. ag-testar-manual navega manualmente e reporta.
+Diferenca de ag-capturar-tela: ag-capturar-tela captura TELA INTEIRA (apps nativos, desktop). ag-testar-manual interage com BROWSER.
+
+### Fallback para apps nativos
+Se o alvo nao e um browser (app desktop, IDE, terminal), usar ag-capturar-tela como fallback:
+```
+Agent({ subagent_type: "ag-capturar-tela", prompt: "Capture a tela e descreva o app nativo visivel" })
+```
 
 ## Estrategia de Ferramentas
 

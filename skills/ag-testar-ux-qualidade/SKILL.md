@@ -18,6 +18,12 @@ Diferenca de ag-testar-qualidade-qat: ag-testar-qualidade-qat avalia CONTEUDO. a
 Diferenca de ag-testar-e2e: ag-testar-e2e testa FLUXOS. ag-testar-ux-qualidade testa QUALIDADE VISUAL.
 Diferenca de ag-revisar-ux: ag-revisar-ux review pontual. ag-testar-ux-qualidade avaliacao CONTINUA com PDCA.
 
+### Captura de apps nativos (non-browser)
+Para avaliar UX de apps desktop/nativos (nao-browser), usar ag-capturar-tela:
+```
+Agent({ subagent_type: "ag-capturar-tela", prompt: "Capture a tela do app nativo para avaliacao UX-QAT" })
+```
+
 ## Invocacao
 
 ```
