@@ -66,7 +66,7 @@ MacBook Pro M5 com 36GB RAM — proteger contra memory overflow.
 - Max 4 teammates simultaneos (nao 5)
 - Cada teammate sem subagents proprios (flat, nao nested)
 - `TeamDelete` IMEDIATO apos teammates terminarem (liberar memoria)
-- Preferir sequencial (ag-B-23) quando < 6 tasks
+- Preferir sequencial (ag-corrigir-bugs) quando < 6 tasks
 
 **MCP servers:**
 - Subagents herdam MCPs da sessao pai — NAO iniciar MCPs extras
@@ -86,9 +86,9 @@ memory_pressure  # macOS: normal/warn/critical
 - Usar `tmux ls` para verificar sessoes ativas antes de spawnar novos agents
 - Prefix `Ctrl+A` (nao `Ctrl+B`) — remapeado para evitar conflito com Claude Code
 
-## Enforcement por ag-M-00
+## Enforcement por ag-0-orquestrador
 
-ag-M-00 DEVE recusar paralelismo se:
+ag-0-orquestrador DEVE recusar paralelismo se:
 1. Agents modificam codigo SEM `isolation: "worktree"`
 2. Overlap de arquivos > 0
 3. Memory pressure em warn/critical
