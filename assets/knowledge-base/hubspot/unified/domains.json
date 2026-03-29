@@ -1,0 +1,129 @@
+{
+  "01-crm-core": {
+    "name": "CRM Core",
+    "description": "Objetos fundamentais do CRM — contatos, empresas, negócios, proprietários, timeline, leads",
+    "specCount": 9,
+    "specs": [
+      "companies",
+      "contacts",
+      "crm_owners",
+      "deals",
+      "leads",
+      "notes",
+      "objects",
+      "timeline",
+      "users"
+    ]
+  },
+  "02-sales": {
+    "name": "Sales Hub",
+    "description": "Pipeline de vendas — negócios, cotações, previsões, agendamentos, tarefas, metas",
+    "specCount": 11,
+    "specs": [
+      "appointments",
+      "calls",
+      "deal_splits",
+      "forecast_types",
+      "forecasts",
+      "goal_targets",
+      "meetings",
+      "pipelines",
+      "quotes",
+      "sequences",
+      "tasks"
+    ]
+  },
+  "03-marketing": {
+    "name": "Marketing Hub",
+    "description": "Campanhas, emails, formulários, listas, eventos de marketing, envios transacionais",
+    "specCount": 9,
+    "specs": [
+      "campaigns_public_api",
+      "emails",
+      "forms",
+      "lists",
+      "marketing_emails",
+      "marketing_events",
+      "postal_mail",
+      "single_send",
+      "transactional_single_send"
+    ]
+  },
+  "04-service": {
+    "name": "Service Hub",
+    "description": "Atendimento ao cliente — tickets, conversas, feedback, chamadas, transcrições",
+    "specCount": 8,
+    "specs": [
+      "calling_extensions",
+      "communications",
+      "conversations",
+      "custom_channels",
+      "feedback_submissions",
+      "services",
+      "tickets",
+      "transcriptions"
+    ]
+  },
+  "05-commerce": {
+    "name": "Commerce Hub",
+    "description": "E-commerce — produtos, pedidos, faturas, assinaturas, descontos, impostos, carrinhos",
+    "specCount": 11,
+    "specs": [
+      "carts",
+      "commerce_subscriptions",
+      "discounts",
+      "fees",
+      "invoices",
+      "line_items",
+      "orders",
+      "products",
+      "subscription_lifecycle",
+      "subscriptions",
+      "taxes"
+    ]
+  },
+  "06-automation": {
+    "name": "Automation",
+    "description": "Workflows e automações — ações customizadas, sequências, triggers",
+    "specCount": 2,
+    "specs": [
+      "actions_v4",
+      "automation_v4"
+    ]
+  },
+  "07-data-admin": {
+    "name": "Data & Admin",
+    "description": "Configuração e dados — propriedades, schemas, objetos customizados, associações, imports/exports",
+    "specCount": 10,
+    "specs": [
+      "associations",
+      "associations_schema",
+      "custom_objects",
+      "exports",
+      "imports",
+      "limits_tracking",
+      "object_library",
+      "properties",
+      "property_validations",
+      "schemas"
+    ]
+  },
+  "08-extensions": {
+    "name": "Extensions & Apps",
+    "description": "Extensões e integrações — apps, webhooks, video conferencing, visitor ID, parceiros",
+    "specCount": 11,
+    "specs": [
+      "app_uninstalls",
+      "commerce_payments",
+      "contracts",
+      "courses",
+      "listings",
+      "partner_clients",
+      "partner_services",
+      "public_app_crm_cards",
+      "public_app_feature_flags_v3",
+      "video_conferencing_extension",
+      "visitor_identification"
+    ]
+  }
+}

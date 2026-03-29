@@ -1,0 +1,134 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "totalTerms": 25
+  },
+  "terms": [
+    {
+      "technical": "OAuth 2.0",
+      "business": "Autenticação OAuth",
+      "context": "Fluxo de autorização: redirect → callback → access_token + refresh_token."
+    },
+    {
+      "technical": "Private App Token",
+      "business": "Token de App Privado",
+      "context": "Alternativa ao OAuth para integrações internas. Não expira mas tem scopes fixos."
+    },
+    {
+      "technical": "association",
+      "business": "Associação (vínculo entre objetos)",
+      "context": "Link entre objetos CRM (contato↔empresa, deal↔contato). Pode ser 1:N ou N:N."
+    },
+    {
+      "technical": "batch",
+      "business": "Operação em Lote",
+      "context": "CRUD em múltiplos registros (até 100/batch). Mais eficiente que chamadas individuais."
+    },
+    {
+      "technical": "company",
+      "business": "Empresa",
+      "context": "Registro de organização. Associado a contatos e deals via associations."
+    },
+    {
+      "technical": "contact",
+      "business": "Contato (pessoa)",
+      "context": "Registro de pessoa no CRM. Identificado por email. Tem lifecycle stage."
+    },
+    {
+      "technical": "cursor pagination",
+      "business": "Paginação por Cursor",
+      "context": "Resposta inclui paging.next.after. Usar como parâmetro after na próxima chamada."
+    },
+    {
+      "technical": "custom object",
+      "business": "Objeto Customizado",
+      "context": "Tipo de registro criado pelo usuário (ex: Projetos, Veículos). Tem schema próprio."
+    },
+    {
+      "technical": "deal",
+      "business": "Negócio/Oportunidade",
+      "context": "Oportunidade de venda. Progride por stages dentro de um pipeline."
+    },
+    {
+      "technical": "deal stage",
+      "business": "Estágio do Negócio",
+      "context": "Posição do deal no pipeline (ex: Qualificação, Proposta, Fechamento)."
+    },
+    {
+      "technical": "forecast",
+      "business": "Previsão de Receita",
+      "context": "Projeção de receita baseada em deals no pipeline. Por período e categoria."
+    },
+    {
+      "technical": "form",
+      "business": "Formulário",
+      "context": "Formulário web para captura de leads. Cria/atualiza contatos automaticamente."
+    },
+    {
+      "technical": "lead status",
+      "business": "Status do Lead",
+      "context": "Qualificação do lead dentro do estágio atual (New, Open, In Progress, etc.)."
+    },
+    {
+      "technical": "lifecycle stage",
+      "business": "Estágio do Ciclo de Vida",
+      "context": "Onde o contato está na jornada: subscriber → lead → MQL → SQL → opportunity → customer → evangelist."
+    },
+    {
+      "technical": "list",
+      "business": "Lista de Contatos",
+      "context": "Segmentação de contatos. Pode ser estática (manual) ou dinâmica (filtros)."
+    },
+    {
+      "technical": "owner",
+      "business": "Proprietário/Responsável",
+      "context": "Usuário HubSpot responsável por um contato, deal ou ticket."
+    },
+    {
+      "technical": "pipeline",
+      "business": "Pipeline (funil)",
+      "context": "Sequência de estágios por onde deals ou tickets progridem."
+    },
+    {
+      "technical": "property",
+      "business": "Propriedade (campo)",
+      "context": "Campo de um objeto CRM. Pode ser default ou customizado. Tem tipo, grupo e opções."
+    },
+    {
+      "technical": "quote",
+      "business": "Cotação/Proposta",
+      "context": "Documento de proposta comercial associado a um deal. Pode incluir line items."
+    },
+    {
+      "technical": "rate limit",
+      "business": "Limite de Requisições",
+      "context": "100 requests/10s (OAuth), 500K/dia (privadas). Retorna 429 quando excedido."
+    },
+    {
+      "technical": "sequence",
+      "business": "Sequência de Emails",
+      "context": "Cadeia automatizada de emails enviados em intervalos. Para prospecção outbound."
+    },
+    {
+      "technical": "subscription",
+      "business": "Assinatura (recorrente)",
+      "context": "Cobrança recorrente vinculada a produto/serviço. Commerce Hub."
+    },
+    {
+      "technical": "ticket",
+      "business": "Chamado/Ticket de Suporte",
+      "context": "Solicitação de atendimento. Progride por stages no pipeline de service."
+    },
+    {
+      "technical": "webhook",
+      "business": "Webhook (notificação push)",
+      "context": "HubSpot envia POST quando eventos ocorrem (create, update, delete em objetos)."
+    },
+    {
+      "technical": "workflow",
+      "business": "Fluxo de Automação",
+      "context": "Automação trigger-based. Executa ações quando condições são atendidas."
+    }
+  ]
+}

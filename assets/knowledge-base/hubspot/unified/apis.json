@@ -1,0 +1,722 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "totalSpecs": 71,
+    "totalEndpoints": 862,
+    "baseUrl": "https://api.hubapi.com",
+    "auth": "OAuth 2.0 (Bearer token) or Private App Token"
+  },
+  "specs": [
+    {
+      "file": "actions_v4.json",
+      "name": "actions_v4",
+      "title": "Automation Actions V4",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "06-automation",
+      "endpointCount": 18,
+      "pathCount": 10,
+      "sizeKB": 87
+    },
+    {
+      "file": "app_uninstalls.json",
+      "name": "app_uninstalls",
+      "title": "CRM App Uninstalls",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "08-extensions",
+      "endpointCount": 1,
+      "pathCount": 1,
+      "sizeKB": 6
+    },
+    {
+      "file": "appointments.json",
+      "name": "appointments",
+      "title": "CRM Appointments",
+      "description": "",
+      "domain": "02-sales",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 390
+    },
+    {
+      "file": "associations.json",
+      "name": "associations",
+      "title": "Associations",
+      "description": "Associations define the relationships between objects in HubSpot. These endpoints allow you to create, read, and remove associations.",
+      "domain": "07-data-admin",
+      "endpointCount": 3,
+      "pathCount": 3,
+      "sizeKB": 80
+    },
+    {
+      "file": "associations_schema.json",
+      "name": "associations_schema",
+      "title": "CRM Associations Schema",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "07-data-admin",
+      "endpointCount": 9,
+      "pathCount": 7,
+      "sizeKB": 206
+    },
+    {
+      "file": "automation_v4.json",
+      "name": "automation_v4",
+      "title": "Automation Automation V4",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "06-automation",
+      "endpointCount": 8,
+      "pathCount": 5,
+      "sizeKB": 260
+    },
+    {
+      "file": "calling_extensions.json",
+      "name": "calling_extensions",
+      "title": "CRM Calling Extensions",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "04-service",
+      "endpointCount": 13,
+      "pathCount": 5,
+      "sizeKB": 41
+    },
+    {
+      "file": "calls.json",
+      "name": "calls",
+      "title": "Calls",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "02-sales",
+      "endpointCount": 11,
+      "pathCount": 8,
+      "sizeKB": 63
+    },
+    {
+      "file": "campaigns_public_api.json",
+      "name": "campaigns_public_api",
+      "title": "Marketing Campaigns Public Api",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "03-marketing",
+      "endpointCount": 24,
+      "pathCount": 16,
+      "sizeKB": 85
+    },
+    {
+      "file": "carts.json",
+      "name": "carts",
+      "title": "Carts",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 138
+    },
+    {
+      "file": "commerce_payments.json",
+      "name": "commerce_payments",
+      "title": "Commerce Payments",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "08-extensions",
+      "endpointCount": 11,
+      "pathCount": 8,
+      "sizeKB": 63
+    },
+    {
+      "file": "commerce_subscriptions.json",
+      "name": "commerce_subscriptions",
+      "title": "CRM Commerce Subscriptions",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 298
+    },
+    {
+      "file": "communications.json",
+      "name": "communications",
+      "title": "CRM Communications",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "04-service",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 137
+    },
+    {
+      "file": "companies.json",
+      "name": "companies",
+      "title": "Companies",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "01-crm-core",
+      "endpointCount": 12,
+      "pathCount": 9,
+      "sizeKB": 66
+    },
+    {
+      "file": "contacts.json",
+      "name": "contacts",
+      "title": "Contacts",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "01-crm-core",
+      "endpointCount": 13,
+      "pathCount": 10,
+      "sizeKB": 68
+    },
+    {
+      "file": "contracts.json",
+      "name": "contracts",
+      "title": "Contracts",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "08-extensions",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 135
+    },
+    {
+      "file": "conversations.json",
+      "name": "conversations",
+      "title": "Conversations Inbox & Messages",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "04-service",
+      "endpointCount": 16,
+      "pathCount": 13,
+      "sizeKB": 95
+    },
+    {
+      "file": "courses.json",
+      "name": "courses",
+      "title": "Courses",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "08-extensions",
+      "endpointCount": 11,
+      "pathCount": 8,
+      "sizeKB": 62
+    },
+    {
+      "file": "crm_owners.json",
+      "name": "crm_owners",
+      "title": "Crm Owners",
+      "description": "HubSpot uses **owners** to assign CRM objects to specific people in your organization. The endpoints described here are used to get a list of the owners that are available for an account. To assign an",
+      "domain": "01-crm-core",
+      "endpointCount": 2,
+      "pathCount": 2,
+      "sizeKB": 14
+    },
+    {
+      "file": "custom_channels.json",
+      "name": "custom_channels",
+      "title": "Conversations Custom Channels",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "04-service",
+      "endpointCount": 13,
+      "pathCount": 7,
+      "sizeKB": 78
+    },
+    {
+      "file": "custom_objects.json",
+      "name": "custom_objects",
+      "title": "Custom Objects",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "07-data-admin",
+      "endpointCount": 12,
+      "pathCount": 9,
+      "sizeKB": 286
+    },
+    {
+      "file": "deal_splits.json",
+      "name": "deal_splits",
+      "title": "CRM Deal Splits",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "02-sales",
+      "endpointCount": 2,
+      "pathCount": 2,
+      "sizeKB": 20
+    },
+    {
+      "file": "deals.json",
+      "name": "deals",
+      "title": "Deals",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "01-crm-core",
+      "endpointCount": 15,
+      "pathCount": 11,
+      "sizeKB": 131
+    },
+    {
+      "file": "discounts.json",
+      "name": "discounts",
+      "title": "Discounts",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 137
+    },
+    {
+      "file": "emails.json",
+      "name": "emails",
+      "title": "CRM Emails",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "03-marketing",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 137
+    },
+    {
+      "file": "exports.json",
+      "name": "exports",
+      "title": "CRM Exports",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "07-data-admin",
+      "endpointCount": 3,
+      "pathCount": 3,
+      "sizeKB": 24
+    },
+    {
+      "file": "feedback_submissions.json",
+      "name": "feedback_submissions",
+      "title": "Feedback Submissions",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "04-service",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 301
+    },
+    {
+      "file": "fees.json",
+      "name": "fees",
+      "title": "CRM Fees",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 137
+    },
+    {
+      "file": "forecast_types.json",
+      "name": "forecast_types",
+      "title": "CRM Forecast Types",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "02-sales",
+      "endpointCount": 2,
+      "pathCount": 2,
+      "sizeKB": 10
+    },
+    {
+      "file": "forecasts.json",
+      "name": "forecasts",
+      "title": "CRM Forecasts",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "02-sales",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 388
+    },
+    {
+      "file": "forms.json",
+      "name": "forms",
+      "title": "Forms",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "03-marketing",
+      "endpointCount": 6,
+      "pathCount": 2,
+      "sizeKB": 75
+    },
+    {
+      "file": "goal_targets.json",
+      "name": "goal_targets",
+      "title": "Goal Targets",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "02-sales",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 137
+    },
+    {
+      "file": "imports.json",
+      "name": "imports",
+      "title": "CRM Imports",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "07-data-admin",
+      "endpointCount": 5,
+      "pathCount": 4,
+      "sizeKB": 39
+    },
+    {
+      "file": "invoices.json",
+      "name": "invoices",
+      "title": "Invoices",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 138
+    },
+    {
+      "file": "leads.json",
+      "name": "leads",
+      "title": "Leads",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "01-crm-core",
+      "endpointCount": 11,
+      "pathCount": 8,
+      "sizeKB": 63
+    },
+    {
+      "file": "limits_tracking.json",
+      "name": "limits_tracking",
+      "title": "Limits Tracking",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "07-data-admin",
+      "endpointCount": 9,
+      "pathCount": 9,
+      "sizeKB": 179
+    },
+    {
+      "file": "line_items.json",
+      "name": "line_items",
+      "title": "CRM Line Items",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 137
+    },
+    {
+      "file": "listings.json",
+      "name": "listings",
+      "title": "Listings",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "08-extensions",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 137
+    },
+    {
+      "file": "lists.json",
+      "name": "lists",
+      "title": "CRM Lists",
+      "description": "CRUD operations to manage lists and list memberships",
+      "domain": "03-marketing",
+      "endpointCount": 29,
+      "pathCount": 22,
+      "sizeKB": 254
+    },
+    {
+      "file": "marketing_emails.json",
+      "name": "marketing_emails",
+      "title": "Marketing Emails",
+      "description": "",
+      "domain": "03-marketing",
+      "endpointCount": 19,
+      "pathCount": 15,
+      "sizeKB": 187
+    },
+    {
+      "file": "marketing_events.json",
+      "name": "marketing_events",
+      "title": "Marketing Marketing Events",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "03-marketing",
+      "endpointCount": 36,
+      "pathCount": 28,
+      "sizeKB": 136
+    },
+    {
+      "file": "meetings.json",
+      "name": "meetings",
+      "title": "Meetings",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "02-sales",
+      "endpointCount": 11,
+      "pathCount": 8,
+      "sizeKB": 62
+    },
+    {
+      "file": "notes.json",
+      "name": "notes",
+      "title": "Notes",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "01-crm-core",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 138
+    },
+    {
+      "file": "object_library.json",
+      "name": "object_library",
+      "title": "CRM Object Library",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "07-data-admin",
+      "endpointCount": 2,
+      "pathCount": 2,
+      "sizeKB": 49
+    },
+    {
+      "file": "objects.json",
+      "name": "objects",
+      "title": "CRM Objects",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "01-crm-core",
+      "endpointCount": 11,
+      "pathCount": 8,
+      "sizeKB": 265
+    },
+    {
+      "file": "orders.json",
+      "name": "orders",
+      "title": "Orders",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "05-commerce",
+      "endpointCount": 11,
+      "pathCount": 8,
+      "sizeKB": 62
+    },
+    {
+      "file": "partner_clients.json",
+      "name": "partner_clients",
+      "title": "CRM Partner Clients",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "08-extensions",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 134
+    },
+    {
+      "file": "partner_services.json",
+      "name": "partner_services",
+      "title": "CRM Partner Services",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "08-extensions",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 137
+    },
+    {
+      "file": "pipelines.json",
+      "name": "pipelines",
+      "title": "Pipelines",
+      "description": "Pipelines represent distinct stages in a workflow, like closing a deal or servicing a support ticket. These endpoints provide access to read and modify pipelines in HubSpot. Pipelines support `deals` ",
+      "domain": "02-sales",
+      "endpointCount": 14,
+      "pathCount": 6,
+      "sizeKB": 221
+    },
+    {
+      "file": "postal_mail.json",
+      "name": "postal_mail",
+      "title": "CRM Postal Mail",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "03-marketing",
+      "endpointCount": 11,
+      "pathCount": 8,
+      "sizeKB": 61
+    },
+    {
+      "file": "products.json",
+      "name": "products",
+      "title": "Products",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 139
+    },
+    {
+      "file": "properties.json",
+      "name": "properties",
+      "title": "Properties",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "07-data-admin",
+      "endpointCount": 13,
+      "pathCount": 7,
+      "sizeKB": 202
+    },
+    {
+      "file": "property_validations.json",
+      "name": "property_validations",
+      "title": "CRM Property Validations",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "07-data-admin",
+      "endpointCount": 4,
+      "pathCount": 3,
+      "sizeKB": 93
+    },
+    {
+      "file": "public_app_crm_cards.json",
+      "name": "public_app_crm_cards",
+      "title": "Public App Crm Cards",
+      "description": "Allows an app to extend the CRM UI by surfacing custom cards in the sidebar of record pages. These cards are defined up-front as part of app configuration, then populated by external data fetch reques",
+      "domain": "08-extensions",
+      "endpointCount": 7,
+      "pathCount": 4,
+      "sizeKB": 45
+    },
+    {
+      "file": "public_app_feature_flags_v3.json",
+      "name": "public_app_feature_flags_v3",
+      "title": "CRM Public App Feature Flags V3",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "08-extensions",
+      "endpointCount": 10,
+      "pathCount": 6,
+      "sizeKB": 26
+    },
+    {
+      "file": "quotes.json",
+      "name": "quotes",
+      "title": "Quotes",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "02-sales",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 138
+    },
+    {
+      "file": "schemas.json",
+      "name": "schemas",
+      "title": "Schemas",
+      "description": "The CRM uses schemas to define how custom objects should store and represent information in the HubSpot CRM. Schemas define details about an object's type, properties, and associations. The schema can",
+      "domain": "07-data-admin",
+      "endpointCount": 8,
+      "pathCount": 5,
+      "sizeKB": 56
+    },
+    {
+      "file": "sequences.json",
+      "name": "sequences",
+      "title": "Sequences",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "02-sales",
+      "endpointCount": 4,
+      "pathCount": 4,
+      "sizeKB": 29
+    },
+    {
+      "file": "services.json",
+      "name": "services",
+      "title": "Services",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "04-service",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 137
+    },
+    {
+      "file": "single_send.json",
+      "name": "single_send",
+      "title": "Single-send",
+      "description": "",
+      "domain": "03-marketing",
+      "endpointCount": 1,
+      "pathCount": 1,
+      "sizeKB": 13
+    },
+    {
+      "file": "subscription_lifecycle.json",
+      "name": "subscription_lifecycle",
+      "title": "CRM Subscription Lifecycle",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 3,
+      "pathCount": 3,
+      "sizeKB": 10
+    },
+    {
+      "file": "subscriptions.json",
+      "name": "subscriptions",
+      "title": "Communication Preferences Subscriptions",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 10,
+      "pathCount": 8,
+      "sizeKB": 61
+    },
+    {
+      "file": "tasks.json",
+      "name": "tasks",
+      "title": "CRM Tasks",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "02-sales",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 136
+    },
+    {
+      "file": "taxes.json",
+      "name": "taxes",
+      "title": "CRM Taxes",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "05-commerce",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 136
+    },
+    {
+      "file": "tickets.json",
+      "name": "tickets",
+      "title": "Tickets",
+      "description": "CRM objects such as companies, contacts, deals, line items, products, tickets, and quotes are standard objects in HubSpot’s CRM. These core building blocks support custom properties, store critical in",
+      "domain": "04-service",
+      "endpointCount": 12,
+      "pathCount": 9,
+      "sizeKB": 64
+    },
+    {
+      "file": "timeline.json",
+      "name": "timeline",
+      "title": "Timeline",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "01-crm-core",
+      "endpointCount": 11,
+      "pathCount": 7,
+      "sizeKB": 59
+    },
+    {
+      "file": "transactional_single_send.json",
+      "name": "transactional_single_send",
+      "title": "Transactional Single Send",
+      "description": "",
+      "domain": "03-marketing",
+      "endpointCount": 6,
+      "pathCount": 4,
+      "sizeKB": 24
+    },
+    {
+      "file": "transcriptions.json",
+      "name": "transcriptions",
+      "title": "Transcriptions",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "04-service",
+      "endpointCount": 4,
+      "pathCount": 3,
+      "sizeKB": 19
+    },
+    {
+      "file": "users.json",
+      "name": "users",
+      "title": "CRM Users",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "01-crm-core",
+      "endpointCount": 17,
+      "pathCount": 13,
+      "sizeKB": 136
+    },
+    {
+      "file": "video_conferencing_extension.json",
+      "name": "video_conferencing_extension",
+      "title": "Video Conferencing Extension",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "08-extensions",
+      "endpointCount": 3,
+      "pathCount": 1,
+      "sizeKB": 9
+    },
+    {
+      "file": "visitor_identification.json",
+      "name": "visitor_identification",
+      "title": "Conversations Visitor Identification",
+      "description": "Basepom for all HubSpot Projects",
+      "domain": "08-extensions",
+      "endpointCount": 1,
+      "pathCount": 1,
+      "sizeKB": 8
+    }
+  ]
+}
