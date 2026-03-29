@@ -1,0 +1,38 @@
+{
+  "01-solicitacoes": {
+    "name": "Solicitações (Instances)",
+    "description": "Processos abertos pelos usuários — criar, listar, detalhar, cancelar solicitações",
+    "zeevConcept": "Instance = uma execução de um fluxo (processo)",
+    "endpointCount": 12
+  },
+  "02-tarefas": {
+    "name": "Tarefas (Assignments)",
+    "description": "Tarefas pendentes atribuídas aos usuários — listar, detalhar, completar, delegar",
+    "zeevConcept": "Assignment = uma atividade que um usuário precisa executar",
+    "endpointCount": 11
+  },
+  "03-fluxos": {
+    "name": "Fluxos (Flows/Processes)",
+    "description": "Definições de processos — listar fluxos ativos, editar, visualizar BPMN",
+    "zeevConcept": "Flow = template de processo (BPMN). Uma Instance é execução de um Flow.",
+    "endpointCount": 8
+  },
+  "04-financeiro": {
+    "name": "Financeiro (API Dados)",
+    "description": "API de dados financeiros — consulta de solicitações financeiras com filtros e estatísticas",
+    "zeevConcept": "Endpoint customizado Raíz (não é Zeev nativo). Agregação de dados financeiros.",
+    "endpointCount": 0
+  },
+  "05-admin": {
+    "name": "Administração e Relatórios",
+    "description": "SLA, grupos organizacionais, relatórios, backlog, aging — visão gerencial",
+    "zeevConcept": "Endpoints de gestão: overview, métricas, relatórios consolidados",
+    "endpointCount": 63
+  },
+  "06-autenticacao": {
+    "name": "Autenticação e Tokens",
+    "description": "Geração de tokens, impersonation, verificação — fluxo de autenticação",
+    "zeevConcept": "Service token → impersonate → temporary token (8min TTL)",
+    "endpointCount": 4
+  }
+}

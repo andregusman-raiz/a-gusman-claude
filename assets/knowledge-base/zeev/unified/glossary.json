@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "totalTerms": 20
+  },
+  "terms": [
+    {
+      "technical": "SLA",
+      "business": "Acordo de Nível de Serviço",
+      "context": "Tempo máximo para resolver uma tarefa. Monitorado via /assignments/report."
+    },
+    {
+      "technical": "X-API-Key",
+      "business": "Header de autenticação (API Dados)",
+      "context": "Header HTTP usado na API de dados financeiros."
+    },
+    {
+      "technical": "ZEEV_API_KEY",
+      "business": "Chave da API de Dados (env var)",
+      "context": "API key para metabases.raizeducacao.com.br/api-dados"
+    },
+    {
+      "technical": "ZEEV_NATIVE_API_URL",
+      "business": "URL base da API Nativa (env var)",
+      "context": "Produção: raizeducacao.zeev.it | Staging: hmlraizeducacao.zeev.it"
+    },
+    {
+      "technical": "ZEEV_SERVICE_TOKEN",
+      "business": "Token de serviço Zeev (env var)",
+      "context": "Token permanente da service account. URL-encoded. Nunca expor em frontend."
+    },
+    {
+      "technical": "action",
+      "business": "Ação (completar/devolver tarefa)",
+      "context": "Ações disponíveis em um assignment: completar, devolver, encaminhar."
+    },
+    {
+      "technical": "aging",
+      "business": "Envelhecimento de tarefas",
+      "context": "Distribuição por idade: 0-7d, 7-30d, 30-90d, 90d+. Indica gargalos."
+    },
+    {
+      "technical": "assignment",
+      "business": "Tarefa Pendente",
+      "context": "Uma atividade dentro de um processo que precisa de ação humana. Atribuída a um usuário."
+    },
+    {
+      "technical": "backlog",
+      "business": "Tarefas acumuladas",
+      "context": "Tarefas pendentes agrupadas por fluxo ou pessoa. Indica sobrecarga."
+    },
+    {
+      "technical": "bearer",
+      "business": "Token de autenticação Bearer",
+      "context": "Header: Authorization: Bearer {token}. Usado na API Nativa v2."
+    },
+    {
+      "technical": "flow",
+      "business": "Fluxo/Processo (template)",
+      "context": "Definição BPMN de um processo. Uma instance é execução de um flow."
+    },
+    {
+      "technical": "flow_list",
+      "business": "Lista de Fluxos Ativos",
+      "context": "Fluxos filtrados (sem DESATIVADO). Via /flows/edit no admin."
+    },
+    {
+      "technical": "formField",
+      "business": "Campo do Formulário",
+      "context": "Campo preenchido pelo usuário em uma solicitação. Cada flow tem formulários diferentes."
+    },
+    {
+      "technical": "groups",
+      "business": "Grupos organizacionais",
+      "context": "Estrutura hierárquica da organização no Zeev. Usado para routing."
+    },
+    {
+      "technical": "impersonate",
+      "business": "Impersonação (agir como usuário)",
+      "context": "Mecanismo onde service account obtém token temporário de outro usuário. RLS via Zeev."
+    },
+    {
+      "technical": "instance",
+      "business": "Solicitação/Processo",
+      "context": "Uma execução de um fluxo BPMN. Cada vez que alguém abre um chamado, cria uma instance."
+    },
+    {
+      "technical": "numero_solicitacao",
+      "business": "Número da Solicitação",
+      "context": "Identificador da solicitação na API de Dados (financeiro)."
+    },
+    {
+      "technical": "reportLink",
+      "business": "Link do Relatório (Zeev)",
+      "context": "URL para relatório nativo no Zeev. Não há acesso direto aos dados de auditoria."
+    },
+    {
+      "technical": "serviceToken",
+      "business": "Token de Serviço (permanente)",
+      "context": "Token da service account. URL-encoded (% chars). Usado para iniciar impersonation."
+    },
+    {
+      "technical": "temporaryToken",
+      "business": "Token Temporário (8min)",
+      "context": "Token obtido via impersonation. Expira em ~10min, cache recomendado de 8min."
+    }
+  ]
+}
