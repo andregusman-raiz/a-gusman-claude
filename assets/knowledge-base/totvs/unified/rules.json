@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "sources": [
+      "DOC-4 (regras negócio)",
+      "DOC-12 (cadastros auxiliares)",
+      "DOC-15 (financeiro)",
+      "DOC-17 (segurança)"
+    ]
+  },
+  "matricula": {
+    "statusMachine": {
+      "description": "Máquina de estados de matrícula — transições controladas entre status",
+      "states": [
+        "ATIVA",
+        "TRANCADA",
+        "CANCELADA",
+        "TRANSFERIDA",
+        "CONCLUÍDA",
+        "EVADIDA"
+      ],
+      "transitions": [
+        {
+          "from": "ATIVA",
+          "to": "TRANCADA",
+          "auth": "Secretária + Diretor",
+          "reversible": true,
+          "note": "Requer justificativa e prazo"
+        },
+        {
+          "from": "ATIVA",
+          "to": "CANCELADA",
+          "auth": "Diretor",
+          "reversible": false,
+          "note": "Gera rescisão contratual"
+        },
+        {
+          "from": "ATIVA",
+          "to": "TRANSFERIDA",
+          "auth": "Secretária + Diretor",
+          "reversible": false,
+          "note": "Requer declaração de transferência"
+        },
+        {
+          "from": "ATIVA",
+          "to": "CONCLUÍDA",
+          "auth": "Sistema (automático)",
+          "reversible": false,
+          "note": "Após apuração de resultado final"
+        },
+        {
+          "from": "ATIVA",
+          "to": "EVADIDA",
+          "auth": "Secretária",
+          "reversible": false,
+          "note": "Após N dias sem frequência (configurável)"
+        },
+        {
+          "from": "TRANCADA",
+          "to": "ATIVA",
+          "auth": "Secretária + Diretor",
+          "reversible": true,
+          "note": "Dentro do prazo de trancamento"
+        },
+        {
+          "from": "TRANCADA",
+          "to": "CANCELADA",
+          "auth": "Diretor",
+          "reversible": false
+        },
+        {
+          "from": "TRANCADA",
+          "to": "EVADIDA",
+          "auth": "Sistema",
+          "reversible": false,
+          "note": "Após período máximo de trancamento"
+        }
+      ],
+      "terminalStates": [
+        "CANCELADA",
+        "TRANSFERIDA",
+        "CONCLUÍDA"
+      ],
+      "reentryAllowed": [
+        "EVADIDA"
+      ]
+    },
+    "statusFlags": {
+      "description": "Cada SSTATUS tem flags booleanas que controlam comportamento. Ver enums.json > SStatus.",
+      "categories": {
+        "natureza": [
+          "PLATIVO",
+          "MATRICULAPROVISORIA",
+          "PLREMATRICULA",
+          "PLINDICATRANC",
+          "CUCONCCURSO",
+          "CUINDICATRANSF",
+          "CUINDICADESVINCULACAO",
+          "APROVADO",
+          "RESULTADO"
+        ],
+        "financeiro": [
+          "PLEXIGECONTRATO",
+          "PLCANCELACONTRATO",
+          "PLBLOQFINANC",
+          "PLVALINADIMPLMATRICPORTAL"
+        ],
+        "academico": [
+          "CUPERMITEMATRICPL",
+          "PLPERMITETRANCAMENTO",
+          "PLINCLUIRDISC",
+          "PLDISCAUTOMATICA"
+        ],
+        "disciplina": [
+          "DIEMCURSO",
+          "DICREDITOCURSADO",
+          "DIHISTORICO",
+          "DIBLQNOTAFALTA"
+        ]
+      }
+    },
+    "prerequisites": [
+      "Certidão de Nascimento (obrigatório menores)",
+      "RG ou CPF do responsável (obrigatório)",
+      "CPF do aluno (obrigatório a partir do EF)",
+      "Comprovante de Residência (max 3 meses)",
+      "Histórico Escolar Anterior (exceto Ed. Infantil)",
+      "Fotos 3x4",
+      "Atestado de Saúde / Cartão de Vacina (configurável)",
+      "Laudo médico / PEI (condicional — NEE)"
+    ],
+    "rematricula": {
+      "requires": [
+        "Status ATIVA ou CONCLUÍDA",
+        "Dentro da janela de rematrícula",
+        "Sem inadimplência (se PLVALINADIMPLMATRICPORTAL=S)"
+      ],
+      "generates": [
+        "Novo registro SMATRICPL",
+        "Novo SCONTRATO com parcelas do ano"
+      ]
+    }
+  },
+  "notas": {
+    "escala": "0.0 a 10.0 (configurável por escola)",
+    "mediaAprovacao": "7.0 (configurável via SPARAMETRO)",
+    "casasDecimais": "1 (configurável)",
+    "arredondamento": "Configurável (up, down, nearest)",
+    "etapas": "Definidas em SETAPAS por turma-disciplina",
+    "formula": "Configurável: média simples, ponderada, ou fórmula customizada",
+    "recuperacao": "Nota de recuperação pode substituir a menor nota ou compor média"
+  },
+  "frequencia": {
+    "minimoAprovacao": "75% (LDB Art. 24, inciso VI)",
+    "registroLogic": "Sem registro = Presente. Registro com SITUACAO='A' = Ausente.",
+    "aulasPrevistas": "Derivadas de SHORARIOTURMA × dias letivos do calendário",
+    "abono": "Atestado médico, licença maternidade, convocação militar (registrado em SOCORRENCIAALUNO)"
+  },
+  "financeiro": {
+    "fluxo": "Matrícula (SSTATUS.PLEXIGECONTRATO) → SCONTRATO → SPARCELA → SLAN → FLAN",
+    "cancelamento": "SSTATUS.PLCANCELACONTRATO=S → cancela contrato automaticamente",
+    "bolsa": "SBOLSAALUNO vincula aluno a SBOLSA; SBOLSALAN aplica desconto por lançamento",
+    "inadimplencia": "Bloqueio de portal/rematrícula quando PLVALINADIMPLMATRICPORTAL=S"
+  },
+  "multiTenant": {
+    "key": "CODCOLIGADA",
+    "rule": "TODA query DEVE filtrar por CODCOLIGADA. Scoping automático via DOC-16.",
+    "coligadas": "20 ativas (ver enums.json > GColigada)"
+  },
+  "pii": {
+    "description": "Campos com dados pessoais sensíveis — exigem mascaramento em APIs públicas",
+    "highConfidence": [
+      "CPF",
+      "CNPJ",
+      "CGC",
+      "EMAIL",
+      "SALARIO",
+      "VALORSALARIO"
+    ],
+    "mediumConfidence": [
+      "TELEFONE",
+      "CELULAR",
+      "RUA",
+      "BAIRRO",
+      "CEP",
+      "DATANASCIMENTO",
+      "NOME"
+    ],
+    "masking": {
+      "CPF": "***.***.***.XX",
+      "EMAIL": "x***@dominio.com",
+      "TELEFONE": "(XX) XXXXX-XXXX",
+      "NOME": "Primeiras 3 letras + ***"
+    },
+    "tablesWithPII": [
+      "PPESSOA",
+      "SALUNO",
+      "SPROFESSOR",
+      "PFUNC",
+      "GCOLIGADA"
+    ],
+    "riskScoring": "Score 0-100. >=85=CRITICAL (maxRows=200), >=70=HIGH (maxRows=500)"
+  },
+  "obz": {
+    "description": "Regras aprendidas do projeto OBZ (orçamento base zero)",
+    "rules": [
+      {
+        "id": "OBZ-01",
+        "rule": "NUMTEMPOS não existe no TOTVS",
+        "detail": "Nem SQL (NUMAULASEM/DURACAOAULA são NULL) nem SOAP (não vem no ReadView). Tempos de aula vêm do simulador Excel (Modelo26), não do banco.",
+        "impact": "Queries de custo professor por turma não podem usar TOTVS para tempos — precisa do Excel ou input manual."
+      },
+      {
+        "id": "OBZ-02",
+        "rule": "MARCA ≠ COLIGADA",
+        "detail": "O Modelo26 (planilha BAR) filtra por MARCA (SAP, QI, MT, etc) que mapeia para COLIGADA+FILIAL no TOTVS. SAP = Col 8 Fil 4. QI = Col 2. SP = Col 7 (mas 0 func!).",
+        "impact": "Toda query SQL deve usar o mapeamento MARCA→COLIGADA correto. Ver enums.json MARCA_COLIGADA."
+      },
+      {
+        "id": "OBZ-03",
+        "rule": "PFFINANC, não PFHSTFIN",
+        "detail": "Tabela de folha no SQL é PFFINANC (49M rows). PFHSTFIN é nome do DataServer SOAP, não existe como tabela SQL. CODEVENTO é VARCHAR.",
+        "impact": "Queries de folha detalhada devem usar PFFINANC. Nunca comparar CODEVENTO com int."
+      }
+    ]
+  }
+}

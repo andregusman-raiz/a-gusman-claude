@@ -1,0 +1,519 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "totalQueries": 28,
+    "sources": {
+      "DOC-3": 15,
+      "DOC-14": 8,
+      "DOC-13": 5
+    },
+    "note": "Queries catalogadas com metadata. SQL real nos DOCs fonte."
+  },
+  "queries": [
+    {
+      "name": "dashboard-matriculas-status",
+      "domain": "04-educacional-pessoas",
+      "description": "Dashboard: contagem de matrículas por status no período letivo",
+      "tables": [
+        "SMATRICPL",
+        "SSTATUS",
+        "SPLETIVO"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET"
+      ],
+      "useCase": "Dashboard principal — distribuição de alunos por situação",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "dashboard-frequencia-media",
+      "domain": "03-educacional-operacao",
+      "description": "Dashboard: frequência média por turma-disciplina",
+      "tables": [
+        "SNOTAETAPA",
+        "STURMADISC",
+        "STURMA"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET"
+      ],
+      "useCase": "Dashboard — monitoramento de frequência geral",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "alunos-por-turma",
+      "domain": "04-educacional-pessoas",
+      "description": "Lista alunos matriculados em uma turma com status",
+      "tables": [
+        "SMATRICULA",
+        "SALUNO",
+        "SSTATUS",
+        "STURMADISC"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDTURMADISC"
+      ],
+      "useCase": "Chamada, diário de classe",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "notas-por-turma-etapa",
+      "domain": "03-educacional-operacao",
+      "description": "Notas de todos alunos de uma turma-disciplina em uma etapa",
+      "tables": [
+        "SNOTAETAPA",
+        "SALUNO",
+        "STURMADISC"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDTURMADISC",
+        "CODETAPA"
+      ],
+      "useCase": "Digitação de notas, boletim parcial",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "boletim-aluno",
+      "domain": "04-educacional-pessoas",
+      "description": "Boletim completo do aluno: todas disciplinas, todas etapas",
+      "tables": [
+        "SNOTAETAPA",
+        "SMATRICULA",
+        "STURMADISC",
+        "SDISCIPLINA",
+        "SETAPAS"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "RA",
+        "IDPERLET"
+      ],
+      "useCase": "Boletim escolar, relatório para pais",
+      "riskScore": 5,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "frequencia-diaria-turma",
+      "domain": "04-educacional-pessoas",
+      "description": "Frequência diária de uma turma em um período",
+      "tables": [
+        "SFREQUENCIA",
+        "SALUNO",
+        "SHORARIOTURMA"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDTURMADISC",
+        "DATA_INICIO",
+        "DATA_FIM"
+      ],
+      "useCase": "Registro de chamada, relatório de faltas",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "turmas-professor",
+      "domain": "04-educacional-pessoas",
+      "description": "Turmas e disciplinas vinculadas a um professor",
+      "tables": [
+        "SPROFESSORTURMA",
+        "STURMADISC",
+        "STURMA",
+        "SDISCIPLINA"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "CODPROF",
+        "IDPERLET"
+      ],
+      "useCase": "Tela do professor, grade horária",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "inadimplentes-periodo",
+      "domain": "05-financeiro",
+      "description": "Alunos com parcelas vencidas no período",
+      "tables": [
+        "SPARCELA",
+        "SCONTRATO",
+        "SALUNO",
+        "FLAN"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET",
+        "DATA_REFERENCIA"
+      ],
+      "useCase": "Cobrança, relatório financeiro",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "bolsistas-ativos",
+      "domain": "05-financeiro",
+      "description": "Alunos com bolsa ativa e percentual de desconto",
+      "tables": [
+        "SBOLSAALUNO",
+        "SBOLSA",
+        "SALUNO",
+        "SCONTRATO"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET"
+      ],
+      "useCase": "Gestão de bolsas, relatório social",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "historico-aluno",
+      "domain": "04-educacional-pessoas",
+      "description": "Histórico escolar completo: disciplinas concluídas + pendentes",
+      "tables": [
+        "SHISTDISCCONCLUIDAS",
+        "SHISTDISCPENDENTES",
+        "SDISCIPLINA"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "RA"
+      ],
+      "useCase": "Histórico escolar, transferência",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "vagas-turma",
+      "domain": "03-educacional-operacao",
+      "description": "Vagas disponíveis por turma (max - matriculados)",
+      "tables": [
+        "STURMA",
+        "SMATRICULA"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET"
+      ],
+      "useCase": "Processo seletivo, rematrícula",
+      "riskScore": 0,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "professores-sem-turma",
+      "domain": "04-educacional-pessoas",
+      "description": "Professores cadastrados sem vínculo de turma no período",
+      "tables": [
+        "SPROFESSOR",
+        "SPROFESSORTURMA"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET"
+      ],
+      "useCase": "Gestão de RH, alocação de professores",
+      "riskScore": 0,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "evasao-tendencia",
+      "domain": "04-educacional-pessoas",
+      "description": "Alunos com frequência abaixo do limiar configurável",
+      "tables": [
+        "SNOTAETAPA",
+        "SMATRICULA",
+        "SALUNO"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET",
+        "LIMIAR_FREQUENCIA"
+      ],
+      "useCase": "Prevenção de evasão, alerta precoce",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "resultado-final-turma",
+      "domain": "03-educacional-operacao",
+      "description": "Resultado final (aprovado/reprovado) por turma-disciplina",
+      "tables": [
+        "SMATRICULA",
+        "SSTATUS",
+        "SALUNO"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDTURMADISC"
+      ],
+      "useCase": "Ata final, conselho de classe",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "receita-por-coligada",
+      "domain": "05-financeiro",
+      "description": "Receita total e inadimplência por coligada/período",
+      "tables": [
+        "FLAN",
+        "FLANBAIXA",
+        "SLAN",
+        "SPARCELA"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET"
+      ],
+      "useCase": "Dashboard financeiro, DRE educacional",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-3"
+    },
+    {
+      "name": "status-matricula-detalhado",
+      "domain": "04-educacional-pessoas",
+      "description": "Status de matrícula com todas as flags SSTATUS expandidas",
+      "tables": [
+        "SMATRICPL",
+        "SSTATUS",
+        "SALUNO"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET"
+      ],
+      "useCase": "Análise detalhada de situação acadêmica",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-14"
+    },
+    {
+      "name": "boletim-completo-pivot",
+      "domain": "03-educacional-operacao",
+      "description": "Boletim com notas em colunas (pivot por etapa)",
+      "tables": [
+        "SNOTAETAPA",
+        "SETAPAS",
+        "SMATRICULA",
+        "SDISCIPLINA"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "RA",
+        "IDPERLET"
+      ],
+      "useCase": "Boletim formatado para impressão",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-14"
+    },
+    {
+      "name": "turmas-professor-horario",
+      "domain": "04-educacional-pessoas",
+      "description": "Grade horária do professor com dia/hora/sala",
+      "tables": [
+        "SPROFESSORTURMA",
+        "SHORARIOTURMA",
+        "STURMADISC",
+        "SSALA"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "CODPROF",
+        "IDPERLET"
+      ],
+      "useCase": "Grade horária do professor",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-14"
+    },
+    {
+      "name": "inadimplencia-acumulada",
+      "domain": "05-financeiro",
+      "description": "Inadimplência acumulada por faixa de atraso (30/60/90+ dias)",
+      "tables": [
+        "SPARCELA",
+        "FLAN",
+        "FLANBAIXA",
+        "SALUNO"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "DATA_REFERENCIA"
+      ],
+      "useCase": "Relatório de aging de recebíveis",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-14"
+    },
+    {
+      "name": "ocupacao-salas",
+      "domain": "03-educacional-operacao",
+      "description": "Taxa de ocupação de salas por dia/horário",
+      "tables": [
+        "SHORARIOTURMA",
+        "SSALA",
+        "STURMADISC"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET"
+      ],
+      "useCase": "Otimização de espaço físico",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-14"
+    },
+    {
+      "name": "comparativo-coligadas",
+      "domain": "01-framework",
+      "description": "Métricas comparativas entre coligadas (alunos, receita, inadimplência)",
+      "tables": [
+        "GCOLIGADA",
+        "SMATRICPL",
+        "FLAN"
+      ],
+      "params": [
+        "IDPERLET"
+      ],
+      "useCase": "Dashboard executivo multi-unidade",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-14"
+    },
+    {
+      "name": "disciplinas-reprovacao-alta",
+      "domain": "03-educacional-operacao",
+      "description": "Disciplinas com taxa de reprovação acima do limiar",
+      "tables": [
+        "SMATRICULA",
+        "SSTATUS",
+        "SDISCIPLINA",
+        "STURMADISC"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET",
+        "LIMIAR"
+      ],
+      "useCase": "Análise pedagógica, plano de melhoria",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-14"
+    },
+    {
+      "name": "alunos-risco-evasao",
+      "domain": "04-educacional-pessoas",
+      "description": "Score de risco de evasão baseado em frequência + notas + inadimplência",
+      "tables": [
+        "SNOTAETAPA",
+        "SMATRICULA",
+        "SPARCELA",
+        "SALUNO"
+      ],
+      "params": [
+        "CODCOLIGADA",
+        "IDPERLET"
+      ],
+      "useCase": "Modelo preditivo de evasão",
+      "riskScore": 3,
+      "riskLevel": "LOW",
+      "source": "DOC-14"
+    },
+    {
+      "name": "gdic-listar-tabelas-educacionais",
+      "domain": "08-metadados",
+      "description": "Lista todas as tabelas educacionais (prefixo S) via dicionário GDIC",
+      "tables": [
+        "GCAMPOS"
+      ],
+      "params": [],
+      "useCase": "Descoberta de schema, documentação automática",
+      "riskScore": 0,
+      "riskLevel": "LOW",
+      "source": "DOC-13"
+    },
+    {
+      "name": "gdic-campos-tabela",
+      "domain": "08-metadados",
+      "description": "Campos e descrições de uma tabela específica via GDIC",
+      "tables": [
+        "GDIC"
+      ],
+      "params": [
+        "TABELA"
+      ],
+      "useCase": "Dicionário de dados, documentação",
+      "riskScore": 0,
+      "riskLevel": "LOW",
+      "source": "DOC-13"
+    },
+    {
+      "name": "gdic-busca-campo-descricao",
+      "domain": "08-metadados",
+      "description": "Busca campo por descrição em PT-BR no GDIC",
+      "tables": [
+        "GDIC"
+      ],
+      "params": [
+        "DESCRICAO_LIKE"
+      ],
+      "useCase": "Descoberta: 'qual campo armazena matrícula?'",
+      "riskScore": 0,
+      "riskLevel": "LOW",
+      "source": "DOC-13"
+    },
+    {
+      "name": "glinksrel-fks-tabela",
+      "domain": "08-metadados",
+      "description": "Foreign keys de/para uma tabela via GLINKSREL",
+      "tables": [
+        "GLINKSREL"
+      ],
+      "params": [
+        "TABELA"
+      ],
+      "useCase": "Mapeamento de relacionamentos",
+      "riskScore": 0,
+      "riskLevel": "LOW",
+      "source": "DOC-13"
+    },
+    {
+      "name": "glinksrel-fks-educacionais",
+      "domain": "08-metadados",
+      "description": "Todos os relacionamentos entre tabelas educacionais",
+      "tables": [
+        "GLINKSREL"
+      ],
+      "params": [],
+      "useCase": "Modelo relacional completo",
+      "riskScore": 0,
+      "riskLevel": "LOW",
+      "source": "DOC-13"
+    }
+  ]
+}
