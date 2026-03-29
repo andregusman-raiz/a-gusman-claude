@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "totalTerms": 16
+  },
+  "terms": [
+    {
+      "technical": "aluno",
+      "business": "Aluno (matrícula)",
+      "context": "Registro de aluno. Identificado por CodigoAluno. Vinculado a curso/turma."
+    },
+    {
+      "technical": "ata_nota",
+      "business": "Ata de notas",
+      "context": "Documento oficial com notas dos alunos por disciplina/período."
+    },
+    {
+      "technical": "boleto",
+      "business": "Boleto bancário",
+      "context": "Documento de cobrança gerado via integração bancária (BB, Itaú, Santander)."
+    },
+    {
+      "technical": "catraca",
+      "business": "Catraca (controle de acesso)",
+      "context": "Integração com catracas físicas para controle de entrada/saída."
+    },
+    {
+      "technical": "contrato",
+      "business": "Contrato educacional",
+      "context": "Vínculo financeiro entre escola e responsável. Gera lançamentos."
+    },
+    {
+      "technical": "ficha_saude",
+      "business": "Ficha de saúde do aluno",
+      "context": "Dados médicos: alergias, medicações, tipo sanguíneo."
+    },
+    {
+      "technical": "instancia",
+      "business": "Instância da escola",
+      "context": "Cada escola tem URL própria: {escola}.sophia.com.br. API roda na instância."
+    },
+    {
+      "technical": "lancamento",
+      "business": "Lançamento financeiro",
+      "context": "Cobrança gerada para o responsável. Tem vencimento, valor, status."
+    },
+    {
+      "technical": "lista_chamada",
+      "business": "Lista de chamada (frequência)",
+      "context": "Registro de presença/ausência por aula."
+    },
+    {
+      "technical": "matricula",
+      "business": "Matrícula",
+      "context": "Vínculo aluno↔curso↔período. Tem status (ativa, trancada, cancelada)."
+    },
+    {
+      "technical": "parceiro",
+      "business": "Parceiro de integração",
+      "context": "Conta de API autorizada pela escola. Credenciais: usuario_parceiro + senha."
+    },
+    {
+      "technical": "processo_seletivo",
+      "business": "Processo seletivo (vestibular)",
+      "context": "Funil de captação de novos alunos. Campanha → inscrição → contratação."
+    },
+    {
+      "technical": "quadro_horario",
+      "business": "Quadro de horários",
+      "context": "Grade de aulas por turma/dia/horário."
+    },
+    {
+      "technical": "responsavel",
+      "business": "Responsável (financeiro/pedagógico)",
+      "context": "Pessoa responsável pelo aluno. Pode ser financeiro e/ou pedagógico."
+    },
+    {
+      "technical": "token",
+      "business": "Token de autenticação (20min)",
+      "context": "Obtido via POST /Autenticacao/login. Vinculado ao IP. Expira em 20min."
+    },
+    {
+      "technical": "unidade",
+      "business": "Unidade escolar (campus)",
+      "context": "Filial/campus da escola. Multi-unidade suportado."
+    }
+  ]
+}

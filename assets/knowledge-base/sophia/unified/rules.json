@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "sources": [
+      "DOC-1",
+      "DOC-3",
+      "DOC-4"
+    ]
+  },
+  "authentication": {
+    "method": "POST /Autenticacao/login",
+    "body": {
+      "usuario": "parceiro_usuario",
+      "senha": "parceiro_senha"
+    },
+    "tokenTTL": "20 minutos",
+    "ipBound": true,
+    "note": "Token vinculado ao IP de origem. Mudança de IP = novo login.",
+    "costNote": "API é recurso pago — ativação tem custo adicional por escola."
+  },
+  "limits": {
+    "tokenExpiry": "20min (não configurável)",
+    "ipBinding": "Token vinculado ao IP (não ao user-agent)",
+    "costPerSchool": "Ativação de API tem custo adicional",
+    "formats": "JSON e XML suportados (header Accept)",
+    "pagination": "Offset-based (?pagina=1&registros=50)"
+  },
+  "crossReference": {
+    "description": "Mapeamento SophiA → TOTVS RM (DOC-1 seção 14)",
+    "domains": {
+      "Alunos": "SALUNO",
+      "Matrículas": "SMATRICULA/SMATRICPL",
+      "Turmas": "STURMA/STURMADISC",
+      "Disciplinas": "SDISCIPLINA",
+      "Notas": "SNOTAETAPA",
+      "Frequência": "SFREQUENCIA",
+      "Contratos": "SCONTRATO",
+      "Lançamentos": "FLAN",
+      "Responsáveis": "PPESSOA",
+      "Professores": "SPROFESSOR"
+    }
+  },
+  "empresa": {
+    "nome": "Primasoft/Soluções Sophia",
+    "fundacao": 1993,
+    "sede": "São José dos Campos/SP",
+    "controlador": "Volaris Group (Constellation Software, Canadá, desde 2018)",
+    "clientes": "3.500-5.000+ instituições",
+    "produtos": 10
+  }
+}
