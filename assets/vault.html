@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vault &mdash; rAIz Ecossistema</title>
+<style>
+:root, [data-theme="dark"] {
+  --bg: #0f1117; --surface: #1a1d27; --surface-hover: #222632;
+  --border: #2a2e3a; --text: #e4e4e7; --text-muted: #71717a;
+  --accent: #F7941D; --accent-dim: rgba(247,148,29,0.12);
+  --teal: #5BB5A2; --teal-dim: rgba(91,181,162,0.12);
+  --green: #22c55e; --green-dim: rgba(34,197,94,0.15);
+  --red: #ef4444; --red-dim: rgba(239,68,68,0.12);
+  --blue: #3b82f6; --blue-dim: rgba(59,130,246,0.12);
+  --purple: #a855f7; --purple-dim: rgba(168,85,247,0.12);
+  --footer-muted: #52525b; --input-bg: #12141c; --overlay: rgba(0,0,0,0.6);
+}
+[data-theme="light"] {
+  --bg: #f4f5f7; --surface: #ffffff; --surface-hover: #f0f1f3;
+  --border: #e2e4e9; --text: #1a202c; --text-muted: #64748b;
+  --accent: #d97b10; --accent-dim: rgba(217,123,16,0.10);
+  --teal: #0d9488; --teal-dim: rgba(13,148,136,0.10);
+  --green: #16a34a; --green-dim: rgba(22,163,74,0.10);
+  --red: #dc2626; --red-dim: rgba(220,38,38,0.08);
+  --blue: #2563eb; --blue-dim: rgba(37,99,235,0.08);
+  --purple: #7c3aed; --purple-dim: rgba(124,58,237,0.08);
+  --footer-muted: #94a3b8; --input-bg: #f8f9fb; --overlay: rgba(0,0,0,0.3);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
+.container { max-width: 860px; margin: 0 auto; padding: 32px 20px; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.header h1 { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+.header .subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.back-link { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); transition: all 0.2s; }
+.back-link:hover { border-color: var(--accent); color: var(--accent); }
+.theme-toggle { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.lock-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; gap: 20px; }
+.lock-icon { font-size: 3rem; opacity: 0.3; }
+.lock-screen p { color: var(--text-muted); font-size: 0.9rem; text-align: center; max-width: 360px; }
+.master-input { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; border-radius: 8px; font-size: 1rem; width: 300px; text-align: center; letter-spacing: 0.1em; outline: none; }
+.master-input:focus { border-color: var(--accent); }
+.master-input::placeholder { letter-spacing: normal; color: var(--text-muted); }
+.btn { padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+.btn-primary { background: var(--accent-dim); color: var(--accent); border-color: rgba(247,148,29,0.25); }
+.btn-primary:hover { background: rgba(247,148,29,0.2); }
+.btn-danger { background: var(--red-dim); color: var(--red); border-color: rgba(239,68,68,0.2); }
+.btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+.btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; }
+.search-input { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; flex: 1; outline: none; }
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--text-muted); }
+.entries { display: flex; flex-direction: column; gap: 10px; }
+.entry { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; transition: border-color 0.2s; }
+.entry:hover { border-color: rgba(247,148,29,0.3); }
+.entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.entry-name { font-weight: 700; font-size: 1rem; }
+.entry-badges { display: flex; gap: 6px; align-items: center; }
+.entry-type { font-size: 0.68rem; font-weight: 600; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+.type-service { background: var(--blue-dim); color: var(--blue); }
+.type-ai { background: var(--purple-dim); color: var(--purple); }
+.type-infra { background: var(--teal-dim); color: var(--teal); }
+.type-auth { background: var(--red-dim); color: var(--red); }
+.type-other { background: var(--accent-dim); color: var(--accent); }
+/* Fields */
+.fields { display: flex; flex-direction: column; gap: 6px; }
+.field-row { display: flex; align-items: center; gap: 8px; }
+.field-label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; min-width: 80px; flex-shrink: 0; }
+.field-value { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; background: var(--input-bg); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: all; }
+.field-value.masked { color: var(--text-muted); letter-spacing: 0.15em; user-select: none; }
+.field-value.plain { user-select: all; }
+.field-copy { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 4px 8px; border-radius: 5px; font-size: 0.68rem; cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
+.field-copy:hover { border-color: var(--accent); color: var(--accent); }
+.entry-actions-row { display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+.entry-notes { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; }
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: var(--overlay); display: none; align-items: center; justify-content: center; z-index: 100; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; width: 520px; max-width: 92vw; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-size: 1.1rem; margin-bottom: 20px; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.form-input { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; width: 100%; outline: none; }
+.form-input:focus { border-color: var(--accent); }
+.form-select { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; width: 100%; outline: none; }
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.fields-editor { display: flex; flex-direction: column; gap: 8px; }
+.field-edit-row { display: flex; gap: 6px; align-items: center; }
+.field-edit-row input { flex: 1; }
+.field-edit-row input:first-child { max-width: 120px; }
+.field-edit-row select { width: 90px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 6px; font-size: 0.8rem; }
+.btn-remove-field { background: var(--red-dim); color: var(--red); border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 1rem; flex-shrink: 0; }
+.btn-add-field { font-size: 0.8rem; padding: 6px 12px; margin-top: 4px; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,0.3); padding: 10px 20px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; }
+.toast.show { opacity: 1; }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.empty-state p { margin-top: 8px; font-size: 0.85rem; }
+.security-note { font-size: 0.72rem; color: var(--footer-muted); text-align: center; margin-top: 24px; padding: 12px; border-top: 1px solid var(--border); }
+.footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--footer-muted); display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div><h1>Vault</h1><div class="subtitle">Senhas e tokens criptografados localmente</div></div>
+    <div class="header-actions">
+      <a class="back-link" href="plataformas.html">Hub</a>
+      <button class="theme-toggle" id="theme-toggle">&#9790;</button>
+    </div>
+  </div>
+  <div id="lock-screen" class="lock-screen">
+    <div class="lock-icon">&#128274;</div>
+    <p>Digite sua senha mestra para desbloquear. AES-256-GCM no browser.</p>
+    <input type="password" class="master-input" id="master-password" placeholder="Senha mestra" autocomplete="off">
+    <button class="btn btn-primary" id="btn-unlock">Desbloquear</button>
+    <div id="lock-error" style="color:var(--red);font-size:0.82rem;display:none"></div>
+  </div>
+  <div id="vault-content" style="display:none">
+    <div class="toolbar">
+      <input type="text" class="search-input" id="search" placeholder="Buscar servico, campo ou valor...">
+      <button class="btn btn-primary" id="btn-add">+ Novo</button>
+      <button class="btn btn-danger btn-sm" id="btn-lock">Bloquear</button>
+    </div>
+    <div class="entries" id="entries"></div>
+    <div class="security-note">AES-256-GCM + PBKDF2 (600k iter) | localStorage | Nada sai do browser</div>
+  </div>
+  <div class="footer"><span>vault.html</span><span id="entry-count"></span></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h2 id="modal-title">Nova Entrada</h2>
+    <input type="hidden" id="edit-id">
+    <div class="form-group">
+      <label>Nome do Servico</label>
+      <input type="text" class="form-input" id="f-name" placeholder="Ex: N8N, OpenAI, TOTVS RM">
+    </div>
+    <div class="form-group">
+      <label>Categoria</label>
+      <select class="form-select" id="f-type">
+        <option value="service">Servico</option>
+        <option value="ai">AI / LLM</option>
+        <option value="infra">Infra / DevOps</option>
+        <option value="auth">Auth / Seguranca</option>
+        <option value="other">Outro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Campos</label>
+      <div class="fields-editor" id="fields-editor"></div>
+      <button class="btn btn-ghost btn-add-field" id="btn-add-field">+ Campo</button>
+    </div>
+    <div class="form-group">
+      <label>Notas (opcional)</label>
+      <input type="text" class="form-input" id="f-notes" placeholder="Observacoes gerais">
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" id="btn-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="btn-save">Salvar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var PBKDF2_ITERATIONS = 600000;
+var STORAGE_KEY = 'raiz-vault-v2';
+
+async function deriveKey(pw, salt) {
+  var km = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:PBKDF2_ITERATIONS,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function encrypt(pt, pw) {
+  var salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+  var key=await deriveKey(pw,salt), ct=await crypto.subtle.encrypt({name:'AES-GCM',iv:iv},key,new TextEncoder().encode(pt));
+  var b=new Uint8Array(28+ct.byteLength); b.set(salt,0); b.set(iv,16); b.set(new Uint8Array(ct),28);
+  return btoa(String.fromCharCode.apply(null,b));
+}
+async function decrypt(c, pw) {
+  var r=Uint8Array.from(atob(c),function(x){return x.charCodeAt(0)});
+  var key=await deriveKey(pw,r.slice(0,16));
+  return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:r.slice(16,28)},key,r.slice(28)));
+}
+
+var masterPwd=null, entries=[], revealedEntries={};
+
+async function saveVault() { try{localStorage.setItem(STORAGE_KEY,await encrypt(JSON.stringify(entries),masterPwd));}catch(e){} }
+async function loadVault(pw) { var d; try{d=localStorage.getItem(STORAGE_KEY);}catch(e){} if(!d)return null; return JSON.parse(await decrypt(d,pw)); }
+function hasVault() { try{return !!localStorage.getItem(STORAGE_KEY);}catch(e){return false;} }
+
+function showToast(m) { var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2000); }
+function typeClass(t) { return 'type-'+(t||'other'); }
+var MASK = '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022';
+
+function renderEntries(filter) {
+  var c = document.getElementById('entries');
+  while(c.firstChild) c.removeChild(c.firstChild);
+  var list = entries;
+  if(filter) { var q=filter.toLowerCase(); list=entries.filter(function(e){
+    var txt = e.name+' '+e.type+' '+(e.notes||'')+' '+e.fields.map(function(f){return f.label+' '+f.value;}).join(' ');
+    return txt.toLowerCase().indexOf(q)!==-1;
+  });}
+  if(!list.length) {
+    var em=document.createElement('div'); em.className='empty-state';
+    var p=document.createElement('p'); p.textContent=entries.length?'Nenhum resultado.':'Clique "+ Novo" para adicionar.'; em.appendChild(p); c.appendChild(em);
+    document.getElementById('entry-count').textContent=entries.length+' servicos'; return;
+  }
+  list.forEach(function(entry) {
+    var div=document.createElement('div'); div.className='entry';
+    // Header
+    var hdr=document.createElement('div'); hdr.className='entry-header';
+    var nm=document.createElement('span'); nm.className='entry-name'; nm.textContent=entry.name; hdr.appendChild(nm);
+    var badges=document.createElement('div'); badges.className='entry-badges';
+    var badge=document.createElement('span'); badge.className='entry-type '+typeClass(entry.type); badge.textContent=entry.type; badges.appendChild(badge);
+    var fcount=document.createElement('span'); fcount.style.cssText='font-size:0.7rem;color:var(--text-muted)'; fcount.textContent=entry.fields.length+' campos'; badges.appendChild(fcount);
+    hdr.appendChild(badges); div.appendChild(hdr);
+    // Fields
+    var revealed = !!revealedEntries[entry.id];
+    var fieldsDiv=document.createElement('div'); fieldsDiv.className='fields';
+    entry.fields.forEach(function(f) {
+      var row=document.createElement('div'); row.className='field-row';
+      var lbl=document.createElement('span'); lbl.className='field-label'; lbl.textContent=f.label; row.appendChild(lbl);
+      var val=document.createElement('div'); val.className='field-value';
+      if(f.sensitive && !revealed) { val.classList.add('masked'); val.textContent=MASK; }
+      else { val.classList.add('plain'); val.textContent=f.value; }
+      row.appendChild(val);
+      var cp=document.createElement('button'); cp.className='field-copy'; cp.textContent='Copiar';
+      cp.addEventListener('click',(function(v){return function(){navigator.clipboard.writeText(v).then(function(){showToast('Copiado!');});};})(f.value));
+      row.appendChild(cp);
+      fieldsDiv.appendChild(row);
+    });
+    div.appendChild(fieldsDiv);
+    // Notes
+    if(entry.notes) { var n=document.createElement('div'); n.className='entry-notes'; n.textContent=entry.notes; div.appendChild(n); }
+    // Actions
+    var acts=document.createElement('div'); acts.className='entry-actions-row';
+    var btnR=document.createElement('button'); btnR.className='btn btn-ghost btn-sm'; btnR.textContent=revealed?'Ocultar':'Revelar';
+    btnR.addEventListener('click',(function(id){return function(){if(revealedEntries[id])delete revealedEntries[id];else revealedEntries[id]=true;renderEntries(document.getElementById('search').value);};})(entry.id));
+    acts.appendChild(btnR);
+    var btnE=document.createElement('button'); btnE.className='btn btn-ghost btn-sm'; btnE.textContent='Editar';
+    btnE.addEventListener('click',(function(en){return function(){openModal(en);};})(entry)); acts.appendChild(btnE);
+    var btnD=document.createElement('button'); btnD.className='btn btn-danger btn-sm'; btnD.textContent='Excluir';
+    btnD.addEventListener('click',(function(id){return function(){if(confirm('Remover?')){entries=entries.filter(function(x){return x.id!==id;});saveVault().then(function(){renderEntries(document.getElementById('search').value);});}};})(entry.id));
+    acts.appendChild(btnD);
+    div.appendChild(acts);
+    c.appendChild(div);
+  });
+  document.getElementById('entry-count').textContent=entries.length+' servicos';
+}
+
+// Modal fields editor
+var modalFields = [];
+function renderFieldsEditor() {
+  var c=document.getElementById('fields-editor'); while(c.firstChild)c.removeChild(c.firstChild);
+  modalFields.forEach(function(f,i) {
+    var row=document.createElement('div'); row.className='field-edit-row';
+    var inpL=document.createElement('input'); inpL.className='form-input'; inpL.placeholder='Label'; inpL.value=f.label;
+    inpL.addEventListener('input',(function(idx){return function(e){modalFields[idx].label=e.target.value;};})(i));
+    var inpV=document.createElement('input'); inpV.className='form-input'; inpV.placeholder='Valor'; inpV.value=f.value;
+    inpV.addEventListener('input',(function(idx){return function(e){modalFields[idx].value=e.target.value;};})(i));
+    var sel=document.createElement('select'); sel.className=''; sel.style.cssText='width:80px;background:var(--input-bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-size:0.78rem';
+    var o1=document.createElement('option'); o1.value='false'; o1.textContent='Visivel'; var o2=document.createElement('option'); o2.value='true'; o2.textContent='Oculto';
+    sel.appendChild(o1); sel.appendChild(o2); sel.value=f.sensitive?'true':'false';
+    sel.addEventListener('change',(function(idx){return function(e){modalFields[idx].sensitive=e.target.value==='true';};})(i));
+    var rm=document.createElement('button'); rm.className='btn-remove-field'; rm.textContent='\u00D7';
+    rm.addEventListener('click',(function(idx){return function(){modalFields.splice(idx,1);renderFieldsEditor();};})(i));
+    row.appendChild(inpL); row.appendChild(inpV); row.appendChild(sel); row.appendChild(rm); c.appendChild(row);
+  });
+}
+function openModal(entry) {
+  document.getElementById('modal-title').textContent=entry?'Editar':'Nova Entrada';
+  document.getElementById('edit-id').value=entry?entry.id:'';
+  document.getElementById('f-name').value=entry?entry.name:'';
+  document.getElementById('f-type').value=entry?entry.type:'service';
+  document.getElementById('f-notes').value=entry?(entry.notes||''):'';
+  modalFields=entry?JSON.parse(JSON.stringify(entry.fields)):[{label:'',value:'',sensitive:true}];
+  renderFieldsEditor();
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('f-name').focus();
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function saveEntry() {
+  var name=document.getElementById('f-name').value.trim();
+  var fields=modalFields.filter(function(f){return f.label.trim()&&f.value.trim();});
+  if(!name||!fields.length){showToast('Nome e pelo menos 1 campo obrigatorios');return;}
+  var editId=document.getElementById('edit-id').value;
+  if(editId) {
+    var ex=entries.find(function(e){return e.id===editId;});
+    if(ex){ex.name=name;ex.type=document.getElementById('f-type').value;ex.fields=fields;ex.notes=document.getElementById('f-notes').value.trim();ex.updated=new Date().toISOString();}
+  } else {
+    entries.push({id:crypto.randomUUID(),name:name,type:document.getElementById('f-type').value,fields:fields,notes:document.getElementById('f-notes').value.trim(),created:new Date().toISOString(),updated:new Date().toISOString()});
+  }
+  saveVault().then(function(){closeModal();renderEntries(document.getElementById('search').value);showToast(editId?'Atualizado!':'Salvo!');});
+}
+
+document.getElementById('btn-add-field').addEventListener('click',function(){modalFields.push({label:'',value:'',sensitive:true});renderFieldsEditor();});
+
+async function unlock() {
+  var pw=document.getElementById('master-password').value; if(!pw)return;
+  var err=document.getElementById('lock-error'); err.style.display='none';
+  if(!hasVault()){masterPwd=pw;entries=[];await saveVault();document.getElementById('lock-screen').style.display='none';document.getElementById('vault-content').style.display='block';renderEntries();showToast('Vault criado!');return;}
+  try{var d=await loadVault(pw);masterPwd=pw;entries=d||[];document.getElementById('lock-screen').style.display='none';document.getElementById('vault-content').style.display='block';renderEntries();}
+  catch(e){err.textContent='Senha incorreta';err.style.display='block';document.getElementById('master-password').value='';document.getElementById('master-password').focus();}
+}
+function lock(){masterPwd=null;entries=[];revealedEntries={};document.getElementById('vault-content').style.display='none';document.getElementById('lock-screen').style.display='flex';document.getElementById('master-password').value='';document.getElementById('lock-error').style.display='none';}
+
+document.getElementById('btn-unlock').addEventListener('click',unlock);
+document.getElementById('master-password').addEventListener('keydown',function(e){if(e.key==='Enter')unlock();});
+document.getElementById('btn-lock').addEventListener('click',lock);
+document.getElementById('btn-add').addEventListener('click',function(){openModal(null);});
+document.getElementById('btn-save').addEventListener('click',saveEntry);
+document.getElementById('btn-cancel').addEventListener('click',closeModal);
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('search').addEventListener('input',function(){renderEntries(this.value);});
+if(!hasVault())document.getElementById('btn-unlock').textContent='Criar Vault';
+
+function getStoredTheme(){try{return localStorage.getItem('raiz-theme');}catch(e){return null;}}
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('theme-toggle').textContent=t==='dark'?'\u263E':'\u2600';try{localStorage.setItem('raiz-theme',t);}catch(e){}}
+document.getElementById('theme-toggle').addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme')||'dark';setTheme(c==='dark'?'light':'dark');});
+setTheme(getStoredTheme()||'dark');
+
+var lockTimer;
+function resetLockTimer(){clearTimeout(lockTimer);if(masterPwd){lockTimer=setTimeout(function(){lock();showToast('Bloqueado por inatividade');},300000);}}
+document.addEventListener('mousemove',resetLockTimer);document.addEventListener('keydown',resetLockTimer);document.addEventListener('click',resetLockTimer);
+</script>
+</body>
+</html>
