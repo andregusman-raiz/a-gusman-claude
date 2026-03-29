@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metodologia rAIz Claude Code</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --raiz-orange: #F7941D;
+  --raiz-orange-dark: #D97B10;
+  --raiz-orange-light: #FDE8C8;
+  --raiz-orange-xlight: #FEF3E2;
+  --raiz-teal: #5BB5A2;
+  --raiz-teal-dark: #3D9A87;
+  --raiz-teal-light: #D4EFE9;
+  --raiz-teal-xlight: #EAF6F3;
+  --bg-app: #F8F9FA;
+  --surface: #FFFFFF;
+  --foreground: #1A202C;
+  --text-secondary: #4A5568;
+  --text-muted: #718096;
+  --border: #E2E8F0;
+  --muted-bg: #F0F4F8;
+  --sidebar-bg: #1E2433;
+  --sidebar-accent: #2D3548;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  color: var(--foreground);
+  background: var(--bg-app);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+/* ===== HERO ===== */
+.hero {
+  background: var(--sidebar-bg);
+  color: white;
+  padding: 48px 0 40px;
+  text-align: center;
+}
+.hero-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.hero svg { margin-bottom: 16px; }
+.hero h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+.hero .subtitle {
+  font-size: 15px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 400;
+}
+.hero .tagline {
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--raiz-orange);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.hero .stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 24px;
+}
+.hero .stat {
+  text-align: center;
+}
+.hero .stat-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--raiz-orange);
+  font-variant-numeric: tabular-nums;
+}
+.hero .stat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 2px;
+}
+
+/* ===== NAV ===== */
+.toc-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.toc-bar-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.toc-bar a {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.toc-bar a:hover {
+  background: var(--raiz-orange-xlight);
+  color: var(--raiz-orange-dark);
+}
+
+/* ===== CONTENT ===== */
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* Sections */
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-top: 48px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--raiz-orange);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+h2 .section-num {
+  background: var(--raiz-orange);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--raiz-teal-dark);
+  margin-top: 32px;
+  margin-bottom: 12px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+p { margin-bottom: 12px; }
+
+/* Blockquotes = command examples */
+blockquote {
+  background: var(--sidebar-bg);
+  color: #E2E8F0;
+  border-left: 3px solid var(--raiz-orange);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+blockquote p { margin-bottom: 0; color: #E2E8F0; }
+
+/* Code */
+code {
+  background: var(--muted-bg);
+  color: var(--raiz-teal-dark);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+pre {
+  background: var(--sidebar-bg);
+  color: #E2E8F0;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 12px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+}
+thead th {
+  background: var(--muted-bg);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 2px solid var(--border);
+}
+tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:hover { background: var(--raiz-teal-xlight); }
+
+/* Lists */
+ul, ol {
+  margin: 8px 0 12px 20px;
+}
+li { margin-bottom: 4px; }
+
+/* Strong emphasis */
+strong { color: var(--foreground); font-weight: 600; }
+
+/* Horizontal rule */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 40px 0;
+}
+
+/* Callout boxes for key concepts */
+p > strong:first-child {
+  color: var(--raiz-orange-dark);
+}
+
+/* Links */
+a {
+  color: var(--raiz-teal-dark);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--raiz-orange);
+  text-decoration: underline;
+}
+
+/* Footer */
+.footer {
+  background: var(--sidebar-bg);
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  padding: 32px 24px;
+  font-size: 13px;
+}
+.footer a {
+  color: var(--raiz-orange);
+}
+.footer .brand {
+  color: var(--raiz-orange);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Print */
+@media print {
+  .toc-bar { display: none; }
+  .hero { padding: 24px 0; }
+  body { font-size: 12px; }
+  h2 { break-before: page; }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .hero h1 { font-size: 22px; }
+  .hero .stats { gap: 16px; }
+  .hero .stat-value { font-size: 22px; }
+  .toc-bar { display: none; }
+  .content { padding: 20px 16px 60px; }
+  h2 { font-size: 18px; }
+  table { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 225 225" width="80" height="80" role="img" aria-label="rAIz Educacao">
+      <g fill="#6dba90" transform="translate(0,225) scale(0.1,-0.1)">
+        <path d="M802 1988 c4 -153 5 -166 30 -213 31 -59 76 -104 138 -136 41 -22 59 -24 218 -27 l173 -4 -3 169 c-3 156 -5 171 -28 217 -14 27 -44 66 -68 87 -68 59 -110 69 -300 69 l-164 0 4 -162z"/>
+        <path d="M1550 1964 c-38 -16 -85 -57 -103 -89 -6 -11 -14 -75 -17 -143 l-5 -122 108 0 c118 0 162 12 210 58 50 47 60 78 65 200 l5 112 -114 0 c-79 -1 -125 -5 -149 -16z"/>
+      </g>
+      <g fill="#e8893a" transform="translate(0,225) scale(0.1,-0.1)">
+        <path d="M300 1025 l0 -475 70 0 c70 0 70 0 70 145 0 80 4 145 8 145 5 0 36 -64 70 -142 60 -143 60 -143 136 -146 l77 -3 -76 150 c-41 83 -75 154 -75 158 0 5 14 16 30 25 16 9 39 32 50 50 18 30 20 50 20 238 0 180 -3 210 -19 247 -31 68 -72 83 -231 83 l-130 0 0 -475z m230 325 c18 -18 20 -33 20 -184 0 -165 0 -165 -26 -185 -15 -12 -40 -21 -55 -21 -29 0 -29 0 -29 205 0 205 0 205 35 205 22 0 43 -8 55 -20z"/>
+        <path d="M910 1497 c0 -2 -31 -215 -70 -473 -38 -258 -70 -470 -70 -471 0 -2 31 -3 68 -3 68 0 68 0 86 140 18 140 18 140 80 140 63 0 63 0 81 -140 18 -140 18 -140 87 -140 69 0 69 0 63 32 -6 38 -135 906 -135 913 0 3 -43 5 -95 5 -52 0 -95 -1 -95 -3z m115 -357 c8 -69 18 -137 21 -152 5 -27 4 -28 -40 -28 -25 0 -46 1 -46 3 0 1 9 69 20 151 11 81 20 151 20 154 0 3 2 3 4 1 3 -2 12 -61 21 -129z"/>
+        <path d="M1330 1025 l0 -475 65 0 65 0 0 475 0 475 -65 0 -65 0 0 -475z"/>
+        <path d="M1580 1435 c0 -65 0 -65 91 -65 90 0 91 0 85 -22 -57 -212 -186 -744 -186 -767 0 -31 0 -31 175 -31 175 0 175 0 175 65 0 65 0 65 -95 65 -52 0 -95 3 -95 7 0 4 41 168 90 364 50 196 90 378 90 403 0 46 0 46 -165 46 -165 0 -165 0 -165 -65z"/>
+      </g>
+      <g fill="#5bbbc7" transform="translate(0,225) scale(0.1,-0.1)">
+        <path d="M730 405 c0 -42 -11 -58 -25 -35 -3 6 -20 10 -36 10 -43 0 -79 -39 -79 -85 0 -67 76 -110 122 -68 17 15 18 15 18 0 0 -10 5 -17 10 -17 6 0 10 47 10 120 0 73 -4 120 -10 120 -5 0 -10 -20 -10 -45z m-20 -65 c11 -11 20 -31 20 -45 0 -30 -32 -65 -59 -65 -28 0 -63 48 -55 74 17 55 59 71 94 36z"/>
+        <path d="M432 360 c-60 -56 -24 -150 57 -150 20 0 42 4 50 9 20 13 -3 23 -34 15 -26 -6 -75 17 -75 36 0 6 29 10 65 10 63 0 65 1 65 25 0 35 -42 75 -78 75 -15 0 -38 -9 -50 -20z m79 -10 c10 -6 19 -20 19 -30 0 -17 -7 -20 -50 -20 -56 0 -67 17 -28 44 26 19 33 19 59 6z"/>
+        <path d="M800 315 c0 -52 4 -69 20 -85 21 -21 74 -27 85 -10 5 8 11 7 21 -1 20 -16 26 5 22 86 -2 44 -8 70 -15 73 -10 3 -13 -13 -13 -57 0 -53 -3 -62 -24 -76 -19 -13 -29 -14 -45 -5 -18 9 -21 20 -21 75 0 51 -3 65 -15 65 -12 0 -15 -14 -15 -65z"/>
+        <path d="M1015 356 c-56 -56 -15 -151 62 -144 20 2 38 8 40 15 3 8 -6 10 -30 6 -29 -4 -37 -1 -55 22 -12 15 -22 33 -22 40 0 7 10 25 22 40 18 23 26 26 55 22 24 -4 33 -2 30 6 -2 7 -20 13 -40 15 -28 2 -42 -3 -62 -22z"/>
+        <path d="M1165 370 c-7 -11 -1 -13 38 -10 31 2 57 -15 57 -36 0 -10 -13 -14 -45 -14 -36 0 -47 -4 -61 -25 -15 -23 -15 -27 0 -50 12 -19 25 -25 51 -25 18 0 37 4 40 10 4 6 13 5 25 -2 22 -14 39 -3 22 14 -7 7 -12 38 -12 70 0 46 -4 59 -19 68 -25 13 -88 13 -96 0z m95 -93 c0 -25 -37 -50 -65 -43 -24 6 -34 34 -18 49 13 13 83 8 83 -6z"/>
+        <path d="M1355 356 c-35 -35 -34 -88 3 -122 15 -14 35 -33 45 -41 9 -9 17 -20 17 -24 0 -4 -8 -10 -17 -12 -14 -4 -13 -5 4 -6 29 -1 40 19 20 34 -23 16 -21 23 5 27 12 2 23 9 26 15 2 9 -5 11 -27 7 -23 -5 -35 -1 -55 19 -14 15 -26 33 -26 42 0 9 12 27 26 42 20 20 32 24 55 19 22 -4 29 -2 27 7 -3 6 -21 13 -41 15 -28 2 -42 -3 -62 -22z"/>
+        <path d="M1505 370 c-7 -11 -1 -13 38 -10 31 2 57 -15 57 -36 0 -10 -13 -14 -43 -14 -24 0 -48 -5 -55 -12 -19 -19 -15 -66 7 -78 25 -13 68 -13 76 0 5 8 11 7 21 -1 7 -6 22 -8 31 -4 17 6 17 7 1 16 -14 8 -18 23 -18 67 0 32 -5 63 -12 70 -14 14 -94 16 -103 2z m95 -94 c0 -18 -27 -46 -45 -46 -26 0 -45 12 -45 29 0 26 9 31 52 31 26 0 38 -4 38 -14z"/>
+        <path d="M1695 355 c-54 -53 -16 -145 58 -145 46 0 87 40 87 85 0 75 -92 113 -145 60z m93 -11 c33 -23 27 -83 -9 -103 -24 -13 -29 -13 -53 2 -34 23 -37 78 -4 101 28 20 38 20 66 0z"/>
+      </g>
+    </svg>
+    <h1>Metodologia rAIz Claude Code</h1>
+    <div class="subtitle">Guia pratico de implementacao com IA para equipes</div>
+    <div class="tagline">Pego e faco. Se der errado, joga fora. Se der certo, replica.</div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">464</div>
+        <div class="stat-label">Entregas em 15 dias</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">44</div>
+        <div class="stat-label">Assistentes</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">59</div>
+        <div class="stat-label">Habilidades</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">13x</div>
+        <div class="stat-label">Sessoes / dia</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOC BAR -->
+<div class="toc-bar">
+  <div class="toc-bar-inner">
+    <a href="#rotina">Rotina</a>
+    <a href="#prompting">Prompting</a>
+    <a href="#backlog">Backlog</a>
+    <a href="#construcao">Construcao</a>
+    <a href="#correcao">Correcao</a>
+    <a href="#assistentes">Assistentes</a>
+    <a href="#protecao">Protecao</a>
+    <a href="#continuidade">Continuidade</a>
+    <a href="#replicacao">Replicacao</a>
+    <a href="#compartilhar">Compartilhar</a>
+    <a href="#erros">Erros</a>
+    <a href="#comecar">Comecar</a>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+<h1 id="metodologia-raiz-claude-code">Metodologia rAIz Claude Code</h1>
+<h2 id="guia-pratico-de-implementacao-com-ia-para-equipes">Guia Pratico
+de Implementacao com IA para Equipes</h2>
+<blockquote>
+<p>A Metodologia rAIz Claude Code e o sistema que usamos para executar
+464 entregas em 15 dias. Nao porque somos rapidos — porque montamos um
+sistema onde dizemos O QUE queremos e ele faz. Este guia explica
+como.</p>
+</blockquote>
+<hr />
+<h2 id="indice">Indice</h2>
+<ol type="1">
+<li><a href="#1-minha-rotina--como-e-um-dia-real">Minha rotina — como
+funciona um dia real</a></li>
+<li><a href="#2-como-eu-peco-as-coisas">Como eu peco as coisas</a></li>
+<li><a href="#3-como-eu-gerencio-o-que-precisa-ser-feito">Como eu
+gerencio o que precisa ser feito</a></li>
+<li><a href="#4-como-eu-construo-algo-do-zero">Como eu construo algo do
+zero</a></li>
+<li><a href="#5-como-eu-corrijo-problemas">Como eu corrijo
+problemas</a></li>
+<li><a href="#6-meus-assistentes--qual-usar-e-quando">Meus assistentes —
+qual usar e quando</a></li>
+<li><a href="#7-como-eu-protejo-meu-trabalho-sem-perder-velocidade">Como
+eu protejo meu trabalho sem perder velocidade</a></li>
+<li><a href="#8-como-eu-trabalho-em-projetos-que-duram-semanas">Como eu
+trabalho em projetos que duram semanas</a></li>
+<li><a href="#9-como-eu-replico-isso-para-qualquer-projeto">Como eu
+replico isso para qualquer projeto</a></li>
+<li><a href="#10-como-eu-compartilho-isso--e-como-voce-pode-pegar">Como
+eu compartilho isso — e como voce pode pegar</a></li>
+<li><a href="#11-o-que-eu-aprendi-errando">O que eu aprendi
+errando</a></li>
+<li><a href="#12-como-comecar-se-voce-quer-fazer-igual">Como comecar se
+voce quer fazer igual</a></li>
+</ol>
+<hr />
+<h2 id="a-rotina-como-funciona-um-dia-real">1. A rotina — como funciona
+um dia real</h2>
+<h3 id="o-ritmo">O ritmo</h3>
+<p>Abro o Claude Code umas 13 vezes por dia. Cada sessao dura entre 10
+minutos e 2 horas. Em media, dou 8-9 instrucoes por sessao. Em 15 dias,
+foram 464 entregas feitas.</p>
+<p>Nao e que eu trabalho rapido. E que eu montei um sistema onde eu dou
+a direcao e o Claude executa. Meu trabalho e decidir O QUE fazer, nao
+COMO fazer.</p>
+<h3 id="a-filosofia-pego-e-faco">A filosofia: “Pego e faco”</h3>
+<p>O tempo de discussao e sempre maior que o tempo de execucao. Enquanto
+as pessoas discutem se algo e possivel, eu ja fiz. Nao porque sei mais —
+porque pulo a etapa de “sera que da?”.</p>
+<p>A analogia e simples: ninguem pergunta “sera que o Google tem
+passagem aerea?”. Voce vai la e pesquisa. Com IA e a mesma coisa. Nao
+pergunte se da para fazer. Faca. Se der errado, joga fora — foram poucas
+horas de trabalho.</p>
+<p>Esse modelo mental e mais importante que qualquer tecnica. E a
+diferenca entre ficar especificando para dar certo (mentalidade antiga)
+e fazer rapido, ver o resultado, e ajustar (mentalidade nova).</p>
+<h3 id="como-comeca-uma-sessao-tipica">Como comeca uma sessao
+tipica</h3>
+<p>Abro o terminal e digo algo assim:</p>
+<blockquote>
+<p>“Continuar com o Grupo 2 do backlog. Issue #201. Repo em
+~/Claude/GitHub/raiz-platform”</p>
+</blockquote>
+<p>Ou:</p>
+<blockquote>
+<p>“Tem um bug no modulo de contratos — campo businessUnitId nao
+reconhece camelCase. Issue #312. Diagnosticar antes de mexer.”</p>
+</blockquote>
+<p>Ou:</p>
+<blockquote>
+<p>“Preparar o app de chamada para integracao com o sistema da escola.
+Repo em ~/Claude/projetos/chamada-app”</p>
+</blockquote>
+<p>Eu nao explico como fazer. Digo o que quero e onde esta. O sistema
+decide qual assistente usar, qual abordagem seguir, e executa.</p>
+<h3 id="o-que-eu-faco-enquanto-ele-trabalha">O que eu faco enquanto ele
+trabalha</h3>
+<p>Depende. Se e algo simples, fico olhando e corrijo se desviar. Se e
+algo grande, mando rodar em background e vou para outra sessao. Ja
+cheguei a ter 3-4 sessoes rodando ao mesmo tempo em projetos
+diferentes.</p>
+<h3 id="como-termina-uma-sessao">Como termina uma sessao</h3>
+<p>Quando termino um bloco de trabalho, peco para salvar o estado:</p>
+<blockquote>
+<p>“Estou parando por hoje. Salva onde paramos, o que foi feito, o que
+falta.”</p>
+</blockquote>
+<p>Na proxima vez que abro, digo:</p>
+<blockquote>
+<p>“Continuando de ontem. Le o estado salvo e me diz onde paramos.”</p>
+</blockquote>
+<p>E ele retoma exatamente de onde parou.</p>
+<hr />
+<h2 id="como-pedir-as-coisas">2. Como pedir as coisas</h2>
+<h3 id="a-regra-de-ouro">A regra de ouro</h3>
+<p>A qualidade do que o Claude entrega depende 100% de como voce pede.
+Ele faz exatamente o que voce diz — e esse e o problema. Se voce pede
+errado, ele executa errado, rapido, e com confianca.</p>
+<h3 id="prompting-simplificado-menos-e-mais">Prompting simplificado —
+menos e mais</h3>
+<p>Esquece prompt grande. Eu nao uso prompt grande ha muito tempo.
+Escrevo na velocidade da fala, sem corrigir portugues, com redundancia.
+Se eu escrevi a mesma coisa duas vezes, tudo bem — ele entende.</p>
+<p>O que importa nao e a FORMA, e o CONTEUDO. Tres linhas claras batem
+um paragrafo bem formatado.</p>
+<blockquote>
+<p>“Analisa a base do TOTVS. Faz especificacoes do que uma secretaria
+precisaria. Executa.”</p>
+</blockquote>
+<p>Se esqueci de colocar o agente no comeco, boto no final: adiciono
+<code>#ag</code> e pronto. Se lembrei de mais uma coisa, escrevo
+embaixo. Nao precisa ser bonito.</p>
+<p><strong>Regra</strong>: Se voce esta escrevendo mais de 3 linhas para
+pedir algo, provavelmente esta complicando.</p>
+<h3 id="exemplos-reais-do-que-funciona">Exemplos reais do que
+funciona</h3>
+<p><strong>Para resolver uma issue do backlog:</strong> &gt; “Resolver
+issue #201. Ler a issue, criar uma especificacao, implementar, verificar
+contra a especificacao, rodar testes, criar PR linkada. Repo em
+~/Claude/GitHub/raiz-platform”</p>
+<p><strong>Para corrigir um bug:</strong> &gt; “Bug: quando clica em
+salvar no formulario de perfil, o telefone nao salva. Endpoint
+/api/profile. ANTES de mexer em codigo, investiga a causa. Me mostra o
+que encontrou antes de implementar.”</p>
+<p><strong>Para construir algo novo:</strong> &gt; “Quero um endpoint
+que recebe uma lista de alunos e retorna quais estao presentes. Usar a
+tabela <code>attendance</code> do Supabase. Testar com dados reais.”</p>
+<p><strong>Para rodar testes:</strong> &gt; “Roda os testes do modulo de
+autenticacao. Se algum falhar, me mostra qual e por que — nao tenta
+consertar sozinho.”</p>
+<h3 id="o-que-nao-funciona">O que NAO funciona</h3>
+<blockquote>
+<p>“Corrige o bug” (qual bug? onde?) “Melhora o codigo” (qual parte?
+melhora como?) “Implementa a feature” (qual feature? como deve
+funcionar?)</p>
+</blockquote>
+<p>Quanto mais vago, pior o resultado. Nao precisa escrever um livro —
+mas diga O QUE, ONDE, e COMO VERIFICAR.</p>
+<h3 id="quando-interromper">Quando interromper</h3>
+<p>Se voce ve que ele esta indo na direcao errada, interrompa
+IMEDIATAMENTE:</p>
+<blockquote>
+<p>“Para. Nao e isso. O problema nao e no endpoint, e no banco.
+Investiga a query.”</p>
+</blockquote>
+<p>Cada minuto que voce espera ele seguir no caminho errado e um minuto
+de retrabalho. Quanto antes corrigir, melhor.</p>
+<h3 id="pedidos-com-pontos-de-salvamento">Pedidos com pontos de
+salvamento</h3>
+<p>Para qualquer coisa que leve mais de 15 minutos:</p>
+<blockquote>
+<p>“Implementar features A, B e C. Salvar o progresso depois de cada
+uma. Rodar testes antes de salvar. Se algo falhar, para e me avisa antes
+de tentar consertar.”</p>
+</blockquote>
+<p>Sem pontos de salvamento, se algo quebra na feature C, voce perde A e
+B tambem.</p>
+<hr />
+<h2 id="como-gerenciar-o-que-precisa-ser-feito">3. Como gerenciar o que
+precisa ser feito</h2>
+<h3 id="github-issues-como-meu-backlog">GitHub Issues como meu
+backlog</h3>
+<p>Tudo que precisa ser feito vira uma issue no GitHub. Cada issue tem:
+- Um titulo claro - Uma descricao do que precisa acontecer - Labels de
+prioridade e tipo</p>
+<p>Eu organizo em grupos por prioridade e tamanho. Um grupo tipico tem
+5-20 issues.</p>
+<h3 id="o-fluxo-de-cada-issue">O fluxo de cada issue</h3>
+<p>Toda issue passa por um pipeline:</p>
+<pre><code>Issue no GitHub
+   ↓
+Especificacao (o que vai ser feito, escrito antes de codar)
+   ↓
+Implementacao (o codigo em si)
+   ↓
+Verificacao (comparar o que foi feito com a especificacao)
+   ↓
+Testes (funciona? nao quebra nada?)
+   ↓
+PR no GitHub (entrega linkada a issue: &quot;closes #N&quot;)</code></pre>
+<p>Eu tenho um assistente especifico para isso — o
+<strong>ag-M-51</strong> (pipeline de issues). Eu digo:</p>
+<blockquote>
+<p>“Resolver issue #201”</p>
+</blockquote>
+<p>E ele faz tudo: le a issue, cria a especificacao, implementa,
+verifica contra a especificacao, roda testes, cria a PR. Se algo nao
+passa na verificacao, ele ajusta antes de entregar.</p>
+<h3 id="quando-nao-vale-a-pena-fazer-especificacao">Quando nao vale a
+pena fazer especificacao</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr>
+<th>Situacao</th>
+<th>Precisa de especificacao?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Feature nova com 3+ telas</td>
+<td>Sim, sempre</td>
+</tr>
+<tr>
+<td>Bug simples e isolado</td>
+<td>Nao, so o diagnostico</td>
+</tr>
+<tr>
+<td>Ajuste de texto ou visual</td>
+<td>Nao</td>
+</tr>
+<tr>
+<td>Refatoracao grande</td>
+<td>Sim (definir o que muda e o que nao muda)</td>
+</tr>
+<tr>
+<td>Algo que voce nao conhece bem</td>
+<td>Sim (especificacao = entender antes de mexer)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="trabalhando-em-lotes">Trabalhando em lotes</h3>
+<p>Quando tenho 5-20 issues para resolver:</p>
+<blockquote>
+<p>“Grupo 2 do backlog: issues #201 a #215. Tamanho medio. Resolver em
+sequencia, salvar depois de cada uma.”</p>
+</blockquote>
+<p>Se sao issues pequenas e independentes, posso mandar em paralelo:</p>
+<blockquote>
+<p>“Issues #201, #202, #203 — sao independentes, pode fazer as 3 ao
+mesmo tempo. Cada uma em area separada para nao conflitar.”</p>
+</blockquote>
+<h3 id="labels-cuidado-importante">Labels — cuidado importante</h3>
+<p>Antes de criar issues com etiquetas, SEMPRE verifico quais etiquetas
+existem no repositorio:</p>
+<blockquote>
+<p>“Lista as labels que existem nesse repo antes de criar a issue”</p>
+</blockquote>
+<p>Parece bobo, mas ja perdi tempo recriando issues porque as etiquetas
+que assumi existir nao existiam.</p>
+<hr />
+<h2 id="como-construir-algo-do-zero">4. Como construir algo do zero</h2>
+<h3 id="o-fluxo-que-funciona">O fluxo que funciona</h3>
+<p>Depois de muitos projetos, este e o caminho que consistentemente
+funciona:</p>
+<h4 id="passo-1-definir-antes-de-construir">Passo 1: Definir antes de
+construir</h4>
+<blockquote>
+<p>“Quero construir um app de chamada escolar. Vai integrar com o
+sistema TOTVS da escola. Precisa: login do professor, lista de turmas,
+marcar presenca, sincronizar com o TOTVS. Me faz uma especificacao com:
+telas, dados, integracao, e o que pode dar errado.”</p>
+</blockquote>
+<p>A especificacao e o contrato. Sem ela, o Claude vai inventando
+conforme avanca e voce termina com algo diferente do que queria.</p>
+<h4 id="passo-2-montar-a-base">Passo 2: Montar a base</h4>
+<blockquote>
+<p>“Agora cria o projeto seguindo a especificacao. Comeca pela
+estrutura: criar o projeto, instalar o que precisa, configurar o banco,
+criar as tabelas. Salvar depois de cada etapa.”</p>
+</blockquote>
+<p>Nao peca tudo de uma vez. Peca a estrutura primeiro, verifique que
+funciona, depois preencha.</p>
+<h4 id="passo-3-uma-coisa-de-cada-vez">Passo 3: Uma coisa de cada
+vez</h4>
+<blockquote>
+<p>“Implementar o login do professor conforme a especificacao. Testar o
+fluxo completo.”</p>
+</blockquote>
+<p>Depois que o login funciona:</p>
+<blockquote>
+<p>“Agora implementar a lista de turmas. Testar.”</p>
+</blockquote>
+<p>Uma funcionalidade por vez. Testar. Salvar. Proxima. Parece lento mas
+e drasticamente mais rapido que “faz tudo” e depois 3 horas caçando
+problemas.</p>
+<h4 id="passo-4-conferir-contra-a-especificacao">Passo 4: Conferir
+contra a especificacao</h4>
+<blockquote>
+<p>“Compara o que foi feito com a especificacao original. Lista o que
+esta pronto, o que esta pela metade, e o que falta.”</p>
+</blockquote>
+<h3 id="layout-primeiro-backend-depois">Layout primeiro, backend
+depois</h3>
+<p>Uma das coisas que mais mudou meu resultado: fazer o layout funcional
+ANTES de conectar qualquer dado real.</p>
+<p>O fluxo que funciona:</p>
+<ol type="1">
+<li>Pedir para analisar a base de conhecimento e a API disponivel</li>
+<li>Gerar especificacoes (pedir varias vezes, iterar)</li>
+<li>Criar layout funcional SEM dados reais — tudo com mock</li>
+<li>Validar o layout: clicar, navegar, testar como usuario</li>
+<li>So depois conectar backend/API</li>
+</ol>
+<blockquote>
+<p>“Faz o layout completo da secretaria. Esquece os dados por enquanto.
+Quero ver todas as telas funcionando, clicando, navegando.”</p>
+</blockquote>
+<p>Por que funciona: o Claude e muito mais assertivo no layout quando
+nao precisa lidar com backend ao mesmo tempo. E para mim, corrigir e
+infinitamente mais facil quando eu VEJO o resultado — em vez de ler
+codigo.</p>
+<p>Quando fiz isso no front do TOTVS, o nivel do layout que veio de cara
+foi brutal. Antes, ele tentava fazer layout E back juntos — entregava os
+dois mais ou menos. Separando, o layout veio profissional.</p>
+<h3 id="construir-motores-nao-solucoes-pontuais">Construir motores, nao
+solucoes pontuais</h3>
+<p>Este e talvez o conceito mais importante deste guia: <strong>nao peca
+para a IA fazer algo — peca para ela criar a MAQUINA que faz
+algo</strong>.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Errado (pontual)</th>
+<th>Certo (motor replicavel)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“Analisa os microdados do ENEM”</td>
+<td>“Cria uma plataforma de analise de microdados do ENEM”</td>
+</tr>
+<tr>
+<td>“Ajeita essa apresentacao”</td>
+<td>“Cria uma solucao que ajeite apresentacoes sozinha”</td>
+</tr>
+<tr>
+<td>“Consolida dados das concessionarias”</td>
+<td>“Cria automacao que consolide dados de 13 concessionarias”</td>
+</tr>
+<tr>
+<td>“Monta plano de transicao da equipe”</td>
+<td>“Cria software de melhoria de processo”</td>
+</tr>
+</tbody>
+</table>
+<p>A logica: o tempo gasto para fazer algo rapido muitas vezes e MAIOR
+do que criar a solucao que resolve sempre. E a solucao replica — no
+outro ano, no outro projeto, para outro time.</p>
+<blockquote>
+<p>“Ao inves de pedir para a IA analisar, peca para ela montar o motor
+de analise.”</p>
+</blockquote>
+<p>Exemplo real: ao inves de pedir ao Claude para analisar dados de
+transicao de equipe, eu criei um software de melhoria de processo.
+Entradas: transcricoes, emails exportados, WhatsApp. Saida: diagnostico
+automatico. Agora qualquer transicao de equipe passa pelo mesmo
+motor.</p>
+<h3 id="apis-primeiro-scraping-quando-necessario">APIs primeiro,
+scraping quando necessario</h3>
+<p>Quando preciso capturar dados externos:</p>
+<ol type="1">
+<li><strong>API primeiro</strong> — sempre a melhor solucao,
+disparado</li>
+<li><strong>Scraping automatizado</strong> — software que grava
+interacoes e gera “receita” passo-a-passo</li>
+<li><strong>Scraping manual</strong> — ultimo recurso</li>
+</ol>
+<p>Criei um software que grava minha navegacao (cliques, formularios) e
+gera uma receita replicavel. Na proxima vez, ele repete sozinho. Se o
+site mudar, regravo a receita — e rapido.</p>
+<h3 id="repositorios-github-como-atalho">Repositorios GitHub como
+atalho</h3>
+<p>Antes de construir qualquer coisa do zero, peco para o Claude buscar
+repositorios existentes:</p>
+<blockquote>
+<p>“Quais sao os melhores repositorios de Gantt/timeline no GitHub? Me
+mostra os mais populares.”</p>
+</blockquote>
+<p>A rede social do GitHub (estrelas) e otima para encontrar solucoes ja
+prontas. Na hora de implementar:</p>
+<blockquote>
+<p>“Usa esse repositorio como base para criar o nosso timeline.”</p>
+</blockquote>
+<p>Isso muda muito — muita coisa que a gente acha que precisa construir,
+alguem ja fez.</p>
+<h3 id="modulo-central-de-apis-evitar-regras-espalhadas">Modulo central
+de APIs — evitar regras espalhadas</h3>
+<p>Quando comecei a conectar APIs no front do TOTVS, cada pagina
+acessava a API diretamente. Se mudasse alguma coisa, eu precisava achar
+e corrigir em N lugares.</p>
+<p>Solucao: um modulo intermediario que centraliza TODAS as chamadas de
+API. As paginas nao acessam a API — acessam o modulo. Filtros viram
+objetos reutilizaveis (plugins).</p>
+<blockquote>
+<p>“Nao quero nenhuma regra de negocio direto no modulo. Cria um modulo
+central onde todas as APIs ficam. Os outros modulos acessam por
+ele.”</p>
+</blockquote>
+<p>Beneficio: se algo muda na API, mudo em 1 lugar. Se preciso do mesmo
+filtro em 5 paginas, e o mesmo objeto.</p>
+<h3 id="para-projetos-maiores">Para projetos maiores</h3>
+<p>Se o projeto e grande, eu uso o <strong>ag-M-00</strong>
+(orquestrador). Ele e o maestro — eu digo o que quero e ele decide quais
+assistentes usar, em que ordem, com que abordagem:</p>
+<blockquote>
+<p>“/ag-M-00-orquestrar novo projeto: app de gestao de tarefas. Stack:
+Next.js, TypeScript, Supabase, Tailwind.”</p>
+</blockquote>
+<p>Ele vai: 1. Criar a estrutura do projeto (ag-P-01) 2. Configurar o
+ambiente (ag-P-02) 3. Pedir que eu defina as funcionalidades 4. Criar a
+especificacao (ag-P-06) 5. Planejar a execucao (ag-P-07) 6. Construir
+(ag-B-08) 7. Testar (ag-Q-13) 8. Fazer deploy (ag-D-27)</p>
+<p>Eu so preciso dar a direcao e aprovar nos momentos-chave.</p>
+<hr />
+<h2 id="como-corrigir-problemas">5. Como corrigir problemas</h2>
+<h3 id="o-erro-que-mais-me-custou-tempo">O erro que mais me custou
+tempo</h3>
+<p>Em 193 sessoes, 71 vezes o problema foi: comecei a corrigir antes de
+entender o que estava errado. O Claude (ou eu) pulava direto para a
+solucao e o fix nao resolvia, ai tentava outro, e outro…</p>
+<h3 id="o-que-eu-faco-agora">O que eu faco agora</h3>
+<p>Antes de tocar em qualquer coisa, faco o Claude responder 3
+perguntas:</p>
+<blockquote>
+<p>“Bug: [descricao]. ANTES de implementar qualquer coisa, me responde:
+1. O que deveria acontecer? 2. O que esta acontecendo? 3. Quais sao as 3
+causas mais provaveis?”</p>
+</blockquote>
+<p>So depois de revisar as respostas e concordar, digo “ok, corrige a
+causa #X”.</p>
+<h3
+id="diagnosticos-iterativos-a-tecnica-que-mais-melhora-qualidade">Diagnosticos
+iterativos — a tecnica que mais melhora qualidade</h3>
+<p>Alem das 3 perguntas, uso uma tecnica que mudou o jogo: pedir
+diagnosticos REPETIDOS antes de entregar.</p>
+<p>O fluxo:</p>
+<ol type="1">
+<li>“Faz o diagnostico” → ele lista 15 problemas</li>
+<li>“Corrija” → ele corrige</li>
+<li>“Faz novo diagnostico” → lista 8 problemas</li>
+<li>“Corrija” → corrige</li>
+<li>“Faz novo diagnostico” → lista 2 problemas</li>
+<li>“Corrija” → pronto</li>
+</ol>
+<p>Criterio de parada: quando vem 1-2 itens em vez de 15. O esforço de
+pedir “mais um diagnostico” e minimo comparado com mandar para alguem
+testar e voltar com uma lista de erros.</p>
+<p>Funciona especialmente quando estou em reuniao ou fazendo outra coisa
+— so aperto “proximo diagnostico” e ele vai refinando sozinho.</p>
+<blockquote>
+<p>“Faz diagnostico de UI/UX. Corrija. Faz novo diagnostico. Corrija.
+Repete ate ter no maximo 2 itens.”</p>
+</blockquote>
+<p>Para a API do TOTVS, fiquei assim: “veja quais APIs nao estao
+funcionando e faca de novo. Veja novamente. Compare versus as specs.
+Execute.” Cada iteracao melhorava.</p>
+<h3 id="qat-teste-visual-com-screenshot">QAT — teste visual com
+screenshot</h3>
+<p>Tres niveis de teste, em ordem de qualidade:</p>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Nivel</th>
+<th>O que faz</th>
+<th>Qualidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Teste de codigo</td>
+<td>Verifica se compila e nao quebra</td>
+<td>Basica</td>
+</tr>
+<tr>
+<td>Teste real (Playwright)</td>
+<td>Abre browser e simula usuario</td>
+<td>Boa</td>
+</tr>
+<tr>
+<td>QAT (screenshot + avaliacao)</td>
+<td>Tira screenshot, avalia visualmente, corrige</td>
+<td>Excelente</td>
+</tr>
+</tbody>
+</table>
+<p>O QAT e pedir para o Claude tirar um screenshot da tela, avaliar o
+resultado visual, e corrigir ate ficar bom. Ele e <strong>muito mais
+rigoroso</strong> avaliando um screenshot do que avaliando o proprio
+codigo.</p>
+<blockquote>
+<p>“Tira screenshot da pagina. Avalia se o layout esta bom. Corrija o
+que nao esta. Tira outro screenshot. Repete ate ficar profissional.”</p>
+</blockquote>
+<p>Para padronizar, criei 40 prompts de validacao (via James Parker) com
+uma regra importante: <strong>o Claude nao pode mudar os criterios de
+avaliacao</strong>. Sem essa regra, quando nao atingia a nota, ele
+mudava o calculo para considerar que “abrir a pagina = nota 7”. Com a
+regra, ele e obrigado a melhorar de verdade.</p>
+<h3 id="quando-a-primeira-tentativa-nao-funciona">Quando a primeira
+tentativa nao funciona</h3>
+<blockquote>
+<p>“Nao resolveu. PARA. Nao tenta variacao do mesmo caminho. O
+diagnostico provavelmente esta errado. Reavalia.”</p>
+</blockquote>
+<p>O instinto natural e insistir na mesma direcao. Resista. Se a
+primeira tentativa nao resolveu, o problema provavelmente nao e onde
+voce pensou.</p>
+<p><strong>Regra</strong>: Maximo 2 tentativas do mesmo tipo. Depois,
+muda a abordagem.</p>
+<h3 id="muitos-problemas-de-uma-vez">Muitos problemas de uma vez</h3>
+<table>
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 54%" />
+</colgroup>
+<thead>
+<tr>
+<th>Quantidade</th>
+<th>Como eu faco</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 problema</td>
+<td>Peco direto com contexto claro</td>
+</tr>
+<tr>
+<td>2-5 problemas</td>
+<td>Peco em sequencia, salvando entre cada um</td>
+</tr>
+<tr>
+<td>6+ problemas</td>
+<td>Uso o <strong>ag-B-23</strong> no modo batch (resolve em
+sprints)</td>
+</tr>
+<tr>
+<td>20+ problemas</td>
+<td>Uso o <strong>ag-B-23</strong> no modo triagem primeiro (classifica
+por prioridade)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="quando-eu-nao-sei-o-que-esta-errado">Quando EU nao sei o que
+esta errado</h3>
+<blockquote>
+<p>“O login parou de funcionar. Nao sei por que. Investiga: olha os
+registros, rastreia o fluxo, e me conta o que encontrou ANTES de tentar
+consertar qualquer coisa.”</p>
+</blockquote>
+<p>Uso o Claude como investigador, nao como consertador. Ele e otimo em
+vasculhar 50 arquivos e achar o problema. Pessimo em adivinhar sem
+investigar.</p>
+<hr />
+<h2 id="os-assistentes-qual-usar-e-quando">6. Os assistentes — qual usar
+e quando</h2>
+<h3 id="o-conceito">O conceito</h3>
+<p>Eu criei mais de 40 assistentes especializados. Cada um sabe fazer
+uma coisa muito bem. Em vez de explicar como fazer cada tarefa, eu chamo
+o assistente certo.</p>
+<h3 id="o-mapa-pratico">O mapa pratico</h3>
+<p><strong>“Quero criar algo…”</strong></p>
+<table>
+<thead>
+<tr>
+<th>Eu quero…</th>
+<th>Assistente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Comecar um projeto do zero</td>
+<td><strong>ag-P-01</strong> (monta a estrutura toda)</td>
+</tr>
+<tr>
+<td>Entender como um codigo funciona</td>
+<td><strong>ag-P-03</strong> (explora e explica)</td>
+</tr>
+<tr>
+<td>Escrever a especificacao de uma feature</td>
+<td><strong>ag-P-06</strong> (cria a spec)</td>
+</tr>
+<tr>
+<td>Fazer o plano de execucao</td>
+<td><strong>ag-P-07</strong> (divide em tarefas)</td>
+</tr>
+<tr>
+<td>Implementar codigo</td>
+<td><strong>ag-B-08</strong> (constroi seguindo o plano)</td>
+</tr>
+<tr>
+<td>Fazer algo com interface bonita</td>
+<td><strong>ag-B-52</strong> (design visual)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>“Quero corrigir algo…”</strong></p>
+<table>
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Eu quero…</th>
+<th>Assistente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolver 1 bug</td>
+<td><strong>ag-B-09</strong> (investiga fundo) ou peco direto</td>
+</tr>
+<tr>
+<td>Resolver 2-5 bugs</td>
+<td><strong>ag-B-23 –batch</strong> (resolve em sequencia)</td>
+</tr>
+<tr>
+<td>Resolver 6+ bugs</td>
+<td><strong>ag-B-23 –parallel</strong> (resolve em paralelo)</td>
+</tr>
+<tr>
+<td>So classificar bugs sem resolver</td>
+<td><strong>ag-B-23 –triage</strong> (diagnostica todos)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>“Quero garantir qualidade…”</strong></p>
+<table>
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Eu quero…</th>
+<th>Assistente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Criar testes</td>
+<td><strong>ag-Q-13</strong> (testes que realmente pegam bugs)</td>
+</tr>
+<tr>
+<td>Testar a tela como usuario</td>
+<td><strong>ag-Q-22</strong> (simula usuario no navegador)</td>
+</tr>
+<tr>
+<td>Rodar suite completa</td>
+<td><strong>ag-Q-51</strong> (batches de 10-20 testes)</td>
+</tr>
+<tr>
+<td>Ciclo completo: testar, corrigir, retestar</td>
+<td><strong>ag-Q-39</strong> (loop ate ficar verde)</td>
+</tr>
+<tr>
+<td>Revisar o codigo</td>
+<td><strong>ag-Q-14</strong> (review profundo)</td>
+</tr>
+<tr>
+<td>Conferir se tudo foi feito</td>
+<td><strong>ag-Q-12</strong> (compara com o plano)</td>
+</tr>
+<tr>
+<td>Auditoria de seguranca</td>
+<td><strong>ag-Q-15</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>“Quero publicar…”</strong></p>
+<table>
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Eu quero…</th>
+<th>Assistente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Publicar com pipeline completo</td>
+<td><strong>ag-D-27</strong> (8 etapas com verificacao)</td>
+</tr>
+<tr>
+<td>Publicar rapido</td>
+<td><strong>ag-D-19</strong> (direto)</td>
+</tr>
+<tr>
+<td>Verificar apos publicacao</td>
+<td><strong>ag-D-38</strong> (testes na versao publicada)</td>
+</tr>
+<tr>
+<td>Monitorar se esta funcionando</td>
+<td><strong>ag-D-20</strong> (acompanha apos publicacao)</td>
+</tr>
+<tr>
+<td>Salvar versao no git</td>
+<td><strong>ag-D-18</strong> (branches, PRs, releases)</td>
+</tr>
+<tr>
+<td>Criar/ajustar banco de dados</td>
+<td><strong>ag-D-17</strong> (migrations)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>“Quero resolver uma issue do GitHub…”</strong></p>
+<table>
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Eu quero…</th>
+<th>Assistente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pipeline completo (issue→spec→build→test→PR)</td>
+<td><strong>ag-M-51</strong></td>
+</tr>
+<tr>
+<td>So ver o que tem para fazer</td>
+<td>Leio as issues no GitHub</td>
+</tr>
+<tr>
+<td>Registrar problema para depois</td>
+<td><strong>ag-M-50</strong> (cria issue estruturada)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>“Nao sei qual usar…”</strong></p>
+<blockquote>
+<p>“/ag-M-00-orquestrar [o que eu quero]”</p>
+</blockquote>
+<p>O <strong>ag-M-00</strong> e o maestro. Eu descrevo o que quero e ele
+decide qual assistente chamar. E o mais usado quando a tarefa nao e
+obvia.</p>
+<h3 id="quando-forcar-um-assistente-especifico">Quando forcar um
+assistente especifico</h3>
+<p>As vezes o orquestrador nao usa o assistente certo — especialmente
+para layout e UX. Quando a qualidade visual importa, eu forco:</p>
+<blockquote>
+<p>“O layout nao esta bom. E necessario que voce veja quais agentes voce
+tem e use o MELHOR deles para UX.”</p>
+</blockquote>
+<p>Ou mais direto:</p>
+<blockquote>
+<p>“Use o agente de design UX para refazer esse layout.”</p>
+</blockquote>
+<p>Nao precisa saber o nome exato. Se digitar “UX”, “QAT”, “debugger” na
+busca, ele encontra. Mas se voce nao forcar, ele usa o agente generico e
+o resultado e inferior.</p>
+<p><strong>Regra</strong>: Para qualidade visual (layout, UX), SEMPRE
+forcar o agente especializado. O orquestrador nem sempre escolhe
+sozinho.</p>
+<h3 id="plan-mode-quando-usar">Plan mode — quando usar</h3>
+<p>Uso plan mode (shift+tab) apenas quando vou planejar de verdade — um
+projeto novo, uma arquitetura. Nao uso mais para tudo como fazia
+antes.</p>
+<p>Para tarefas de execucao, e mais rapido pedir direto: “planeje, nao
+execute” no prompt. Isso ja forca o planejamento sem o overhead do plan
+mode.</p>
+<h3 id="atalhos-rapidos-para-coisas-simples">Atalhos rapidos (para
+coisas simples)</h3>
+<p>Para coisas simples que nao precisam do pipeline completo, tenho
+atalhos:</p>
+<table>
+<thead>
+<tr>
+<th>Atalho</th>
+<th>O que faz</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/code-review</code></td>
+<td>Review rapido (poucos arquivos)</td>
+</tr>
+<tr>
+<td><code>/commit</code></td>
+<td>Salvar progresso rapidamente</td>
+</tr>
+<tr>
+<td><code>/commit-push-pr</code></td>
+<td>Salvar, enviar, e criar PR de uma vez</td>
+</tr>
+<tr>
+<td><code>/deploy</code></td>
+<td>Publicar preview rapido</td>
+</tr>
+<tr>
+<td><code>/clean_gone</code></td>
+<td>Limpar branches que ja foram deletadas</td>
+</tr>
+<tr>
+<td><code>/feature-dev</code></td>
+<td>Implementar feature simples do inicio ao fim</td>
+</tr>
+<tr>
+<td><code>/seer</code></td>
+<td>Investigar erros em producao (via Sentry)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Regra</strong>: Atalhos para coisas simples. Assistentes para
+coisas que precisam de qualidade garantida.</p>
+<hr />
+<h2 id="como-proteger-o-trabalho-sem-perder-velocidade">7. Como proteger
+o trabalho sem perder velocidade</h2>
+<h3 id="salvamentos-frequentes">Salvamentos frequentes</h3>
+<p>A coisa mais importante: <strong>salvar a cada avanco que
+funciona</strong>.</p>
+<blockquote>
+<p>“Salvar depois de cada feature. Rodar testes antes de salvar.”</p>
+</blockquote>
+<p>Se voce acumula 2 horas sem salvar e algo quebra, voce perde 2 horas.
+Se voce salva a cada 15 minutos, voce perde no maximo 15 minutos.</p>
+<h3 id="protecoes-automaticas">Protecoes automaticas</h3>
+<p>Eu configurei 3 protecoes que funcionam sozinhas, sem eu precisar
+pensar:</p>
+<ol type="1">
+<li><p><strong>Protecao de branch principal</strong>: Impede que o
+Claude salve direto na branch principal do projeto. Ele e obrigado a
+criar uma branch separada e fazer PR. Isso previne que uma mudanca mal
+feita quebre tudo.</p></li>
+<li><p><strong>Protecao de arquivos de configuracao</strong>: Impede que
+o Claude sobrescreva arquivos de configuracao inteiros (package.json,
+tsconfig.json, etc.). Ele so pode fazer alteracoes pontuais. Isso
+previne que dependencias desaparecam.</p></li>
+<li><p><strong>Deteccao de segredos</strong>: Se o Claude acidentalmente
+coloca uma senha ou chave de API no codigo, recebe um alerta
+imediato.</p></li>
+</ol>
+<p>Tres protecoes. Cobrem 80% dos desastres possiveis. E eu nao preciso
+pensar nelas — funcionam sozinhas.</p>
+<h3 id="permissoes-nao-ficar-aprovando-cada-acao">Permissoes — nao ficar
+aprovando cada acao</h3>
+<p>Eu configurei para que o Claude possa executar ferramentas de
+desenvolvimento livremente (git, npm, node, etc.), mas NUNCA possa ler
+arquivos de senha ou chaves privadas.</p>
+<p>Sem isso, voce fica clicando “aprovar” em cada comando simples e
+perde o fluxo. Configure uma vez, esqueca para sempre.</p>
+<p>Para quem quer copiar: no arquivo <code>settings.local.json</code>,
+voce lista o que e permitido e o que e proibido. As permissoes ficam
+salvas e valem para todas as sessoes.</p>
+<h3 id="verificacao-antes-de-operacoes-longas">Verificacao antes de
+operacoes longas</h3>
+<p>Antes de mandar rodar uma suite de 200 testes ou resolver 20
+issues:</p>
+<blockquote>
+<p>“Roda 1 teste primeiro para ver se o ambiente esta funcionando”</p>
+</blockquote>
+<p>Ja perdi horas rodando suites inteiras com credenciais expiradas. Um
+teste rapido antes pega o problema em segundos.</p>
+<h3 id="quando-algo-da-errado-recuperacao">Quando algo da errado:
+recuperacao</h3>
+<table>
+<colgroup>
+<col style="width: 41%" />
+<col style="width: 58%" />
+</colgroup>
+<thead>
+<tr>
+<th>Problema</th>
+<th>O que eu faco</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arquivo de config sobrescrito</td>
+<td>Recupero a versao anterior do git</td>
+</tr>
+<tr>
+<td>Salvei na branch errada</td>
+<td>Movo as mudancas para a branch certa</td>
+</tr>
+<tr>
+<td>Algo que funcionava parou</td>
+<td>Comparo com a versao anterior para achar o que mudou</td>
+</tr>
+<tr>
+<td>Perdi trabalho nao salvo</td>
+<td>Aceito a perda e implemento “salvar frequentemente”</td>
+</tr>
+</tbody>
+</table>
+<p>A melhor recuperacao e <strong>prevencao</strong>: salvar
+frequentemente e protecoes automaticas.</p>
+<hr />
+<h2 id="como-trabalhar-em-projetos-que-duram-semanas">8. Como trabalhar
+em projetos que duram semanas</h2>
+<h3 id="o-desafio-cada-sessao-comeca-do-zero">O desafio: cada sessao
+comeca do zero</h3>
+<p>Quando voce abre uma nova sessao do Claude Code, ele nao lembra nada
+da sessao anterior. Se voce esta construindo algo ao longo de dias,
+precisa de estrategias de continuidade.</p>
+<h3 id="o-arquivo-de-instrucoes-como-memoria-permanente">O arquivo de
+instrucoes como memoria permanente</h3>
+<p>O CLAUDE.md e um arquivo que o Claude le SEMPRE que voce abre uma
+sessao. Tudo que esta la, ele sabe. Entao eu mantenho atualizado:</p>
+<pre><code>## Estado atual do projeto
+- Login: PRONTO
+- Dashboard: EM ANDAMENTO (falta grafico de vendas)
+- Relatorios: NAO INICIADO
+
+## Decisoes tomadas
+- Usamos Clerk para autenticacao (mais simples para MVP)
+- Banco usa exclusao logica (marca como deletado, nao apaga de verdade)</code></pre>
+<p>Quando inicio uma nova sessao, o Claude ja sabe onde estamos.</p>
+<h3 id="memoria-entre-sessoes">Memoria entre sessoes</h3>
+<p>Para coisas que eu quero que o Claude lembre ENTRE projetos:</p>
+<blockquote>
+<p>“Salva na memoria: eu prefiro respostas curtas em portugues. Nao
+preciso de explicacao detalhada a menos que eu peca. Quando algo der
+errado, me diz o que aconteceu e o que vai fazer.”</p>
+</blockquote>
+<p>Isso fica salvo e vale para todas as sessoes futuras, em qualquer
+projeto.</p>
+<h3 id="transicao-entre-projetos">Transicao entre projetos</h3>
+<p>Eu trabalho em 4-5 projetos ao mesmo tempo. Quando mudo de
+projeto:</p>
+<ol type="1">
+<li>Salvo o estado do projeto atual</li>
+<li>Limpo o contexto (<code>/clear</code>)</li>
+<li>Abro o novo projeto — o Claude le o CLAUDE.md dele e ja sabe o
+contexto</li>
+<li>Verifico que estou na branch certa e que as credenciais
+funcionam</li>
+</ol>
+<h3 id="sessoes-longas-quando-o-claude-comeca-a-esquecer">Sessoes longas
+— quando o Claude comeca a “esquecer”</h3>
+<p>Sinais de que o contexto esta cheio: - Respostas ficando curtas
+demais - Esquecendo coisas que eu disse no inicio - Repetindo perguntas
+ja respondidas</p>
+<p>Solucao: <code>/compact</code> (comprime o contexto, mantem o
+essencial) ou <code>/clear</code> e recomecar.</p>
+<h3 id="base-de-conhecimento-reducao-drastica-de-erros">Base de
+conhecimento — reducao drastica de erros</h3>
+<p>Toda vez que vou trabalhar com um software novo, a PRIMEIRA coisa que
+faco e baixar toda a documentacao e colocar na pasta do ambiente:</p>
+<pre><code>~/Claude/assets/knowledge-base/
+├── totvs/        # 14 arquivos, 750 records
+├── sophia/       # Swagger + docs
+├── layers/       # APIs, dados
+├── hubspot/      # 74 arquivos, specs OpenAPI
+├── n8n/          # Endpoints, env vars
+└── ...</code></pre>
+<p>Com a documentacao disponivel, o Claude para de ficar tentando
+adivinhar e passa a consultar. O tempo de tentativa-e-erro cai
+drasticamente.</p>
+<blockquote>
+<p>“Baixa toda documentacao do Sofia e coloca na knowledge-base.”</p>
+</blockquote>
+<p>O trabalho de adicionar e minimo: digitei o nome e ele buscou. Quando
+fui fazer o front do Sofia, foi super rapido porque ja tinha a base do
+TOTVS — so adicionei a do Sofia e ele replicou o mesmo padrao.</p>
+<p>Referencia a documentacao no CLAUDE.md para que ele saiba onde
+buscar:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## Base de Conhecimento</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>TOTVS: ~/Claude/assets/knowledge-base/totvs/</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sofia: ~/Claude/assets/knowledge-base/sophia/</span></code></pre></div>
+<h3 id="replicacao-entre-projetos-custo-quase-zero">Replicacao entre
+projetos — custo quase zero</h3>
+<p>Quando termino um projeto e vou fazer algo similar, o custo de
+replicacao e quase zero:</p>
+<blockquote>
+<p>“Aprenda no diretorio do TOTVS. Agora faca igual no diretorio do
+Sofia.”</p>
+</blockquote>
+<p>Como tudo esta na mesma pasta cloud, com o mesmo CLAUDE.md, com a
+mesma base de conhecimento, o Claude replica o padrao. Fazer o front do
+Sofia e do TOTVS esta dando o MESMO trabalho — porque o motor ja
+existe.</p>
+<p>A chave: pasta cloud centralizada com projetos dentro. Antes, cada
+projeto tinha seus aprendizados separados. Agora, tudo e
+compartilhado.</p>
+<h3 id="projetos-realmente-grandes-meses">Projetos realmente grandes
+(meses)</h3>
+<p>Para o meu projeto principal (raiz-platform), o fluxo e: - 57 issues
+no backlog, organizadas em grupos por prioridade - Cada grupo tem 5-15
+issues - Trabalho um grupo por vez, em sessoes de 2-4 horas - Ao final
+de cada grupo, salvo estado e documento o que foi feito - Em 15 dias: 48
+issues implementadas, 16 PRs entregues, 63 especificacoes criadas</p>
+<p>A chave nao e velocidade — e consistencia. Um pouco todo dia, bem
+organizado, acumula rapido.</p>
+<hr />
+<h2 id="como-replicar-para-qualquer-projeto">9. Como replicar para
+qualquer projeto</h2>
+<h3 id="o-principio-escrever-uma-vez-usar-em-todos">O principio:
+escrever uma vez, usar em todos</h3>
+<p>Quando descubro algo que funciona (uma regra, uma protecao, um
+fluxo), nao quero reescrever para cada projeto. Entao organizei em
+camadas:</p>
+<p><strong>Camada pessoal</strong> (vale para tudo que eu faco): - Meu
+idioma preferido, meu estilo de trabalho - Fica em
+<code>~/.claude/CLAUDE.md</code></p>
+<p><strong>Camada do workspace</strong> (vale para todos os projetos no
+workspace): - Regras de git, qualidade, convencoes - Protecoes
+automaticas - Fica em <code>~/Claude/CLAUDE.md</code></p>
+<p><strong>Camada do projeto</strong> (vale so para aquele projeto): -
+Stack especifica, rotas, particularidades - Fica em
+<code>~/Claude/GitHub/meu-projeto/CLAUDE.md</code></p>
+<p>Cada camada herda as anteriores. Eu so escrevo o especifico em cada
+uma.</p>
+<h3 id="regras-separadas-para-organizar-melhor">Regras separadas para
+organizar melhor</h3>
+<p>Quando o arquivo de instrucoes fica grande, quebre em arquivos
+separados na pasta <code>.claude/rules/</code>. Cada arquivo e carregado
+automaticamente:</p>
+<ul>
+<li><code>como-salvar-codigo.md</code> — regras de branches, commits,
+PRs</li>
+<li><code>como-investigar-bugs.md</code> — protocolo de diagnostico</li>
+<li><code>como-verificar-qualidade.md</code> — o que rodar antes de
+entregar</li>
+</ul>
+<h3 id="licoes-aprendidas-nao-repetir-erros">Licoes aprendidas — nao
+repetir erros</h3>
+<p>Toda vez que algo inesperado acontece e me custa tempo, documento num
+arquivo de “licoes aprendidas”. Na proxima vez que o Claude for mexer
+nessa area, ele ja sabe do risco.</p>
+<p>Exemplo real: &gt; “O comando <code>bun test</code> e
+<code>bun run test</code> sao coisas DIFERENTES. O primeiro ignora
+configuracoes. Sempre usar <code>bun run test</code>.”</p>
+<p>Parece bobo. Mas me custou 2 horas ate descobrir.</p>
+<h3 id="modelos-prontos">Modelos prontos</h3>
+<p>Para coisas que eu repito em todo projeto (configuracao de CI, setup
+de banco, testes), tenho modelos prontos que copio e personalizo. Nao
+comeco do zero nunca mais.</p>
+<hr />
+<h2 id="como-compartilhar-e-como-voce-pode-pegar">10. Como compartilhar
+— e como voce pode pegar</h2>
+<h3 id="o-repositorio-publico">O repositorio publico</h3>
+<p>Todo o meu sistema esta disponivel de graca no GitHub:</p>
+<p><strong>https://github.com/andregusman-raiz/a-gusman-claude</strong></p>
+<p>La estao todos os 44 assistentes, 59 habilidades, 27 regras, 25
+protecoes, e 11 guias estrategicos.</p>
+<h3 id="como-instalar">Como instalar</h3>
+<p>O repositorio tem um instalador automatico com 3 niveis:</p>
+<p><strong>Iniciante</strong> (~7 arquivos, 2 minutos): - Regras basicas
+de seguranca - Protecoes essenciais - O orquestrador (ag-M-00) - Modelo
+de CLAUDE.md</p>
+<p><strong>Padrao</strong> (~50 arquivos, 10 minutos): - Tudo do
+iniciante - 16 assistentes principais - Modelos para projetos comuns</p>
+<p><strong>Completo</strong> (180+ arquivos, 20 minutos): - Sistema
+completo: todos os assistentes, regras, protecoes, guias</p>
+<p>Para instalar:</p>
+<pre><code>git clone https://github.com/andregusman-raiz/a-gusman-claude
+cd a-gusman-claude
+bash install.sh --tier starter   # ou standard, ou full</code></pre>
+<h3 id="o-que-voce-ganha">O que voce ganha</h3>
+<ul>
+<li><strong>Assistentes prontos</strong>: Em vez de explicar como fazer
+cada coisa, voce chama o assistente certo</li>
+<li><strong>Protecoes automaticas</strong>: Branch, config, segredos —
+funcionam sozinhas</li>
+<li><strong>Regras de qualidade</strong>: Verificacoes que rodam antes
+de entregar</li>
+<li><strong>Fluxo de issues</strong>: Pipeline completo de issue ate
+entrega</li>
+<li><strong>Licoes aprendidas</strong>: 193 sessoes de erros
+documentados para voce nao repetir</li>
+</ul>
+<h3 id="como-contribuir">Como contribuir</h3>
+<p>O repositorio e aberto. Se voce criou um assistente, regra, ou
+protecao que funciona bem, pode contribuir. O arquivo
+<code>CONTRIBUTING.md</code> explica como.</p>
+<hr />
+<h2 id="o-que-aprendemos-errando">11. O que aprendemos errando</h2>
+<p>Cada erro aqui me custou horas. Estao documentados para que voce nao
+precise repetir.</p>
+<h3 id="faz-tudo-de-uma-vez">“Faz tudo de uma vez”</h3>
+<p>Pedi para implementar 7 funcionalidades numa sessao sem pontos de
+salvamento. Na funcionalidade 5, algo quebrou. Sem salvamentos
+intermediarios, perdi tudo.</p>
+<p><strong>O que eu faco agora</strong>: Salvar depois de cada
+funcionalidade. Sempre.</p>
+<h3 id="assistentes-pisando-um-no-outro">Assistentes pisando um no
+outro</h3>
+<p>Mandei 3 assistentes trabalharem no mesmo projeto ao mesmo tempo.
+Eles se atrapalharam, corromperam o historico do git, e perdi 4 horas de
+trabalho.</p>
+<p><strong>O que eu faco agora</strong>: Cada assistente trabalha numa
+copia isolada do projeto. Se nao for possivel isolar, faco um de cada
+vez.</p>
+<h3 id="substituicao-em-massa-sem-conferir">Substituicao em massa sem
+conferir</h3>
+<p>Pedi para trocar um texto em todos os arquivos de teste. 28 arquivos
+quebraram porque aquele texto tinha significados diferentes em contextos
+diferentes.</p>
+<p><strong>O que eu faco agora</strong>: Substituicoes em lotes de 5
+arquivos. Testo entre cada lote. Se quebrar, volto atras e faco um por
+um.</p>
+<h3 id="corrigir-sem-entender">Corrigir sem entender</h3>
+<p>“Corrige esse erro” — o Claude tentou 4 solucoes diferentes, nenhuma
+funcionou, porque o diagnostico estava errado desde o inicio.</p>
+<p><strong>O que eu faco agora</strong>: 3 perguntas antes de qualquer
+correcao: O que deveria acontecer? O que esta acontecendo? Quais as
+causas mais provaveis?</p>
+<h3 id="suite-de-testes-com-credenciais-vencidas">Suite de testes com
+credenciais vencidas</h3>
+<p>Rodei 200 testes que precisavam de uma API externa. As credenciais
+tinham expirado. 45 minutos perdidos.</p>
+<p><strong>O que eu faco agora</strong>: 1 teste rapido antes de rodar a
+suite toda. Pega o problema em segundos.</p>
+<h3 id="arquivo-de-configuracao-sobrescrito">Arquivo de configuracao
+sobrescrito</h3>
+<p>O Claude substituiu o arquivo package.json inteiro em vez de editar
+uma linha. Metade das dependencias desapareceram.</p>
+<p><strong>O que eu faco agora</strong>: Protecao automatica que
+bloqueia substituicao total de arquivos de configuracao. So permite
+edicoes pontuais.</p>
+<h3 id="protecoes-automaticas-computador-travou">106 protecoes
+automaticas = computador travou</h3>
+<p>Criei protecoes demais. Cada acao do Claude disparava dezenas de
+verificacoes. O computador congelou com 200GB de memoria consumida.</p>
+<p><strong>O que eu faco agora</strong>: Poucas protecoes, todas
+essenciais. Nada de protecao que so “avisa” sem bloquear.</p>
+<h3 id="sessoes-longas-sem-limpar-contexto">Sessoes longas sem limpar
+contexto</h3>
+<p>Trabalhei 3 horas seguidas numa sessao. No final, o Claude estava
+“esquecendo” instrucoes do inicio.</p>
+<p><strong>O que eu faco agora</strong>: Limpo o contexto quando mudo de
+tarefa. Comprimo quando a sessao fica longa.</p>
+<h3 id="o-padrao-por-tras-dos-erros">O padrao por tras dos erros</h3>
+<p>Olhando para 193 sessoes, quase todos os problemas caem em 4
+categorias:</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 42%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th>Categoria</th>
+<th>% dos problemas</th>
+<th>Prevencao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Trabalho acumulado sem salvar</td>
+<td>30%</td>
+<td>Salvar a cada funcionalidade</td>
+</tr>
+<tr>
+<td>Diagnostico errado</td>
+<td>37%</td>
+<td>3 perguntas antes de corrigir</td>
+</tr>
+<tr>
+<td>Assistentes se atrapalhando</td>
+<td>15%</td>
+<td>Isolamento obrigatorio</td>
+</tr>
+<tr>
+<td>Ambiente invalido (credenciais, branch)</td>
+<td>18%</td>
+<td>Verificacao rapida antes de comecar</td>
+</tr>
+</tbody>
+</table>
+<p>Resolva esses 4 e voce elimina 80% dos problemas.</p>
+<hr />
+<h2 id="como-comecar">12. Como comecar</h2>
+<h3 id="semana-1-o-basico">Semana 1: O basico</h3>
+<p><strong>Dia 1:</strong> - Instale o Claude Code - Crie um arquivo
+CLAUDE.md no seu projeto com: sua stack + 3 regras basicas - Configure
+permissoes (permitir ferramentas de desenvolvimento, bloquear senhas) -
+Faca uma tarefa simples e observe como funciona</p>
+<p><strong>Dia 2-3:</strong> - Adicione regras ao CLAUDE.md baseadas em
+erros que aconteceram - Comece a salvar frequentemente (a cada avanco
+que funciona)</p>
+<p><strong>Dia 4-5:</strong> - Instale o sistema de assistentes (nivel
+iniciante) do repositorio publico - Experimente o ag-M-00 (orquestrador)
+para uma tarefa</p>
+<h3 id="semana-2-pegando-o-ritmo">Semana 2: Pegando o ritmo</h3>
+<ul>
+<li>Configure a protecao de branch (impede salvar na branch
+principal)</li>
+<li>Organize suas issues no GitHub como backlog</li>
+<li>Experimente o ag-M-51 (pipeline de issues) para resolver uma issue
+completa</li>
+<li>Documente suas primeiras “licoes aprendidas”</li>
+</ul>
+<h3 id="semana-3-escalando">Semana 3: Escalando</h3>
+<ul>
+<li>Instale o nivel padrao dos assistentes</li>
+<li>Crie suas primeiras regras separadas
+(<code>.claude/rules/</code>)</li>
+<li>Salve suas preferencias na memoria do Claude</li>
+<li>Experimente assistentes em paralelo (com isolamento!)</li>
+</ul>
+<h3 id="mes-1-produtividade-alta">Mes 1: Produtividade alta</h3>
+<p>Neste ponto voce tera: - Um CLAUDE.md maduro com regras reais (nao
+teoria) - 3 protecoes automaticas funcionando - Um fluxo de issue →
+especificacao → implementacao → entrega - Licoes aprendidas documentadas
+- Assistentes especializados para suas tarefas mais comuns</p>
+<h3 id="o-conselho-mais-importante">O conselho mais importante</h3>
+<p><strong>Nao tente montar tudo de uma vez.</strong> Comece com o
+CLAUDE.md e as permissoes. Va adicionando conforme sente necessidade. O
+melhor sistema e o que voce realmente usa, nao o mais completo.</p>
+<p>Eu comecei com 1 arquivo e 0 assistentes. Hoje tenho 44 assistentes e
+59 habilidades. Mas levou semanas de iteracao — cada protecao nasceu de
+um erro real, cada assistente nasceu de uma tarefa que eu fazia
+repetidamente.</p>
+<p>Seu caminho vai ser diferente do meu. O que importa e o ciclo:
+<strong>usar → errar → documentar → nao repetir</strong>. Esse ciclo e o
+que transforma o Claude Code de “uma ferramenta” em “um sistema que
+trabalha do seu jeito”.</p>
+<hr />
+<blockquote>
+<p>Feito por quem usa 13 vezes por dia, erra frequentemente, e documenta
+cada erro. Atualizado em 23/03/2026 com aprendizados de reuniao pratica
+sobre IA e automacoes. Repositorio:
+https://github.com/andregusman-raiz/a-gusman-claude</p>
+</blockquote>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="brand">rAIz Educacao</div>
+  <p style="margin-top:8px">Metodologia rAIz Claude Code &mdash; Atualizado em 23/03/2026</p>
+  <p style="margin-top:4px"><a href="https://github.com/andregusman-raiz/a-gusman-claude">github.com/andregusman-raiz/a-gusman-claude</a></p>
+</div>
+
+</body>
+</html>

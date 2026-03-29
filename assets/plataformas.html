@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plataformas &mdash; rAIz Ecossistema</title>
+<style>
+/* Dark theme (default) */
+:root, [data-theme="dark"] {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface-hover: #222632;
+  --border: #2a2e3a;
+  --text: #e4e4e7;
+  --text-muted: #71717a;
+  --accent: #F7941D;
+  --accent-dim: rgba(247,148,29,0.12);
+  --teal: #5BB5A2;
+  --teal-dim: rgba(91,181,162,0.12);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.15);
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --blue-dim: rgba(59,130,246,0.12);
+  --purple: #a855f7;
+  --purple-dim: rgba(168,85,247,0.12);
+  --footer-muted: #52525b;
+  --dot-off: #52525b;
+  --dash-icon-bg: rgba(255,255,255,0.06);
+}
+/* Light theme */
+[data-theme="light"] {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-hover: #f0f1f3;
+  --border: #e2e4e9;
+  --text: #1a202c;
+  --text-muted: #64748b;
+  --accent: #d97b10;
+  --accent-dim: rgba(217,123,16,0.10);
+  --teal: #0d9488;
+  --teal-dim: rgba(13,148,136,0.10);
+  --green: #16a34a;
+  --green-dim: rgba(22,163,74,0.10);
+  --red: #dc2626;
+  --blue: #2563eb;
+  --blue-dim: rgba(37,99,235,0.08);
+  --purple: #7c3aed;
+  --purple-dim: rgba(124,58,237,0.08);
+  --footer-muted: #94a3b8;
+  --dot-off: #cbd5e1;
+  --dash-icon-bg: rgba(0,0,0,0.04);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+.container { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.header h1 { font-size: 1.5rem; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+.header .subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+.scan-btn {
+  background: var(--accent-dim); color: var(--accent);
+  border: 1px solid rgba(247,148,29,0.25); padding: 8px 16px;
+  border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s;
+}
+.scan-btn:hover { background: rgba(247,148,29,0.2); }
+.scan-btn.scanning { opacity: 0.6; cursor: wait; }
+.status-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.status-chip {
+  display: flex; align-items: center; gap: 6px; font-size: 0.78rem;
+  color: var(--text-muted); background: var(--surface); padding: 6px 12px;
+  border-radius: 6px; border: 1px solid var(--border);
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.dot-gray { background: var(--dot-off); }
+.projects { display: flex; flex-direction: column; gap: 12px; }
+.project {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; transition: border-color 0.2s;
+}
+.project:hover { border-color: rgba(247,148,29,0.3); }
+.project-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.project-name { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.01em; }
+.project-badges { display: flex; gap: 6px; }
+.badge {
+  font-size: 0.68rem; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: 0.03em;
+}
+.badge-next { background: var(--blue-dim); color: var(--blue); }
+.badge-ts { background: var(--blue-dim); color: #60a5fa; }
+.badge-tool { background: var(--purple-dim); color: var(--purple); }
+.links { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.link-item {
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+  border-radius: 8px; text-decoration: none; color: var(--text); font-size: 0.82rem;
+  transition: all 0.15s; border: 1px solid transparent;
+}
+.link-item:hover { background: var(--surface-hover); border-color: var(--border); }
+.link-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+}
+.icon-prod { background: var(--green-dim); color: var(--green); }
+.icon-preview { background: var(--accent-dim); color: var(--accent); }
+.icon-local { background: var(--teal-dim); color: var(--teal); }
+.icon-github { background: var(--purple-dim); color: var(--purple); }
+.icon-service { background: var(--blue-dim); color: var(--blue); }
+.icon-dash { background: var(--dash-icon-bg); color: var(--text-muted); }
+.link-label { font-weight: 500; }
+.link-url { font-size: 0.7rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-info { flex: 1; min-width: 0; }
+.local-status {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  margin-left: auto; transition: all 0.3s;
+}
+.local-up { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.local-down { background: var(--dot-off); }
+.local-checking { background: var(--accent); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.section-title {
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-muted); margin: 28px 0 12px;
+}
+.footer {
+  margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--footer-muted); display: flex; justify-content: space-between;
+}
+#last-scan { font-style: italic; }
+/* Theme toggle */
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.theme-toggle {
+  background: var(--surface); color: var(--text-muted);
+  border: 1px solid var(--border); width: 36px; height: 36px;
+  border-radius: 8px; cursor: pointer; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+@media (max-width: 600px) {
+  .links { grid-template-columns: 1fr; }
+  .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div>
+      <h1>rAIz Ecossistema</h1>
+      <div class="subtitle">Links consolidados de todas as plataformas</div>
+    </div>
+    <div class="header-actions">
+      <a class="scan-btn" href="vault.html" style="text-decoration:none">&#128274; Vault</a>
+      <button class="scan-btn" id="scan-btn">Scan Localhost</button>
+      <button class="theme-toggle" id="theme-toggle" title="Alternar tema">&#9790;</button>
+    </div>
+  </div>
+
+  <div class="status-bar" id="status-bar">
+    <div class="status-chip"><span class="dot dot-gray"></span><span>Clique "Scan Localhost" para verificar</span></div>
+  </div>
+
+  <div class="projects">
+
+    <!-- rAIz Platform -->
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">rAIz Platform (Cowork)</span>
+        <div class="project-badges"><span class="badge badge-next">Next.js 14</span><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://raiz-platform-git-andregusman-raizs-projects.vercel.app" target="_blank">
+          <div class="link-icon icon-prod">PRD</div>
+          <div class="link-info"><div class="link-label">Production</div><div class="link-url">raiz-platform-git...vercel.app</div></div>
+        </a>
+        <a class="link-item" href="http://localhost:3000" target="_blank" data-port="3000">
+          <div class="link-icon icon-local">DEV</div>
+          <div class="link-info"><div class="link-label">Localhost :3000</div><div class="link-url">~/Claude/GitHub/raiz-platform/</div></div>
+          <span class="local-status local-down" data-port-dot="3000"></span>
+        </a>
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/rAIz_Cowork" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Raiz-Educacao-SA/rAIz_Cowork</div></div>
+        </a>
+        <a class="link-item" href="https://vercel.com/andregusman-raizs-projects/raiz-platform-git" target="_blank">
+          <div class="link-icon icon-dash">VCL</div>
+          <div class="link-info"><div class="link-label">Vercel Dashboard</div><div class="link-url">Deployments, Logs, Settings</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Prof Digital -->
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Professor Raiz Digital</span>
+        <div class="project-badges"><span class="badge badge-next">Next.js 16</span><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://profdigital.vercel.app" target="_blank">
+          <div class="link-icon icon-prod">PRD</div>
+          <div class="link-info"><div class="link-label">Production</div><div class="link-url">profdigital.vercel.app</div></div>
+        </a>
+        <a class="link-item" href="https://chamada-app-seven.vercel.app" target="_blank">
+          <div class="link-icon icon-preview">OLD</div>
+          <div class="link-info"><div class="link-label">Deploy Antigo</div><div class="link-url">chamada-app-seven.vercel.app</div></div>
+        </a>
+        <a class="link-item" href="http://localhost:3001" target="_blank" data-port="3001">
+          <div class="link-icon icon-local">DEV</div>
+          <div class="link-info"><div class="link-label">Localhost :3001</div><div class="link-url">~/Claude/GitHub/profdigital/</div></div>
+          <span class="local-status local-down" data-port-dot="3001"></span>
+        </a>
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/profdigital-raiz" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Raiz-Educacao-SA/profdigital-raiz</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Automata -->
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Automata</span>
+        <div class="project-badges"><span class="badge badge-next">Next.js</span><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="http://localhost:3002" target="_blank" data-port="3002">
+          <div class="link-icon icon-local">DEV</div>
+          <div class="link-info"><div class="link-label">Localhost :3002</div><div class="link-url">~/Claude/GitHub/automata/</div></div>
+          <span class="local-status local-down" data-port-dot="3002"></span>
+        </a>
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/automata-raiz" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub (org)</div><div class="link-url">Raiz-Educacao-SA/automata-raiz</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- TOTVS Educacional Frontend -->
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">TOTVS Educacional Frontend</span>
+        <div class="project-badges"><span class="badge badge-next">Next.js</span><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://front-totvs.vercel.app" target="_blank">
+          <div class="link-icon icon-prod">PRD</div>
+          <div class="link-info"><div class="link-label">Production</div><div class="link-url">front-totvs.vercel.app</div></div>
+        </a>
+        <a class="link-item" href="http://localhost:3003" target="_blank" data-port="3003">
+          <div class="link-icon icon-local">DEV</div>
+          <div class="link-info"><div class="link-label">Localhost :3003</div><div class="link-url">~/Claude/projetos/totvs-educacional-frontend/app/</div></div>
+          <span class="local-status local-down" data-port-dot="3003"></span>
+        </a>
+        <a class="link-item" href="https://vercel.com/andregusman-raizs-projects/app" target="_blank">
+          <div class="link-icon icon-dash">VCL</div>
+          <div class="link-info"><div class="link-label">Vercel Dashboard</div><div class="link-url">Projeto "app"</div></div>
+        </a>
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/totvs-educacional-frontend" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Raiz-Educacao-SA/totvs-educacional-frontend</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- SophiA Educacional Frontend -->
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">SophiA Educacional Frontend</span>
+        <div class="project-badges"><span class="badge badge-next">Next.js 16</span><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://sophia-educacional-frontend.vercel.app" target="_blank">
+          <div class="link-icon icon-prod">PRD</div>
+          <div class="link-info"><div class="link-label">Production</div><div class="link-url">sophia-educacional-frontend.vercel.app</div></div>
+        </a>
+        <a class="link-item" href="http://localhost:3004" target="_blank" data-port="3004">
+          <div class="link-icon icon-local">DEV</div>
+          <div class="link-info"><div class="link-label">Localhost :3004</div><div class="link-url">~/Claude/projetos/sophia-educacional-frontend/</div></div>
+          <span class="local-status local-down" data-port-dot="3004"></span>
+        </a>
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/sophia-raiz" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Raiz-Educacao-SA/sophia-raiz</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- FGTS Platform -->
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">FGTS Platform</span>
+        <div class="project-badges"><span class="badge badge-next">Next.js</span><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://fgts-platform.vercel.app" target="_blank">
+          <div class="link-icon icon-prod">PRD</div>
+          <div class="link-info"><div class="link-label">Production</div><div class="link-url">fgts-platform.vercel.app</div></div>
+        </a>
+        <a class="link-item" href="http://localhost:3005" target="_blank" data-port="3005">
+          <div class="link-icon icon-local">DEV</div>
+          <div class="link-info"><div class="link-label">Localhost :3005</div><div class="link-url">~/Claude/GitHub/fgts-platform/</div></div>
+          <span class="local-status local-down" data-port-dot="3005"></span>
+        </a>
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/fgts-platform" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Raiz-Educacao-SA/fgts-platform</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- rAIz Agent Dashboard -->
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">rAIz Agent Dashboard</span>
+        <div class="project-badges"><span class="badge badge-next">Next.js</span><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="http://localhost:4200" target="_blank" data-port="4200">
+          <div class="link-icon icon-local">DEV</div>
+          <div class="link-info"><div class="link-label">Localhost :4200</div><div class="link-url">~/Claude/projetos/raiz-agent-dashboard/</div></div>
+          <span class="local-status local-down" data-port-dot="4200"></span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Roadmap Manager -->
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Roadmap Manager</span>
+        <div class="project-badges"><span class="badge badge-next">Next.js</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://roadmap-manager-seven.vercel.app" target="_blank">
+          <div class="link-icon icon-prod">PRD</div>
+          <div class="link-info"><div class="link-label">Production</div><div class="link-url">roadmap-manager-seven.vercel.app</div></div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Other Repos -->
+  <div class="section-title">Outros Repositorios (Raiz-Educacao-SA)</div>
+  <div class="projects">
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Raiz do Conhecimento (Ava)</span>
+        <div class="project-badges"><span class="badge badge-next">App</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/Raiz-do-conhecimento" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Ava Raiz Educacao</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">rAIz AI Prof</span>
+        <div class="project-badges"><span class="badge badge-next">Next.js</span><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/rAIz-AI-Prof" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">App Raiz Prof AI</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Sistema Gestao PJ</span>
+        <div class="project-badges"><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/sistema-gestao-pj-raiz" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Gestao de contratos, pagamentos e beneficios PJ</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">NFS-e Downloader</span>
+        <div class="project-badges"><span class="badge badge-tool">Python</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/nfse-downloader" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Download NFS-e via API Nacional (cert A1)</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Financeiro CPC06</span>
+        <div class="project-badges"><span class="badge badge-tool">Finance</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/financeiro_cpc06" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Raiz-Educacao-SA/financeiro_cpc06</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Process Machine (PRISM-Lite)</span>
+        <div class="project-badges"><span class="badge badge-ts">TS</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/process-machine" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Config-driven process analysis (7 fases)</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Pro.AI Extrator HSM</span>
+        <div class="project-badges"><span class="badge badge-tool">Python</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/proai-extrator-hsm" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Extrator de relatorios WhatsApp Business</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">CMEF Contador Matriculas</span>
+        <div class="project-badges"><span class="badge badge-next">Web</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/cmef-contador-matriculas" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Dashboard TV corporativa - matriculas</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">SkillCert Raiz</span>
+        <div class="project-badges"><span class="badge badge-tool">Eval</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/skillcert-raiz" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Avaliacao do SkillCert</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Shared Practices</span>
+        <div class="project-badges"><span class="badge badge-tool">Docs</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA/shared-practices" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Best practices, patterns, templates (Layer 2)</div></div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-title">Repositorios (andregusman-raiz)</div>
+  <div class="projects">
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">a-gusman-claude</span>
+        <div class="project-badges"><span class="badge badge-tool">Agents</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/andregusman-raiz/a-gusman-claude" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">46 agents, 60 skills, 31 rules, 12 playbooks</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">FGTS Docs</span>
+        <div class="project-badges"><span class="badge badge-tool">Docs</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/andregusman-raiz/fgts-docs" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Documentacao tecnica FGTS, TOTVS RM</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">ENEM Upload Owner</span>
+        <div class="project-badges"><span class="badge badge-tool">App</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/andregusman-raiz/enem-uploadowner" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">andregusman-raiz/enem-uploadowner</div></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Raiz Educacao (Legacy)</span>
+        <div class="project-badges"><span class="badge badge-tool">Legacy</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://github.com/andregusman-raiz/Raiz_Educacao" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub</div><div class="link-url">Vibecoding Raiz (original)</div></div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Services -->
+  <div class="section-title">Servicos e Infra</div>
+  <div class="projects">
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Servicos Externos</span>
+        <div class="project-badges"><span class="badge badge-tool">Infra</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="https://n8n.raizeducacao.com.br" target="_blank">
+          <div class="link-icon icon-service">N8N</div>
+          <div class="link-info"><div class="link-label">n8n (Workflows)</div><div class="link-url">n8n.raizeducacao.com.br</div></div>
+        </a>
+        <a class="link-item" href="https://supabase.com/dashboard" target="_blank">
+          <div class="link-icon icon-service">SB</div>
+          <div class="link-info"><div class="link-label">Supabase Dashboard</div><div class="link-url">supabase.com/dashboard</div></div>
+        </a>
+        <a class="link-item" href="https://vercel.com/andregusman-raizs-projects" target="_blank">
+          <div class="link-icon icon-service">VCL</div>
+          <div class="link-info"><div class="link-label">Vercel Team</div><div class="link-url">andregusman-raizs-projects</div></div>
+        </a>
+        <a class="link-item" href="https://github.com/andregusman-raiz" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub (pessoal)</div><div class="link-url">andregusman-raiz</div></div>
+        </a>
+        <a class="link-item" href="https://github.com/Raiz-Educacao-SA" target="_blank">
+          <div class="link-icon icon-github">GH</div>
+          <div class="link-info"><div class="link-label">GitHub (org)</div><div class="link-url">Raiz-Educacao-SA</div></div>
+        </a>
+        <a class="link-item" href="https://sentry.io" target="_blank">
+          <div class="link-icon icon-service">SNT</div>
+          <div class="link-info"><div class="link-label">Sentry</div><div class="link-url">Monitoring e Errors</div></div>
+        </a>
+        <a class="link-item" href="https://portal.sophia.com.br" target="_blank">
+          <div class="link-icon icon-service">SPH</div>
+          <div class="link-info"><div class="link-label">SophiA Portal</div><div class="link-url">portal.sophia.com.br (API/Swagger)</div></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- This page -->
+  <div class="section-title">Esta Pagina</div>
+  <div class="projects">
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">rAIz Ecossistema Hub</span>
+        <div class="project-badges"><span class="badge badge-tool">HTML</span></div>
+      </div>
+      <div class="links">
+        <a class="link-item" href="file:///Users/andregusmandeoliveira/Claude/assets/plataformas.html">
+          <div class="link-icon icon-local">LOC</div>
+          <div class="link-info"><div class="link-label">Versao Local</div><div class="link-url">~/Claude/assets/plataformas.html (scan localhost ativo)</div></div>
+        </a>
+        <a class="link-item" href="https://raiz-hub.vercel.app" target="_blank" id="link-published">
+          <div class="link-icon icon-prod">WEB</div>
+          <div class="link-info"><div class="link-label">Versao Publicada</div><div class="link-url">raiz-hub.vercel.app</div></div>
+        </a>
+        <a class="link-item" href="vault.html">
+          <div class="link-icon icon-service">&#128274;</div>
+          <div class="link-info"><div class="link-label">Vault (Senhas/Tokens)</div><div class="link-url">AES-256-GCM criptografado localmente</div></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span id="last-scan">Nenhum scan realizado</span>
+    <span>plataformas.html - ~/Claude/assets/</span>
+  </div>
+
+</div>
+
+<script>
+const PORTS = [3000, 3001, 3002, 3003, 3004, 3005, 4200];
+
+async function checkPort(port) {
+  const controller = new AbortController();
+  const timeout = setTimeout(function() { controller.abort(); }, 1500);
+  try {
+    await fetch('http://localhost:' + port, { mode: 'no-cors', signal: controller.signal });
+    clearTimeout(timeout);
+    return true;
+  } catch (e) {
+    clearTimeout(timeout);
+    return false;
+  }
+}
+
+function setDotClass(port, className) {
+  var dot = document.querySelector('[data-port-dot="' + port + '"]');
+  if (dot) { dot.className = 'local-status ' + className; }
+}
+
+function renderStatusBar(results) {
+  var bar = document.getElementById('status-bar');
+  var upCount = results.filter(function(r) { return r.up; }).length;
+  // Build chips safely with DOM API
+  while (bar.firstChild) { bar.removeChild(bar.firstChild); }
+
+  // Total chip
+  var totalChip = document.createElement('div');
+  totalChip.className = 'status-chip';
+  var totalDot = document.createElement('span');
+  totalDot.className = 'dot ' + (upCount > 0 ? 'dot-green' : 'dot-gray');
+  totalChip.appendChild(totalDot);
+  var totalText = document.createElement('span');
+  totalText.textContent = upCount + '/' + PORTS.length + ' servicos ativos';
+  totalChip.appendChild(totalText);
+  bar.appendChild(totalChip);
+
+  // Per-port chips
+  results.forEach(function(r) {
+    var chip = document.createElement('div');
+    chip.className = 'status-chip';
+    var d = document.createElement('span');
+    d.className = 'dot ' + (r.up ? 'dot-green' : 'dot-gray');
+    chip.appendChild(d);
+    var t = document.createElement('span');
+    t.textContent = ':' + r.port + ' ' + (r.up ? 'UP' : 'off');
+    chip.appendChild(t);
+    bar.appendChild(chip);
+  });
+}
+
+async function scanPorts() {
+  var btn = document.getElementById('scan-btn');
+  btn.classList.add('scanning');
+  btn.textContent = 'Scanning...';
+
+  PORTS.forEach(function(p) { setDotClass(p, 'local-checking'); });
+
+  var results = await Promise.all(PORTS.map(async function(port) {
+    var up = await checkPort(port);
+    setDotClass(port, up ? 'local-up' : 'local-down');
+    return { port: port, up: up };
+  }));
+
+  renderStatusBar(results);
+
+  document.getElementById('last-scan').textContent =
+    'Ultimo scan: ' + new Date().toLocaleTimeString('pt-BR');
+
+  btn.classList.remove('scanning');
+  btn.textContent = 'Scan Localhost';
+}
+
+document.getElementById('scan-btn').addEventListener('click', scanPorts);
+
+// Theme toggle
+function getStoredTheme() {
+  try { return localStorage.getItem('raiz-theme'); } catch(e) { return null; }
+}
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  var btn = document.getElementById('theme-toggle');
+  // moon for dark, sun for light
+  btn.textContent = theme === 'dark' ? '\u263E' : '\u2600';
+  btn.title = theme === 'dark' ? 'Mudar para Light' : 'Mudar para Dark';
+  try { localStorage.setItem('raiz-theme', theme); } catch(e) {}
+}
+document.getElementById('theme-toggle').addEventListener('click', function() {
+  var current = document.documentElement.getAttribute('data-theme') || 'dark';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+  var stored = getStoredTheme();
+  setTheme(stored || 'dark');
+  setTimeout(scanPorts, 500);
+});
+</script>
+</body>
+</html>

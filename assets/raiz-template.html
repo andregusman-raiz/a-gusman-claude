@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$title$</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --raiz-orange: #F7941D;
+  --raiz-orange-dark: #D97B10;
+  --raiz-orange-light: #FDE8C8;
+  --raiz-orange-xlight: #FEF3E2;
+  --raiz-teal: #5BB5A2;
+  --raiz-teal-dark: #3D9A87;
+  --raiz-teal-light: #D4EFE9;
+  --raiz-teal-xlight: #EAF6F3;
+  --bg-app: #F8F9FA;
+  --surface: #FFFFFF;
+  --foreground: #1A202C;
+  --text-secondary: #4A5568;
+  --text-muted: #718096;
+  --border: #E2E8F0;
+  --muted-bg: #F0F4F8;
+  --sidebar-bg: #1E2433;
+  --sidebar-accent: #2D3548;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  color: var(--foreground);
+  background: var(--bg-app);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+/* ===== HERO ===== */
+.hero {
+  background: var(--sidebar-bg);
+  color: white;
+  padding: 48px 0 40px;
+  text-align: center;
+}
+.hero-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.hero svg { margin-bottom: 16px; }
+.hero h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+.hero .subtitle {
+  font-size: 15px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 400;
+}
+.hero .tagline {
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--raiz-orange);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.hero .stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 24px;
+}
+.hero .stat {
+  text-align: center;
+}
+.hero .stat-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--raiz-orange);
+  font-variant-numeric: tabular-nums;
+}
+.hero .stat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 2px;
+}
+
+/* ===== NAV ===== */
+.toc-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.toc-bar-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.toc-bar a {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.toc-bar a:hover {
+  background: var(--raiz-orange-xlight);
+  color: var(--raiz-orange-dark);
+}
+
+/* ===== CONTENT ===== */
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* Sections */
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-top: 48px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--raiz-orange);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+h2 .section-num {
+  background: var(--raiz-orange);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--raiz-teal-dark);
+  margin-top: 32px;
+  margin-bottom: 12px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+p { margin-bottom: 12px; }
+
+/* Blockquotes = command examples */
+blockquote {
+  background: var(--sidebar-bg);
+  color: #E2E8F0;
+  border-left: 3px solid var(--raiz-orange);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+blockquote p { margin-bottom: 0; color: #E2E8F0; }
+
+/* Code */
+code {
+  background: var(--muted-bg);
+  color: var(--raiz-teal-dark);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+pre {
+  background: var(--sidebar-bg);
+  color: #E2E8F0;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 12px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+}
+thead th {
+  background: var(--muted-bg);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 2px solid var(--border);
+}
+tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:hover { background: var(--raiz-teal-xlight); }
+
+/* Lists */
+ul, ol {
+  margin: 8px 0 12px 20px;
+}
+li { margin-bottom: 4px; }
+
+/* Strong emphasis */
+strong { color: var(--foreground); font-weight: 600; }
+
+/* Horizontal rule */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 40px 0;
+}
+
+/* Callout boxes for key concepts */
+p > strong:first-child {
+  color: var(--raiz-orange-dark);
+}
+
+/* Links */
+a {
+  color: var(--raiz-teal-dark);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--raiz-orange);
+  text-decoration: underline;
+}
+
+/* Footer */
+.footer {
+  background: var(--sidebar-bg);
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  padding: 32px 24px;
+  font-size: 13px;
+}
+.footer a {
+  color: var(--raiz-orange);
+}
+.footer .brand {
+  color: var(--raiz-orange);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Print */
+@media print {
+  .toc-bar { display: none; }
+  .hero { padding: 24px 0; }
+  body { font-size: 12px; }
+  h2 { break-before: page; }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .hero h1 { font-size: 22px; }
+  .hero .stats { gap: 16px; }
+  .hero .stat-value { font-size: 22px; }
+  .toc-bar { display: none; }
+  .content { padding: 20px 16px 60px; }
+  h2 { font-size: 18px; }
+  table { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 225 225" width="80" height="80" role="img" aria-label="rAIz Educacao">
+      <g fill="#6dba90" transform="translate(0,225) scale(0.1,-0.1)">
+        <path d="M802 1988 c4 -153 5 -166 30 -213 31 -59 76 -104 138 -136 41 -22 59 -24 218 -27 l173 -4 -3 169 c-3 156 -5 171 -28 217 -14 27 -44 66 -68 87 -68 59 -110 69 -300 69 l-164 0 4 -162z"/>
+        <path d="M1550 1964 c-38 -16 -85 -57 -103 -89 -6 -11 -14 -75 -17 -143 l-5 -122 108 0 c118 0 162 12 210 58 50 47 60 78 65 200 l5 112 -114 0 c-79 -1 -125 -5 -149 -16z"/>
+      </g>
+      <g fill="#e8893a" transform="translate(0,225) scale(0.1,-0.1)">
+        <path d="M300 1025 l0 -475 70 0 c70 0 70 0 70 145 0 80 4 145 8 145 5 0 36 -64 70 -142 60 -143 60 -143 136 -146 l77 -3 -76 150 c-41 83 -75 154 -75 158 0 5 14 16 30 25 16 9 39 32 50 50 18 30 20 50 20 238 0 180 -3 210 -19 247 -31 68 -72 83 -231 83 l-130 0 0 -475z m230 325 c18 -18 20 -33 20 -184 0 -165 0 -165 -26 -185 -15 -12 -40 -21 -55 -21 -29 0 -29 0 -29 205 0 205 0 205 35 205 22 0 43 -8 55 -20z"/>
+        <path d="M910 1497 c0 -2 -31 -215 -70 -473 -38 -258 -70 -470 -70 -471 0 -2 31 -3 68 -3 68 0 68 0 86 140 18 140 18 140 80 140 63 0 63 0 81 -140 18 -140 18 -140 87 -140 69 0 69 0 63 32 -6 38 -135 906 -135 913 0 3 -43 5 -95 5 -52 0 -95 -1 -95 -3z m115 -357 c8 -69 18 -137 21 -152 5 -27 4 -28 -40 -28 -25 0 -46 1 -46 3 0 1 9 69 20 151 11 81 20 151 20 154 0 3 2 3 4 1 3 -2 12 -61 21 -129z"/>
+        <path d="M1330 1025 l0 -475 65 0 65 0 0 475 0 475 -65 0 -65 0 0 -475z"/>
+        <path d="M1580 1435 c0 -65 0 -65 91 -65 90 0 91 0 85 -22 -57 -212 -186 -744 -186 -767 0 -31 0 -31 175 -31 175 0 175 0 175 65 0 65 0 65 -95 65 -52 0 -95 3 -95 7 0 4 41 168 90 364 50 196 90 378 90 403 0 46 0 46 -165 46 -165 0 -165 0 -165 -65z"/>
+      </g>
+      <g fill="#5bbbc7" transform="translate(0,225) scale(0.1,-0.1)">
+        <path d="M730 405 c0 -42 -11 -58 -25 -35 -3 6 -20 10 -36 10 -43 0 -79 -39 -79 -85 0 -67 76 -110 122 -68 17 15 18 15 18 0 0 -10 5 -17 10 -17 6 0 10 47 10 120 0 73 -4 120 -10 120 -5 0 -10 -20 -10 -45z m-20 -65 c11 -11 20 -31 20 -45 0 -30 -32 -65 -59 -65 -28 0 -63 48 -55 74 17 55 59 71 94 36z"/>
+        <path d="M432 360 c-60 -56 -24 -150 57 -150 20 0 42 4 50 9 20 13 -3 23 -34 15 -26 -6 -75 17 -75 36 0 6 29 10 65 10 63 0 65 1 65 25 0 35 -42 75 -78 75 -15 0 -38 -9 -50 -20z m79 -10 c10 -6 19 -20 19 -30 0 -17 -7 -20 -50 -20 -56 0 -67 17 -28 44 26 19 33 19 59 6z"/>
+        <path d="M800 315 c0 -52 4 -69 20 -85 21 -21 74 -27 85 -10 5 8 11 7 21 -1 20 -16 26 5 22 86 -2 44 -8 70 -15 73 -10 3 -13 -13 -13 -57 0 -53 -3 -62 -24 -76 -19 -13 -29 -14 -45 -5 -18 9 -21 20 -21 75 0 51 -3 65 -15 65 -12 0 -15 -14 -15 -65z"/>
+        <path d="M1015 356 c-56 -56 -15 -151 62 -144 20 2 38 8 40 15 3 8 -6 10 -30 6 -29 -4 -37 -1 -55 22 -12 15 -22 33 -22 40 0 7 10 25 22 40 18 23 26 26 55 22 24 -4 33 -2 30 6 -2 7 -20 13 -40 15 -28 2 -42 -3 -62 -22z"/>
+        <path d="M1165 370 c-7 -11 -1 -13 38 -10 31 2 57 -15 57 -36 0 -10 -13 -14 -45 -14 -36 0 -47 -4 -61 -25 -15 -23 -15 -27 0 -50 12 -19 25 -25 51 -25 18 0 37 4 40 10 4 6 13 5 25 -2 22 -14 39 -3 22 14 -7 7 -12 38 -12 70 0 46 -4 59 -19 68 -25 13 -88 13 -96 0z m95 -93 c0 -25 -37 -50 -65 -43 -24 6 -34 34 -18 49 13 13 83 8 83 -6z"/>
+        <path d="M1355 356 c-35 -35 -34 -88 3 -122 15 -14 35 -33 45 -41 9 -9 17 -20 17 -24 0 -4 -8 -10 -17 -12 -14 -4 -13 -5 4 -6 29 -1 40 19 20 34 -23 16 -21 23 5 27 12 2 23 9 26 15 2 9 -5 11 -27 7 -23 -5 -35 -1 -55 19 -14 15 -26 33 -26 42 0 9 12 27 26 42 20 20 32 24 55 19 22 -4 29 -2 27 7 -3 6 -21 13 -41 15 -28 2 -42 -3 -62 -22z"/>
+        <path d="M1505 370 c-7 -11 -1 -13 38 -10 31 2 57 -15 57 -36 0 -10 -13 -14 -43 -14 -24 0 -48 -5 -55 -12 -19 -19 -15 -66 7 -78 25 -13 68 -13 76 0 5 8 11 7 21 -1 7 -6 22 -8 31 -4 17 6 17 7 1 16 -14 8 -18 23 -18 67 0 32 -5 63 -12 70 -14 14 -94 16 -103 2z m95 -94 c0 -18 -27 -46 -45 -46 -26 0 -45 12 -45 29 0 26 9 31 52 31 26 0 38 -4 38 -14z"/>
+        <path d="M1695 355 c-54 -53 -16 -145 58 -145 46 0 87 40 87 85 0 75 -92 113 -145 60z m93 -11 c33 -23 27 -83 -9 -103 -24 -13 -29 -13 -53 2 -34 23 -37 78 -4 101 28 20 38 20 66 0z"/>
+      </g>
+    </svg>
+    <h1>Metodologia rAIz Claude Code</h1>
+    <div class="subtitle">Guia pratico de implementacao com IA para equipes</div>
+    <div class="tagline">Pego e faco. Se der errado, joga fora. Se der certo, replica.</div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">464</div>
+        <div class="stat-label">Entregas em 15 dias</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">44</div>
+        <div class="stat-label">Assistentes</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">59</div>
+        <div class="stat-label">Habilidades</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">13x</div>
+        <div class="stat-label">Sessoes / dia</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOC BAR -->
+<div class="toc-bar">
+  <div class="toc-bar-inner">
+    <a href="#rotina">Rotina</a>
+    <a href="#prompting">Prompting</a>
+    <a href="#backlog">Backlog</a>
+    <a href="#construcao">Construcao</a>
+    <a href="#correcao">Correcao</a>
+    <a href="#assistentes">Assistentes</a>
+    <a href="#protecao">Protecao</a>
+    <a href="#continuidade">Continuidade</a>
+    <a href="#replicacao">Replicacao</a>
+    <a href="#compartilhar">Compartilhar</a>
+    <a href="#erros">Erros</a>
+    <a href="#comecar">Comecar</a>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+$body$
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="brand">rAIz Educacao</div>
+  <p style="margin-top:8px">Metodologia rAIz Claude Code &mdash; Atualizado em 23/03/2026</p>
+  <p style="margin-top:4px"><a href="https://github.com/andregusman-raiz/a-gusman-claude">github.com/andregusman-raiz/a-gusman-claude</a></p>
+</div>
+
+</body>
+</html>
