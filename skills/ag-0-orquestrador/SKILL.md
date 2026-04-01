@@ -80,6 +80,8 @@ Input do usuario:
 ├─ VALIDAR QUALIDADE?
 │  "qualidade" "QA completo" "testar tudo" "meridian"
 │  └─→ Skill("ag-7-qualidade", args: "[input]")
+│  "compliance ux" "comparar design" "aderencia design library" "avaliar ux"
+│  └─→ Agent(ag-avaliar-ux-design-library, args: "[URL]")
 │
 ├─ VERIFICAR SEGURANCA?
 │  "seguranca" "security" "OWASP" "LGPD" "sentinel"
@@ -107,6 +109,27 @@ Input do usuario:
 │  NOTA: ag-12 DEVE consultar KB unificada MECE antes:
 │    ~/Claude/assets/knowledge-base/totvs/unified/ (schema, glossary, queries, rules)
 │    ~/Claude/assets/knowledge-base/zeev/unified/ (apis, integration, rules)
+│
+├─ DEBATER DECISAO TECNICA?
+│  "debater" "mesa redonda" "trade-off" "decidir entre"
+│  "comparar opcoes" "qual abordagem" "discutir alternativas"
+│  └─→ Skill("ag-mesa-redonda", args: "[decisao]")
+│
+├─ REVISAR SPEC/PRD (ADVERSARIAL)?
+│  "quebrar design" "adversarial" "edge cases da spec"
+│  "suposicoes implicitas" "tentar quebrar"
+│  └─→ Skill("ag-adversario", args: "[SPEC path]")
+│
+├─ COMPRIMIR DOCUMENTO?
+│  "destilar" "comprimir documento" "otimizar para LLM"
+│  "documento grande" "reduzir tokens"
+│  └─→ Skill("ag-destilar", args: "[path]")
+│
+├─ DOCUMENTAR DECISAO / REQUISITO DE PRODUTO?
+│  "prd" "requisito de produto" "documento de produto"
+│  └─→ Skill("prd-writer", args: "[input]")
+│  "adr" "decisao arquitetural" "registrar decisao"
+│  └─→ Skill("adr", args: "[input]")
 │
 ├─ PLUGIN RAPIDO?
 │  "review PR" → /code-review | "commit" → /commit
