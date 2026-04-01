@@ -70,6 +70,16 @@ paths:
 
 ---
 
+## Novos Skills (BMAD-inspired)
+
+| Sinal | Skill | O que faz |
+|-------|-------|-----------|
+| Decisao com 2+ alternativas | `/ag-mesa-redonda [decisao]` | Debate multi-perspectiva → ADR |
+| Spec pronta, antes do build | `/ag-adversario [spec.md]` | Tenta quebrar o design, encontra edge cases |
+| Documento grande para agents | `/ag-destilar [path]` | Comprime mantendo 100% da info |
+| `--autonomo` em qualquer machine | ex: `/ag-1-construir --autonomo` | Executa sem parar, reporta no final |
+| `--draft` em qualquer machine | ex: `/ag-2-corrigir --draft` | Rascunho rapido, sem quality gates |
+
 ## Agents individuais (power user)
 
 Agents fora de machines, uteis para tarefas ad-hoc:
@@ -78,6 +88,12 @@ Agents fora de machines, uteis para tarefas ad-hoc:
 |-------|---------|
 | ag-saude-sessao | Health check antes de comecar |
 | ag-analisar-contexto | Tech debt, riscos arquiteturais |
+| ag-advisor | Analise proativa — sugere melhorias sem ser pedido |
+| ag-cacar-bugs | Bug hunter proativo — encontra bugs latentes |
+| ag-insights | Metricas de sessao/projeto (tokens, trends, health) |
+| ag-rebobinar | Undo estruturado com preview e backup |
+| ag-thinkback | Replay de decisoes — por que decidimos X? |
+| ag-teleportar | Switch inteligente entre projetos |
 | ag-testar-manual | QA exploratorio via Playwright |
 | ag-migrar-dados | Database migrations |
 | ag-criar-agente | Criar novos agents |
