@@ -163,7 +163,9 @@
       "Bash(__NEW_LINE_c06e28c0e8d909f3__ done:*)",
       "mcp__plugin_github_github__search_repositories",
       "Skill(ag-1-construir)",
-      "mcp__plugin_github_github__search_code"
+      "mcp__plugin_github_github__search_code",
+      "Bash(PGPASSWORD=${PGPASSWORD} psql:*)",
+      "Read(//Users/andregusmandeoliveira/Claude/GitHub/fgts-platform/certs/retorno-nis/**)"
     ],
     "deny": [
       "Read(.env)",
@@ -284,5 +286,8 @@
         ]
       }
     ]
+  },
+  "remote": {
+    "defaultEnvironmentId": "env_01AhuwKrG6XAE4hJnmMekN1f"
   }
 }
