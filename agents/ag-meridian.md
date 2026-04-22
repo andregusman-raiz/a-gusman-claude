@@ -175,7 +175,10 @@ Score D1 = rotas_alive / total_rotas * 100
 
 Se D1 FAIL para uma rota → pular D2-D5 para essa rota.
 
-### D2-REAL (dados reais?)
+**CRITICO**: D1 PASS significa APENAS que a pagina carregou sem crash. NAO significa que funciona.
+Build/typecheck passando != feature funcional. NUNCA promover D1 PASS como evidencia de qualidade.
+
+### D2-REAL (dados reais E corretos?)
 
 ```
 1. browser_snapshot() → extrair todo texto visivel
@@ -190,11 +193,21 @@ Se D1 FAIL para uma rota → pular D2-D5 para essa rota.
    - IDs/tokens hardcoded (strings > 20 chars que parecem secrets)
    - Emails/telefones hardcoded em componentes
 4. Verificar que APIs retornam dados (network requests com body vazio ou [])
+5. TRACAR CADEIA E2E: API response → adapter/transform → state/context → componente → DOM
+   - Verificar que o valor exibido no DOM corresponde ao valor retornado pela API
+   - Se pagina mostra numeros, verificar que sao os numeros CORRETOS (nao apenas "existem numeros")
+   - Comparar amostra: pegar 2-3 valores da API response e confirmar que aparecem corretamente na UI
 ```
 
-Score D2 = rotas_com_dados_reais / rotas_testadas * 100
+**ANTI-PATTERN**: `body.length > 200` ou "pagina tem conteudo" NAO prova dados corretos.
+Checar corretude SEMANTICA: o dado exibido E o dado esperado? Presenca != Corretude.
 
-### D3-WORKS (funciona?)
+Score D2 = rotas_com_dados_reais_E_corretos / rotas_testadas * 100
+
+### D3-WORKS (funciona via INTERACAO?)
+
+**REGRA FUNDAMENTAL**: D3 testa INTERACAO, nao presenca. Uma feature so "funciona" se o usuario
+consegue COMPLETAR o workflow. Snapshot estatico pos-load NAO conta como teste D3.
 
 Para cada rota, testar elementos interativos detectados no SCOUT:
 
@@ -204,18 +217,22 @@ FILTERS:
   2. Interagir com filtro (selecionar opcao ou digitar)
   3. Verificar que dados na pagina MUDARAM (comparar snapshots antes/depois)
   4. Se dados iguais → filtro nao funciona → D3 FAIL
+  5. TROCAR filtro para outra opcao → verificar que dados mudaram novamente
+  6. Verificar que dados filtrados sao SEMANTICAMENTE corretos (nao apenas diferentes)
 
 SEARCH:
   1. Encontrar campo de busca
   2. Digitar termo existente nos dados visiveis
   3. Verificar que resultados sao relevantes
   4. Digitar termo inexistente → verificar empty state
+  5. Limpar busca → verificar que dados originais voltaram
 
 FORMS:
   1. Encontrar formulario
   2. Preencher campos obrigatorios
   3. Submeter
   4. Verificar feedback (success toast, redirect, ou error message)
+  5. Verificar que dados submetidos PERSISTIRAM (recarregar pagina e conferir)
 
 CRUD:
   1. Criar item (se form disponivel)
@@ -229,9 +246,25 @@ NAVIGATION:
   1. Para cada link no menu/sidebar
   2. Clicar → verificar que pagina carrega (nao 404)
   3. Verificar breadcrumbs/URL correta
+
+DROPDOWNS/SELECTS (OBRIGATORIO — anti-pattern #5):
+  1. Encontrar todos os dropdowns/selects na pagina
+  2. Abrir dropdown → verificar que opcoes carregaram
+  3. Selecionar opcao → verificar que selecao efetivou (valor visivel mudou)
+  4. Verificar que a selecao PROPAGOU (dados dependentes atualizaram)
+  5. Bugs em dropdowns sao os MAIS COMUNS e so aparecem apos interacao
+
+TAB/ACCORDION SWITCHES:
+  1. Identificar tabs, accordions, ou segmented controls
+  2. Clicar em CADA tab/section
+  3. Verificar que conteudo MUDOU (nao apenas que o tab ficou ativo)
+  4. Verificar que dados no tab sao CORRETOS para aquele contexto
 ```
 
-Score D3 = features_funcionando / features_testadas * 100
+**ANTI-PATTERN**: Checar apenas "pagina carregou com dados" NUNCA e suficiente para D3.
+Se nao houve CLICK, SELECT, TYPE, ou SUBMIT → D3 NAO foi testado.
+
+Score D3 = features_funcionando_via_interacao / features_testadas * 100
 
 ### D4-LOOKS (visual correto?)
 
@@ -387,13 +420,33 @@ Agent({
 })
 ```
 
-### 3.4 Verify Sprint
+### 3.4 Verify Sprint (INTERACAO OBRIGATORIA)
+
+**REGRA CRITICA**: NUNCA declarar fix completo baseado apenas em build/typecheck passando.
+Build pass = sem erros de tipo. NAO significa que o bug foi resolvido para o usuario.
 
 Apos cada sprint:
 1. Merge worktree para branch principal
-2. Re-rodar D1-D5 APENAS nas rotas afetadas pelos fixes
-3. Comparar scores: se qualquer dimensao CAIU → regressao detectada
-4. Se regressao → `git revert` do commit causador, documentar
+2. **REPRODUZIR o cenario original do bug via Playwright**:
+   - Navegar ate a rota afetada
+   - Executar a MESMA interacao que causava o bug (click, select, submit)
+   - Verificar que o resultado CORRETO aparece (nao apenas "nao crashou")
+3. **Tracar dados E2E**: API response → adapter → state → componente → DOM visivel
+   - Se fix foi em adapter: verificar que dado transformado chega correto no componente
+   - Se fix foi em componente: verificar que renderiza o dado correto do state
+   - Se fix foi em API: verificar que response propagou ate o DOM
+4. **Testar interacoes adjacentes**: mudar filtro, trocar tab, selecionar outro item
+   - Bugs frequentemente "resolvem" em 1 cenario mas quebram em adjacentes
+5. Re-rodar D1-D5 APENAS nas rotas afetadas pelos fixes
+6. Comparar scores: se qualquer dimensao CAIU → regressao detectada
+7. Se regressao → `git revert` do commit causador, documentar
+
+**CHECKLIST POS-FIX** (todos obrigatorios antes de marcar fix como DONE):
+- [ ] Bug original REPRODUZIDO e verificado como resolvido via Playwright
+- [ ] Interacao do usuario testada (nao apenas page load)
+- [ ] Dados corretos exibidos (nao apenas "dados existem")
+- [ ] Interacoes adjacentes nao quebraram
+- [ ] Screenshot de evidencia capturado
 
 ### 3.5 Commit
 
@@ -415,7 +468,8 @@ MQS = D1 * 0.25 + D2 * 0.20 + D3 * 0.25 + D4 * 0.15 + D5 * 0.15
 ### Decisao
 
 ```
-SE MQS >= threshold AND P0_issues == 0 AND regressoes == 0 AND delta_MQS < 2:
+SE MQS >= threshold AND P0_issues == 0 AND regressoes == 0 AND delta_MQS < 2
+   AND todos_fixes_verificados_via_interacao == true:
   → STOP → ir para DELIVER
 
 SE MQS < threshold AND issues_fixaveis > 0 AND ciclo < 5:
@@ -424,6 +478,10 @@ SE MQS < threshold AND issues_fixaveis > 0 AND ciclo < 5:
 SE ciclo >= 5 OR issues_fixaveis == 0:
   → FORCE STOP → ir para DELIVER com WARNING
 ```
+
+**GATE OBRIGATORIO**: Convergencia so pode ser declarada se TODOS os fixes aplicados
+foram verificados via interacao Playwright (nao apenas build pass). Se algum fix nao
+teve verificacao de interacao → re-testar antes de declarar CONVERGED.
 
 ### Tracking
 
@@ -578,6 +636,7 @@ rm -f /tmp/meridian-*.json
 
 ## Anti-Patterns (NUNCA)
 
+### Operacionais
 1. NUNCA relaxar MQS threshold durante run
 2. NUNCA adicionar mock data como "fix"
 3. NUNCA hardcodar valores como "fix"
@@ -588,3 +647,10 @@ rm -f /tmp/meridian-*.json
 8. NUNCA skip D5-FEELS (a dimensao mais importante)
 9. NUNCA declarar CONVERGED sem evidencia (screenshots + scores)
 10. NUNCA fazer git add -A (sempre arquivos especificos)
+
+### Diagnostico — 5 Falhas Fundamentais (aprendidas em 21 PRs no SophiA)
+11. **Presenca != Corretude**: `body.length > 200` ou "pagina tem conteudo" NAO prova que dados estao corretos. Sempre verificar corretude SEMANTICA — o dado exibido E o dado esperado.
+12. **API isolada != E2E funcional**: `curl /api/X returns 200` NAO significa que dados fluem corretamente pelo pipeline adapter → context → page. Tracar a cadeia completa.
+13. **Build pass != Feature funciona**: `tsc --noEmit = 0 erros` significa sem erros de tipo, NAO que a feature funciona para o usuario. SEMPRE reproduzir cenario via Playwright apos fix.
+14. **Heuristica QAT != Verificacao real**: Checar "numeros existem na pagina" nao detecta "numeros ERRADOS na pagina". Comparar valores exibidos com valores da fonte (API/DB).
+15. **Snapshot estatico != Teste de interacao**: Checar DOM apos page load NAO detecta bugs que so aparecem apos INTERACAO (dropdown select, filter change, tab switch). Se nao houve click/select/type → feature NAO foi testada.

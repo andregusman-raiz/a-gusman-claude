@@ -165,7 +165,19 @@
       "Skill(ag-1-construir)",
       "mcp__plugin_github_github__search_code",
       "Bash(PGPASSWORD=${PGPASSWORD} psql:*)",
-      "Read(//Users/andregusmandeoliveira/Claude/GitHub/fgts-platform/certs/retorno-nis/**)"
+      "Read(//Users/andregusmandeoliveira/Claude/GitHub/fgts-platform/certs/retorno-nis/**)",
+      "mcp__plugin_playwright_playwright__browser_tabs",
+      "Bash(~/.claude/scripts/repo-lock.sh acquire:*)",
+      "Bash(~/.claude/scripts/repo-lock.sh validate:*)",
+      "Bash(~/.claude/scripts/repo-lock.sh release:*)",
+      "Bash(mkdir -p ~/.claude/mcp-servers)",
+      "Bash(mv ~/Claude/mcp-computer-use ~/.claude/mcp-servers/computer-use)",
+      "Read(//Users/andregusmandeoliveira/.claude/mcp-servers/**)",
+      "Bash(PGPASSWORD=betting psql *)",
+      "Bash(mkdir -p ~/Claude/.claude/skills/pptx/templates)",
+      "Read(//System/Library/Fonts/**)",
+      "Bash(mkdir -p ~/Claude/docs/diagnosticos/2026-04-22-agx-diagnostic)",
+      "Bash(mkdir -p ~/Claude/.claude/shared/adr)"
     ],
     "deny": [
       "Read(.env)",
@@ -210,7 +222,17 @@
         ]
       }
     ],
-    "Stop": [],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/gap-acceptance-guard.py",
+            "statusMessage": "Gap acceptance guard..."
+          }
+        ]
+      }
+    ],
     "SubagentStop": [],
     "PreCompact": [
       {
@@ -286,6 +308,9 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "context7@claude-plugins-official": false
   },
   "remote": {
     "defaultEnvironmentId": "env_01AhuwKrG6XAE4hJnmMekN1f"

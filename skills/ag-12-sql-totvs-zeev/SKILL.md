@@ -62,9 +62,57 @@ Fontes brutas: `~/Claude/assets/knowledge-base/zeev/raw/`
 
 ---
 
+## Pre-Generation Gates (OBRIGATÓRIO antes de gerar qualquer SQL)
+
+Executar TODOS os gates sequencialmente. Se qualquer gate falhar → PARAR e reportar.
+
+### GATE 1 — Source Selection
+Mapear o domínio de negócio para a fonte correta ANTES de tocar em SQL:
+
+| Domínio | Fonte Primária | Tabelas Chave |
+|---------|---------------|---------------|
+| Matrículas, educacional, metas | **PBI_RAIZ** (RAIZDB01) | Tabela_Z_PAINELMATRICULA_BI, Tabela_f_matriculas |
+| Financeiro, cobrança, acordos | **PBI_RAIZ** (RAIZDB01) | Tabela_FICHAFINANCEIRA, Tabela_RPTCOBRANCA |
+| RH, folha, ponto, compras, contábil | **TOTVS RM** (Cloud) | PFUNC, PFFINANC, PFHSTAFT, PEVENTO |
+| HubSpot (deals, contacts, leads) | **Neon** (PostgreSQL) | hubspot_deal (335K), hubspot_contact (518K) |
+| Layers, Zeev, audit trail | **Neon** (PostgreSQL) | layers_*, zeev_*, hubspot_totvs_match (41K) |
+
+Se domínio ambíguo → PARAR e perguntar ao usuário. NUNCA adivinhar fonte.
+
+### GATE 2 — Schema Validation (TOTVS RM only)
+1. Ler `~/Claude/assets/knowledge-base/totvs/unified/schema.json` para CADA tabela mencionada
+2. Verificar nomes EXATOS de colunas — NUNCA inventar nomes de campos
+3. Se tabela não está no schema.json (69 tabelas): STOP e declarar "tabela não catalogada na KB"
+4. Verificar flags PII em schema.json — se query toca campos PII, aplicar regras de mascaramento
+
+### GATE 3 — Multi-Tenant Guard
+1. TOTVS RM: toda query DEVE ter `CODCOLIGADA` no WHERE — injetar se ausente
+2. COL=10 (Escolas Integradas Raiz): 3 marcas com status DIFERENTES:
+   - FIL=1 (Qi Recreio): CODSTATUS IN (2, 3)
+   - FIL=3,4,6 (Sá Pereira): CODSTATUS IN (14, 15)
+   - FIL=7 (SAP): CODSTATUS IN (25, 32)
+3. Atribuição de marca SEMPRE por `(CODCOLIGADA, CODFILIAL)` pair — NUNCA só CODCOLIGADA
+
+### GATE 4 — Anti-Pattern Rejection
+Rejeitar e reescrever automaticamente:
+- `SELECT *` → expandir para colunas nomeadas (consultar schema.json)
+- Sem `(NOLOCK)` em leitura TOTVS RM → adicionar a todo FROM/JOIN
+- Neon query com >5K rows esperados sem paginação → adicionar LIMIT 1000 + OFFSET loop
+- `BETWEEN` em DateTime → reescrever como `>= AND <`
+- `YEAR()`, `CONVERT(DATE, ...)` em filtro → reescrever como range sargable
+
+### GATE 5 — PBI_RAIZ Domain Check
+Se domínio é matrículas/financeiro/educacional:
+1. Verificar se PBI_RAIZ tem a tabela equivalente (ver guide pbi-raiz-bridge.md)
+2. Preferir PBI_RAIZ — já tem regras de negócio decodificadas (evita reverse-engineering de DAX)
+3. SQL gotcha PBI_RAIZ: NULL-safe filter obrigatório: `(col <> 'X' OR col IS NULL)`
+4. Discovery: `/api/pbi-raiz/tables`, `/api/pbi-raiz/columns/{table}`
+
+---
+
 ## Workflow ao receber query para otimizar
 
-1. Identificar sistema-alvo: TOTVS RM (SQL Server) ou Zeev (API REST) ou PostgreSQL (Neon)
+1. **Executar Gates 1-5 acima** (obrigatório, não pular)
 2. Consultar schema.json → confirmar nomes reais de tabelas/campos
 3. Consultar glossary.json → entender significado de campos crípticos
 4. Consultar queries.json → verificar se já existe query similar catalogada

@@ -26,6 +26,26 @@ metadata:
 /construir --audit-only adicionar feature X            # So SPEC, sem build
 ```
 
+## Guard de escopo — Multi-PR auto-delegate
+
+**ANTES de iniciar ASSESS**, verificar se o objetivo e single-PR ou multi-PR.
+
+Sinais de multi-PR (qualquer um destes = escopo grande demais):
+- Path de plano que contem "execution-plan", "roadmap", "multi-phase"
+- Plano/SPEC menciona 3+ PRs, 3+ fases, 3+ features independentes
+- Estimativa > 1 sessao ou > 20 arquivos em dominios diferentes
+- Usuario disse explicitamente "multi-PR", "varias fases", "fatiado"
+
+Se detectado multi-PR:
+1. **NAO executar** — ag-1-construir e single-PR por design
+2. **Reportar ao orquestrador** (ou ao usuario direto) com:
+   - Identificacao dos N PRs/fases do plano
+   - Recomendacao: `/ag-0-orquestrador [path do plano]` para fatiamento
+   - OU: para frentes simultaneas independentes, `/ag-team-safe` com worktree isolation
+3. NAO tentar rodar o plano inteiro em 1 sessao — historicamente falha.
+
+Exececao: `--force-single-pr` flag (so para rodar a PRIMEIRA fase do plano como PR isolado).
+
 ## O que faz
 
 Executa construcao completa AUTONOMA em 9 fases:
