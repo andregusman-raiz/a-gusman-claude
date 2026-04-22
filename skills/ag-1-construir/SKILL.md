@@ -13,6 +13,124 @@ metadata:
 
 # CONSTRUIR — Maquina Autonoma de Construcao
 
+## Inline KB — SDD Templates (Opus 4.7 ADR-0001 P1.2)
+
+> Templates inline para eliminar Read round-trip nas fases de PRD/SPEC/PLAN. Versão completa das skills `prd-writer`, `spec-writer`, `adr`.
+
+### PRD skeleton (Product Requirements)
+
+```markdown
+# PRD: <feature name>
+**Data:** YYYY-MM-DD | **Autor:** <user> | **Status:** [Draft|Approved|Implemented]
+
+## 1. Problema
+<O que o usuário não consegue fazer hoje? Qual dor concreta?>
+
+## 2. Personas
+<Quem usa? Quais perfis? Frequência?>
+
+## 3. Escopo (IN)
+- <features que SERÃO entregues>
+
+## 4. Fora de escopo (OUT)
+- <explicitamente NÃO entregar nesta iteração>
+
+## 5. Métricas de sucesso
+- <KPI 1: baseline → target>
+- <KPI 2: como medir>
+
+## 6. Riscos e dependências
+- <dependência externa, risco técnico, prazo crítico>
+```
+
+### SPEC skeleton (Technical Specification)
+
+```markdown
+# SPEC: <feature>
+**Refs:** PRD.md, related issues #N | **ADR:** link se houver
+
+## Objetivo
+<1 parágrafo: o que construir, por quê>
+
+## Arquitetura
+<Diagrama (mermaid) + componentes + fluxo de dados>
+
+## Interfaces
+### API
+| Method | Path | Request | Response | Auth |
+### Types/Schemas
+<Zod/TypeScript types>
+
+## Edge cases
+- <caso 1: input inesperado>
+- <caso 2: falha externa>
+- <caso 3: concorrência/race>
+
+## Critérios de aceite
+- [ ] <cond 1 verificável>
+- [ ] <cond 2 verificável>
+
+## Test plan
+- Unit: <módulos>
+- Integration: <fluxos>
+- E2E: <user journeys via Playwright>
+
+## Rollback
+<como reverter se quebrar produção>
+```
+
+### ADR skeleton (Architecture Decision Record)
+
+```markdown
+# ADR-NNNN: <decisão>
+**Status:** [Proposto|Aprovado|Executado|Substituído] | **Data:** YYYY-MM-DD
+
+## Contexto
+<Por que precisamos decidir? Quais forças estão em jogo?>
+
+## Decisão
+<O que decidimos fazer — UMA frase clara>
+
+## Alternativas consideradas
+### A. <opção A>
+- Prós: ...
+- Contras: ...
+- Rejeitada porque: ...
+### B. <opção B>
+...
+
+## Consequências
+- Positivas: ...
+- Negativas: ...
+- Neutras (trade-offs aceitos): ...
+
+## Referências
+- <link PRD/SPEC>
+- <link externo>
+```
+
+### Execution Plan skeleton (quando multi-PR)
+
+```markdown
+# Execution Plan: <objetivo>
+**Duração estimada:** N semanas | **PRs previstos:** N
+
+## Fases
+### Fase 1 (Semana 1)
+- **Ação 1.1** — <desc> — 1 PR — owner, gate, rollback
+
+## Grafo de dependências
+<DAG textual: qual ação desbloqueia qual>
+
+## Métricas de sucesso
+| KPI | Baseline | Target | Como medir |
+
+## Riscos
+| Risco | Prob | Impacto | Mitigação |
+```
+
+---
+
 ## Invocacao
 
 ```

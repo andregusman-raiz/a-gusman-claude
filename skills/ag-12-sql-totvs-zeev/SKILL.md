@@ -24,6 +24,83 @@ metadata:
 
 # SQL Optimization & Data Queries — TOTVS RM, Zeev BPM, PostgreSQL
 
+## Inline KB — Quick Reference (Opus 4.7 ADR-0001 P1.2)
+
+> KB inline para eliminar Read round-trip em prompts comuns. Para KB completa e atualizada, consultar `~/Claude/assets/knowledge-base/totvs/`.
+
+### Tabelas TOTVS mais usadas
+
+| Tabela | Propósito | Colunas-chave |
+|---|---|---|
+| `PPESSOA` | Cadastro pessoa (aluno, funcionário, responsável) | CODIGO, NOME, CPF, DTNASCIMENTO |
+| `SALUNO` | Aluno educacional | CODCOLIGADA, RA, CODPESSOA, CODCURSO, CODHABILITACAO |
+| `SMATRICULA` | Matrícula por período | CODCOLIGADA, RA, IDPERLET, CODSTATUS, DTMATRICULA |
+| `PFUNC` | Funcionário RH (680 cols — NUNCA SELECT *) | CODCOLIGADA, CHAPA, CODPESSOA, CODSITUACAO |
+| `PFFINANC` | Ficha financeira (histórico) | CODCOLIGADA, CHAPA, ANOCOMP, MESCOMP |
+| `PEVENTO` | Eventos folha (código evento) | CODCOLIGADA, CODEVENTO, DESCRICAO, TIPO |
+| `FLAN` | Lançamentos financeiros | CODCOLIGADA, IDLAN, CODCFO, STATUSLAN, VALORORIGINAL |
+| `GCOLIGADA` | Coligadas (32 ativas) | CODCOLIGADA, NOME, CNPJ |
+
+### Enums críticos (SStatus por coligada)
+
+```
+COL=1 (Raiz):     matriculado = CODSTATUS IN (2, 3)
+COL=2 (QI):       matriculado = CODSTATUS IN (2, 3)
+COL=10 (SIR):     matriculado = CODSTATUS IN (14, 15, 25, 32) ← stratificado por filial
+  FIL=1 (QI Recreio):   IN (2, 3)
+  FIL=3,4,6 (Sá Pereira): IN (14, 15)
+  FIL=7 (SAP):           IN (25, 32)
+```
+
+### Guards obrigatórios TOTVS
+
+1. `WHERE CODCOLIGADA = N` **sempre** (multi-tenant)
+2. `FROM TBL (NOLOCK)` **sempre** em leitura
+3. `SELECT col1, col2, ...` — **NUNCA `SELECT *`**
+4. DateTime sargable: `WHERE DT >= '2026-01-01' AND DT < '2027-01-01'` (não `YEAR(DT)=2026`)
+5. COL=10: use `(CODCOLIGADA, CODFILIAL)` pair para mapeamento de marca
+
+### Neon (PostgreSQL) — patterns
+
+| Tabela | Rows | Paginação obrigatória |
+|---|---|---|
+| hubspot_deal | 335K | sim (>5K) |
+| hubspot_contact | 518K | sim |
+| hubspot_lead_raiz | 57K | sim |
+| hubspot_totvs_match | 41K | sim |
+| pbi_painel_matriculas | 32K | sim |
+| ficha_financeira | 436K | sim |
+| holerite | 47.5K | sim |
+
+Pattern:
+```python
+OFFSET = 0; BATCH = 1000
+while True:
+    rows = query(f"SELECT ... ORDER BY id LIMIT {BATCH} OFFSET {OFFSET}")
+    if not rows: break
+    process(rows); OFFSET += BATCH
+```
+
+### Data Source Router (domain → source)
+
+| Domínio | Fonte Primária |
+|---|---|
+| Matrículas, educacional, metas | PBI_RAIZ (business rules decoded) |
+| Financeiro, acordos | PBI_RAIZ |
+| RH, folha, ponto, compras | TOTVS RM |
+| HubSpot deals/contacts/leads | Neon |
+| Zeev BPM | Neon (mirror) |
+
+**Regra:** consultar tabela acima ANTES de escrever query. Domínio ambíguo → PARAR e perguntar.
+
+### PBI_RAIZ (bridge)
+
+- `SELECT * FROM INFORMATION_SCHEMA.TABLES` para discovery
+- NULL-safe filter: `WHERE (col <> 'X' OR col IS NULL)` (SQL Server exclui NULL silencioso)
+- Tabelas `Tabela_*` já tem regras de negócio decoded (não replicar em SQL raw)
+
+---
+
 ## Knowledge Base Unificada (OBRIGATÓRIO consultar)
 
 ### TOTVS RM — KB MECE
