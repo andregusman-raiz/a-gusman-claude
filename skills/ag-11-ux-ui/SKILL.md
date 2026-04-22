@@ -22,6 +22,69 @@ argument-hint: "[action] [element/project]"
 
 Esta machine (ag-11-ux-ui) mantém valor como **orchestrator de design**: curadoria da Raiz Design Library, catálogo de 24 soluções, decisão entre estilos/paletas/fonts, integração com stack-decisions.
 
+## Inline Design Tokens — rAIz (Opus 4.7 ADR-0001 P1.2)
+
+> Tokens críticos inline para eliminar Read. Catálogo completo em `~/Claude/assets/design-library/catalog.md`.
+
+### Cores Raiz (core palette)
+
+```css
+--raiz-primary: #2E7D32;       /* verde raiz */
+--raiz-primary-dark: #1B5E20;
+--raiz-secondary: #FFA726;     /* amarelo complementar */
+--raiz-success: #4CAF50;
+--raiz-warning: #FB8C00;
+--raiz-error: #E53935;
+--raiz-info: #1E88E5;
+--raiz-text: #212121;
+--raiz-text-muted: #757575;
+--raiz-bg: #FFFFFF;
+--raiz-bg-alt: #F5F5F5;
+--raiz-border: #E0E0E0;
+```
+
+### Tipografia
+
+```css
+--font-sans: 'Inter', system-ui, sans-serif;
+--font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+/* Scale */
+--text-xs: 0.75rem;   /* 12px */
+--text-sm: 0.875rem;  /* 14px */
+--text-base: 1rem;    /* 16px */
+--text-lg: 1.125rem;  /* 18px */
+--text-xl: 1.25rem;   /* 20px */
+--text-2xl: 1.5rem;   /* 24px */
+--text-3xl: 1.875rem; /* 30px */
+--text-4xl: 2.25rem;  /* 36px */
+```
+
+### Spacing (4px grid)
+
+```css
+--space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+--space-4: 1rem;    --space-6: 1.5rem; --space-8: 2rem;
+--space-12: 3rem;   --space-16: 4rem;
+```
+
+### Radius + shadow
+
+```css
+--radius-sm: 0.375rem; --radius: 0.5rem; --radius-lg: 0.75rem; --radius-full: 9999px;
+--shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+--shadow:    0 2px 4px rgba(0,0,0,.1);
+--shadow-lg: 0 10px 15px rgba(0,0,0,.1);
+```
+
+### 24 Soluções catalogadas (quick index)
+
+dashboard, workflow, chat, marketing-site, admin-panel, form-wizard, data-table, kanban, calendar, timeline, media-gallery, profile, settings, onboarding, pricing, checkout, auth-flow, notifications, search, filters, editor, report-viewer, report-builder, analytics
+
+**Se solução existe no catálogo → adaptar, não criar do zero.** Spec completa em `~/Claude/assets/design-library/solutions/NN-id/spec.md`.
+
+---
+
 ## Pre-Load: rAIz Design Library (OBRIGATORIO)
 
 ANTES de gerar qualquer design system ou componente, consultar:
