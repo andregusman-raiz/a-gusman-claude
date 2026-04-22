@@ -24,8 +24,37 @@ Antes de instalar qualquer dependência nova ou escolher tecnologia:
 | Charts | Recharts | Chart.js |
 | Testes | Vitest + Playwright | Jest (novo), Cypress |
 
+## Plugin skills canonical por stack area (ADR-0001)
+
+Para cada escolha na tabela acima, use a skill oficial correspondente:
+
+| Stack area | Skill oficial canonical |
+|---|---|
+| Auth (Clerk/Auth0) | `vercel:auth` |
+| Database (Supabase) | `supabase:supabase` + `supabase:supabase-postgres-best-practices` |
+| Storage (Vercel Blob, Neon, Upstash) | `vercel:vercel-storage` |
+| Cache | `vercel:runtime-cache` + `vercel:next-cache-components` |
+| ORM Supabase | `supabase:supabase` |
+| Styling (shadcn) | `vercel:shadcn` |
+| AI SDK (streaming, tools, agents) | `vercel:ai-sdk` |
+| AI Gateway (multi-provider, failover) | `vercel:ai-gateway` |
+| Chatbot multi-platform | `vercel:chat-sdk` |
+| Claude API/SDK direto | `claude-api` |
+| Workflow/durável | `vercel:workflow` |
+| Sandbox (exec untrusted code) | `vercel:vercel-sandbox` |
+| Next.js framework | `vercel:nextjs` + `vercel:next-cache-components` + `vercel:next-upgrade` |
+| Turbopack | `vercel:turbopack` |
+| Functions (serverless/edge) | `vercel:vercel-functions` |
+| Routing middleware | `vercel:routing-middleware` |
+| Marketplace integrations | `vercel:marketplace` |
+| Error monitoring | `sentry:sentry-sdk-setup` + `sentry:sentry-workflow` |
+| Infra não-Vercel (Railway) | `railway:use-railway` |
+| UI criativa | `frontend-design:frontend-design` |
+| Figma → código | `figma:figma-implement-design` |
+
 ## Enforcement
 
-- ag-6-iniciar DEVE aplicar o template padrão ao criar projeto
+- ag-6-iniciar DEVE aplicar o template padrão ao criar projeto E invocar skills canonicals
 - ag-1-construir DEVE verificar deps antes de instalar
 - Se lib rejeitada for detectada em `npm install` → alertar o usuário
+- Ao configurar AI feature: preferir `vercel:ai-sdk` antes de escrever call direto a provider

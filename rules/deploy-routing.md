@@ -6,22 +6,35 @@ paths:
 
 # Deploy Routing
 
+## Canonical (ADR-0001)
+
+**`vercel:deployments-cicd` é skill canonical para deploys Vercel.** Atualizada pela Vercel, cobre preview/prod/rollback/promote/inspect/CI config.
+
+Para deploys Railway: **`railway:use-railway`** canonical.
+
+`ag-3-entregar` e `ag-pipeline-deploy` continuam como entry-points de machine que **delegam** para as skills oficiais, adicionando quality gates customizados + integração Sentry + multi-ambiente.
+
 ## Arvore de Decisao
 
 ```
 Quer fazer deploy?
-├── Preview (testar antes de producao)
-│   ├── Via feature branch push → automatico (Vercel Git Integration)
-│   └── Manual → ag-pipeline-deploy --preview
+├── Skill oficial direto (preferido para deploy simples)
+│   ├── Vercel preview/prod → vercel:deployments-cicd
+│   ├── Vercel CLI (logs, link, pull) → vercel:vercel-cli
+│   ├── Env vars Vercel → vercel:env-vars
+│   └── Railway → railway:use-railway
 │
-├── Producao
-│   ├── Caminho padrao → ag-pipeline-deploy (pipeline completo 8 etapas + canary)
-│   ├── Deploy automatico → git push origin master → Vercel Git Integration
-│   │   (pre-deploy-gate.sh no buildCommand executa typecheck + lint + test)
-│   └── PROIBIDO → vercel --prod manual sem pipeline
+├── Machine local (quando precisar de pipeline customizado)
+│   ├── Preview com quality gates → ag-3-entregar (delega a skill oficial)
+│   ├── Producao 8-etapas + canary → ag-pipeline-deploy (delega + adiciona gates)
+│   └── Rollback + aprovacao → ag-publicar-deploy
 │
-└── Rollback
-    └── ag-publicar-deploy rollback (SEMPRE com aprovacao do usuario)
+├── Automatico (recomendado para deploys rotineiros)
+│   └── git push origin master → Vercel Git Integration
+│       (pre-deploy-gate.sh no buildCommand executa typecheck + lint + test)
+│
+└── PROIBIDO
+    └── vercel --prod manual sem pipeline E sem Git Integration
 ```
 
 ## Caminho Padrao (RECOMENDADO para todo deploy)

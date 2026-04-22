@@ -4,6 +4,18 @@
 Para abrir, visualizar ou interagir com qualquer URL localhost, SEMPRE usar Playwright MCP.
 NUNCA abrir browser do sistema (Safari, Chrome) via `open`, `xdg-open`, ou similar.
 
+## Divisão canonical Playwright vs Chrome DevTools MCP (ADR-0001)
+
+| Caso | Canonical | Razão |
+|---|---|---|
+| Navegação, clicks, forms, fluxo usuário | **Playwright MCP** | Snapshot a11y tree + headless rápido |
+| Screenshots de regressão visual | **Playwright MCP** | `browser_take_screenshot` |
+| Performance / LCP / CWV / trace | **Chrome DevTools MCP** (`debug-optimize-lcp`, `performance_start_trace`) | DevTools reais |
+| A11y audit formal (WCAG) | **Chrome DevTools MCP** (`a11y-debugging`) | Lighthouse a11y score |
+| Memory leak / heap snapshot | **Chrome DevTools MCP** (`memory-leak-debugging`) | `take_memory_snapshot` |
+| Network inspection detalhada | **Chrome DevTools MCP** (`list_network_requests`) | Timing completo |
+| Console messages/errors | Qualquer (Playwright `browser_console_messages` OU Chrome `list_console_messages`) | Escolha conveniência |
+
 ## Modo de Execucao
 - SEMPRE rodar em **headless** (minimizado, sem janela visivel)
 - Configurado via `--headless` no plugin Playwright MCP

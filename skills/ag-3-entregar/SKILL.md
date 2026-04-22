@@ -13,6 +13,20 @@ metadata:
 
 # ENTREGAR — Maquina Autonoma de Entrega
 
+## Canonical delegation (ADR-0001)
+
+Esta machine **delega para skills oficiais** quando aplicável:
+
+| Detecção | Canonical | Ação |
+|---|---|---|
+| `vercel.json` OR `.vercel/project.json` presente | `vercel:deployments-cicd` | Orquestrar via skill oficial Vercel |
+| `railway.json` presente | `railway:use-railway` | Orquestrar via skill oficial Railway |
+| Deploy manual via CLI | `vercel:vercel-cli` | Usar CLI guidance oficial |
+| Env vars gestão | `vercel:env-vars` | Delegar configuração |
+| Rollback Vercel | `vercel:deployments-cicd` (modo rollback) | Delegar |
+
+**Para deploys simples em projetos Vercel, preferir invocar diretamente `vercel:deployments-cicd`.** Esta machine (ag-3-entregar) adiciona valor quando: pipeline multi-ambiente (preview → staging → prod), quality gates customizados, integração com Sentry release, ou recovery multi-tentativa.
+
 ## Invocacao
 
 ```
