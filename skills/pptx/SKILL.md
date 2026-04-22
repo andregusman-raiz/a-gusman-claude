@@ -210,3 +210,91 @@ libreoffice --headless --convert-to pdf presentation.pptx --outdir /tmp/
 4. Respeitar a regra 6x6 (max 6 linhas, 6 palavras por linha)
 5. Manter consistencia de cores/fontes entre slides
 6. Testar abertura no PowerPoint/LibreOffice apos repack
+
+## REGRAS OBRIGATORIAS Anti-Overflow (R1-R8)
+
+> Incidente 2026-04-21 (Organograma/FP&A/AI-first rAIz): textos ultrapassaram caixas em cards
+> de grid 2x2 porque `python-pptx` nao mede largura renderizada — `word_wrap=True` apenas quebra
+> palavras, mas nao valida se a altura da caixa comporta o numero de linhas resultante.
+>
+> **Essas regras sao obrigatorias em TODO PPTX gerado via python-pptx.**
+
+### R1 — Texto SEMPRE via helper medido
+Toda chamada a `add_textbox` em python-pptx DEVE passar por `add_text_safe()` ou
+`add_paragraphs_safe()` em `skills/pptx/templates/pptx_utils.py`. O helper mede
+via Pillow + fonte do sistema, faz word-wrap real e auto-encolhe o tamanho ate caber.
+
+### R2 — Fundo claro como padrao
+Default `LIGHT_THEME` (fundo off-white, texto near-black). Dark mode apenas quando
+explicitamente solicitado. Paleta Raiz oficial usa laranja `#F7941D` + teal `#5BB5A2`
+como accents sobre fundo claro — nunca como fundo de card inteiro (ilegibilidade).
+
+### R3 — Fontes com arquivo fisico
+Usar `Helvetica` ou `Arial` como `font_name` quando for medir via Pillow. Fontes
+web-only (IBM Plex Sans sem TTF instalado) quebram a medicao. O helper usa fallback
+para Helvetica.ttc do macOS automaticamente, mas o `font_name` passado ao pptx
+deve corresponder ao que sera renderizado.
+
+### R4 — Larguras baseadas em Emu, com padding explicito
+- Cards de grid: calcular `(SW - 2*margin - gap) / N` em Emu, nunca hardcode
+- Padding interno minimo: `2pt` em cada lado (margin_left/right/top/bottom do TextFrame)
+- Altura do card: reservar minimo `lines * size * 1.3` em pt para o texto + padding
+
+### R5 — Metric blocks sao caso especial
+Numeros grandes (`metric`, ex: "400+", "~15", "262k") DEVEM ter caixa dedicada com
+`fit_text_size(max=32, min=20)`. Nao compartilhar caixa com label — label em caixa
+separada ao lado com `size=9-10, bold, color=muted`.
+
+### R6 — Bullet text: 1 linha preferencial, max 2
+Cada bullet deve caber em 1 linha a 9pt numa caixa de 2.8in de largura. Se o texto
+natural passa → **encurtar o conteudo** em vez de reduzir fonte. Guardrail de
+comprimento: max 12 palavras / 75 caracteres por bullet.
+
+### R7 — Verificacao obrigatoria pos-geracao
+Apos `prs.save(path)`, rodar `verify_deck(path)` do helper. Ele converte via LibreOffice
+para PDF — se falha, o PPTX provavelmente tem problema de layout.
+Para QA visual completo: `render_deck_to_pngs(path)` + inspecao das PNGs via Read tool.
+
+### R8 — Usar `DeckBuilder` para decks profissionais
+Quando disponivel, preferir `skills/pptx/templates/deck_builder.py` que ja aplica R1-R7.
+Para casos simples de 1-2 slides, uso direto de `add_text_safe()` e suficiente.
+
+### Caminho preferido (template-first)
+
+```python
+import sys
+sys.path.insert(0, "/Users/andregusmandeoliveira/Claude/.claude/skills/pptx/templates")
+
+from pptx_utils import (
+    LIGHT_THEME, add_text_safe, add_paragraphs_safe,
+    fit_text_size, verify_deck, render_deck_to_pngs,
+)
+
+T = LIGHT_THEME
+# ... criar Presentation, slide ...
+
+# toda caixa de texto passa pelo helper — auto-shrink se nao couber
+add_text_safe(slide, Inches(0.5), Inches(1.2), Inches(12.3), Inches(1.0),
+              "Action title do slide",
+              size=18, bold=True, color=T["text"], font_name="Helvetica",
+              warn_cb=lambda m: print("warn:", m))
+
+# salvar + verify automatico
+prs.save(OUT)
+ok, warnings = verify_deck(OUT)
+pngs, _ = render_deck_to_pngs(OUT)   # QA visual
+```
+
+### Guardrails de conteudo (complementa R6)
+
+| Elemento | Max chars | Max palavras |
+|----------|-----------|--------------|
+| Eyebrow / Section label | 40 | 6 |
+| Action title (1-2 linhas) | 180 | 28 |
+| Subtitle / deck | 130 | 20 |
+| Bullet de card | 75 | 12 |
+| Metric label | 45 | 7 |
+| Stack/footer de card | 90 | 14 |
+| Takeaway bar | 200 | 30 |
+
+Se o conteudo natural excede → reescrever, nunca reduzir font-size abaixo de 8pt.

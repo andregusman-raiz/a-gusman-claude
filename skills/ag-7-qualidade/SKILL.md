@@ -49,3 +49,13 @@ Agent({
 ```
 
 Toda a logica, state management e convergencia estao em ag-meridian.
+
+## Regras Criticas de Verificacao (feedback SophiA — 21 PRs)
+
+O MERIDIAN DEVE seguir estas regras aprendidas de falhas reais:
+
+1. **NUNCA declarar fix completo baseado em build/typecheck** — reproduzir bug via Playwright
+2. **Presenca != Corretude** — "pagina tem dados" nao significa "dados corretos"
+3. **API 200 != E2E funcional** — tracar dados: API → adapter → state → DOM
+4. **Snapshot estatico != Teste** — se nao houve click/select/type, feature NAO foi testada
+5. **Testar interacoes adjacentes** — mudar filtro, trocar tab, selecionar outro item apos fix

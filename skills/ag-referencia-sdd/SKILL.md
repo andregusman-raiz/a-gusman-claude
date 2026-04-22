@@ -31,26 +31,16 @@ PRD.md → SPEC.md → Execucao → Review
 
 ## Templates
 
-### PRD Template
-```markdown
-# PRD: [Nome]
-## Problema
-## Escopo (In/Out)
-## Requisitos Funcionais
-## Requisitos Nao-Funcionais
-## Metricas de Sucesso
-## Riscos
-```
+### PRD → `/prd [feature]` (skill prd-writer)
+Gera PRD padronizado com problema, personas, escopo, metricas de sucesso, riscos.
+Output: `docs/specs/{name}-prd.md` (max 100 linhas)
 
-### SPEC Template
-```markdown
-# SPEC: [Nome]
-## Contexto (link para PRD)
-## Decisoes Tecnicas
-## Plano de Implementacao (steps numerados)
-## Testes Obrigatorios
-## Rollback Plan
-## Criterios de Aceitacao
-```
+### SPEC → `/spec-writer [feature]` ou ag-especificar-solucao
+Gera SPEC tecnica implementavel com interfaces, edge cases, criterios de aceite.
+Output: `docs/specs/{name}-spec.md` (max 200 linhas)
+
+### ADR → `/adr [decisao]` (skill adr)
+Registra decisoes arquiteturais com contexto, alternativas e trade-offs.
+Output: `docs/adr/ADR-{NNN}-{slug}.md` (max 60 linhas)
 
 > Playbook detalhado: `.claude/Playbooks/01_Spec_Driven_Development.md`
