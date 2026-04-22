@@ -26,6 +26,17 @@ if [[ "$INPUT" == *"git clean -f"* ]]; then
   echo "BLOCKED: git clean -f permanently deletes untracked files." && exit 2
 fi
 
+# SQL Safety Guards — Block dangerous query patterns against TOTVS RM
+# SELECT * on large TOTVS tables (PFUNC=680 cols, SMATRICPL=1M+ rows, SPARCELA=5M+)
+if echo "$INPUT" | grep -qiP 'SELECT\s+\*\s+FROM\s+(PFUNC|SMATRICULA|SMATRICPL|SHABILITACAOALUNO|PPESSOA|SPARCELA|FLAN)\b'; then
+  echo "BLOCKED: SELECT * on large TOTVS table. Specify column names (PFUNC has 680 cols). Consult schema.json." && exit 2
+fi
+# Multi-tenant queries without CODCOLIGADA filter
+if echo "$INPUT" | grep -qiP 'FROM\s+(PFUNC|SMATRICULA|SMATRICPL|SPARCELA|FLAN|SHABILITACAOALUNO|PFHSTAFT)\b' && \
+   ! echo "$INPUT" | grep -qi 'CODCOLIGADA'; then
+  echo "BLOCKED: Query on multi-tenant TOTVS table without CODCOLIGADA filter. Add WHERE CODCOLIGADA = N." && exit 2
+fi
+
 # Warn on git stash (non-blocking) — prefer WIP commits
 if [[ "$INPUT" == *"git stash"* ]] && \
    [[ "$INPUT" != *"git stash list"* ]] && \
