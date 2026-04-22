@@ -6,6 +6,21 @@ context: fork
 argument-hint: "[action] [element/project]"
 ---
 
+## Pre-Load: rAIz Design Library (OBRIGATORIO)
+
+ANTES de gerar qualquer design system ou componente, consultar:
+
+1. **Design System Oficial**: `~/Claude/assets/UI_UX/raiz-educacao-design-system.md` — tokens, cores, tipografia, spacing (para projetos rAIz)
+2. **Catalogo de Solucoes**: `~/Claude/assets/design-library/catalog.md` — 24 solucoes curadas
+3. **Solution Specs**: `~/Claude/assets/design-library/solutions/NN-id/spec.md` — props, layout, CSS, deps
+4. **Componentes Base**: `~/Claude/assets/design-library/catalog/src/components/ui/` — 13 shadcn customizados
+
+Se o projeto e rAIz Educacao → usar tokens do design system oficial como base.
+Se existe solucao catalogada → adaptar em vez de criar do zero.
+Se criou componente novo reutilizavel → propor adicao ao catalogo como nova solution spec.
+
+---
+
 ## Stack Detection
 - **Framework**: !`cat package.json 2>/dev/null | grep -o '"next"\|"react"\|"vue"\|"svelte"' | head -1 || echo "unknown"`
 

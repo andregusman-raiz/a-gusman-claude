@@ -3,6 +3,7 @@
 # Run: bash scripts/validate-framework.sh
 
 set -euo pipefail
+shopt -s nullglob  # empty globs return empty list instead of literal pattern
 
 ERRORS=0
 WARNINGS=0
@@ -82,15 +83,30 @@ hook_count=$(ls hooks/*.sh 2>/dev/null | wc -l | tr -d ' ')
 ok "$hook_count hooks validated"
 
 # 5. No hardcoded references
+# Critical paths (scripts, hooks): hardcoded user refs = ERROR (breaks portability)
+# Content paths (agents/skills/rules markdown): hardcoded business domain = WARN
+# Rationale: markdown content naturally describes specific business context (Raiz Educação)
 echo ""
 echo "--- Hardcoded References ---"
-HARDCODED=$(grep -rl "raizeducacao\|andregusman\|rAIz-AI-Prof\|rAIz_AI" \
-  agents/ skills/ rules/ hooks/ CLAUDE.md Playbooks/ 2>/dev/null || true)
-if [[ -n "$HARDCODED" ]]; then
-  for f in $HARDCODED; do
-    error "hardcoded reference in: $f"
+# Critical: scripts and hooks should NEVER have user-specific hardcoded refs
+# Exclude this script itself (contains the grep pattern)
+HARDCODED_CRITICAL=$(grep -rl --exclude=validate-framework.sh "raizeducacao\|andregusman\|rAIz-AI-Prof\|rAIz_AI" \
+  hooks/ scripts/ 2>/dev/null || true)
+if [[ -n "$HARDCODED_CRITICAL" ]]; then
+  for f in $HARDCODED_CRITICAL; do
+    error "hardcoded reference in script/hook: $f"
   done
-else
+fi
+
+# Warning only: markdown content (expected to reference business domain)
+HARDCODED_CONTENT=$(grep -rl "raizeducacao\|andregusman\|rAIz-AI-Prof\|rAIz_AI" \
+  agents/ skills/ rules/ CLAUDE.md Playbooks/ 2>/dev/null || true)
+if [[ -n "$HARDCODED_CONTENT" ]]; then
+  count=$(echo "$HARDCODED_CONTENT" | wc -l | tr -d ' ')
+  warn "$count markdown files contain business-domain refs (raizeducacao/etc) — acceptable in content"
+fi
+
+if [[ -z "$HARDCODED_CRITICAL" && -z "$HARDCODED_CONTENT" ]]; then
   ok "No hardcoded references found"
 fi
 

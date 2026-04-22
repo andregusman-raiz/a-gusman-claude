@@ -12,7 +12,7 @@ NC='\033[0m'
 # 1. Hard limit: max Claude CLI processes (MOST IMPORTANT CHECK)
 # Only count actual "claude" binary processes, not subprocesses that have "claude" in path
 CLAUDE_COUNT=$(ps aux | awk '$11 ~ /\/claude$/ || $11 == "claude"' | wc -l | tr -d ' ')
-MAX_CLAUDE=6
+MAX_CLAUDE=12
 
 if [ "$CLAUDE_COUNT" -ge "$MAX_CLAUDE" ]; then
   echo -e "${RED}BLOCKED: $CLAUDE_COUNT sessoes Claude ativas (max: $MAX_CLAUDE)${NC}"

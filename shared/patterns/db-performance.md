@@ -445,6 +445,56 @@ AFTER INSERT OR DELETE ON comments
 FOR EACH ROW EXECUTE FUNCTION update_comment_count();
 ```
 
+## SQL Server (TOTVS RM / PBI_RAIZ)
+
+### NOLOCK para Read Queries
+Toda query SELECT contra SQL Server de produção DEVE usar `(NOLOCK)`:
+```sql
+SELECT f.CODCOLIGADA, f.NOME
+FROM PFUNC f (NOLOCK)
+INNER JOIN PPESSOA p (NOLOCK) ON p.CODIGO = f.CODPESSOA
+WHERE f.CODCOLIGADA = 2
+```
+Exceção: cálculos financeiros que exigem consistent read — omitir NOLOCK e comentar.
+
+### Row-Count Guard (Ad-Hoc Queries)
+Antes de executar query ad-hoc, estimar volume:
+```sql
+SELECT COUNT(*) FROM SMATRICPL (NOLOCK) WHERE CODCOLIGADA = 2 AND CODSTATUS IN (2, 3)
+```
+Se estimate > 500: adicionar `TOP 500` ou paginar com `OFFSET/FETCH NEXT`.
+
+### DateTime Sargable (obrigatório)
+```sql
+-- ERRADO (quebra índice, full scan)
+WHERE YEAR(DTCONTRATO) = 2026
+WHERE CONVERT(DATE, DTMATRICULA) = '2026-03-25'
+WHERE DTMATRICULA BETWEEN '2026-01-01' AND '2026-12-31'
+
+-- CORRETO (usa índice)
+WHERE DTCONTRATO >= '2026-01-01' AND DTCONTRATO < '2027-01-01'
+WHERE DTMATRICULA >= '2026-03-25' AND DTMATRICULA < '2026-03-26'
+```
+
+### Pagination (SQL Server)
+```sql
+SELECT CODCOLIGADA, RA, NOME
+FROM SMATRICPL (NOLOCK)
+WHERE CODCOLIGADA = 2
+ORDER BY RA
+OFFSET 0 ROWS FETCH NEXT 500 ROWS ONLY;
+```
+
+### SELECT * Proibido
+PFUNC: 680 colunas. SMATRICPL: 1M+ rows. SPARCELA: 5M+ rows.
+SEMPRE especificar colunas. Consultar `~/Claude/assets/knowledge-base/totvs/unified/schema.json`.
+
+### Multi-Tenant (CODCOLIGADA)
+TODA query contra tabelas TOTVS RM DEVE filtrar por `CODCOLIGADA`.
+COL=10 tem 3 marcas: usar `(CODCOLIGADA, CODFILIAL)` pair para atribuição de marca.
+
+---
+
 ## NUNCA
 
 - Tabela sem indice no campo usado em RLS policy
