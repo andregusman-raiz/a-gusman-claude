@@ -29,7 +29,11 @@ OUTPUT_PATH = Path.home() / "Claude" / "docs" / "diagnosticos" / "usage-heatmap-
 
 
 def parse_project_name(dir_name: str) -> str:
-    """Converte '-Users-andregusmandeoliveira-Claude-GitHub-raiz-platform' → 'raiz-platform'"""
+    """Derives project name from encoded directory name.
+
+    Example input:  -Users-<user>-Claude-GitHub-<project-name>
+    Example output: <project-name>
+    """
     if "-GitHub-" in dir_name:
         return dir_name.split("-GitHub-")[-1].split("-.claude-")[0]
     if "-projetos-" in dir_name:
