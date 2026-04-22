@@ -1,13 +1,16 @@
 ---
 name: ag-criar-cenario-ux-qat
-description: Cria cenarios UX-QAT de alta qualidade. Mapeia telas, seleciona rubrics visuais, define interacoes criticas, captura golden screenshots e documenta anti-patterns visuais.
+description: "[INTERNAL — invocada via ag-4-teste-final] Cria cenarios UX-QAT de alta qualidade. Mapeia telas, seleciona rubrics visuais, define interacoes criticas, captura golden screenshots e documenta anti-patterns visuais."
 model: sonnet
 argument-hint: "[nome-da-tela]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
+visibility: internal
 ---
 
-# ag-criar-cenario-ux-qat — Criar Cenario UX-QAT
+# ag-criar-cenario-ux-qat — Criar Cenario UX-QAT (INTERNAL)
+
+> **Internal skill** — invocada automaticamente por `ag-4-teste-final ux-qat` via Agent tool. Não use diretamente via `/`. Para criar cenário UX-QAT use `/ag-4-teste-final ux-qat [url]`.
 
 ## Papel
 
