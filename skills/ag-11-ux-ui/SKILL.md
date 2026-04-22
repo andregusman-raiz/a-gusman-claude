@@ -6,6 +6,22 @@ context: fork
 argument-hint: "[action] [element/project]"
 ---
 
+## Canonical delegation (ADR-0001)
+
+**Esta machine delega para skills oficiais quando aplicável:**
+
+| Caso | Canonical |
+|---|---|
+| URL Figma no prompt (Figma → código) | `figma:figma-implement-design` |
+| Criar design system no Figma | `figma:figma-generate-library` |
+| Escrever em Figma canvas | `figma:figma-use` (prerequisito obrigatório antes de `use_figma` tool) |
+| Code Connect (Figma ↔ código) | `figma:figma-code-connect` |
+| shadcn/ui setup + componentes | `vercel:shadcn` |
+| React best-practices review | `vercel:react-best-practices` |
+| UI criativa/distintiva | `frontend-design:frontend-design` |
+
+Esta machine (ag-11-ux-ui) mantém valor como **orchestrator de design**: curadoria da Raiz Design Library, catálogo de 24 soluções, decisão entre estilos/paletas/fonts, integração com stack-decisions.
+
 ## Pre-Load: rAIz Design Library (OBRIGATORIO)
 
 ANTES de gerar qualquer design system ou componente, consultar:

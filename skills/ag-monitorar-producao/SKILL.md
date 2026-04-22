@@ -8,6 +8,19 @@ disable-model-invocation: true
 
 # ag-monitorar-producao — Monitorar Producao
 
+## Canonical delegation (ADR-0001)
+
+**Para operações com Sentry, preferir skills oficiais:**
+
+| Caso | Canonical |
+|---|---|
+| Debug/triage de issues em produção | `sentry:sentry-workflow` |
+| Question ad-hoc ("tem erro no projeto X?") | `sentry:seer` (ou `/seer`) |
+| Setup de alerts/OTEL | `sentry:sentry-feature-setup` |
+| SDK install em projeto novo | `sentry:sentry-sdk-setup` |
+
+Esta machine mantém valor para: **multi-monitoring orchestrator** (Sentry + Web Vitals + custom metrics + auto-rollback em uma única pipeline), observação ativa pós-deploy por janela de tempo, e integração com `ag-3-entregar`.
+
 Spawn the `ag-monitorar-producao` agent to monitor post-deploy production health, detect degradation, and trigger rollback if needed.
 
 ## Invocation
