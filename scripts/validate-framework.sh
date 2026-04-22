@@ -39,7 +39,7 @@ for f in agents/ag-*.md; do
     error "$name: invalid model '$model' (must be haiku|sonnet|opus)"
   fi
 done
-agent_count=$(ls agents/ag-*.md 2>/dev/null | wc -l | tr -d ' ')
+agent_count=$({ find agents -maxdepth 1 -name "ag-*.md" 2>/dev/null || true; } | wc -l | tr -d ' ')
 ok "$agent_count agents validated"
 
 # 2. Command-to-agent mapping
@@ -52,7 +52,7 @@ for f in commands/ag*.md; do
     warn "$cmd: doesn't reference an agent or skill"
   fi
 done
-cmd_count=$(ls commands/ag*.md 2>/dev/null | wc -l | tr -d ' ')
+cmd_count=$({ find commands -maxdepth 1 -name "ag*.md" 2>/dev/null || true; } | wc -l | tr -d ' ')
 ok "$cmd_count commands validated"
 
 # 3. Skills have SKILL.md
@@ -79,7 +79,7 @@ for f in hooks/*.sh; do
     error "$(basename $f): syntax error"
   fi
 done
-hook_count=$(ls hooks/*.sh 2>/dev/null | wc -l | tr -d ' ')
+hook_count=$({ find hooks -maxdepth 1 -name "*.sh" 2>/dev/null || true; } | wc -l | tr -d ' ')
 ok "$hook_count hooks validated"
 
 # 5. No hardcoded references
