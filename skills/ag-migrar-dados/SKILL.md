@@ -8,6 +8,19 @@ disable-model-invocation: true
 
 # ag-migrar-dados — Migrar Dados
 
+## Canonical delegation (ADR-0001)
+
+**Para Supabase, preferir skill oficial:**
+
+| Caso | Canonical |
+|---|---|
+| Supabase migrations (schema, RLS, Edge Functions) | `supabase:supabase` |
+| Postgres best-practices, performance tuning | `supabase:supabase-postgres-best-practices` |
+| Prisma/Drizzle migrations (não-Supabase) | esta machine (ag-migrar-dados) |
+| SQL Server (TOTVS RM), MSSQL | esta machine + `ag-12-sql-totvs-zeev` |
+
+Esta machine mantém valor para projetos **não-Supabase**, migrations multi-DB, e contextos onde skill oficial não cobre (TOTVS RM, MSSQL).
+
 Spawn the `ag-migrar-dados` agent to create and validate database schema migrations.
 
 ## Invocation

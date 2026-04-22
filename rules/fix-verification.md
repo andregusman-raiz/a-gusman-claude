@@ -2,8 +2,20 @@
 
 ## Regra Principal
 
-NUNCA declarar um bug fix completo sem verificacao interativa via Playwright.
+NUNCA declarar um bug fix completo sem verificacao interativa.
 Build + typecheck passing NAO e suficiente. O fix deve ser verificado do ponto de vista do USUARIO.
+
+## Ferramentas por tipo de bug (ADR-0001 integrado)
+
+| Tipo de bug | Ferramenta canonical | Quando usar |
+|---|---|---|
+| Navegação/UI básica | Playwright MCP | Fluxo do usuário, clicks, forms, screenshots |
+| Performance (LCP, FCP, CWV) | `chrome-devtools-mcp:debug-optimize-lcp` | Página lenta, métricas Core Web Vitals |
+| A11y (ARIA, keyboard, contrast) | `chrome-devtools-mcp:a11y-debugging` | Audit acessibilidade |
+| Memory leaks / OOM | `chrome-devtools-mcp:memory-leak-debugging` | App cresce memória indefinidamente |
+| Network / API failures | `chrome-devtools-mcp:chrome-devtools` (list_network_requests) | Request falhando, headers errados |
+| End-to-end flow (browser→API→DB→response) | `vercel:verification` | "Por que isso não funciona?" sem causa óbvia |
+| Debug Sentry error | `sentry:seer` ou `sentry:sentry-workflow` | Erro em produção já reportado |
 
 ## Protocolo Obrigatorio (para CADA bug corrigido)
 
