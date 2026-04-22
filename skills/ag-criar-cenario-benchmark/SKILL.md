@@ -1,13 +1,16 @@
 ---
 name: ag-criar-cenario-benchmark
-description: QAT-Benchmark Scenario Designer — cria cenarios de benchmark com dual-run, 8 dimensoes, anti-contaminacao e criterios L1-L4 por dimensao.
+description: "[INTERNAL — invocada via ag-4-teste-final benchmark] QAT-Benchmark Scenario Designer — cria cenarios de benchmark com dual-run, 8 dimensoes, anti-contaminacao e criterios L1-L4 por dimensao."
 model: sonnet
 argument-hint: "[capability]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
+visibility: internal
 ---
 
-# ag-criar-cenario-benchmark — QAT-Benchmark Scenario Designer
+# ag-criar-cenario-benchmark — QAT-Benchmark Scenario Designer (INTERNAL)
+
+> **Internal skill** — invocada automaticamente por `ag-4-teste-final benchmark` via Agent tool. Não use diretamente via `/`. Para criar cenário benchmark use `/ag-4-teste-final benchmark [url]`.
 
 ## Papel
 

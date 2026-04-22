@@ -1,13 +1,16 @@
 ---
 name: ag-criar-cenario-qat
-description: Cria cenarios QAT de alta qualidade seguindo metodologia User Story → QAT Scenario. Gera spec com 4 camadas (L1-L4), rubrica v2 especifica, golden sample e anti-patterns.
+description: "[INTERNAL — invocada via ag-4-teste-final] Cria cenarios QAT de alta qualidade seguindo metodologia User Story → QAT Scenario. Gera spec com 4 camadas (L1-L4), rubrica v2 especifica, golden sample e anti-patterns."
 model: sonnet
 argument-hint: "[nome-do-cenario]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 disable-model-invocation: true
+visibility: internal
 ---
 
-# ag-criar-cenario-qat — Criar Cenario QAT
+# ag-criar-cenario-qat — Criar Cenario QAT (INTERNAL)
+
+> **Internal skill** — invocada automaticamente por `ag-4-teste-final` via Agent tool. Não use diretamente via `/`. Para criar cenário QAT customizado use `/ag-4-teste-final qat [path]`.
 
 ## Papel
 
