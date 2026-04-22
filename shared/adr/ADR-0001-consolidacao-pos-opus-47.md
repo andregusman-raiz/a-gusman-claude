@@ -1,10 +1,12 @@
 # ADR-0001 — Consolidação do ecossistema Ag-X pós Opus 4.7 1M context
 
-> **Status:** APROVADO (2026-04-22 — autonomia total autorizada pelo usuário)
+> **Status:** EXECUTADO (12/15 ações — 2026-04-22 16:30)
 > **Data:** 2026-04-22
 > **Autores:** Diagnóstico autônomo ag-1-construir --autonomo
 > **Contexto do repo:** `~/Claude/` workspace (Camada 1+2: `.claude/` global)
-> **Aprovação:** Usuário delegou execução autônoma completa focada em qualidade. Transição PROPOSTO → APROVADO efetuada em 2026-04-22 16:10.
+> **Aprovação:** Usuário delegou execução autônoma completa focada em qualidade. Transição PROPOSTO → APROVADO → EXECUTADO (parcial) em 2026-04-22.
+> **PRs executados:** #7 (baseline BMAD), #8 (P0.1 agents archive), #9 (P0.3-0.5 canonicals + P1.3-1.5), #10 (P2.3 unify rules + P2.5 power-user docs)
+> **Backlog remanescente:** P1.2 (inline KBs — optimization), P2.1 (JSONL parser — enhancement), P2.2 (refactor prompts grandes — optimization), P2.4 (QAT scenarios internal — chore)
 
 ---
 
