@@ -1,12 +1,23 @@
 """Minimal builder — gera PPTX deck simples a partir do outline da pipeline.
 
-Usado pela CLI quando o caller nao injeta um builder customizado. Foco e
-producao de um deck funcional com tokens rAIz aplicados (chrome, action title,
-takeaway bar, content area), suficiente para o audit rodar end-to-end.
+DEPRECATED — desde feat/ag-5-cli-full-pipeline (2026-04-26).
 
-Decks complexos / com charts ainda devem usar a pipeline com builder
-customizado (mckinsey_pptx + visualization). Esse builder cobre o caso comum
-de invocacao externa: outline simples -> deck legivel.
+Use ExecutiveDeckPipeline em cli.py::_build_deck_full (full pipeline com
+13 validators). Este modulo permanece como FALLBACK quando o pipeline
+canonico lanca excecao (briefing exotico, dependencia faltando, etc) e
+para o builder funcao injetada via build_v1.
+
+Decks complexos / com charts SEMPRE devem usar a pipeline com builder
+customizado (mckinsey_pptx + visualization). Esse builder cobre o caso
+de invocacao externa minima: outline simples -> deck legivel + audit
+basico (geometric + 26 anti-patterns), porem SEM:
+  - action_title scorer (V04)
+  - anatomy_validator (PR2.2)
+  - lang_validator (frases fracas)
+  - bullet_validator (paralelismo)
+  - one_message_validator
+  - chart_validator V01-V13 + AP01-AP08
+  - pyramid_validator + final_acceptance (7 testes)
 """
 from __future__ import annotations
 
