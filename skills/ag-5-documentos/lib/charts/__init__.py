@@ -27,8 +27,11 @@ from .base import (
 )
 from .bar_chart import BarChart
 from .builder import ChartBuilder
+from .bullet_chart import BulletChart
 from .donut_chart import DonutChart
+from .infographic_chart import InfographicChart
 from .line_chart import LineChart
+from .waterfall_chart import WaterfallChart
 
 
 # Parallel to RENDER_REGISTRY. Keys are chart types; values are classes that
@@ -45,9 +48,12 @@ CHART_REGISTRY = {
     # Donut/pie family (PR-A)
     "donut":         DonutChart,
     "pie":           DonutChart,
-    # PR-B/C/D/E will append here:
+    # Financial / KPI family (PR-B)
+    "waterfall":     WaterfallChart,
+    "bullet":        BulletChart,
+    "infographic":   InfographicChart,
+    # PR-C/D/E will append here:
     # "stacked_bar", "stacked100_bar", "combo",
-    # "waterfall", "bullet", "infographic",
     # "scatter", "heatmap",
     # "treemap", "driver_tree", "slope",
 }
@@ -66,4 +72,7 @@ __all__ = [
     "BarChart",
     "LineChart",
     "DonutChart",
+    "WaterfallChart",
+    "BulletChart",
+    "InfographicChart",
 ]
