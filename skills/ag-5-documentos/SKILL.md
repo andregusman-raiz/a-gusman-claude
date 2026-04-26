@@ -568,9 +568,15 @@ Ver detalhes em `lib/configs/slide_template.yaml`.
 `line_multi`, `area`, `area_stacked`, `pie`, `donut`, `waterfall`, `bullet`,
 `heatmap`, `scatter`, `bubble`, `histogram`, `sparkline`, `combo`.
 
-Roadmap: implementacao do modulo `lib/charts/` segue SPEC chart-CEO em
-`docs/specs/ag-5-documentos-graficos-ceo/SPEC.md`. Atualmente o sistema valida
-specs (V01-V13) e detecta anti-patterns (AP01-AP08) via `chart_validator.py`.
+Modulo `lib/charts/` IMPLEMENTADO (SPEC chart-CEO PR-A...PR-F mergeado em
+2026-04-26). 18 chart types em `CHART_REGISTRY` (paralelo a `RENDER_REGISTRY`):
+bar/grouped_bar, line/area, donut/pie, waterfall, bullet, infographic,
+stacked_bar/stacked100_bar, combo, scatter, heatmap, treemap, driver_tree,
+slope. Implementacao: matplotlib Agg + python-pptx via `embed_chart_in_slide`.
+Validacao: V01-V13 (`ChartSpecValidator`) + AP01-AP08 (`ChartAntiPatternDetector`)
+integrados ao `audit_deck(chart_specs=...)`. Pipeline integration:
+`viz_spec_to_chart_spec()` + `compute_chart_region()`. Insight LLM auto via
+`ChartInsightGenerator` com cache TTL 7d e fallback regex.
 
 ### Tabela de storylines canonical (6 templates)
 

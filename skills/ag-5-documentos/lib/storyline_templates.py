@@ -453,8 +453,80 @@ def apply_storyline(briefing: Briefing,
     return briefing.model_copy(update={"outline": new_outline})
 
 
+# ---------------------------------------------------------------------------
+# PR-F retrofit (chart-CEO SPEC) — chart_type recommendations per storyline.
+#
+# Maps storyline_kind -> ordered list of chart types (CHART_REGISTRY keys) that
+# typically resolve the storyline's narrative arc. Pipeline.assign_visualizations
+# can use this to suggest chart_type when slide.viz.kind matches a CHART_REGISTRY
+# entry; storyline drives which chart fits each block.
+#
+# Source: SPEC Etapa 3 (Storylines Canonicas x Mapeamento de Graficos).
+# ---------------------------------------------------------------------------
+STORYLINE_CHART_HINTS: Dict[str, List[str]] = {
+    "recomendacao": [
+        # Recomendacao Estrategica (12-16 slides). Order matches SPEC Etapa 3.1.
+        "bar",          # situacao atual
+        "waterfall",    # diagnostico de causas
+        "driver_tree",  # decomposicao causal alternativa
+        "waterfall",    # business case (financial bridge)
+    ],
+    "diagnostico": [
+        # Diagnostico Executivo (8-12 slides). SPEC Etapa 3.2.
+        "line",            # KPI principal YoY
+        "bar",             # breakdown por categoria
+        "stacked100_bar",  # composicao percentual
+        "donut",           # distribuicao
+        "treemap",         # hierarquia por area
+        "grouped_bar",     # comparacao benchmarks
+        "heatmap",         # matriz prioridade
+        "combo",           # detalhe por segmento (bar + line)
+    ],
+    "status": [
+        # Status de Projeto (6-10 slides). SPEC Etapa 3.3.
+        "bullet",       # progresso vs plano (3-5 KPIs)
+        "waterfall",    # budget burn
+        "bar",          # entregas por categoria
+    ],
+    "treinamento": [
+        # Treinamento Executivo. Domínio textual; charts pontuais.
+        "line",         # serie temporal quando ha dado
+        "bar",          # comparacao pontual
+    ],
+    "business_case": [
+        # Business Case (8-14 slides). SPEC Etapa 3.5.
+        "donut",         # tamanho de mercado
+        "treemap",       # tamanho de mercado alternativo
+        "line",          # crescimento historico
+        "area",          # crescimento com volume
+        "combo",         # projecao receita
+        "waterfall",     # P&L sumario
+        "heatmap",       # analise sensibilidade
+        "driver_tree",   # ROI decomposicao
+        "grouped_bar",   # comparativo concorrentes
+    ],
+    "comite": [
+        # Comite Executivo (5-8 slides, alta densidade). SPEC Etapa 3.6.
+        "bullet",       # scorecard
+        "infographic",  # N metricas em 1 slide
+        "line",         # KPI evolucao com hero number
+    ],
+}
+
+
+def get_chart_hints(storyline_kind: str) -> List[str]:
+    """Returns ordered list of chart_type recommendations for a storyline.
+
+    Empty list when storyline_kind is unknown — caller falls back to the
+    auto-detector (visualization.select_visualization).
+    """
+    return list(STORYLINE_CHART_HINTS.get(storyline_kind, []))
+
+
 __all__ = [
     "STORYLINE_TEMPLATES",
+    "STORYLINE_CHART_HINTS",
     "get_storyline_template",
+    "get_chart_hints",
     "apply_storyline",
 ]

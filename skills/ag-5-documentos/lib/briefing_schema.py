@@ -88,6 +88,16 @@ class SlideOutline(BaseModel):
         default=None,
         description="Dados quantificados para popular o slide.",
     )
+    chart_intent: Optional[str] = Field(
+        default=None,
+        max_length=240,
+        description=(
+            "Declaracao 'quero mostrar que...' especifica para o chart "
+            "(SPEC graficos-CEO Etapa 7 PR-F retrofit). Diferente de "
+            "quero_mostrar_que (narrativa do slide); este campo descreve "
+            "o que o chart em si deve revelar visualmente."
+        ),
+    )
 
     @field_validator("bullets")
     @classmethod
