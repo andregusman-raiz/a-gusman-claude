@@ -505,8 +505,15 @@ def detect_intra_slide_overlap(slide, slide_num: int,
 # ---------------------------------------------------------------------------
 def audit_slide(prs, slide_num: int, slide,
                 slide_bg_hex: str = "#F8F9FA",
-                check_contrast: bool = True) -> List[AuditWarning]:
-    """Retorna lista de warnings para o slide informado (1-indexed)."""
+                check_contrast: bool = True,
+                slide_kind: Optional[str] = None) -> List[AuditWarning]:
+    """Retorna lista de warnings para o slide informado (1-indexed).
+
+    Args:
+        slide_kind: opcional, layout-kind do slide (ex: 'bullet_list',
+                    'card_grid'). Se fornecido e for layout de bullets,
+                    aciona bullet_validator.
+    """
     from pptx.enum.text import PP_ALIGN
     w: List[AuditWarning] = []
 
@@ -597,6 +604,38 @@ def audit_slide(prs, slide_num: int, slide,
     except ImportError:
         pass
 
+    # PR 2.1 — Bullet block quality (count, paralelismo, comprimento, bold)
+    # Acionar quando slide_kind sinaliza bloco de bullets/cards OU
+    # quando ha 2+ paragrafos significativos como bullets implicitos.
+    try:
+        from .bullet_validator import validate_bullet_block as _vbb
+        _BULLET_KINDS = {"bullet_list", "card_grid", "bullets",
+                          "list", "checklist", "feature_list"}
+        should_check_bullets = (
+            slide_kind is not None and slide_kind.lower() in _BULLET_KINDS
+        )
+        if should_check_bullets:
+            # Coletar bullets: paragrafos nao-vazios em todos os shapes
+            # exceto o title (heuristica: shape com menor area)
+            bullets: List[str] = []
+            if text_shapes:
+                ranked = sorted(
+                    text_shapes,
+                    key=lambda st: (st[0].width or 0) * (st[0].height or 0),
+                )
+                title_shape_id = id(ranked[0][0])
+                for shp, _ in text_shapes:
+                    if id(shp) == title_shape_id:
+                        continue
+                    for para in shp.text_frame.paragraphs:
+                        ptext = (para.text or "").strip()
+                        if ptext and len(ptext.split()) >= 2:
+                            bullets.append(ptext)
+            if bullets:
+                w.extend(_vbb(bullets, slide_num=slide_num))
+    except ImportError:
+        pass
+
     # PR 1.4 — One-message-per-slide (regra SEMPRE-04)
     # Heuristica: title + concatenacao de paragrafos longos (>=8 palavras)
     # como body. Severity medium (sugestao de divisao).
@@ -635,18 +674,24 @@ def audit_deck(pptx_path: Path,
                viz_kinds: Optional[List[str]] = None,
                min_viz_ratio: float = 0.30,
                return_quality_levels: bool = False,
-               titles: Optional[List[str]] = None) -> Any:
+               titles: Optional[List[str]] = None,
+               mece_exhibits: Optional[List[Dict[str, Any]]] = None) -> Any:
     """Audita o deck inteiro.
 
     Args:
         viz_kinds: opcional, lista de layout-kinds (1 por slide). Se fornecida,
                    habilita gates P0.2 (viz ratio) e P1.2 (layout repetition).
+                   Tambem propaga slide_kind para audit_slide (bullet validator).
         min_viz_ratio: threshold do gate P0.2 (default 0.30 = 30%).
         return_quality_levels: PR 1.4 — se True, retorna tuple
                                (warnings, QualityAssessment). Default False
                                para back-compat.
         titles: opcional, lista de action titles (para bonus DECISION em
                 quality_levels.assess_deck).
+        mece_exhibits: PR 2.1 — opcional, lista de exhibits estruturais
+                       a validar com MECE. Cada item e dict no formato:
+                       {"slide_num": int, "items": List[str], "context": str}
+                       Aciona mece_validator (LLM ou regex fallback).
     """
     prs = Presentation(str(pptx_path))
     all_warnings: List[AuditWarning] = []
@@ -657,9 +702,14 @@ def audit_deck(pptx_path: Path,
             slide_bg = _detect_slide_bg(slide, default_hex=slide_bg)
         except Exception:
             pass
+        # Passa slide_kind quando viz_kinds disponivel (1-indexed -> 0-based)
+        kind = None
+        if viz_kinds is not None and 0 <= (i - 1) < len(viz_kinds):
+            kind = viz_kinds[i - 1]
         all_warnings.extend(audit_slide(prs, i, slide,
                                          slide_bg_hex=slide_bg,
-                                         check_contrast=check_contrast))
+                                         check_contrast=check_contrast,
+                                         slide_kind=kind))
 
     # PR 1.3 — Deck-level lang consistency check
     try:
@@ -690,6 +740,20 @@ def audit_deck(pptx_path: Path,
             ))
         # P1.2 — layout repetition
         all_warnings.extend(detect_layout_repetition_from_kinds(viz_kinds))
+
+    # PR 2.1 — MECE validator em exhibits estruturais
+    if mece_exhibits:
+        try:
+            from .mece_validator import validate_mece_warnings as _vmw
+            for exhibit in mece_exhibits:
+                items = exhibit.get("items") or []
+                if len(items) < 2:
+                    continue
+                ctx = exhibit.get("context")
+                snum = exhibit.get("slide_num", 0) or 0
+                all_warnings.extend(_vmw(items, context=ctx, slide_num=snum))
+        except ImportError:
+            pass
 
     if return_quality_levels:
         # PR 1.4 — agregacao em hierarquia 4 niveis
