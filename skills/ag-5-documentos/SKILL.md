@@ -24,6 +24,12 @@ metadata:
 > **Atualizado em 2026-04-25** com P0/P1 da auditoria rigorosa
 > (`docs/diagnosticos/2026-04-25-avaliacao-rigorosa-pptx-skill.md`).
 > Nota anterior: 5.4/10. Meta apos P0+P1: ~7.5/10.
+>
+> **2026-04-25 (v4 audit)**: aplicados P0.6/P0.7/P0.8 + P1.5/P1.6/P1.7
+> apos auditoria slide-por-slide do v4 (nota 7.2/10).
+> Defeitos cobertos: arbitrary wrap, intra-slide overlap, audience leak,
+> closing slide com 5 frases, cover sem logo, hero caption inflada,
+> stack ordem semantica != visual, accent monolitico (laranja decorativo).
 
 **Nunca entregar a primeira versao (v1).** Todo deck executivo passa por 7 fases:
 
@@ -44,7 +50,35 @@ build com tokens rAIz   [P1.4] multimodal review fix loop ate <=3 iter
 **Gates obrigatorios (bloqueiam entrega):**
 - P0.2 — >= 30% slides com viz nao-textual
 - P0.5 — Texto WCAG AA (contraste >= 4.5:1)
+- P0.6 — Zero quebras de label em ponto NAO-natural (arbitrary wrap)
+- P0.7 — Zero shapes sobrepostos sem `_overlay_intentional` marker
 - Geometria — zero shapes vazando da slide
+
+**Validators bloqueantes (P0.6, P0.7) — adicionados em 2026-04-25:**
+
+| Validator | Detecta | Causa de origem (v4 audit) |
+|-----------|---------|----------------------------|
+| `detect_arbitrary_label_wrap()` | Labels com 3+ linhas terminando em ponto NAO-natural (palavra cortada, separador artificial '/') | Slide 20: "Criar pasta / de trabalho / ~/Claude-Workspace" — 3 quebras arbitrarias |
+| `detect_intra_slide_overlap()` | Shapes com >=20% overlap dentro do mesmo slide, exceto marcados como `_overlay_intentional` | Slide 22: ladder lateral sobre matriz 2x2, truncando "Var competitiva." e "Es" |
+
+Ambos rodam dentro de `audit_slide()` e sao reportados em `audit["blocked_for_delivery"]`.
+
+**Audience gate (P0.8) — 2026-04-25:**
+
+`ExecutiveDeckPipeline(audience="external")` ativa auto-mask de nomes
+proprios internos detectados via regex (CamelCase sem prefix Raiz).
+Exemplos: `JusRaiz` → `plataforma interna`. Brand allowlist preserva
+`Raiz`/`RaizEducacao`/`rAIz`. Warnings emitidos para revisao manual.
+
+Audiences validas: `internal` (no-op), `external`, `board_external`,
+`investor`, `press`.
+
+**Cross-section layout balance (P1.5) — 2026-04-25:**
+
+`detect_layout_repetition_from_kinds(layout_kinds, concentration_threshold=0.30)`
+agora reporta tambem `kind_concentration` quando um kind individual
+representa >30% do deck — sinal de monotonia visual mesmo sem repeticao
+consecutiva.
 
 **Bypass permitido apenas com flag explicita:** `--skip-review` ou `--draft`.
 
@@ -213,22 +247,65 @@ Apos PDF gerado (FASE 6), Claude orquestrador DEVE:
 ### Charts (`lib/timeline_charts.py`)
 `timeline_horizontal()`, `line_chart_simple()`, `bar_chart_horizontal()`.
 
-### Biblioteca de exhibits (`lib/exhibits/`) — P1.1
+### Biblioteca de exhibits (`lib/exhibits/`) — P1.1 + P1.6 refactors
 
-10 builders canonicos, cada um com `render(slide, spec, brand)`:
+11 builders canonicos, cada um com `render(slide, spec, brand)`:
 
 | Kind | Quando usar |
 |---|---|
-| `hero_number` | Numero gigante 60-100pt + tese curta |
+| `hero_number` | Numero gigante + caption HARD LIMIT 12 palavras (P1.6d) |
 | `matrix_2x2` | Classificacao 2 dimensoes (4 quadrantes) |
 | `timeline_horizontal` | Marcos sequenciais |
 | `bar_chart_comparison` | Comparacao 2-5 segmentos |
-| `stack_hierarchy` | N camadas em stack vertical |
+| `stack_hierarchy` | N camadas + emphasis_index opcional (P1.6e) |
 | `before_after_arrow` | 2 estados com seta dominante |
 | `risk_heatmap` | Risco x impacto (5x5 ou 3x3) |
 | `quote_slide` | Citacao editorial |
 | `decision_slide` | Pergunta + 2-3 opcoes com trade-offs |
 | `process_flow` | Etapas com setas |
+| `section_divider` | Divisor entre blocos com variant `with_preview` (P1.6a) |
+
+**Refactors P1.6 (2026-04-25):**
+
+| Refactor | Detalhe |
+|----------|---------|
+| P1.6a `section_divider` | Variante `with_preview` — 3-4 mini-cards prévia do conteudo |
+| P1.6b `closing_slide` | 1 frase + 1 visual. Rejeita >2 frases via `_validate_text_budget()` |
+| P1.6c `cover_slide` | `logo_path` OBRIGATORIO. Rejeita sem logo via `_validate_logo()` |
+| P1.6d `hero_number` | Caption HARD LIMIT 12 palavras + 1 frase. Excess vai para `_overflow_to_takeaway` |
+| P1.6e `stack_hierarchy` | Param `emphasis_index` — destaca camada arbitraria (resolve "Generativa > Agentica") |
+
+### Brand semantics (P1.7) — `palette_overrides/raiz.py`
+
+Tres tiers para uso disciplinado da paleta (evitar laranja-decorativo):
+
+| Tier | Token raiz | Uso recomendado |
+|------|-----------|-----------------|
+| `accent_strong` | `#F7941D` (RAIZ_ORANGE) | Capa, hero side-bars, divisores criticos |
+| `accent_moderate` | `#5BB5A2` (RAIZ_TEAL) | Takeaway bars, dividers, accents secundarios |
+| `accent_neutral` | `#1E2433` (SIDEBAR) | Body backgrounds, navy escuro |
+
+Uso:
+```python
+from lib.palette_overrides.raiz import (
+    ACCENT_STRONG, ACCENT_MODERATE, ACCENT_NEUTRAL,
+    tier_color, tier_for_exhibit,
+)
+
+# Brand carregado tem os tiers como atributos:
+brand = get_brand("raiz")
+brand.accent_strong    # "#F7941D"
+brand.accent_moderate  # "#5BB5A2"
+brand.accent_neutral   # "#1E2433"
+
+# Helper para mapeamento canonical exhibit → tier
+tier_for_exhibit("takeaway_bar")    # "moderate"
+tier_for_exhibit("cover_slide")      # "strong"
+tier_color("strong")                  # "#F7941D"
+```
+
+Resultado: deck preserva identidade Raiz (laranja em pontos-chave) sem
+virar laranja-decorativo (anti-pattern McKinsey).
 
 Uso:
 ```python

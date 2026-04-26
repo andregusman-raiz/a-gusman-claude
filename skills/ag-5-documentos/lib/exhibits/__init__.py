@@ -1,21 +1,22 @@
-"""Biblioteca de exhibits canonicos McKinsey-grade (P1.1).
+"""Biblioteca de exhibits canonicos McKinsey-grade (P1.1, P1.6 refactors).
 
 Cada modulo exporta uma funcao `render(slide, spec, brand=None)` que recebe:
   - slide: pptx.slide.Slide (alvo de renderizacao)
   - spec:  dict com inputs especificos do exhibit
   - brand: Brand (palette_overrides), opcional
 
-Tipos disponiveis (10):
+Tipos disponiveis (11):
   - matrix_2x2          — Classificacao 2 dimensoes
   - timeline_horizontal — Marcos sequenciais (re-export do timeline_charts)
-  - hero_number         — Numero gigante 60-100pt + tese
+  - hero_number         — Numero gigante + caption (HARD LIMIT 12 palavras P1.6d)
   - quote_slide         — Citacao editorial
   - decision_slide      — Pergunta + 2-3 opcoes com trade-offs
   - process_flow        — Etapas com setas
   - risk_heatmap        — Matriz risco x impacto
   - bar_chart_comparison — Bar chart 2-5 segmentos (re-export)
-  - stack_hierarchy     — Stack vertical com N camadas
+  - stack_hierarchy     — Stack vertical com emphasis_index (P1.6e)
   - before_after_arrow  — 2 estados com seta dominante e delta
+  - section_divider     — Divisor entre blocos com variant 'with_preview' (P1.6a)
 
 Cada exhibit tambem expoe `EXAMPLE_INPUT` para documentacao e tests.
 """
@@ -27,6 +28,7 @@ from .matrix_2x2 import render as render_matrix_2x2, EXAMPLE_INPUT as MATRIX_EXA
 from .process_flow import render as render_process_flow, EXAMPLE_INPUT as FLOW_EXAMPLE
 from .quote_slide import render as render_quote_slide, EXAMPLE_INPUT as QUOTE_EXAMPLE
 from .risk_heatmap import render as render_risk_heatmap, EXAMPLE_INPUT as RISK_EXAMPLE
+from .section_divider import render as render_section_divider, EXAMPLE_INPUT as SECTION_EXAMPLE
 from .stack_hierarchy import render as render_stack_hierarchy, EXAMPLE_INPUT as STACK_EXAMPLE
 from .timeline_horizontal import render as render_timeline_horizontal, EXAMPLE_INPUT as TIMELINE_EXAMPLE
 
@@ -41,6 +43,7 @@ RENDER_REGISTRY = {
     "process_flow":          render_process_flow,
     "quote_slide":           render_quote_slide,
     "risk_heatmap":          render_risk_heatmap,
+    "section_divider":       render_section_divider,
     "stack_hierarchy":       render_stack_hierarchy,
     "timeline_horizontal":   render_timeline_horizontal,
 }
@@ -54,6 +57,7 @@ EXAMPLE_INPUTS = {
     "process_flow":          FLOW_EXAMPLE,
     "quote_slide":           QUOTE_EXAMPLE,
     "risk_heatmap":          RISK_EXAMPLE,
+    "section_divider":       SECTION_EXAMPLE,
     "stack_hierarchy":       STACK_EXAMPLE,
     "timeline_horizontal":   TIMELINE_EXAMPLE,
 }
@@ -70,6 +74,7 @@ __all__ = [
     "render_process_flow",
     "render_quote_slide",
     "render_risk_heatmap",
+    "render_section_divider",
     "render_stack_hierarchy",
     "render_timeline_horizontal",
 ]
