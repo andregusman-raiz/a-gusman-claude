@@ -30,11 +30,14 @@ from .builder import ChartBuilder
 from .bullet_chart import BulletChart
 from .combo_chart import ComboChart
 from .donut_chart import DonutChart
+from .driver_tree_chart import DriverTreeChart
 from .heatmap_chart import HeatmapChart
 from .infographic_chart import InfographicChart
 from .line_chart import LineChart
 from .scatter_chart import ScatterChart
+from .slope_chart import SlopeChart
 from .stacked_bar_chart import StackedBarChart
+from .treemap_chart import TreemapChart
 from .waterfall_chart import WaterfallChart
 
 
@@ -63,8 +66,10 @@ CHART_REGISTRY = {
     # Analysis family (PR-D)
     "scatter":         ScatterChart,
     "heatmap":         HeatmapChart,
-    # PR-E will append here:
-    # "treemap", "driver_tree", "slope",
+    # Hierarchical / new types (PR-E)
+    "treemap":         TreemapChart,
+    "driver_tree":     DriverTreeChart,
+    "slope":           SlopeChart,
 }
 
 
@@ -88,4 +93,7 @@ __all__ = [
     "ComboChart",
     "ScatterChart",
     "HeatmapChart",
+    "TreemapChart",
+    "DriverTreeChart",
+    "SlopeChart",
 ]
