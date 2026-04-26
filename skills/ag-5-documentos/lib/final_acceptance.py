@@ -237,7 +237,16 @@ def run_final_acceptance(
         details.append("Teste 1 (Pyramid): SKIPPED (validator indisponivel)")
 
     # Teste 2 — one message per slide
-    one_check_fn = one_message_fn or _default_one_message_check
+    # PR 1.4 — usa lib.one_message_validator quando disponivel; fallback no
+    # heuristico local _default_one_message_check.
+    if one_message_fn is None:
+        try:
+            from .one_message_validator import check_titles as _check_titles
+            one_check_fn = _check_titles
+        except ImportError:
+            one_check_fn = _default_one_message_check
+    else:
+        one_check_fn = one_message_fn
     om_result = one_check_fn(titles)
     tests[2] = bool(om_result.get("passed", True))
     details.append(

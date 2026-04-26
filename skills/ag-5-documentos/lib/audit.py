@@ -597,19 +597,56 @@ def audit_slide(prs, slide_num: int, slide,
     except ImportError:
         pass
 
+    # PR 1.4 — One-message-per-slide (regra SEMPRE-04)
+    # Heuristica: title + concatenacao de paragrafos longos (>=8 palavras)
+    # como body. Severity medium (sugestao de divisao).
+    try:
+        from .one_message_validator import detect_multi_message as _dmm
+        # Heuristica: maior shape com texto e o "title" do slide;
+        # restantes formam o body.
+        title_text: str = ""
+        body_chunks: List[str] = []
+        if text_shapes:
+            # Title heuristico: shape com menor area (cards de title sao
+            # geralmente menores que body). Como fallback, primeiro shape.
+            ranked = sorted(
+                text_shapes,
+                key=lambda st: (st[0].width or 0) * (st[0].height or 0),
+            )
+            title_shape, title_text = ranked[0][0], ranked[0][1]
+            for shp, txt in text_shapes:
+                if shp is title_shape:
+                    continue
+                # Concatena paragrafos significativos
+                for para in shp.text_frame.paragraphs:
+                    ptext = (para.text or "").strip()
+                    if ptext and len(ptext.split()) >= 4:
+                        body_chunks.append(ptext)
+        body_text = " ".join(body_chunks) if body_chunks else None
+        w.extend(_dmm(title_text, body=body_text, slide_num=slide_num))
+    except ImportError:
+        pass
+
     return w
 
 
 def audit_deck(pptx_path: Path,
                check_contrast: bool = True,
                viz_kinds: Optional[List[str]] = None,
-               min_viz_ratio: float = 0.30) -> List[AuditWarning]:
+               min_viz_ratio: float = 0.30,
+               return_quality_levels: bool = False,
+               titles: Optional[List[str]] = None) -> Any:
     """Audita o deck inteiro.
 
     Args:
         viz_kinds: opcional, lista de layout-kinds (1 por slide). Se fornecida,
                    habilita gates P0.2 (viz ratio) e P1.2 (layout repetition).
         min_viz_ratio: threshold do gate P0.2 (default 0.30 = 30%).
+        return_quality_levels: PR 1.4 — se True, retorna tuple
+                               (warnings, QualityAssessment). Default False
+                               para back-compat.
+        titles: opcional, lista de action titles (para bonus DECISION em
+                quality_levels.assess_deck).
     """
     prs = Presentation(str(pptx_path))
     all_warnings: List[AuditWarning] = []
@@ -654,6 +691,14 @@ def audit_deck(pptx_path: Path,
         # P1.2 — layout repetition
         all_warnings.extend(detect_layout_repetition_from_kinds(viz_kinds))
 
+    if return_quality_levels:
+        # PR 1.4 — agregacao em hierarquia 4 niveis
+        try:
+            from .quality_levels import assess_deck as _assess_deck
+            qa = _assess_deck(all_warnings, titles=titles)
+            return all_warnings, qa
+        except ImportError:
+            return all_warnings, None
     return all_warnings
 
 
