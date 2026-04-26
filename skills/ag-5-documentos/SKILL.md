@@ -145,13 +145,52 @@ Todas as cores e fontes sao carregadas de
 |-------|--------------|---------------------|
 | primary (dark bg) | `#1E2433` sidebar | `#1E2433` navy |
 | accent (brand) | `#F7941D` orange | `#3CBFE0` cyan |
-| font heading | IBM Plex Sans | Calibri |
-| font body | IBM Plex Sans | Calibri |
+| font heading | Montserrat | Calibri |
+| font body | Montserrat | Calibri |
 | bg light | `#F8F9FA` | `#F8F9FA` |
 
 **Em duvida sobre uma cor:** abrir catalog rAIz em
 `cd ~/Claude/assets/design-library/catalog && npm run dev -- -p 3011`
 → `http://localhost:3011/tokens` (Playwright MCP).
+
+### Tipografia canonical (guia mestre 16.2-16.3, migrado 2026-04-25)
+
+Escala em pontos para uso em PPTX. Valores em `lib/raiz_tokens.FONT_SIZE`.
+
+| Token | Tamanho (pt) | Uso |
+|-------|--------------|-----|
+| `kicker` | 9 | Section kicker (cabecalho do chrome) |
+| `caption` | 9 | Captions, source lines, footer |
+| `body_sm` | 12 | Body compact (cards densos) |
+| `body` | **14** | Body padrao em slides (guia 14-16) |
+| `subtitle` | **16** | Subtitulo abaixo do action title (guia 14-18) |
+| `takeaway` | **14** | Takeaway bar |
+| `label` | **14** | Labels destacados em cards |
+| `h3` | **16** | Titulos de cards/quadrantes |
+| `h2` | **20** | Titulos secundarios |
+| `h1` | **28** | Action title (guia 26-30) |
+| `section` | **36** | Titulo de secao em divisor (guia 32-44) — NOVO |
+| `hero` | **40** | KPIs medios (guia 32-56) |
+| `hero_xl` | **56** | KPIs grandes em capa |
+| `table` | **11** | Texto em tabela (guia 9-12) — NOVO |
+
+**Bumps em negrito** vieram da migracao Montserrat. Para reverter um layout
+especifico ao tamanho legacy (pre-2026-04-25), importar `FONT_SIZE_LEGACY` em
+vez de `FONT_SIZE`:
+
+```python
+from lib.raiz_tokens import FONT_SIZE, FONT_SIZE_LEGACY
+size_now = FONT_SIZE["body"]            # 14 (Montserrat era)
+size_old = FONT_SIZE_LEGACY["body"]     # 11 (IBM Plex Sans era — escape hatch)
+```
+
+### Fallback de fonte (Helvetica)
+
+`Brand.font_heading`/`font_body` agora passam por `pptx_utils.resolve_font_family()`,
+que detecta se Montserrat esta instalada (via varredura de `~/Library/Fonts`,
+`/usr/share/fonts`, etc.). Se ausente, escreve **Helvetica** no XML do PPTX e
+loga warning unico. Nunca aborta build. Para sumir com o warning, instalar a
+fonte: `https://fonts.google.com/specimen/Montserrat` → `~/Library/Fonts/`.
 
 ### Briefing rigoroso obrigatorio (PRE-fase 1)
 
