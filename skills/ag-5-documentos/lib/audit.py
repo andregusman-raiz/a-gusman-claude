@@ -12,9 +12,19 @@ Defeitos detectados (P0/P1 da auditoria 2026-04-25):
   - [P0.5] Contraste WCAG AA texto vs background < 4.5:1
   - [P0.2] Viz ratio non-textual < 30% (deck-level)
   - [P0.3] Action title sem numero quando dado disponivel
+  - [P0.6] Arbitrary label wrap — quebras de linha em ponto NAO-natural (BLOQUEANTE)
+  - [P0.7] Intra-slide overlap — shapes sobrepostos sem declaracao overlay (BLOQUEANTE)
   - [P1.2] 3+ slides consecutivos com mesmo layout
   - [P1.3] Source line ausente em slide com afirmacao categorica
+  - [P1.5] Cross-section layout balance — kind_concentration > 30% (monotonia visual)
   - Anti-patterns canonical (4 cores accent, card-grid > 6, bullet > 18 palavras)
+
+Validators bloqueantes (entrega abortada se detectar):
+  - P0.6 detect_arbitrary_label_wrap()
+  - P0.7 detect_intra_slide_overlap()
+  - P0.5 contrast WCAG AA (high severity)
+  - Geometria out_of_bounds (high severity)
+  - P0.2 viz ratio < 30%
 """
 from __future__ import annotations
 
@@ -312,8 +322,19 @@ def check_source_line_for_categorical(slide, slide_num: int) -> Optional[AuditWa
 # Layout repetition (P1.2) — operate em layout-types informados externamente
 # ---------------------------------------------------------------------------
 def detect_layout_repetition_from_kinds(layout_kinds: List[str],
-                                         max_consecutive: int = 2) -> List[AuditWarning]:
-    """Recebe lista de layout-types (1 por slide), retorna warnings se 3+ consecutivos iguais."""
+                                         max_consecutive: int = 2,
+                                         concentration_threshold: float = 0.30) -> List[AuditWarning]:
+    """Recebe lista de layout-types (1 por slide), retorna warnings.
+
+    Detecta:
+      - 3+ slides consecutivos com mesmo layout (existing)
+      - [P1.5] Cross-section layout balance — kind_concentration > threshold
+
+    Args:
+        layout_kinds: lista de kinds (1 por slide)
+        max_consecutive: max consecutivos do mesmo kind antes de warn
+        concentration_threshold: max ratio de um kind sobre total (default 0.30 = 30%)
+    """
     warnings: List[AuditWarning] = []
     streak_kind = None
     streak_n = 0
@@ -328,6 +349,154 @@ def detect_layout_repetition_from_kinds(layout_kinds: List[str],
         else:
             streak_kind = kind
             streak_n = 1
+
+    # P1.5 — kind_concentration metric (cross-section balance)
+    total = len(layout_kinds)
+    if total > 0:
+        from collections import Counter as _Counter
+        concentration = _Counter(layout_kinds)
+        for kind, count in concentration.items():
+            ratio = count / total
+            if ratio > concentration_threshold:
+                warnings.append(AuditWarning(
+                    0, "kind_concentration", "medium",
+                    f"[P1.5] kind '{kind}' representa {ratio:.0%} do deck "
+                    f"({count}/{total}) — monotonia visual (max {concentration_threshold:.0%})"
+                ))
+    return warnings
+
+
+# ---------------------------------------------------------------------------
+# Arbitrary label wrap (P0.6) — BLOQUEANTE
+# ---------------------------------------------------------------------------
+# Pontos NATURAIS de quebra: virgula, ponto, ponto-e-virgula, dois-pontos,
+# travessao, fim de frase, fim de palavra (espaco antes da quebra).
+_NATURAL_BREAK_END = re.compile(r"[,;:\.\!\?—–\-]\s*$|\s$")
+# Pattern de palavra cortada no meio: termina com letra E proxima linha
+# comeca com letra (sem hifenacao)
+_WORD_BOUNDARY = re.compile(r"\w$")
+
+
+def _has_natural_break(line: str) -> bool:
+    """Linha termina em ponto natural de quebra?
+
+    Naturais: virgula, ponto, ponto-e-virgula, dois-pontos, travessao,
+    interrogacao, exclamacao, fim de frase. Espaco final tambem e aceito
+    (significa que python-pptx auto-quebrou em espaco, OK).
+    """
+    if not line:
+        return True
+    return bool(_NATURAL_BREAK_END.search(line))
+
+
+def detect_arbitrary_label_wrap(slide, slide_num: int,
+                                 max_arbitrary: int = 1) -> List[AuditWarning]:
+    """Detecta labels que quebram em ponto NAO-natural (P0.6 — BLOQUEANTE).
+
+    Heuristica:
+      - Para cada textbox, examina paragrafos (linhas explicitas no PPTX)
+      - Se >max_arbitrary linhas terminam em ponto NAO-natural, sinaliza
+      - Especialmente: termina em palavra cortada ou separador artificial '/'
+
+    Causa do defeito (slide 20 v4): 'Criar pasta / de trabalho /
+    ~/Claude-Workspace' — 3 quebras arbitrarias com '/' como separador.
+
+    Args:
+        slide: pptx.slide.Slide
+        slide_num: numero do slide (1-indexed)
+        max_arbitrary: max quebras arbitrarias toleradas por shape
+    """
+    warnings: List[AuditWarning] = []
+    for shape in slide.shapes:
+        if not shape.has_text_frame:
+            continue
+        tf = shape.text_frame
+        paragraphs = [p.text or "" for p in tf.paragraphs]
+        # Filtrar paragrafos vazios
+        non_empty = [p for p in paragraphs if p.strip()]
+        if len(non_empty) < 3:
+            # Apenas labels com 3+ linhas explicitas sao candidatos
+            continue
+        # Contar linhas que NAO terminam em ponto natural
+        arbitrary_breaks = 0
+        for line in non_empty[:-1]:  # ignorar ultima linha
+            if not _has_natural_break(line):
+                arbitrary_breaks += 1
+        if arbitrary_breaks > max_arbitrary:
+            preview = " / ".join(non_empty[:3])[:80]
+            warnings.append(AuditWarning(
+                slide_num, "arbitrary_wrap", "high",
+                f"[P0.6] Label com {arbitrary_breaks} quebras arbitrarias "
+                f"(nao em ponto natural): {preview!r}..."
+            ))
+    return warnings
+
+
+# ---------------------------------------------------------------------------
+# Intra-slide overlap (P0.7) — BLOQUEANTE
+# ---------------------------------------------------------------------------
+def detect_intra_slide_overlap(slide, slide_num: int,
+                                min_ratio: float = 0.20,
+                                ignore_marker: str = "_overlay_intentional") -> List[AuditWarning]:
+    """Detecta shapes sobrepostos dentro do mesmo slide (P0.7 — BLOQUEANTE).
+
+    Diferenca para audit overlap existente:
+      - Audit existente so checa text_shapes (com texto). Este checa TODOS os
+        shapes (matrix 2x2 com card sobreposto, ladder lateral sobre quadrante,
+        etc.).
+      - Este nao confunde com layered design intencional: shape com nome
+        contendo '_overlay_intentional' e ignorado.
+
+    Causa do defeito (slide 22 v4): matriz 2x2 com ladder lateral
+    sobrepondo quadrantes, truncando 'Var competitiva.' e 'Es'.
+
+    Args:
+        slide: pptx.slide.Slide
+        slide_num: numero do slide (1-indexed)
+        min_ratio: min overlap ratio para reportar (default 0.20 = 20%)
+        ignore_marker: substring no shape.name que marca overlay intencional
+    """
+    warnings: List[AuditWarning] = []
+    all_shapes = []
+    for shape in slide.shapes:
+        # Shapes com tamanho/posicao validos
+        try:
+            if shape.width and shape.height and shape.left is not None and shape.top is not None:
+                # Skip explicit overlay-intentional
+                name = getattr(shape, "name", "") or ""
+                if ignore_marker in name:
+                    continue
+                all_shapes.append(shape)
+        except (AttributeError, TypeError):
+            continue
+
+    seen_pairs = set()
+    for i, a in enumerate(all_shapes):
+        for b in all_shapes[i+1:]:
+            key = (id(a), id(b))
+            if key in seen_pairs:
+                continue
+            seen_pairs.add(key)
+            # Use mesma logica de _bbox_overlap_ratio
+            ratio = _bbox_overlap_ratio(a, b)
+            if ratio >= min_ratio:
+                # Identificacao do par
+                desc_a = getattr(a, "name", "") or "shape_a"
+                desc_b = getattr(b, "name", "") or "shape_b"
+                if a.has_text_frame:
+                    txt_a = (a.text_frame.text or "").strip()[:25]
+                    if txt_a:
+                        desc_a = f"{desc_a}({txt_a!r})"
+                if b.has_text_frame:
+                    txt_b = (b.text_frame.text or "").strip()[:25]
+                    if txt_b:
+                        desc_b = f"{desc_b}({txt_b!r})"
+                sev = "high" if ratio >= 0.40 else "medium"
+                warnings.append(AuditWarning(
+                    slide_num, "intra_slide_overlap", sev,
+                    f"[P0.7] Shapes sobrepostos {ratio*100:.0f}% — "
+                    f"{desc_a} <-> {desc_b}"
+                ))
     return warnings
 
 
@@ -404,6 +573,12 @@ def audit_slide(prs, slide_num: int, slide,
     src_warning = check_source_line_for_categorical(slide, slide_num)
     if src_warning:
         w.append(src_warning)
+
+    # P0.6 — Arbitrary label wrap (BLOQUEANTE)
+    w.extend(detect_arbitrary_label_wrap(slide, slide_num))
+
+    # P0.7 — Intra-slide overlap (BLOQUEANTE)
+    w.extend(detect_intra_slide_overlap(slide, slide_num))
 
     return w
 
@@ -563,5 +738,6 @@ __all__ = [
     "validate_action_title", "title_has_number", "title_has_anti_pattern",
     "check_source_line_for_categorical",
     "detect_layout_repetition_from_kinds",
+    "detect_arbitrary_label_wrap", "detect_intra_slide_overlap",
     "MCKINSEY_CHECKLIST", "MULTIMODAL_REVIEW_CHECKLIST",
 ]
