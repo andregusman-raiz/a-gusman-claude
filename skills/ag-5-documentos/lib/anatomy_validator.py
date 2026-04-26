@@ -138,17 +138,20 @@ def _shape_text(shape) -> str:
 def _has_accent_fill(shape) -> bool:
     """Detecta se shape tem fill com cor accent (cyan/teal/orange)."""
     try:
-        if shape.fill.type == 1:  # solid
-            color = shape.fill.fore_color.rgb
-            if color is not None:
-                hex_str = f"{int(color):06X}"
-                return any(
-                    hex_str.startswith(prefix)
-                    for prefix in _ACCENT_HINT_HEX_PREFIXES
-                )
-    except (AttributeError, TypeError, KeyError):
-        pass
-    return False
+        fill_type = shape.fill.type
+        if fill_type is None or int(fill_type) != 1:  # not solid
+            return False
+        color = shape.fill.fore_color.rgb
+        if color is None:
+            return False
+        # RGBColor extends tuple; str() -> 'RRGGBB'
+        hex_str = str(color).upper()
+        return any(
+            hex_str.startswith(prefix)
+            for prefix in _ACCENT_HINT_HEX_PREFIXES
+        )
+    except (AttributeError, TypeError, KeyError, ValueError):
+        return False
 
 
 # ---------------------------------------------------------------------------
