@@ -22,7 +22,9 @@ Cada exhibit tambem expoe `EXAMPLE_INPUT` para documentacao e tests.
 """
 from .bar_chart_comparison import render as render_bar_chart_comparison, EXAMPLE_INPUT as BAR_EXAMPLE
 from .before_after_arrow import render as render_before_after_arrow, EXAMPLE_INPUT as BA_EXAMPLE
+from .callout_box import render as render_callout_box, EXAMPLE_INPUT as CALLOUT_EXAMPLE
 from .decision_slide import render as render_decision_slide, EXAMPLE_INPUT as DEC_EXAMPLE
+from .executive_table import render as render_executive_table, EXAMPLE_INPUT as TABLE_EXAMPLE
 from .hero_number import render as render_hero_number, EXAMPLE_INPUT as HERO_EXAMPLE
 from .matrix_2x2 import render as render_matrix_2x2, EXAMPLE_INPUT as MATRIX_EXAMPLE
 from .process_flow import render as render_process_flow, EXAMPLE_INPUT as FLOW_EXAMPLE
@@ -38,7 +40,9 @@ from .timeline_horizontal import render as render_timeline_horizontal, EXAMPLE_I
 RENDER_REGISTRY = {
     "bar_chart_comparison":  render_bar_chart_comparison,
     "before_after_arrow":    render_before_after_arrow,
+    "callout_box":           render_callout_box,
     "decision_slide":        render_decision_slide,
+    "executive_table":       render_executive_table,
     "hero_number":           render_hero_number,
     "matrix_2x2":            render_matrix_2x2,
     "process_flow":          render_process_flow,
@@ -53,7 +57,9 @@ RENDER_REGISTRY = {
 EXAMPLE_INPUTS = {
     "bar_chart_comparison":  BAR_EXAMPLE,
     "before_after_arrow":    BA_EXAMPLE,
+    "callout_box":           CALLOUT_EXAMPLE,
     "decision_slide":        DEC_EXAMPLE,
+    "executive_table":       TABLE_EXAMPLE,
     "hero_number":           HERO_EXAMPLE,
     "matrix_2x2":            MATRIX_EXAMPLE,
     "process_flow":          FLOW_EXAMPLE,
@@ -71,7 +77,9 @@ __all__ = [
     "EXAMPLE_INPUTS",
     "render_bar_chart_comparison",
     "render_before_after_arrow",
+    "render_callout_box",
     "render_decision_slide",
+    "render_executive_table",
     "render_hero_number",
     "render_matrix_2x2",
     "render_process_flow",
