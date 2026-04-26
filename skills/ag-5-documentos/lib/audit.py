@@ -680,10 +680,10 @@ def format_audit_report(warnings: List[AuditWarning]) -> str:
 # Multimodal review checklist (P1.4)
 # ---------------------------------------------------------------------------
 MULTIMODAL_REVIEW_CHECKLIST = """\
-## Auto-review multimodal — checklist 14 itens (P1.4)
+## Auto-review multimodal — checklist 15 itens (P1.4 + Pyramid P1.2)
 
 Apos converter PPTX -> PDF e fazer Read multimodal pagina-a-pagina,
-validar cada item. Bloquear entrega se < 80% passar (11/14).
+validar cada item. Bloquear entrega se < 80% passar (12/15).
 
 VISUALIZATION (criticos)
   [ ] 1. >= 30% dos slides tem visualizacao nao-textual (chart/diagrama/timeline/matrix)
@@ -707,7 +707,11 @@ TEXTO/TIPOGRAFIA
 REGRESSAO
   [ ] 14. Nenhum defeito visual de v1 reapareceu (overlap, vazamento, texto invisivel)
 
-Score: ___/14 (>= 11 obrigatorio para entrega).
+PYRAMID PRINCIPLE (P1.2 PR — secao 6 do guia mestre)
+  [ ] 15. Lendo so os titulos em sequencia, a historia faz sentido (top-down,
+         cada title e conclusao nao topico, fechamento com decisao)
+
+Score: ___/15 (>= 12 obrigatorio para entrega).
 """
 
 
