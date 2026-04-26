@@ -580,6 +580,23 @@ def audit_slide(prs, slide_num: int, slide,
     # P0.7 — Intra-slide overlap (BLOQUEANTE)
     w.extend(detect_intra_slide_overlap(slide, slide_num))
 
+    # PR 1.3 — Linguagem executiva (frases fracas + verbos fracos)
+    # Aplicar em body bullets e takeaways (paragrafos com 8+ palavras —
+    # pula labels curtas tipo titulos de cards)
+    try:
+        from .lang_validator import detect_weak_language as _dwl
+        for shp, _ in text_shapes:
+            for para in shp.text_frame.paragraphs:
+                ptext = (para.text or "").strip()
+                if not ptext:
+                    continue
+                # Pula textos muito curtos (labels de card, KPIs, etc.)
+                if len(ptext.split()) < 8:
+                    continue
+                w.extend(_dwl(ptext, slide_num=slide_num))
+    except ImportError:
+        pass
+
     return w
 
 
@@ -606,6 +623,20 @@ def audit_deck(pptx_path: Path,
         all_warnings.extend(audit_slide(prs, i, slide,
                                          slide_bg_hex=slide_bg,
                                          check_contrast=check_contrast))
+
+    # PR 1.3 — Deck-level lang consistency check
+    try:
+        from .lang_validator import detect_consistent_terms as _dct
+        slide_texts: List[str] = []
+        for slide in prs.slides:
+            chunks: List[str] = []
+            for shape in slide.shapes:
+                if shape.has_text_frame:
+                    chunks.append(shape.text_frame.text or "")
+            slide_texts.append(" ".join(chunks))
+        all_warnings.extend(_dct(slide_texts))
+    except ImportError:
+        pass
 
     # Deck-level: viz ratio (P0.2) + layout repetition (P1.2)
     if viz_kinds is not None:
