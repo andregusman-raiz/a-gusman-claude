@@ -650,3 +650,102 @@ do guia mestre. Bloqueio formal se `tests_passed < 6/7`. Componentes:
 | data-dict | — | — | — |
 | spec | — | — | gh CLI |
 | report | — | — | — |
+
+## External Invocation (CLI)
+
+A skill expoe `cli.py` para invocacao programatica externa (Node subprocess,
+HTTP service, n8n, scripts). Util quando consumidores fora do Claude Code
+precisam gerar/auditar decks (ex: raiz-platform `presentation-bridge.service.ts`
+em Phase 2b).
+
+### Comandos
+
+```bash
+SKILL=~/Claude/.claude/skills/ag-5-documentos
+
+# Build deck a partir de briefing YAML/JSON
+python "$SKILL/cli.py" build \
+  --briefing briefing.yaml \
+  --output deck.pptx \
+  --output-json response.json \
+  --no-llm
+
+# Build com gate: exit 2 se audit detectar blocking findings
+python "$SKILL/cli.py" build \
+  --briefing briefing.json \
+  --output deck.pptx \
+  --fail-on-blocking \
+  --no-llm
+
+# Build via stdin (briefing JSON direto)
+echo '{"titulo":"X","outline":[...]}' | python "$SKILL/cli.py" build \
+  --output deck.pptx --no-llm
+
+# Audit deck existente (sem regerar)
+python "$SKILL/cli.py" audit \
+  --pptx existing.pptx \
+  --output-json audit.json
+
+# Validate briefing (dry-run, sem gerar arquivo)
+python "$SKILL/cli.py" validate --briefing briefing.yaml
+```
+
+### Exit codes (consistente com Node bridge)
+
+| Code | Significado |
+|------|-------------|
+| 0 | Sucesso |
+| 1 | Erro de input (briefing invalido, file not found, JSON/YAML quebrado) |
+| 2 | Falha de validacao (deck gerado mas com blocking findings + `--fail-on-blocking`) |
+| 3 | Erro interno (exception nao tratada) |
+
+### Briefing minimo aceito por `build`
+
+```json
+{
+  "titulo": "Crescimento 2026",
+  "marca": "raiz",
+  "outline": [
+    {"kind": "section_divider", "title": "Introducao"},
+    {"kind": "hero_number", "title": "Receita +30% YoY",
+     "content": {"value": "30%", "label": "YoY"}},
+    {"kind": "bullet_list", "title": "Proximos passos",
+     "bullets": ["Validar", "Implementar", "Monitorar"]}
+  ]
+}
+```
+
+Para briefings completos no schema Pydantic strict (`Briefing` em
+`lib/briefing_schema.py`), os campos `pergunta_principal`, `mensagem_central`,
+`audience`, `format`, `tom` etc. tambem sao aceitos pelo subcomando
+`validate` (que retorna `schema_strict: true`).
+
+### Flags relevantes
+
+- `--no-llm` — pula validators LLM (regex fallback only). Ideal para CI / Node
+  bridge sem acesso a `ANTHROPIC_API_KEY`.
+- `--fail-on-blocking` — propaga blocking findings como exit 2 (build/audit).
+- `--storyline KIND` — override do storyline_kind do briefing.
+
+### Integracao em Node (exemplo simplificado)
+
+```ts
+import { spawn } from "node:child_process";
+
+const child = spawn("python3", [
+  `${SKILL_PATH}/cli.py`, "build",
+  "--briefing", briefingPath,
+  "--output", outPath,
+  "--output-json", responsePath,
+  "--no-llm",
+  "--fail-on-blocking",
+]);
+
+child.on("close", (code) => {
+  if (code === 0) /* OK */;
+  else if (code === 2) /* blocking findings */;
+  else /* erro */;
+});
+```
+
+Implementacao da bridge: ver Phase 2b (raiz-platform).
