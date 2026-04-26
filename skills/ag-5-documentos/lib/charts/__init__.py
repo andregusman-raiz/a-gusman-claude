@@ -97,3 +97,14 @@ __all__ = [
     "DriverTreeChart",
     "SlopeChart",
 ]
+
+
+# Pipeline integration helpers (PR-F) — convenience re-exports
+def viz_spec_to_chart_spec(viz, slide_item):  # type: ignore[no-redef]
+    from .pipeline_hooks import viz_spec_to_chart_spec as _impl
+    return _impl(viz, slide_item)
+
+
+def compute_chart_region(slide_item):  # type: ignore[no-redef]
+    from .pipeline_hooks import compute_chart_region as _impl
+    return _impl(slide_item)
