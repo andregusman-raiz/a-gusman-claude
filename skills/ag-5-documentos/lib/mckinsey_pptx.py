@@ -167,13 +167,20 @@ def chrome(slide, section_label: str, page_n: int, total: int, *,
 # ---------------------------------------------------------------------------
 def validate_action_title_quality(title: str,
                                    source_data: Optional[List[str]] = None) -> dict:
-    """Valida qualidade de action title (P0.3 da auditoria 2026-04-25).
+    """Valida qualidade de action title (P0.3 + P1.3.1 da auditoria 2026-04-25).
 
     Retorna dict com:
       - passes: bool — se titulo passa nos criterios
       - has_number: bool — tem numero quantificado
       - has_anti_pattern: Optional[str] — qual anti-pattern matched
+      - has_conclusion: bool — tem verbo principal + sujeito (nao topico)
+      - has_implication: bool — contem keyword de implicacao
+      - formula_score: int — 0..3 (1 ponto cada: conclusao, numero, implicacao)
       - issues: List[str] — problemas detectados
+
+    Formula McKinsey-grade (PR 1.3 / secao 22 do guia mestre):
+      [Conclusao] + [numero quantificado] + [implicacao]
+      Pelo menos 2 dos 3 elementos exigidos para passar formula check.
 
     Anti-patterns canonical:
       - Comeca com "Os/As/Um/Uma/Sumario/Definicoes/Tipos de/Glossario/A jornada tem"
@@ -210,6 +217,43 @@ def validate_action_title_quality(title: str,
             matched_anti = desc
             break
 
+    # ---- P1.3.1 — Detector de formula [Conclusao] + [Numero] + [Implicacao] ----
+
+    # Conclusao: verbo de acao/estado + sujeito (heuristica conservadora).
+    # Sinais de conclusao: comeca com substantivo+verbo no presente/preterito,
+    # ou comeca com verbo no infinitivo/gerundio (ex: "Conversao caiu", "Receita cresce",
+    # "Capturando R$10MM"). Anti-pattern bloqueia automaticamente.
+    conclusion_indicators = _re.compile(
+        r"\b(?:caiu|cai|caem|cresceu|cresce|crescem|reduz|reduziu|"
+        r"aumentou|aumenta|aumentam|representa|representam|"
+        r"pressiona|pressionam|exige|exigem|deve|devem|"
+        r"limita|limitam|gera|geram|capturou|captura|"
+        r"perde|perdeu|perdem|ganha|ganhou|ganham|"
+        r"acelera|acelerou|atinge|atingiu|"
+        r"desafia|desafiou|supera|superou|"
+        r"concentra|concentrou|fragmenta|fragmentou|"
+        r"transforma|transformou|posiciona|posicionou|"
+        r"\bcaindo|crescendo|reduzindo|aumentando|capturando|gerando|"
+        r"pressionando|exigindo|limitando|concentrando|fragmentando|"
+        r"perdendo|ganhando|acelerando|atingindo|superando)\b",
+        _re.IGNORECASE,
+    )
+    has_conclusion = bool(conclusion_indicators.search(title)) and matched_anti is None
+
+    # Implicacao: keywords explicitas (secao 22.2 do guia)
+    implication_kw = _re.compile(
+        r"\b(?:portanto|exigindo|pressionando|exige|pressiona|"
+        r"deve|deveria|para\s+capturar|para\s+atingir|para\s+evitar|"
+        r"limitando|concentrando|gerando|expondo|"
+        r"impedindo|forcando|obrigando|requer|requerendo|"
+        r"sob\s+risco|sob\s+pressao|sob\s+ameaca|"
+        r"impactando|comprometendo|inviabilizando)\b",
+        _re.IGNORECASE,
+    )
+    has_implication = bool(implication_kw.search(title))
+
+    formula_score = int(has_conclusion) + int(has_number) + int(has_implication)
+
     issues: List[str] = []
     if matched_anti and not has_number:
         issues.append(f"Anti-pattern descritivo ({matched_anti}) sem numero")
@@ -218,12 +262,76 @@ def validate_action_title_quality(title: str,
             if number_re.search(str(sd)):
                 issues.append("Source tem dado quantificado, titulo nao usa")
                 break
+    if formula_score < 2:
+        issues.append(
+            f"Formula fraca: {formula_score}/3 (conclusao={has_conclusion}, "
+            f"numero={has_number}, implicacao={has_implication}) — "
+            f"action title precisa pelo menos 2 dos 3 elementos"
+        )
 
     return {
         "passes":            len(issues) == 0,
         "has_number":        has_number,
         "has_anti_pattern":  matched_anti,
+        "has_conclusion":    has_conclusion,
+        "has_implication":   has_implication,
+        "formula_score":     formula_score,
         "issues":            issues,
+    }
+
+
+def detect_title_parallelism(titles: List[str]) -> dict:
+    """Detecta quebra de paralelismo gramatical entre titulos consecutivos.
+
+    Heuristica: classifica cada titulo em uma de 3 formas iniciais:
+      - 'verbo':       comeca com verbo no infinitivo/gerundio/imperativo
+      - 'substantivo': comeca com substantivo + verbo (frase declarativa)
+      - 'outro':       construcao mista (preposicao, adjetivo no inicio, etc.)
+
+    Retorna dict com:
+      - forms: List[str] — classificacao de cada titulo
+      - mixed: bool — True se ha mais de uma forma no deck
+      - dominant: Optional[str] — forma dominante (se mixed=False)
+      - breaks: List[Tuple[int, str]] — (idx, forma) que quebra paralelismo
+    """
+    import re as _re
+
+    verb_initial_re = _re.compile(
+        r"^(?:[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+(?:ar|er|ir|ndo|ar-se|er-se|ir-se))\b",
+        _re.IGNORECASE,
+    )
+    forms: List[str] = []
+    for t in titles:
+        t = (t or "").strip()
+        if not t:
+            forms.append("vazio")
+            continue
+        first = t.split()[0] if t.split() else ""
+        if verb_initial_re.match(t):
+            forms.append("verbo")
+        elif first and first[0].isupper() and not first.lower() in {
+            "para", "com", "sem", "em", "no", "na", "de", "do", "da",
+            "pela", "pelo", "ate", "sobre", "entre",
+        }:
+            forms.append("substantivo")
+        else:
+            forms.append("outro")
+
+    non_empty = [f for f in forms if f != "vazio"]
+    unique_forms = set(non_empty)
+    mixed = len(unique_forms) > 1
+    dominant = max(non_empty, key=non_empty.count) if non_empty else None
+    breaks: List[tuple] = []
+    if mixed and dominant:
+        for idx, f in enumerate(forms, 1):
+            if f != dominant and f != "vazio":
+                breaks.append((idx, f))
+
+    return {
+        "forms":    forms,
+        "mixed":    mixed,
+        "dominant": dominant if not mixed else None,
+        "breaks":   breaks,
     }
 
 
@@ -381,4 +489,5 @@ __all__ = [
     "chrome", "action_title", "takeaway_bar", "source_line",
     "kpi_card", "status_pill",
     "validate_action_title_quality",
+    "detect_title_parallelism",
 ]
