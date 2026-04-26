@@ -27,6 +27,7 @@ from .decision_slide import render as render_decision_slide, EXAMPLE_INPUT as DE
 from .executive_table import render as render_executive_table, EXAMPLE_INPUT as TABLE_EXAMPLE
 from .hero_number import render as render_hero_number, EXAMPLE_INPUT as HERO_EXAMPLE
 from .matrix_2x2 import render as render_matrix_2x2, EXAMPLE_INPUT as MATRIX_EXAMPLE
+from .one_pager_summary import render as render_one_pager_summary, EXAMPLE_INPUT as ONEPAGER_EXAMPLE
 from .process_flow import render as render_process_flow, EXAMPLE_INPUT as FLOW_EXAMPLE
 from .quote_slide import render as render_quote_slide, EXAMPLE_INPUT as QUOTE_EXAMPLE
 from .risk_heatmap import render as render_risk_heatmap, EXAMPLE_INPUT as RISK_EXAMPLE
@@ -45,6 +46,7 @@ RENDER_REGISTRY = {
     "executive_table":       render_executive_table,
     "hero_number":           render_hero_number,
     "matrix_2x2":            render_matrix_2x2,
+    "one_pager_summary":     render_one_pager_summary,
     "process_flow":          render_process_flow,
     "quote_slide":           render_quote_slide,
     "risk_heatmap":          render_risk_heatmap,
@@ -62,6 +64,7 @@ EXAMPLE_INPUTS = {
     "executive_table":       TABLE_EXAMPLE,
     "hero_number":           HERO_EXAMPLE,
     "matrix_2x2":            MATRIX_EXAMPLE,
+    "one_pager_summary":     ONEPAGER_EXAMPLE,
     "process_flow":          FLOW_EXAMPLE,
     "quote_slide":           QUOTE_EXAMPLE,
     "risk_heatmap":          RISK_EXAMPLE,
@@ -82,6 +85,7 @@ __all__ = [
     "render_executive_table",
     "render_hero_number",
     "render_matrix_2x2",
+    "render_one_pager_summary",
     "render_process_flow",
     "render_quote_slide",
     "render_risk_heatmap",
