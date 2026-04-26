@@ -24,12 +24,16 @@ from .bar_chart_comparison import render as render_bar_chart_comparison, EXAMPLE
 from .before_after_arrow import render as render_before_after_arrow, EXAMPLE_INPUT as BA_EXAMPLE
 from .callout_box import render as render_callout_box, EXAMPLE_INPUT as CALLOUT_EXAMPLE
 from .decision_slide import render as render_decision_slide, EXAMPLE_INPUT as DEC_EXAMPLE
+from .driver_tree import render as render_driver_tree, EXAMPLE_INPUT as DRIVER_EXAMPLE
 from .executive_table import render as render_executive_table, EXAMPLE_INPUT as TABLE_EXAMPLE
+from .funnel_steps import render as render_funnel_steps, EXAMPLE_INPUT as FUNNEL_EXAMPLE
 from .hero_number import render as render_hero_number, EXAMPLE_INPUT as HERO_EXAMPLE
+from .histogram_distribution import render as render_histogram, EXAMPLE_INPUT as HISTOGRAM_EXAMPLE
 from .matrix_2x2 import render as render_matrix_2x2, EXAMPLE_INPUT as MATRIX_EXAMPLE
 from .one_pager_summary import render as render_one_pager_summary, EXAMPLE_INPUT as ONEPAGER_EXAMPLE
 from .process_flow import render as render_process_flow, EXAMPLE_INPUT as FLOW_EXAMPLE
 from .quote_slide import render as render_quote_slide, EXAMPLE_INPUT as QUOTE_EXAMPLE
+from .raci_matrix import render as render_raci_matrix, EXAMPLE_INPUT as RACI_EXAMPLE
 from .risk_heatmap import render as render_risk_heatmap, EXAMPLE_INPUT as RISK_EXAMPLE
 from .scqa_slide import render as render_scqa, EXAMPLE_INPUT as SCQA_EXAMPLE
 from .section_divider import render as render_section_divider, EXAMPLE_INPUT as SECTION_EXAMPLE
@@ -39,39 +43,47 @@ from .timeline_horizontal import render as render_timeline_horizontal, EXAMPLE_I
 
 # Mapa kind -> render fn (usado por pipeline.py)
 RENDER_REGISTRY = {
-    "bar_chart_comparison":  render_bar_chart_comparison,
-    "before_after_arrow":    render_before_after_arrow,
-    "callout_box":           render_callout_box,
-    "decision_slide":        render_decision_slide,
-    "executive_table":       render_executive_table,
-    "hero_number":           render_hero_number,
-    "matrix_2x2":            render_matrix_2x2,
-    "one_pager_summary":     render_one_pager_summary,
-    "process_flow":          render_process_flow,
-    "quote_slide":           render_quote_slide,
-    "risk_heatmap":          render_risk_heatmap,
-    "scqa":                  render_scqa,
-    "section_divider":       render_section_divider,
-    "stack_hierarchy":       render_stack_hierarchy,
-    "timeline_horizontal":   render_timeline_horizontal,
+    "bar_chart_comparison":   render_bar_chart_comparison,
+    "before_after_arrow":     render_before_after_arrow,
+    "callout_box":            render_callout_box,
+    "decision_slide":         render_decision_slide,
+    "driver_tree":            render_driver_tree,
+    "executive_table":        render_executive_table,
+    "funnel_steps":           render_funnel_steps,
+    "hero_number":            render_hero_number,
+    "histogram_distribution": render_histogram,
+    "matrix_2x2":             render_matrix_2x2,
+    "one_pager_summary":      render_one_pager_summary,
+    "process_flow":           render_process_flow,
+    "quote_slide":            render_quote_slide,
+    "raci_matrix":            render_raci_matrix,
+    "risk_heatmap":           render_risk_heatmap,
+    "scqa":                   render_scqa,
+    "section_divider":        render_section_divider,
+    "stack_hierarchy":        render_stack_hierarchy,
+    "timeline_horizontal":    render_timeline_horizontal,
 }
 
 EXAMPLE_INPUTS = {
-    "bar_chart_comparison":  BAR_EXAMPLE,
-    "before_after_arrow":    BA_EXAMPLE,
-    "callout_box":           CALLOUT_EXAMPLE,
-    "decision_slide":        DEC_EXAMPLE,
-    "executive_table":       TABLE_EXAMPLE,
-    "hero_number":           HERO_EXAMPLE,
-    "matrix_2x2":            MATRIX_EXAMPLE,
-    "one_pager_summary":     ONEPAGER_EXAMPLE,
-    "process_flow":          FLOW_EXAMPLE,
-    "quote_slide":           QUOTE_EXAMPLE,
-    "risk_heatmap":          RISK_EXAMPLE,
-    "scqa":                  SCQA_EXAMPLE,
-    "section_divider":       SECTION_EXAMPLE,
-    "stack_hierarchy":       STACK_EXAMPLE,
-    "timeline_horizontal":   TIMELINE_EXAMPLE,
+    "bar_chart_comparison":   BAR_EXAMPLE,
+    "before_after_arrow":     BA_EXAMPLE,
+    "callout_box":            CALLOUT_EXAMPLE,
+    "decision_slide":         DEC_EXAMPLE,
+    "driver_tree":            DRIVER_EXAMPLE,
+    "executive_table":        TABLE_EXAMPLE,
+    "funnel_steps":           FUNNEL_EXAMPLE,
+    "hero_number":            HERO_EXAMPLE,
+    "histogram_distribution": HISTOGRAM_EXAMPLE,
+    "matrix_2x2":             MATRIX_EXAMPLE,
+    "one_pager_summary":      ONEPAGER_EXAMPLE,
+    "process_flow":           FLOW_EXAMPLE,
+    "quote_slide":            QUOTE_EXAMPLE,
+    "raci_matrix":            RACI_EXAMPLE,
+    "risk_heatmap":           RISK_EXAMPLE,
+    "scqa":                   SCQA_EXAMPLE,
+    "section_divider":        SECTION_EXAMPLE,
+    "stack_hierarchy":        STACK_EXAMPLE,
+    "timeline_horizontal":    TIMELINE_EXAMPLE,
 }
 
 
@@ -82,12 +94,16 @@ __all__ = [
     "render_before_after_arrow",
     "render_callout_box",
     "render_decision_slide",
+    "render_driver_tree",
     "render_executive_table",
+    "render_funnel_steps",
     "render_hero_number",
+    "render_histogram",
     "render_matrix_2x2",
     "render_one_pager_summary",
     "render_process_flow",
     "render_quote_slide",
+    "render_raci_matrix",
     "render_risk_heatmap",
     "render_scqa",
     "render_section_divider",
