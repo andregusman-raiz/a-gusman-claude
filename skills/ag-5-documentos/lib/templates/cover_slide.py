@@ -1,5 +1,15 @@
 """Template: capa executiva.
 
+PR 3.5 — 4 elementos canonicos da secao 23 do guia mestre:
+  1) Titulo do projeto (h1, Montserrat 28pt bold)            → campo `title`
+  2) Mensagem central — 1 frase de proposito (<= 14 palavras) → campo `central_message`
+  3) Audience (subtitulo + nome do cliente/area)              → campo `audience`
+  4) Data + autor (footer right, 10pt)                        → campos `date` + `author`
+
+Quando QUALQUER um destes 4 campos novos esta presente, render usa o layout
+expandido. Caso contrario, mantem layout legacy (backward compat).
+
+Legacy schema (continua funcionando inalterado):
 data = {
   "wordmark":        "inspira",               # primeira linha do wordmark
   "wordmark_sub":    "rede de educadores",    # segunda linha
@@ -16,9 +26,18 @@ data = {
   "kpi_sub_2":       "2027 (meta) · +78%",
   "footer":          "Confidencial — Apenas liderancas internas · Abril 2026",
   "logo_path":       "/path/to/logo.png",     # P1.6c — OBRIGATORIO (PNG/JPEG)
-                                               # Validacao falha sem logo.
-                                               # Para skip, passar logo_path="_skip"
-                                               # explicitamente (uso restrito).
+}
+
+Schema expandido (PR 3.5):
+data = {
+  ...legacy fields opcionais...,
+  "title":           "Plano Estrategico 2026-Q3",       # h1 do projeto
+  "central_message": "Acelerar adocao de IA agentica.", # max 14 palavras
+  "audience":        "Comite Executivo · Diretoria N1", # quem assiste
+  "date":            "Abril 2026",                       # quando
+  "author":          "Equipe rAIz Educacao",             # quem fez
+  "accent_color":    "#F7941D",                          # opcional
+  "logo_path":       "...",                              # OBRIGATORIO sempre
 }
 
 P1.6c — Slot logo OBRIGATORIO:
@@ -38,7 +57,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pptx.enum.text import PP_ALIGN
+from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
 
 from ..mckinsey_pptx import (
@@ -46,6 +65,27 @@ from ..mckinsey_pptx import (
     add_rect, add_tb, set_bg,
 )
 from ..palette_overrides import Brand
+
+
+CENTRAL_MESSAGE_MAX_WORDS = 14
+EXPANDED_TRIGGER_FIELDS = ("title", "central_message", "audience", "author")
+
+
+def _is_expanded_layout(data: dict) -> bool:
+    """Retorna True se data tem qualquer campo do schema expandido (PR 3.5)."""
+    return any(data.get(field) for field in EXPANDED_TRIGGER_FIELDS)
+
+
+def _validate_expanded(data: dict) -> None:
+    """Valida campos do schema expandido (PR 3.5)."""
+    cm = str(data.get("central_message") or "").strip()
+    if cm:
+        words = cm.split()
+        if len(words) > CENTRAL_MESSAGE_MAX_WORDS:
+            raise ValueError(
+                f"[PR 3.5] cover_slide central_message excede {CENTRAL_MESSAGE_MAX_WORDS} palavras "
+                f"(recebido {len(words)}). Condensar."
+            )
 
 
 def _validate_logo(data: dict) -> Path:
@@ -73,13 +113,97 @@ def _validate_logo(data: dict) -> Path:
 
 
 def render(slide, data: dict, brand: Brand) -> None:
-    set_bg(slide, brand.primary)
+    """Dispatcher: layout legacy OU expandido (PR 3.5).
 
-    # P1.6c — validar slot logo OBRIGATORIO antes de qualquer render
+    Decide pelo presence de campos PR-3.5 (`title`, `central_message`,
+    `audience`, `author`). Legacy decks continuam renderizando inalterado.
+    """
+    # Logo path validation acontece em ambos os layouts (P1.6c)
     logo_path = _validate_logo(data)
 
+    if _is_expanded_layout(data):
+        _validate_expanded(data)
+        _render_expanded(slide, data, brand, logo_path=logo_path)
+        return
+
+    _render_legacy(slide, data, brand, logo_path=logo_path)
+
+
+def _render_expanded(slide, data: dict, brand: Brand, *, logo_path) -> None:
+    """Layout PR 3.5 — 4 elementos canonicos (secao 23 do guia mestre).
+
+    1) title (h1, 28pt bold)
+    2) central_message (1 frase, 14pt italic)
+    3) audience (subtitulo)
+    4) date + author (footer right, 10pt)
+    """
+    accent_color = data.get("accent_color") or getattr(brand, "accent_strong", brand.accent)
+    set_bg(slide, brand.primary)
+
+    # Top accent bar
+    add_rect(slide, 0, 0, SLIDE_W, Inches(0.12), fill=accent_color)
+
+    # Title (h1) — centrado verticalmente no terco superior
+    title = str(data.get("title") or "").strip()
+    if title:
+        add_tb(slide, Inches(0.8), Inches(2.2),
+               SLIDE_W - Inches(1.6), Inches(1.2),
+               title, size=28, bold=True, color=brand.surface,
+               font=brand.font_heading, align=PP_ALIGN.LEFT, line_spacing=1.1)
+
+    # Accent line abaixo do title
+    add_rect(slide, Inches(0.8), Inches(3.55),
+             Inches(1.6), Inches(0.05), fill=accent_color)
+
+    # Central message — 1 frase de proposito (max 14 palavras)
+    central = str(data.get("central_message") or "").strip()
+    if central:
+        add_tb(slide, Inches(0.8), Inches(3.85),
+               SLIDE_W - Inches(1.6), Inches(0.7),
+               central, size=14, italic=True, color=brand.surface,
+               font=brand.font_body, align=PP_ALIGN.LEFT, line_spacing=1.3)
+
+    # Audience — subtitulo + nome do cliente/area
+    audience = str(data.get("audience") or "").strip()
+    if audience:
+        add_tb(slide, Inches(0.8), Inches(4.85),
+               SLIDE_W - Inches(1.6), Inches(0.5),
+               audience, size=12, bold=True, color=accent_color,
+               font=brand.font_heading, align=PP_ALIGN.LEFT, line_spacing=1.2)
+
+    # Date + author (footer right, 10pt)
+    date = str(data.get("date") or "").strip()
+    author = str(data.get("author") or "").strip()
+    footer_parts = [p for p in (author, date) if p]
+    if footer_parts:
+        footer_text = " · ".join(footer_parts)
+        add_tb(slide, Inches(0.6), SLIDE_H - Inches(0.55),
+               SLIDE_W - Inches(3.0), Inches(0.3),
+               footer_text, size=10, color=brand.fg_muted,
+               font=brand.font_body, align=PP_ALIGN.RIGHT)
+
+    # Logo brand mark (canto inferior direito) — se presente
+    if logo_path is not None:
+        try:
+            logo_w = Inches(1.2)
+            logo_h = Inches(0.6)
+            slide.shapes.add_picture(
+                str(logo_path),
+                SLIDE_W - logo_w - Inches(0.6),
+                SLIDE_H - logo_h - Inches(0.4),
+                width=logo_w, height=logo_h,
+            )
+        except Exception as e:
+            import warnings
+            warnings.warn(f"[P1.6c] Falha ao renderizar logo: {e}", stacklevel=2)
+
+
+def _render_legacy(slide, data: dict, brand: Brand, *, logo_path) -> None:
+    """Layout legacy (pre PR 3.5) — backward compat completo."""
+    set_bg(slide, brand.primary)
+
     # P1.7 — Brand semantics: capa usa accent_strong como cor de identidade
-    accent_strong = getattr(brand, "accent_strong", accent_strong)
+    accent_strong = getattr(brand, "accent_strong", brand.accent)
 
     # Top accent
     add_rect(slide, 0, 0, SLIDE_W, Inches(0.12), fill=accent_strong)
