@@ -79,6 +79,60 @@ def tier_for_exhibit(kind: str, default: str = "moderate") -> str:
     return EXHIBIT_TIER_MAP.get(kind, default)
 
 
+# ---------------------------------------------------------------------------
+# PR 2.3 — Semantic palette (cores que carregam significado)
+# ---------------------------------------------------------------------------
+# Funcoes semanticas de cor (secao 17.3 do guia mestre):
+#   - meaning_problem:    sinaliza problema/risco/queda    (red)
+#   - meaning_gain:       sinaliza ganho/oportunidade/alta (green)
+#   - meaning_attention:  sinaliza atencao/intermediario   (yellow/amber)
+#   - meaning_secondary:  serie secundaria em chart        (gray)
+#
+# Diretrizes: usar SEMPRE estas constantes para sinais semanticos.
+# Nunca decidir cor "porque ficou bonito" — cor carrega significado.
+MEANING_PROBLEM = "#DC2626"        # red-600 — problema, risco, queda
+MEANING_PROBLEM_DARK = "#B91C1C"   # red-700
+MEANING_PROBLEM_LIGHT = "#FCA5A5"  # red-300
+
+MEANING_GAIN = "#059669"           # emerald-600 — ganho, oportunidade
+MEANING_GAIN_DARK = "#047857"      # emerald-700
+MEANING_GAIN_LIGHT = "#86EFAC"     # green-300
+
+MEANING_ATTENTION = "#F59E0B"      # amber-500 — atencao, intermediario
+MEANING_ATTENTION_DARK = "#D97706" # amber-600
+MEANING_ATTENTION_LIGHT = "#FCD34D"  # amber-300
+
+MEANING_SECONDARY = "#9CA3AF"      # gray-400 — serie secundaria
+MEANING_SECONDARY_DARK = "#6B7280" # gray-500
+MEANING_SECONDARY_LIGHT = "#E5E7EB"  # gray-200
+
+
+def meaning_color(meaning: str, variant: str = "base") -> str:
+    """Retorna hex para meaning semantico.
+
+    Args:
+        meaning: 'problem' | 'gain' | 'attention' | 'secondary'
+        variant: 'base' | 'dark' | 'light'
+
+    Returns:
+        Hex string (#RRGGBB).
+    """
+    table = {
+        "problem":   (MEANING_PROBLEM,   MEANING_PROBLEM_DARK,   MEANING_PROBLEM_LIGHT),
+        "gain":      (MEANING_GAIN,      MEANING_GAIN_DARK,      MEANING_GAIN_LIGHT),
+        "attention": (MEANING_ATTENTION, MEANING_ATTENTION_DARK, MEANING_ATTENTION_LIGHT),
+        "secondary": (MEANING_SECONDARY, MEANING_SECONDARY_DARK, MEANING_SECONDARY_LIGHT),
+    }
+    base, dark, light = table.get(meaning.lower(),
+                                    (MEANING_SECONDARY, MEANING_SECONDARY_DARK,
+                                     MEANING_SECONDARY_LIGHT))
+    if variant == "dark":
+        return dark
+    if variant == "light":
+        return light
+    return base
+
+
 __all__ = [
     "ACCENT_STRONG",   "ACCENT_STRONG_DARK",  "ACCENT_STRONG_LIGHT",
     "ACCENT_MODERATE", "ACCENT_MODERATE_DARK","ACCENT_MODERATE_LIGHT",
@@ -86,4 +140,10 @@ __all__ = [
     "EXHIBIT_TIER_MAP",
     "tier_color", "tier_for_exhibit",
     "get_raiz_brand",
+    # PR 2.3 — semantic meanings
+    "MEANING_PROBLEM", "MEANING_PROBLEM_DARK", "MEANING_PROBLEM_LIGHT",
+    "MEANING_GAIN", "MEANING_GAIN_DARK", "MEANING_GAIN_LIGHT",
+    "MEANING_ATTENTION", "MEANING_ATTENTION_DARK", "MEANING_ATTENTION_LIGHT",
+    "MEANING_SECONDARY", "MEANING_SECONDARY_DARK", "MEANING_SECONDARY_LIGHT",
+    "meaning_color",
 ]
