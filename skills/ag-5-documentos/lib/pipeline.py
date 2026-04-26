@@ -475,7 +475,7 @@ class ExecutiveDeckPipeline:
     # ------------------------------------------------------------------
     # FASE 6 — AUDIT (screenshot + multimodal)
     # ------------------------------------------------------------------
-    def audit(self) -> dict:
+    def audit(self, briefing: Optional[Any] = None) -> dict:
         """Audita v1 com gates expandidos.
 
         Inclui:
@@ -487,6 +487,12 @@ class ExecutiveDeckPipeline:
           - Viz ratio gate (P0.2) se viz_kinds presente
           - Layout repetition gate (P1.2) se viz_kinds presente
           - Multimodal review checklist (P1.4) — para Claude completar via Read
+          - Pyramid Principle coherence (PR 1.2) — LLM ou regex fallback
+          - Final acceptance — 7 testes da secao 36 do guia mestre
+
+        Args:
+            briefing: instancia opcional de `briefing_schema.Briefing`. Quando
+                      fornecida, alimenta os testes 1 e 5 do final acceptance.
         """
         if not self.v1_pptx.exists():
             raise RuntimeError("FASE 5 pulada: v1.pptx nao existe.")
@@ -502,6 +508,35 @@ class ExecutiveDeckPipeline:
 
         viz_quality = self.viz_quality_report() if self.outline else {}
 
+        # ----------------------------------------------------------------
+        # PR 1.2 — Pyramid coherence + final acceptance (7 testes)
+        # ----------------------------------------------------------------
+        titles = [
+            (s.get("title") or s.get("message") or "").strip()
+            for s in self.outline
+        ] if self.outline else []
+
+        pyramid_warnings: List[AuditWarning] = []
+        final_acceptance_result: Dict[str, Any] = {}
+        try:
+            from .pyramid_validator import validate_pyramid_coherence
+            pyramid_warnings = validate_pyramid_coherence(titles, briefing)
+            warnings.extend(pyramid_warnings)
+        except ImportError:
+            pass
+
+        try:
+            from .final_acceptance import run_final_acceptance
+            final_acceptance_result = run_final_acceptance(
+                deck_path=self.v1_pptx,
+                briefing=briefing,
+                titles=titles,
+                layout_kinds=self.viz_kinds if self.viz_kinds else None,
+                deck_warnings=warnings,
+            )
+        except ImportError:
+            pass
+
         return {
             "pdf_path":               pdf,
             "warnings":               warnings,
@@ -511,6 +546,8 @@ class ExecutiveDeckPipeline:
             "high_severity_count":    sum(1 for w in warnings if w.severity == "high"),
             "viz_quality":            viz_quality,
             "blocked_for_delivery":   self._blocked_for_delivery(warnings, viz_quality),
+            "pyramid_warnings":       pyramid_warnings,
+            "final_acceptance":       final_acceptance_result,
         }
 
     def _blocked_for_delivery(self, warnings: List[AuditWarning],
@@ -564,11 +601,16 @@ class ExecutiveDeckPipeline:
     def run_full(self,
                  md_content: str,
                  builder_fn: Callable[[Path, Brand], None],
-                 max_iterations: int = 3) -> dict:
+                 max_iterations: int = 3,
+                 briefing: Optional[Any] = None) -> dict:
         """Pipeline backward-compat — sem viz selection automatico.
 
         Para usar P0.1 (visualization-first), chamar synthesize_outline +
         assign_visualizations explicitamente antes de build_v1.
+
+        Args:
+            briefing: instancia opcional de `briefing_schema.Briefing`. Quando
+                      fornecida, alimenta pyramid_validator + final_acceptance.
         """
         self.write_md(md_content)
         self.build_v1(builder_fn)
@@ -576,7 +618,7 @@ class ExecutiveDeckPipeline:
         if self.skip_review:
             return self.promote_to_v2()
 
-        audit_result = self.audit()
+        audit_result = self.audit(briefing=briefing)
         result = self.promote_to_v2()
         result["audit"] = audit_result
         return result
