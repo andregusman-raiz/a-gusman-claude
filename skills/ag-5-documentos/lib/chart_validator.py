@@ -330,3 +330,193 @@ class ChartSpecValidator:
                 self._add("V13", "P2", False,
                           f"waterfall: soma deltas ({sum_deltas}) != total declarado ({declared})",
                           field="data")
+
+
+# ===========================================================================
+# Anti-pattern detectors (PR 4.2) — AP01..AP08 conforme SPEC Etapa 6.2
+# ===========================================================================
+
+# Limite de fatias antes de AP01 disparar.
+AP01_MAX_PIE_SLICES = 5
+# Series de linha acima disso disparam AP02 (small multiples).
+AP02_MAX_LINE_SERIES = 3
+# Numero de categorias em bar que exige sort definido (AP03).
+AP03_BAR_SORT_THRESHOLD = 4
+# Maximo de labels que podem ser highlight sem virar "tudo destacado" (AP08).
+AP08_MAX_HIGHLIGHT = 2
+
+PIE_LIKE_TYPES = {"pie", "donut"}
+LINE_LIKE_TYPES = {"line", "area"}
+BAR_LIKE_TYPES = {"bar", "bar_chart", "grouped_bar", "stacked_bar", "stacked100_bar"}
+
+
+class ChartAntiPatternDetector:
+    """Detecta 8 anti-patterns visuais conforme SPEC Etapa 6.2 (AP01..AP08).
+
+    Diferente de `ChartSpecValidator` (gates de qualidade tecnica), os
+    detectors apontam padroes que comprometem leitura/insight do chart e
+    sugerem correcao automatica.
+    """
+
+    def detect(self, spec: Dict[str, Any]) -> List[AntiPatternDetection]:
+        out: List[AntiPatternDetection] = []
+        spec = spec or {}
+        out.extend(self._ap01(spec))
+        out.extend(self._ap02(spec))
+        out.extend(self._ap03(spec))
+        out.extend(self._ap04(spec))
+        out.extend(self._ap05(spec))
+        out.extend(self._ap06(spec))
+        out.extend(self._ap07(spec))
+        out.extend(self._ap08(spec))
+        return out
+
+    # AP01 — pie/donut com >5 fatias
+    def _ap01(self, spec: dict) -> List[AntiPatternDetection]:
+        if spec.get("type") not in PIE_LIKE_TYPES:
+            return []
+        data = spec.get("data") or []
+        if len(data) <= AP01_MAX_PIE_SLICES:
+            return []
+        return [AntiPatternDetection(
+            code="AP01", severity="warning",
+            message=f"{spec.get('type')} tem {len(data)} fatias (max recomendado {AP01_MAX_PIE_SLICES})",
+            suggestion="Colapsar para top-4 + 'Outros'",
+        )]
+
+    # AP02 — line com >3 series
+    def _ap02(self, spec: dict) -> List[AntiPatternDetection]:
+        if spec.get("type") not in LINE_LIKE_TYPES:
+            return []
+        data = spec.get("data") or []
+        series = {item.get("series") for item in data
+                 if isinstance(item, dict) and item.get("series") is not None}
+        if len(series) <= AP02_MAX_LINE_SERIES:
+            return []
+        return [AntiPatternDetection(
+            code="AP02", severity="warning",
+            message=f"line chart com {len(series)} series (max recomendado {AP02_MAX_LINE_SERIES})",
+            suggestion="Usar small multiples (1 chart por serie)",
+        )]
+
+    # AP03 — bar com >4 categorias e sem sort definido
+    def _ap03(self, spec: dict) -> List[AntiPatternDetection]:
+        if spec.get("type") not in BAR_LIKE_TYPES:
+            return []
+        data = spec.get("data") or []
+        if len(data) <= AP03_BAR_SORT_THRESHOLD:
+            return []
+        fmt = spec.get("format") or {}
+        if fmt.get("sort") in ("asc", "desc"):
+            return []
+        return [AntiPatternDetection(
+            code="AP03", severity="warning",
+            message=f"bar chart com {len(data)} categorias sem sort",
+            suggestion="Adicionar format.sort='desc' para ordenar por valor",
+        )]
+
+    # AP04 — combo sem y_label/y2_label
+    def _ap04(self, spec: dict) -> List[AntiPatternDetection]:
+        if spec.get("type") != "combo":
+            return []
+        fmt = spec.get("format") or {}
+        if fmt.get("y_label") and fmt.get("y2_label"):
+            return []
+        return [AntiPatternDetection(
+            code="AP04", severity="warning",
+            message="combo chart sem labels y_label e y2_label (eixos podem confundir)",
+            suggestion="Definir format.y_label e format.y2_label explicitamente",
+        )]
+
+    # AP05 — waterfall sem barra de total
+    def _ap05(self, spec: dict) -> List[AntiPatternDetection]:
+        if spec.get("type") != "waterfall":
+            return []
+        data = spec.get("data") or []
+        has_total = any(isinstance(item, dict) and item.get("type") == "total"
+                        for item in data)
+        if has_total:
+            return []
+        return [AntiPatternDetection(
+            code="AP05", severity="warning",
+            message="waterfall sem barra de total final",
+            suggestion="Adicionar {'label': 'Total', 'value': <soma>, 'type': 'total'}",
+        )]
+
+    # AP06 — bar com format.zero_baseline=False
+    def _ap06(self, spec: dict) -> List[AntiPatternDetection]:
+        if spec.get("type") not in BAR_LIKE_TYPES:
+            return []
+        fmt = spec.get("format") or {}
+        if fmt.get("zero_baseline") is not False:
+            return []
+        return [AntiPatternDetection(
+            code="AP06", severity="error",
+            message="bar chart com zero_baseline=False (vies visual: amplifica diferencas)",
+            suggestion="Forcar format.zero_baseline=True (ou justificar via decisao explicita)",
+        )]
+
+    # AP07 — donut/pie com value < 0
+    def _ap07(self, spec: dict) -> List[AntiPatternDetection]:
+        if spec.get("type") not in PIE_LIKE_TYPES:
+            return []
+        data = spec.get("data") or []
+        for item in data:
+            v = item.get("value") if isinstance(item, dict) else None
+            if isinstance(v, (int, float)) and v < 0:
+                return [AntiPatternDetection(
+                    code="AP07", severity="error",
+                    message=f"{spec.get('type')} com valor negativo: nao representavel",
+                    suggestion="Trocar para bar divergente (negativo abaixo do eixo)",
+                )]
+        return []
+
+    # AP08 — highlight cobre todos os labels
+    def _ap08(self, spec: dict) -> List[AntiPatternDetection]:
+        fmt = spec.get("format") or {}
+        highlight = list(fmt.get("highlight") or [])
+        data = spec.get("data") or []
+        if not highlight:
+            return []
+        labels = [item.get("label") for item in data
+                  if isinstance(item, dict) and "label" in item]
+        if not labels:
+            return []
+        # Anti-pattern: highlight cobre TODOS os labels (=nada destacado),
+        # OU lista mais labels que o limite recomendado (AP08_MAX_HIGHLIGHT).
+        all_highlighted = set(highlight) >= set(labels)
+        too_many = len(highlight) > AP08_MAX_HIGHLIGHT
+        if not (all_highlighted or too_many):
+            return []
+        msg = ("highlight cobre todos os labels (efetivamente nada destacado)"
+               if all_highlighted
+               else f"highlight com {len(highlight)} labels (max recomendado {AP08_MAX_HIGHLIGHT})")
+        return [AntiPatternDetection(
+            code="AP08", severity="warning",
+            message=msg,
+            suggestion=f"Limitar format.highlight a <= {AP08_MAX_HIGHLIGHT} labels",
+        )]
+
+
+# ===========================================================================
+# Audit completo: combina validators + anti-patterns
+# ===========================================================================
+
+def audit_chart_full(spec: Dict[str, Any]) -> Dict[str, Any]:
+    """Executa ChartSpecValidator + ChartAntiPatternDetector em um spec.
+
+    Retorna dict com:
+      - errors: List[ChartValidationError] — todos os erros V01..V13
+      - anti_patterns: List[AntiPatternDetection] — todos os AP01..AP08
+      - blocked_for_delivery: List[ChartValidationError] — apenas bloqueantes
+      - warnings: List[Union[ChartValidationError, AntiPatternDetection]] —
+            erros nao-bloqueantes + todos os anti-patterns
+    """
+    validator_errors = ChartSpecValidator(spec).validate()
+    anti_patterns = ChartAntiPatternDetector().detect(spec)
+    return {
+        "errors": validator_errors,
+        "anti_patterns": anti_patterns,
+        "blocked_for_delivery": [e for e in validator_errors if e.bloqueante],
+        "warnings": [e for e in validator_errors if not e.bloqueante] + list(anti_patterns),
+    }
