@@ -30,8 +30,10 @@ from .builder import ChartBuilder
 from .bullet_chart import BulletChart
 from .combo_chart import ComboChart
 from .donut_chart import DonutChart
+from .heatmap_chart import HeatmapChart
 from .infographic_chart import InfographicChart
 from .line_chart import LineChart
+from .scatter_chart import ScatterChart
 from .stacked_bar_chart import StackedBarChart
 from .waterfall_chart import WaterfallChart
 
@@ -58,8 +60,10 @@ CHART_REGISTRY = {
     "stacked_bar":     StackedBarChart,
     "stacked100_bar":  StackedBarChart,
     "combo":           ComboChart,
-    # PR-D/E will append here:
-    # "scatter", "heatmap",
+    # Analysis family (PR-D)
+    "scatter":         ScatterChart,
+    "heatmap":         HeatmapChart,
+    # PR-E will append here:
     # "treemap", "driver_tree", "slope",
 }
 
@@ -82,4 +86,6 @@ __all__ = [
     "InfographicChart",
     "StackedBarChart",
     "ComboChart",
+    "ScatterChart",
+    "HeatmapChart",
 ]
