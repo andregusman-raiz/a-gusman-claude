@@ -1,0 +1,152 @@
+# 22 regras canonical do guia mestre executive — secao 35
+#
+# Estrutura por regra:
+#   id        : <category-prefix>-<NN>            (estavel)
+#   category  : SEMPRE | NUNCA
+#   rule      : texto canonical (literal do guia)
+#   validator : nome do modulo/funcao que verifica (None = sem cobertura automatica)
+#   severity  : high | medium | low
+#
+# Notas:
+#   - validator: 'manual' indica regras que dependem de revisao multimodal.
+#   - Quando varias funcoes contribuem, o campo lista a principal.
+#   - Severity refere-se a falha (regra violada). Bloqueio formal acontece via
+#     final_acceptance + audit gates conforme severity.
+
+version: 1
+last_updated: "2026-04-25"
+source: "secao 35 do guia mestre — 22 regras canonical"
+
+sempre:
+  - id: SEMPRE-01
+    category: SEMPRE
+    rule: "Comecar pela resposta"
+    validator: "pyramid_validator.validate_pyramid_coherence"
+    severity: high
+
+  - id: SEMPRE-02
+    category: SEMPRE
+    rule: "Priorizar clareza sobre sofisticacao"
+    validator: "lang_validator.detect_weak_language"
+    severity: medium
+
+  - id: SEMPRE-03
+    category: SEMPRE
+    rule: "Criar titulos com conclusao"
+    validator: "audit.validate_action_title"
+    severity: high
+
+  - id: SEMPRE-04
+    category: SEMPRE
+    rule: "Garantir uma mensagem por slide"
+    validator: "one_message_validator.detect_multi_message"
+    severity: medium
+
+  - id: SEMPRE-05
+    category: SEMPRE
+    rule: "Conectar dados a implicacoes"
+    validator: "audit.check_source_line_for_categorical"
+    severity: medium
+
+  - id: SEMPRE-06
+    category: SEMPRE
+    rule: "Sugerir visual adequado"
+    validator: "audit.audit_deck"
+    severity: medium
+
+  - id: SEMPRE-07
+    category: SEMPRE
+    rule: "Reduzir texto sempre que possivel"
+    validator: "audit.detect_anti_patterns"
+    severity: low
+
+  - id: SEMPRE-08
+    category: SEMPRE
+    rule: "Manter consistencia visual"
+    validator: "audit.detect_layout_repetition_from_kinds"
+    severity: medium
+
+  - id: SEMPRE-09
+    category: SEMPRE
+    rule: "Usar linguagem executiva"
+    validator: "lang_validator.detect_weak_language"
+    severity: medium
+
+  - id: SEMPRE-10
+    category: SEMPRE
+    rule: "Encerrar com decisao, recomendacao ou proximo passo"
+    validator: "final_acceptance._check_decision_clarity"
+    severity: high
+
+  - id: SEMPRE-11
+    category: SEMPRE
+    rule: "Declarar hipoteses quando faltarem dados"
+    validator: "manual"
+    severity: low
+
+  - id: SEMPRE-12
+    category: SEMPRE
+    rule: "Nao inventar numeros ou fontes"
+    validator: "manual"
+    severity: high
+
+nunca:
+  - id: NUNCA-01
+    category: NUNCA
+    rule: "Criar slide sem mensagem"
+    validator: "audit.validate_action_title"
+    severity: high
+
+  - id: NUNCA-02
+    category: NUNCA
+    rule: "Usar titulo apenas descritivo"
+    validator: "audit.title_has_anti_pattern"
+    severity: high
+
+  - id: NUNCA-03
+    category: NUNCA
+    rule: "Preencher slide com texto longo sem hierarquia"
+    validator: "audit.detect_anti_patterns"
+    severity: medium
+
+  - id: NUNCA-04
+    category: NUNCA
+    rule: "Usar graficos decorativos"
+    validator: "manual"
+    severity: low
+
+  - id: NUNCA-05
+    category: NUNCA
+    rule: "Misturar muitas cores"
+    validator: "manual"
+    severity: medium
+
+  - id: NUNCA-06
+    category: NUNCA
+    rule: "Criar bullets redundantes"
+    validator: "audit.detect_anti_patterns"
+    severity: low
+
+  - id: NUNCA-07
+    category: NUNCA
+    rule: "Ignorar publico-alvo"
+    validator: "manual"
+    severity: medium
+
+  - id: NUNCA-08
+    category: NUNCA
+    rule: "Inventar dados"
+    validator: "manual"
+    severity: high
+
+  - id: NUNCA-09
+    category: NUNCA
+    rule: "Fazer recomendacoes sem base"
+    validator: "audit.check_source_line_for_categorical"
+    severity: medium
+
+  - id: NUNCA-10
+    category: NUNCA
+    rule: "Encerrar sem implicacao pratica"
+    validator: "final_acceptance._check_decision_clarity"
+    severity: high
