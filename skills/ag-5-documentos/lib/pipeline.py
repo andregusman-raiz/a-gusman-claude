@@ -328,7 +328,9 @@ class ExecutiveDeckPipeline:
     # ------------------------------------------------------------------
     def synthesize_outline(self, slides: List[Dict[str, Any]],
                            apply_executive_synthesis: bool = True,
-                           audience: Optional[str] = None) -> List[Dict[str, Any]]:
+                           audience: Optional[str] = None,
+                           briefing: Optional[Any] = None,
+                           storyline_template: Optional[str] = None) -> List[Dict[str, Any]]:
         """Recebe lista bruta de slides e aplica sintese executiva (P0.4).
 
         Cada item e dict com 'title', 'message', 'bullets', 'source_section', etc.
@@ -337,9 +339,47 @@ class ExecutiveDeckPipeline:
         P0.8 — Se audience for external/board_external (passado aqui ou na
         construcao da pipeline), aplica auto-mask de nomes proprios internos
         antes do merge.
+
+        PR 1.1 — Briefing estruturado:
+          - `briefing`: instancia de `briefing_schema.Briefing` (opcional).
+            Quando fornecida e `slides` esta vazio, usa briefing.outline
+            para popular slides (cada SlideOutline -> dict).
+          - `storyline_template`: nome de template em `storyline_templates`
+            (opcional). Se briefing.outline estiver vazio, aplica skeleton.
         """
+        # PR 1.1 — Briefing pode popular slides quando lista vazia
+        if (not slides) and briefing is not None:
+            try:
+                from .briefing_schema import Briefing as _Briefing
+                from .storyline_templates import apply_storyline as _apply
+            except ImportError:
+                _Briefing = None
+                _apply = None
+
+            if _Briefing is not None and isinstance(briefing, _Briefing):
+                eff_kind = storyline_template or briefing.storyline_kind
+                eff_brief = briefing
+                if eff_kind and not eff_brief.outline and _apply is not None:
+                    eff_brief = _apply(eff_brief, eff_kind)
+                slides = [
+                    {
+                        "title": (block.kind_hint or "").replace("_", " ").title()
+                                 or f"Slide {block.slide_n}",
+                        "message": block.message,
+                        "bullets": block.bullets or [],
+                        "kind_hint": block.kind_hint,
+                        "quero_mostrar_que": block.quero_mostrar_que,
+                        "data_inputs": block.data_inputs or {},
+                    }
+                    for block in eff_brief.outline
+                ]
+
         # P0.8 — usa audience override se fornecido, senao da pipeline
-        eff_audience = (audience or self.audience or "internal")
+        # Se briefing tem audience e caller nao especificou, prefere o do briefing
+        if audience is None and briefing is not None and hasattr(briefing, "audience"):
+            eff_audience = briefing.audience
+        else:
+            eff_audience = (audience or self.audience or "internal")
 
         if apply_executive_synthesis:
             self.outline = synthesize_executive(slides, audience=eff_audience)
