@@ -66,6 +66,8 @@ CANONICAL_VIZ_TYPES = {
     "process_flow":          "Fluxograma com etapas e setas",
     "bullet_list":           "Lista pura (USAR SO COMO ULTIMO RECURSO)",
     "card_grid":             "Card grid (LEGACY — manter para compat)",
+    # PR-A (chart-CEO SPEC): tipo donut adicionado ao catalog canonico.
+    "donut":                 "Donut chart com hero number central (distribuicao)",
 }
 
 # Tipos considerados "visualization nao-textual" para o gate de 30% (P0.2)
@@ -79,6 +81,8 @@ NON_TEXTUAL_VIZ_TYPES = frozenset({
     "hero_number",
     "risk_heatmap",
     "process_flow",
+    # PR-A (chart-CEO SPEC): donut counts as non-textual viz for P0.2 gate.
+    "donut",
 })
 
 
