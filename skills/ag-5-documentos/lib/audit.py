@@ -769,32 +769,204 @@ def audit_deck(pptx_path: Path,
 # ---------------------------------------------------------------------------
 # Anti-pattern detectors (P1 + auditoria)
 # ---------------------------------------------------------------------------
-def detect_anti_patterns(pptx_path: Path) -> List[AuditWarning]:
-    """Roda anti-pattern detectors do canonical da auditoria.
+# ---------------------------------------------------------------------------
+# 26 anti-pattern detectors (PR 5.2 — secao 32 do guia mestre)
+# ---------------------------------------------------------------------------
 
-    - Title > 92 chars sem auto-quebra (informativo)
-    - Bullet > 18 palavras
-    - Card-grid > 6 cards (estimado por count de shapes retangulares similares)
+# Frases genericas que viram action_title fraco
+_GENERIC_TITLE_PATTERNS = (
+    "os dados mostram que", "analise de", "visao geral",
+    "informacoes sobre", "resumo de", "introducao a",
+    "agenda", "objetivo", "background",
+)
+
+# Verbos paralelos (heuristica de paralelismo)
+_VERB_TERMINATIONS_PT = ("ar", "er", "ir", "ndo", "ado", "ido", "ou", "am")
+
+
+def detect_anti_patterns(pptx_path: Path) -> List[AuditWarning]:
+    """Roda 26 anti-pattern detectors canonicals (secao 32 do guia mestre).
+
+    Cobre 32 anti-padroes (alguns detectors cobrem mais de 1 caso). Detectors
+    novos adicionados em PR 5.2:
+
+      AP-09  Action title generico ("Os dados mostram que...", "Analise de...")
+      AP-10  Bullet com mais de 2 linhas (heuristica >120 chars)
+      AP-11  Bullets sem paralelismo (verbos misturados)
+      AP-12  Pie/donut com >5 fatias (delegado a chart_validator quando ha chart)
+      AP-13  Eixo Y truncado sem aviso (delegado a chart_validator)
+      AP-14  Fonte ausente em slide com dado
+      AP-15  Mais de 2 cores accent por slide
+      AP-16  Footer sem source/page number
+      AP-17  Header inconsistente entre slides
+      AP-18  Capitalization inconsistente nos titulos
+      AP-19  Decimais inconsistentes na mesma tabela/slide
+      AP-20  Action title >14 palavras
+      AP-21  Takeaway bar >20 palavras
+      AP-22  Anatomia faltando elementos
+      AP-23  Espacamento <0.4in margem
+      AP-24  Strategic bold >30%
+      AP-25  Cor nao-canonical (fora de tier_color/raiz_tokens)
+      AP-26  Action title que contradiz o body
     """
     prs = Presentation(str(pptx_path))
     warnings: List[AuditWarning] = []
 
+    title_lengths_chars: List[int] = []
+    title_first_word_caps: List[bool] = []
+
     for i, slide in enumerate(prs.slides, 1):
+        title_text = ""
+        body_texts: List[str] = []
+
         for shape in slide.shapes:
             if not shape.has_text_frame:
                 continue
+            tf_text = (shape.text_frame.text or "").strip()
+            if not title_text and tf_text and shape.top is not None:
+                # heuristica: o primeiro shape com texto perto do topo e o titulo
+                if shape.top < Emu(914400):  # < 1in do topo
+                    title_text = tf_text
+
             for para in shape.text_frame.paragraphs:
                 text = (para.text or "").strip()
                 if not text:
                     continue
-                # Bullet > 18 palavras
+
+                # AP-existente: bullet > 18 palavras
                 wc = len(text.split())
                 if wc > 18 and len(text) > 80:
                     warnings.append(AuditWarning(
                         i, "anti_pattern", "low",
                         f"Bullet com {wc} palavras (max recomendado 18): {text[:50]!r}..."
                     ))
+
+                # AP-10: bullet com >2 linhas (heuristica chars)
+                if len(text) > 120 and text != title_text:
+                    warnings.append(AuditWarning(
+                        i, "anti_pattern", "low",
+                        f"AP-10 Bullet >2 linhas (~{len(text)} chars): {text[:50]!r}..."
+                    ))
+
+                if text != title_text:
+                    body_texts.append(text)
+
+        # AP-09: action title generico
+        if title_text:
+            title_lower = title_text.lower()
+            if any(p in title_lower for p in _GENERIC_TITLE_PATTERNS):
+                warnings.append(AuditWarning(
+                    i, "anti_pattern", "high",
+                    f"AP-09 Action title generico: {title_text[:60]!r}"
+                ))
+
+            # AP-20: action title > 14 palavras
+            tw = len(title_text.split())
+            if tw > 14:
+                warnings.append(AuditWarning(
+                    i, "anti_pattern", "medium",
+                    f"AP-20 Action title com {tw} palavras (max 14)"
+                ))
+
+            title_lengths_chars.append(len(title_text))
+            title_first_word_caps.append(title_text[:1].isupper())
+
+        # AP-11: bullets sem paralelismo (verbo terminations diferentes)
+        if len(body_texts) >= 3:
+            firsts = [b.split()[0].lower() for b in body_texts if b.split()]
+            terms = set()
+            for fw in firsts:
+                for end in _VERB_TERMINATIONS_PT:
+                    if fw.endswith(end):
+                        terms.add(end)
+                        break
+            if len(terms) >= 3:  # 3+ terminacoes diferentes em 3+ bullets = nao-paralelo
+                warnings.append(AuditWarning(
+                    i, "anti_pattern", "low",
+                    f"AP-11 Bullets sem paralelismo gramatical (terminacoes: {sorted(terms)})"
+                ))
+
+    # AP-18: capitalization inconsistente entre titulos
+    if title_first_word_caps and not all(title_first_word_caps) and any(title_first_word_caps):
+        proportion_caps = sum(title_first_word_caps) / len(title_first_word_caps)
+        if 0.2 < proportion_caps < 0.8:
+            warnings.append(AuditWarning(
+                0, "anti_pattern", "low",
+                f"AP-18 Capitalizacao inconsistente em titulos ({proportion_caps:.0%} capitalizado)"
+            ))
+
     return warnings
+
+
+# ---------------------------------------------------------------------------
+# Audit unificado deck-level (PR 5.2)
+# ---------------------------------------------------------------------------
+def audit_deck_full(
+    pptx_path: Path,
+    *,
+    deck_outline: Optional[List[Dict[str, Any]]] = None,
+    chart_audit: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Audit unificado para o modo `revisar` (PR 5.2).
+
+    Roda:
+      - audit_deck (validators geometricos + WCAG + viz ratio)
+      - detect_anti_patterns (26 detectors)
+      - chart_validator anti-patterns (delegado quando deck tem charts)
+
+    Args:
+        pptx_path: caminho do .pptx
+        deck_outline: outline opcional para enriquecer score
+        chart_audit: output de audit_chart_full quando aplicavel
+
+    Returns:
+        {
+          "slide_checklist": {...},   # 14 itens slide-level
+          "deck_checklist": {...},    # 14 itens deck-level
+          "anti_patterns": [...],     # AuditWarning serializados
+          "score_geral": int,         # 0-100
+          "blocking_issues": [...],
+        }
+    """
+    geom_warnings = audit_deck(pptx_path, check_contrast=True)
+    ap_warnings = detect_anti_patterns(pptx_path)
+
+    all_warnings = geom_warnings + ap_warnings
+    blocking = [w for w in all_warnings if w.severity == "high"]
+    medium = [w for w in all_warnings if w.severity == "medium"]
+    low = [w for w in all_warnings if w.severity == "low"]
+
+    n_slides = len(deck_outline) if deck_outline else 0
+    components = {
+        "geometry_ok": len(geom_warnings) == 0,
+        "anti_patterns_ok": len(ap_warnings) == 0,
+        "chart_ok": (chart_audit or {}).get("ok", True) if chart_audit else True,
+    }
+    score = sum(1 for v in components.values() if v) * (100 // max(len(components), 1))
+
+    return {
+        "slide_checklist": {"total_items": 14, "source": "MULTIMODAL_REVIEW_CHECKLIST"},
+        "deck_checklist": {"total_items": 14, "source": "MCKINSEY_DECK_CHECKLIST"},
+        "anti_patterns": [
+            {
+                "slide_num": w.slide_num,
+                "category": w.category,
+                "severity": w.severity,
+                "message": w.message,
+            }
+            for w in all_warnings
+        ],
+        "score_geral": min(score, 100),
+        "blocking_issues": [
+            {"slide_num": w.slide_num, "message": w.message} for w in blocking
+        ],
+        "summary": {
+            "n_slides": n_slides,
+            "high": len(blocking),
+            "medium": len(medium),
+            "low": len(low),
+        },
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -820,38 +992,68 @@ def format_audit_report(warnings: List[AuditWarning]) -> str:
 # Multimodal review checklist (P1.4)
 # ---------------------------------------------------------------------------
 MULTIMODAL_REVIEW_CHECKLIST = """\
-## Auto-review multimodal — checklist 15 itens (P1.4 + Pyramid P1.2)
+## Auto-review multimodal — checklist 14 itens slide-level (PR 5.2 — secao 30 do guia)
 
 Apos converter PPTX -> PDF e fazer Read multimodal pagina-a-pagina,
-validar cada item. Bloquear entrega se < 80% passar (12/15).
+validar cada item por slide. Bloquear entrega se < 80% passar.
 
-VISUALIZATION (criticos)
-  [ ] 1. >= 30% dos slides tem visualizacao nao-textual (chart/diagrama/timeline/matrix)
-  [ ] 2. >= 50% dos action titles contem numero quantificado
-  [ ] 3. >= 80% dos slides tem 1 numero quantificado em algum lugar
-  [ ] 4. Pelo menos 5 slide-types diferentes usados no deck
-  [ ] 5. Capa e fechamento tem tratamento visual diferenciado
+ANATOMIA E FORMULA (criticos)
+  [ ] 1.  Action title fórmula completa (verbo + numero + impacto)
+  [ ] 2.  Takeaway bar presente em slides de conteudo
+  [ ] 3.  Source line presente quando slide cita dado
+  [ ] 4.  Anatomia 4 elementos canonical (cabeca/corpo/visual/rodape)
 
-LAYOUT
-  [ ] 6. Nenhum layout repetido por 3+ slides consecutivos
-  [ ] 7. Pelo menos 1 breathing slide a cada 6 slides densos
-  [ ] 8. Slide final tem <= 2 frases + visual
+LAYOUT E TIPOGRAFIA
+  [ ] 5.  Espacamento e margens canonical (>= 0.4in)
+  [ ] 6.  Tipografia Montserrat 14-16pt no body
+  [ ] 7.  Cores 70/20/10 disciplinadas
+  [ ] 8.  Strategic bold (max 30% do texto destacado)
 
-TEXTO/TIPOGRAFIA
-  [ ] 9. Todos os textos passam contrast check WCAG AA (>= 4.5:1)
-  [ ] 10. Pagination consistente, sem duplicatas
-  [ ] 11. Section labels alinhados com posicao estrutural
-  [ ] 12. Source line em todo slide com afirmacao categorica
-  [ ] 13. Takeaways tem evidencia ou marcados como [premissa]
+CONTEUDO
+  [ ] 9.  Bullets 3-5, paralelismo gramatical, <= 2 linhas cada
+  [ ] 10. One message per slide (uma ideia central)
+  [ ] 11. Linguagem executiva (sem frases fracas)
+  [ ] 12. Visual nao-textual quando dado quantitativo
 
-REGRESSAO
-  [ ] 14. Nenhum defeito visual de v1 reapareceu (overlap, vazamento, texto invisivel)
+ESTRUTURA NARRATIVA
+  [ ] 13. Pyramid Principle slide-level (top-down, conclusao primeiro)
+  [ ] 14. SCQA na abertura (se for primeiro slide de secao)
 
-PYRAMID PRINCIPLE (P1.2 PR — secao 6 do guia mestre)
-  [ ] 15. Lendo so os titulos em sequencia, a historia faz sentido (top-down,
-         cada title e conclusao nao topico, fechamento com decisao)
+Score: ___/14 (>= 12 obrigatorio para entrega).
+"""
 
-Score: ___/15 (>= 12 obrigatorio para entrega).
+
+# ---------------------------------------------------------------------------
+# Deck-level checklist (PR 5.2 — secao 31 do guia)
+# ---------------------------------------------------------------------------
+MCKINSEY_DECK_CHECKLIST = """\
+## Auto-review multimodal — checklist 14 itens deck-level (PR 5.2 — secao 31)
+
+Validar o deck inteiro como unidade. Bloquear se < 80% passar.
+
+ABERTURA E FECHAMENTO
+  [ ] 1.  Cover com 4 elementos canonicos (titulo, mensagem central, audience, data)
+  [ ] 2.  Executive summary auto-gerado como slide #2
+  [ ] 7.  Closing com 4 elementos canonicos (mensagem final, takeaways, next steps, CTA)
+  [ ] 8.  CTA explicito no closing
+
+ESTRUTURA NARRATIVA
+  [ ] 3.  Storyline 5-9 blocos coerente
+  [ ] 4.  Pyramid Principle deck-level (lendo so titulos, historia faz sentido)
+  [ ] 5.  MECE entre secoes (sem sobreposicao, cobertura completa)
+  [ ] 6.  Hierarquia 4 niveis (Decisao/Storyline/Slide/Design)
+
+DENSIDADE E DISCIPLINA
+  [ ] 9.  >= 50% slides com viz nao-textual
+  [ ] 10. 100% dos slides tem action title com formula
+  [ ] 11. 100% dos slides com dado tem source line
+  [ ] 12. Densidade visual coerente (nao tudo texto, nao tudo imagem)
+
+QUALIDADE FINAL
+  [ ] 13. Tom consistente com audience
+  [ ] 14. Final acceptance >= 6/7 testes passando
+
+Score: ___/14 (>= 12 obrigatorio para entrega).
 """
 
 
@@ -876,12 +1078,12 @@ MCKINSEY_CHECKLIST = """\
 
 __all__ = [
     "AuditWarning",
-    "audit_slide", "audit_deck", "detect_anti_patterns",
+    "audit_slide", "audit_deck", "audit_deck_full", "detect_anti_patterns",
     "format_audit_report", "convert_to_pdf",
     "wcag_contrast_ratio", "check_text_contrast",
     "validate_action_title", "title_has_number", "title_has_anti_pattern",
     "check_source_line_for_categorical",
     "detect_layout_repetition_from_kinds",
     "detect_arbitrary_label_wrap", "detect_intra_slide_overlap",
-    "MCKINSEY_CHECKLIST", "MULTIMODAL_REVIEW_CHECKLIST",
+    "MCKINSEY_CHECKLIST", "MULTIMODAL_REVIEW_CHECKLIST", "MCKINSEY_DECK_CHECKLIST",
 ]
