@@ -1,8 +1,10 @@
-"""Pipeline 7-fase para decks executivos (P0.1, P0.4, P1.4 da auditoria 2026-04-25).
+"""Pipeline 7-fase para decks executivos (P0.1, P0.4, P0.8, P1.4 da auditoria).
 
 Workflow:
 
   FASE 1 — SINTESE   : MD primeiro (estrutura e conteudo, review editorial)
+                       [P0.8] audience gate — auto-mask nomes proprios internos
+                       quando audience='external'/'board_external'
   FASE 2 — OUTLINE   : extrai slides do MD (estruturado)
   FASE 3 — VIZ       : visualization-first design (P0.1) — decide tipo de viz por slide
   FASE 4 — LAYOUT    : decisao de layout custom por slide (alimentado por viz)
@@ -22,6 +24,12 @@ Bypass: skip_review=True passa direto v1 -> v2 sem auditoria.
 Sintese executiva (P0.4):
   Antes da geracao, fundir secoes que compartilham 70%+ keywords ou tem
   relacao hierarquica. Reduz mapeamento 1:1 secao->slide.
+
+Audience gate (P0.8):
+  Quando audience='external' ou 'board_external', auto-mask nomes proprios
+  internos detectados via regex (capitalizados sem 'Raiz' prefix).
+  Ex: 'JusRaiz' -> 'plataforma juridica interna'. Usuario recebe warning
+  para revisar manualmente.
 """
 from __future__ import annotations
 
@@ -74,9 +82,110 @@ def _jaccard(a: List[str], b: List[str]) -> float:
     return len(set_a & set_b) / len(set_a | set_b)
 
 
+# ---------------------------------------------------------------------------
+# Audience gate (P0.8) — auto-mask nomes proprios internos para audiencias externas
+# ---------------------------------------------------------------------------
+# Audiencias permitidas
+_AUDIENCES_INTERNAL = frozenset({"internal", "team", "tech"})
+_AUDIENCES_EXTERNAL = frozenset({"external", "board_external", "investor", "press"})
+
+# Termos sempre permitidos (brand canonical)
+_BRAND_ALLOWLIST = frozenset({"Raiz", "RaizEducacao", "RAIZ", "rAIz"})
+
+# Pattern para detectar nomes proprios internos provaveis:
+# - CamelCase ou Pascal com 2+ sequencias (ex: JusRaiz, AutomataRaiz, AppRaiz)
+# - Nome capitalizado seguido de termo tecnico (ex: 'Sistema X', 'Plataforma Y')
+_INTERNAL_NAME_RE = re.compile(
+    r"\b([A-Z][a-z]+(?:[A-Z][a-z]+)+)\b"   # CamelCase: JusRaiz, AppRaiz
+    r"|\b([A-Z]{2,}[a-z]*[A-Z][a-z]+)\b"   # ALLCAPS+camel: HRRaiz
+)
+
+
+def detect_internal_names(text: str,
+                          allowlist: frozenset = _BRAND_ALLOWLIST) -> List[str]:
+    """Retorna lista de nomes proprios internos detectados (excluindo brand)."""
+    matches = []
+    for m in _INTERNAL_NAME_RE.finditer(text):
+        name = m.group(0)
+        if name in allowlist:
+            continue
+        if name not in matches:
+            matches.append(name)
+    return matches
+
+
+def mask_internal_names(text: str,
+                        replacement: str = "plataforma interna",
+                        allowlist: frozenset = _BRAND_ALLOWLIST) -> tuple:
+    """Aplica auto-mask de nomes proprios internos.
+
+    Retorna tupla (texto_mascarado, lista_de_nomes_detectados_para_warning).
+    """
+    detected = detect_internal_names(text, allowlist=allowlist)
+    masked = text
+    for name in detected:
+        # Substituir via word boundary para evitar match parcial
+        masked = re.sub(rf"\b{re.escape(name)}\b", replacement, masked)
+    return masked, detected
+
+
+def apply_audience_gate(slides: List[Dict[str, Any]],
+                        audience: str = "internal",
+                        replacement: str = "plataforma interna") -> tuple:
+    """Aplica audience gate em lista de slides.
+
+    Args:
+        slides: lista de slides (cada um com title, message, bullets)
+        audience: 'internal' (no-op) ou 'external'/'board_external' (auto-mask)
+        replacement: texto de substituicao para nomes internos
+
+    Returns:
+        (slides_filtrados, warnings) — warnings = list de tuplas (slide_idx, names)
+    """
+    audience = (audience or "internal").lower().strip()
+    if audience not in _AUDIENCES_EXTERNAL:
+        return list(slides), []
+
+    filtered: List[Dict[str, Any]] = []
+    warnings: List[tuple] = []  # (slide_idx, [names])
+
+    for idx, s in enumerate(slides):
+        new_s = dict(s)
+        all_detected: List[str] = []
+
+        # Mascara em title, message
+        for field in ("title", "message"):
+            val = s.get(field)
+            if val and isinstance(val, str):
+                masked, detected = mask_internal_names(val, replacement=replacement)
+                new_s[field] = masked
+                all_detected.extend(detected)
+
+        # Mascara em bullets
+        bullets = s.get("bullets") or []
+        if bullets:
+            new_bullets = []
+            for b in bullets:
+                if isinstance(b, str):
+                    masked, detected = mask_internal_names(b, replacement=replacement)
+                    new_bullets.append(masked)
+                    all_detected.extend(detected)
+                else:
+                    new_bullets.append(b)
+            new_s["bullets"] = new_bullets
+
+        if all_detected:
+            warnings.append((idx, list(set(all_detected))))
+
+        filtered.append(new_s)
+
+    return filtered, warnings
+
+
 def synthesize_executive(slides: List[Dict[str, Any]],
                          keyword_threshold: float = 0.70,
-                         max_merge_chain: int = 3) -> List[Dict[str, Any]]:
+                         max_merge_chain: int = 3,
+                         audience: str = "internal") -> List[Dict[str, Any]]:
     """Funde slides com 70%+ de overlap de keywords.
 
     Estrategia:
@@ -88,11 +197,26 @@ def synthesize_executive(slides: List[Dict[str, Any]],
       slides: lista de dicts com 'title', 'message', 'bullets'
       keyword_threshold: threshold (default 0.70)
       max_merge_chain: max slides numa cadeia de merge (default 3)
+      audience: 'internal'|'external'|'board_external' (P0.8 audience gate)
 
     Retorna nova lista (nao muta original).
     """
     if not slides:
         return []
+
+    # P0.8 — audience gate ANTES do merge (se external, mascarar nomes)
+    audience_warnings: List[tuple] = []
+    if audience and audience.lower() in _AUDIENCES_EXTERNAL:
+        slides, audience_warnings = apply_audience_gate(slides, audience=audience)
+        if audience_warnings:
+            import warnings as _w
+            for idx, names in audience_warnings:
+                _w.warn(
+                    f"[P0.8 audience gate] Slide #{idx+1}: nomes proprios internos "
+                    f"detectados {names} mascarados para audience='{audience}'. "
+                    "Revise manualmente se a substituicao for adequada.",
+                    stacklevel=2,
+                )
 
     fused: List[Dict[str, Any]] = []
     skip = set()
@@ -148,10 +272,13 @@ class ExecutiveDeckPipeline:
     out_dir: Path
     brand: Brand = field(default_factory=get_brand)
     skip_review: bool = False
+    # P0.8 — audience gate (afeta sintese executiva)
+    audience: str = "internal"   # 'internal' | 'external' | 'board_external' | 'investor' | 'press'
 
     # State (preenchido em runtime)
     outline: List[Dict[str, Any]] = field(default_factory=list)
     viz_kinds: List[str] = field(default_factory=list)
+    audience_warnings: List[tuple] = field(default_factory=list)
 
     def __post_init__(self):
         self.out_dir = Path(self.out_dir).expanduser()
@@ -200,16 +327,30 @@ class ExecutiveDeckPipeline:
     # FASE 2 — OUTLINE (extrair slides estruturados do MD)
     # ------------------------------------------------------------------
     def synthesize_outline(self, slides: List[Dict[str, Any]],
-                           apply_executive_synthesis: bool = True) -> List[Dict[str, Any]]:
+                           apply_executive_synthesis: bool = True,
+                           audience: Optional[str] = None) -> List[Dict[str, Any]]:
         """Recebe lista bruta de slides e aplica sintese executiva (P0.4).
 
         Cada item e dict com 'title', 'message', 'bullets', 'source_section', etc.
         Retorna lista possivelmente reduzida (slides fundidos).
+
+        P0.8 — Se audience for external/board_external (passado aqui ou na
+        construcao da pipeline), aplica auto-mask de nomes proprios internos
+        antes do merge.
         """
+        # P0.8 — usa audience override se fornecido, senao da pipeline
+        eff_audience = (audience or self.audience or "internal")
+
         if apply_executive_synthesis:
-            self.outline = synthesize_executive(slides)
+            self.outline = synthesize_executive(slides, audience=eff_audience)
         else:
-            self.outline = list(slides)
+            # Sem merge — mas ainda aplica audience gate se external
+            if eff_audience.lower() in _AUDIENCES_EXTERNAL:
+                gated, warns = apply_audience_gate(slides, audience=eff_audience)
+                self.outline = gated
+                self.audience_warnings = warns
+            else:
+                self.outline = list(slides)
         # Persistir
         try:
             import json
@@ -404,4 +545,7 @@ class ExecutiveDeckPipeline:
 __all__ = [
     "ExecutiveDeckPipeline",
     "synthesize_executive",
+    "apply_audience_gate",
+    "detect_internal_names",
+    "mask_internal_names",
 ]
