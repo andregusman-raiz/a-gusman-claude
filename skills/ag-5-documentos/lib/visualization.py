@@ -68,6 +68,13 @@ CANONICAL_VIZ_TYPES = {
     "card_grid":             "Card grid (LEGACY — manter para compat)",
     # PR-A (chart-CEO SPEC): tipo donut adicionado ao catalog canonico.
     "donut":                 "Donut chart com hero number central (distribuicao)",
+    # PR-F (chart-CEO SPEC): retrofit de chart types ao catalog canonico.
+    "waterfall":             "Waterfall (P&L bridge / variacao sequencial)",
+    "bullet":                "Bullet chart (KPI vs target vs benchmark)",
+    "slope":                 "Slope chart (mudanca de ranking entre 2 periodos)",
+    "heatmap":               "Heatmap (intensidade em grid NxM, dado quantitativo)",
+    "combo":                 "Combo (barras + linha em eixo dual)",
+    "treemap":               "Treemap (hierarquia por area/proporcao)",
 }
 
 # Tipos considerados "visualization nao-textual" para o gate de 30% (P0.2)
@@ -83,6 +90,13 @@ NON_TEXTUAL_VIZ_TYPES = frozenset({
     "process_flow",
     # PR-A (chart-CEO SPEC): donut counts as non-textual viz for P0.2 gate.
     "donut",
+    # PR-F (chart-CEO SPEC): all matplotlib chart types count for P0.2 gate.
+    "waterfall",
+    "bullet",
+    "slope",
+    "heatmap",
+    "combo",
+    "treemap",
 })
 
 
@@ -214,6 +228,69 @@ DETECTION_RULES = [
             r"\b(top\s+\d|ranking)\b",
             r"\b(\d+\s*x|\d+\s*vezes)\s+(maior|menor|mais|menos)",
             r"\b\d+%\b.{0,40}\b\d+%\b",  # 2+ percentuais (comparacao)
+        ],
+        0.70,
+    ),
+    # PR-F (chart-CEO SPEC) — 6 novas rules para chart types matplotlib
+    (
+        "donut",
+        "Distribuicao percentual com hero number central — donut chart",
+        [
+            r"\b(distribuicao|share|fatia|fatias|composicao)\b.{0,40}\b\d+%",
+            r"\b(participacao|representa)\b.{0,30}\b\d{1,3}%",
+            r"\b(mix|breakdown)\b.{0,30}(receita|categoria)",
+        ],
+        0.72,
+    ),
+    (
+        "waterfall",
+        "Variacao sequencial com positives e negatives — waterfall (P&L bridge)",
+        [
+            r"\b(variacao|bridge|ponte)\b.{0,30}(receita|ebitda|lucro)",
+            r"\b(p&l|p&L|p\.l\.|pl\b)\b",
+            r"\b(de\s+R?\$?\s*\d+.{0,40}\s+para\s+R?\$?\s*\d+)\b",
+            r"\b(impulsionado por|drivers? de variacao|deltas?)\b",
+        ],
+        0.78,
+    ),
+    (
+        "bullet",
+        "KPI vs target vs benchmark — bullet chart",
+        [
+            r"\b(meta|alvo|target)\b.{0,30}(atingido|atingida|atingiu|cumprido)",
+            r"\b\d+%?\s*(?:da|do)\s+(?:meta|target|alvo)\b",
+            r"\b(benchmark|baseline)\b.{0,30}(supera|abaixo|acima)",
+            r"\b(scorecard|kpi\s+vs)\b",
+        ],
+        0.75,
+    ),
+    (
+        "slope",
+        "Mudanca de ranking entre 2 periodos — slope chart",
+        [
+            r"\b(saltou|caiu|subiu)\s+(?:de|da)\s+\d+.{0,15}(?:para|ao)\s+\d+",
+            r"\b(posicao|ranking|colocacao)\s+\d+.{0,20}(?:para|ao)\s+\d+",
+            r"\b(movimentacao|reposicionamento)\b.{0,30}ranking",
+        ],
+        0.72,
+    ),
+    (
+        "heatmap",
+        "Intensidade em grid NxM (dados quantitativos)",
+        [
+            r"\b(intensidade|matriz)\b.{0,40}(periodo|categoria|trimestre)",
+            r"\b(grid|grade)\b.{0,20}\d+\s*[x×]\s*\d+",
+            r"\b(performance|desempenho)\s+(?:por|x)\s+\w+\s+(?:e|x)\s+\w+",
+        ],
+        0.70,
+    ),
+    (
+        "combo",
+        "Barras + linha em eixo dual — combo chart",
+        [
+            r"\b(volume|receita|quantidade)\b.{0,40}\b(taxa|margem|percentual|%)",
+            r"\b(absoluto|absolutos)\b.{0,30}\b(relativo|relativos|%)",
+            r"\b(bar(?:ra)s?\s+(?:e|com)\s+linhas?|combo)\b",
         ],
         0.70,
     ),

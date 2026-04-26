@@ -675,7 +675,8 @@ def audit_deck(pptx_path: Path,
                min_viz_ratio: float = 0.30,
                return_quality_levels: bool = False,
                titles: Optional[List[str]] = None,
-               mece_exhibits: Optional[List[Dict[str, Any]]] = None) -> Any:
+               mece_exhibits: Optional[List[Dict[str, Any]]] = None,
+               chart_specs: Optional[List[Dict[str, Any]]] = None) -> Any:
     """Audita o deck inteiro.
 
     Args:
@@ -692,6 +693,11 @@ def audit_deck(pptx_path: Path,
                        a validar com MECE. Cada item e dict no formato:
                        {"slide_num": int, "items": List[str], "context": str}
                        Aciona mece_validator (LLM ou regex fallback).
+        chart_specs: PR-F (chart-CEO SPEC) — opcional, lista de dicts
+                     com {"slide_num": int, "spec": dict (ChartSpec.to_dict())}.
+                     Aciona ChartSpecValidator V01-V13 + AP01-AP08 por slide.
+                     Erros bloqueantes -> warnings severity=high; nao-bloqueantes
+                     -> severity por err.level (P1=medium, P2=low).
     """
     prs = Presentation(str(pptx_path))
     all_warnings: List[AuditWarning] = []
@@ -752,6 +758,39 @@ def audit_deck(pptx_path: Path,
                 ctx = exhibit.get("context")
                 snum = exhibit.get("slide_num", 0) or 0
                 all_warnings.extend(_vmw(items, context=ctx, slide_num=snum))
+        except ImportError:
+            pass
+
+    # PR-F (chart-CEO SPEC) — ChartSpecValidator V01-V13 + AP01-AP08 por slide
+    if chart_specs:
+        try:
+            from .chart_validator import (
+                ChartAntiPatternDetector,
+                ChartSpecValidator,
+            )
+            for entry in chart_specs:
+                spec_dict = entry.get("spec") if isinstance(entry, dict) else None
+                snum = entry.get("slide_num", 0) if isinstance(entry, dict) else 0
+                if not isinstance(spec_dict, dict):
+                    continue
+                # V01-V13
+                for err in ChartSpecValidator(spec_dict).validate():
+                    sev = "high" if err.bloqueante else (
+                        "medium" if err.level == "P1" else "low"
+                    )
+                    all_warnings.append(AuditWarning(
+                        snum, f"chart_{err.code}", sev,
+                        f"Chart spec {err.code} ({err.level}): {err.message}"
+                    ))
+                # AP01-AP08
+                detections = ChartAntiPatternDetector().detect(spec_dict)
+                for ap in detections:
+                    sev = "high" if ap.severity == "error" else "medium"
+                    all_warnings.append(AuditWarning(
+                        snum, f"chart_{ap.code}", sev,
+                        f"Chart anti-pattern {ap.code}: {ap.message} "
+                        f"(suggestion: {ap.suggestion})"
+                    ))
         except ImportError:
             pass
 
