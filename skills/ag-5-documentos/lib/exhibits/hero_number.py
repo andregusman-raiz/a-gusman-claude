@@ -4,10 +4,18 @@ Input spec:
     {
         "number": "$40M",       # str — numero/valor a exibir grande
         "context": "economia/ano da Klarna ao substituir 700 atendentes por 1 IA",
+                                # HARD LIMIT: 1 frase, max 12 palavras (P1.6d)
+                                # Excedente sera truncado e movido para takeaway.
         "kicker": "ECONOMIA ANUAL",   # opcional, label acima do numero
         "source":  "Reuters, 2024",   # opcional, fonte
         "size_pt": 100,         # opcional, tamanho da fonte do numero (60-100)
     }
+
+P1.6d — Caption HARD LIMIT:
+  - Maximo 1 frase, 12 palavras (caracteres ate primeiro ponto/excl/inter)
+  - Se input > 12 palavras: truncar com elipse "…"
+  - NAO empilhar texto adicional abaixo do hero number
+  - Excess sera retornado em spec['_overflow_to_takeaway'] para caller
 """
 from __future__ import annotations
 
@@ -31,29 +39,70 @@ EXAMPLE_INPUT = {
 }
 
 
+CAPTION_MAX_WORDS = 12  # P1.6d HARD LIMIT
+
+
+def _enforce_caption_limit(text: str, max_words: int = CAPTION_MAX_WORDS) -> tuple:
+    """Aplica HARD LIMIT no caption: 1 frase, max N palavras.
+
+    Returns (caption_truncado, overflow_text).
+    overflow_text e o que foi cortado (para enviar a takeaway_bar).
+    """
+    if not text:
+        return "", ""
+    # Pegar apenas a primeira frase (ate ponto/excl/inter)
+    import re as _re
+    first_sentence_match = _re.match(r"([^.!?]+[.!?]?)", text.strip())
+    first = first_sentence_match.group(1).strip() if first_sentence_match else text.strip()
+    rest = text.strip()[len(first):].strip()
+
+    words = first.split()
+    if len(words) <= max_words:
+        return first, rest
+    truncated = " ".join(words[:max_words]) + "…"
+    overflow = " ".join(words[max_words:])
+    if rest:
+        overflow = (overflow + " " + rest).strip()
+    return truncated, overflow
+
+
 def render(slide, spec: dict, brand: Brand = None) -> None:
     """Renderiza hero number layout em slide.
 
     Convencao de posicionamento:
       - Kicker (top-left, 0.6in)
       - Numero centralizado (linha do meio do slide)
-      - Tese (uma linha abaixo, max 2 linhas)
+      - Caption HARD LIMIT 12 palavras (P1.6d)
       - Source (rodape, italico cinza)
+
+    P1.7 — Brand semantics:
+      - Side panel/kicker: brand.accent_strong (laranja em raiz)
+      - Numero/divisor accent: brand.accent_moderate (teal em raiz)
     """
     b = brand or get_brand()
 
     number = str(spec.get("number") or "").strip()
-    context = str(spec.get("context") or "").strip()
+    context_raw = str(spec.get("context") or "").strip()
     kicker = str(spec.get("kicker") or "").strip()
     source = str(spec.get("source") or "").strip()
     size_pt = int(spec.get("size_pt") or 100)
     size_pt = max(60, min(110, size_pt))
 
-    # Kicker (label acima do numero)
+    # P1.6d — Aplicar HARD LIMIT no caption
+    context, overflow = _enforce_caption_limit(context_raw, CAPTION_MAX_WORDS)
+    if overflow:
+        # Expor overflow para caller — pode ir para takeaway_bar
+        spec["_overflow_to_takeaway"] = overflow
+
+    # P1.7 — accent_strong para kicker (high impact label)
+    accent_strong = getattr(b, "accent_strong", b.accent)
+    accent_moderate = getattr(b, "accent_moderate", b.accent)
+
+    # Kicker (label acima do numero) — strong tier
     if kicker:
         add_tb(slide, MARGIN_L, Inches(2.0), CONTENT_W, Inches(0.4),
                kicker.upper(),
-               size=FONT_SIZE["kicker"] + 2, bold=True, color=b.accent,
+               size=FONT_SIZE["kicker"] + 2, bold=True, color=accent_strong,
                font=b.font_heading, align=PP_ALIGN.CENTER, line_spacing=1.0)
 
     # Numero gigante (centro vertical do slide)
@@ -63,14 +112,12 @@ def render(slide, spec: dict, brand: Brand = None) -> None:
            font=b.font_heading, align=PP_ALIGN.CENTER,
            anchor=MSO_ANCHOR.MIDDLE, line_spacing=1.0)
 
-    # Tese (max 2 linhas, sublinhar com accent)
-    add_tb(slide, MARGIN_L + Inches(1.5), Inches(4.7),
-           CONTENT_W - Inches(3.0), Inches(0.04),
-           "", color=b.accent)  # placeholder
+    # Divisor accent — moderate tier (P1.7 disciplinado)
     add_rect(slide, MARGIN_L + Inches(3.0), Inches(4.65),
-             Inches(7.3), Inches(0.06), fill=b.accent)
+             Inches(7.3), Inches(0.06), fill=accent_moderate)
 
-    add_tb(slide, MARGIN_L, Inches(4.85), CONTENT_W, Inches(1.2),
+    # Caption (1 frase, hard limit aplicado)
+    add_tb(slide, MARGIN_L, Inches(4.85), CONTENT_W, Inches(0.7),
            context,
            size=FONT_SIZE["h2"], color=b.fg_primary, italic=False,
            font=b.font_body, align=PP_ALIGN.CENTER, line_spacing=1.3)
