@@ -72,25 +72,48 @@ STATUS_WARNING     = COLORS["status"]["warning"]["hex"]         # #E8A820
 STATUS_DANGER      = COLORS["status"]["danger"]["hex"]          # #DC3545
 STATUS_INFO        = COLORS["status"]["info"]["hex"]            # #3B82F6
 
-# Typography
-FONT_HEADING = TYPO["fonts"]["heading"]["family"]  # "IBM Plex Sans"
-FONT_BODY    = TYPO["fonts"]["sans"]["family"]     # "IBM Plex Sans"
+# Typography — Montserrat canonical (guia mestre secoes 16.2/16.3, 2026-04-25)
+# Fallback Helvetica e' aplicado em pptx_utils._resolve_font_path quando .ttf
+# nao esta instalado no sistema (mede via Pillow).
+FONT_HEADING = TYPO["fonts"]["heading"]["family"]  # "Montserrat"
+FONT_BODY    = TYPO["fonts"]["sans"]["family"]     # "Montserrat"
 FONT_MONO    = TYPO["fonts"]["mono"]["family"]     # "IBM Plex Mono"
 
-# Tipografia canonica PPTX (mapeada da escala text-xs → text-[30px])
+# Tipografia canonica PPTX — guia mestre 14-16pt corpo / 26-28pt h1 / 32-44pt section
+# Migracao 2026-04-25: bumps em corpo, subtitulo, takeaway, label, h*, hero (incl novo `section`, `table`).
+# Para reverter um layout especifico ao tamanho legacy, importar `FONT_SIZE_LEGACY` e usar o valor.
 FONT_SIZE = {
-    "kicker":    9,    # SECTION KICKER no chrome
-    "caption":   9,    # captions, source lines
-    "body_sm":   10,   # body compact, bullets
-    "body":      11,   # body padrao em slides
-    "subtitle":  12,   # subtitulo abaixo do action title
-    "takeaway":  12,   # takeaway bar
-    "label":     13,   # labels destacados em cards
-    "h3":        15,   # titulos de cards/quadrantes
-    "h2":        18,   # titulos secundarios
-    "h1":        24,   # action title (escala text-2xl)
-    "hero":      36,   # KPIs medios
-    "hero_xl":   52,   # KPIs grandes em capa
+    "kicker":     9,   # SECTION KICKER no chrome
+    "caption":    9,   # captions, source lines
+    "body_sm":   12,   # body compact (era 10)
+    "body":      14,   # body padrao em slides (era 11) — guia 14-16
+    "subtitle":  16,   # subtitulo abaixo do action title (era 12) — guia 14-18
+    "takeaway":  14,   # takeaway bar (era 12)
+    "label":     14,   # labels destacados em cards (era 13)
+    "h3":        16,   # titulos de cards/quadrantes (era 15)
+    "h2":        20,   # titulos secundarios (era 18)
+    "h1":        28,   # action title (era 24) — guia 26-30
+    "section":   36,   # NOVO: titulo de secao em divisor (guia 32-44)
+    "hero":      40,   # KPIs medios (era 36) — guia 32-56
+    "hero_xl":   56,   # KPIs grandes em capa (era 52)
+    "table":     11,   # NOVO: texto em tabela (guia 9-12)
+}
+
+# Escape hatch — manter valores antigos disponiveis para layouts legacy
+# que dependem das medidas pre-migracao Montserrat (2026-04-25).
+FONT_SIZE_LEGACY = {
+    "kicker":    9,
+    "caption":   9,
+    "body_sm":  10,
+    "body":     11,
+    "subtitle": 12,
+    "takeaway": 12,
+    "label":    13,
+    "h3":       15,
+    "h2":       18,
+    "h1":       24,
+    "hero":     36,
+    "hero_xl":  52,
 }
 
 
@@ -109,5 +132,5 @@ __all__ = [
     "RAIZ_TEAL", "RAIZ_TEAL_DARK", "RAIZ_TEAL_LIGHT",
     "BG_LIGHT", "SURFACE", "FG_PRIMARY", "FG_MUTED", "BORDER_LINE", "SIDEBAR",
     "STATUS_SUCCESS", "STATUS_WARNING", "STATUS_DANGER", "STATUS_INFO",
-    "FONT_HEADING", "FONT_BODY", "FONT_MONO", "FONT_SIZE",
+    "FONT_HEADING", "FONT_BODY", "FONT_MONO", "FONT_SIZE", "FONT_SIZE_LEGACY",
 ]

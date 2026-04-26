@@ -16,6 +16,7 @@ from typing import Optional
 from pptx.dml.color import RGBColor
 
 from .. import raiz_tokens as rz
+from ..pptx_utils import resolve_font_family
 
 
 @dataclass(frozen=True)
@@ -76,7 +77,7 @@ class Brand:
 
 
 def raiz_brand() -> Brand:
-    """Brand default — rAIz Educacao (orange + teal + IBM Plex Sans).
+    """Brand default — rAIz Educacao (orange + teal + Montserrat).
 
     [P1.7] Brand semantics:
       - accent_strong  = RAIZ_ORANGE (#F7941D) — capa, hero, divisor critico
@@ -102,9 +103,9 @@ def raiz_brand() -> Brand:
         warning      = rz.STATUS_WARNING,
         danger       = rz.STATUS_DANGER,
         info         = rz.STATUS_INFO,
-        font_heading = rz.FONT_HEADING,
-        font_body    = rz.FONT_BODY,
-        description  = "rAIz Educacao — orange + teal · IBM Plex Sans",
+        font_heading = resolve_font_family(rz.FONT_HEADING, fallback="Helvetica"),
+        font_body    = resolve_font_family(rz.FONT_BODY,    fallback="Helvetica"),
+        description  = "rAIz Educacao — orange + teal · Montserrat",
         # P1.7 — brand semantics tiers
         accent_strong   = rz.RAIZ_ORANGE,   # #F7941D — high impact (capa, hero)
         accent_moderate = rz.RAIZ_TEAL,     # #5BB5A2 — medium (takeaway, divider)
