@@ -1,0 +1,99 @@
+# Slide Template canonical (PR 5.3 — secao 27 do guia mestre executive)
+#
+# Catalogo de slides canonicos, exhibits, chart types e storylines.
+# Consumido por: pipeline.py, exhibits/, storyline_templates.py, mckinsey_pptx.py.
+
+version: 1
+last_updated: "2026-04-26"
+source: "secao 27 do guia mestre — slide template canonical"
+
+canonical_slides:
+  cover:
+    elements: [title, central_message, audience, date_author]
+    description: "Capa com 4 elementos canonicos"
+
+  section_divider:
+    elements: [section_label, accent_bar]
+    description: "Divisor de secao com label + barra de acento"
+
+  exec_summary:
+    auto_insert_at: 2
+    elements: [recommendation, three_kpis, three_takeaways]
+    description: "Resumo executivo auto-gerado como slide #2"
+
+  scqa:
+    sections: [situation, complication, question, answer]
+    description: "Abertura SCQA — situacao, complicacao, questao, resposta"
+
+  one_pager:
+    layout: 3x2
+    elements: [recommendation, kpis, takeaways, source]
+    description: "One-pager com layout 3x2"
+
+  closing:
+    elements: [final_message, three_takeaways, next_steps, cta]
+    description: "Fechamento com 4 elementos canonicos"
+
+# 19 tipos canonicos de exhibit
+exhibit_types:
+  - matrix_2x2
+  - matrix_3x3
+  - timeline_horizontal
+  - timeline_vertical
+  - process_flow
+  - quadrant
+  - waterfall
+  - pyramid
+  - stack_bar
+  - bullet_list
+  - kpi_row
+  - table
+  - callout
+  - one_pager
+  - histogram
+  - funnel
+  - driver_tree
+  - raci_matrix
+  - exec_summary
+
+# 18 tipos canonicos de chart (alinhado com SPEC chart-CEO)
+chart_types:
+  - bar_horizontal
+  - bar_vertical
+  - bar_stacked
+  - bar_grouped
+  - line
+  - line_multi
+  - area
+  - area_stacked
+  - pie
+  - donut
+  - waterfall
+  - bullet
+  - heatmap
+  - scatter
+  - bubble
+  - histogram
+  - sparkline
+  - combo
+
+# 6 templates canonicos de storyline
+storyline_templates:
+  - id: scqa
+    name: "SCQA (McKinsey classico)"
+    blocks: [situation, complication, question, answer]
+  - id: problem_solution
+    name: "Problema -> Solucao"
+    blocks: [problem, root_cause, solution, impact]
+  - id: recommendation_first
+    name: "Pyramid: Recomendacao primeiro"
+    blocks: [recommendation, supporting_evidence_1, supporting_evidence_2, supporting_evidence_3]
+  - id: before_after
+    name: "Antes vs Depois"
+    blocks: [before_state, gap, intervention, after_state]
+  - id: chronological
+    name: "Cronologico"
+    blocks: [past, present, future, decision]
+  - id: comparative
+    name: "Comparativo"
+    blocks: [option_a, option_b, criteria, recommendation]

@@ -510,6 +510,125 @@ path, ok, warnings = rb.build_and_verify()
 
 Mesmo fora do template, **R1-R5 continuam obrigatorias**.
 
+## Padrao Executive — referencia canonical (PR 5.3)
+
+Esta secao documenta os artefatos canonicos da skill em modo executive,
+finalizados em PR 5.3 (fechamento do plano de 18 PRs).
+
+### Prompt base canonical (modo executive — secao 34 do guia)
+
+Ao receber pedido de deck executivo, o agente deve aplicar o seguinte prompt
+master internamente antes de gerar:
+
+> **Voce e consultor McKinsey-grade.** Receba o briefing e produza um deck
+> que seja: (1) Pyramid-coerente top-down, (2) MECE entre secoes,
+> (3) com action title quantificado em 100% dos slides,
+> (4) viz nao-textual em >= 50% dos slides,
+> (5) source line em todo slide com dado,
+> (6) anatomia 4 elementos canonical em todos os slides de conteudo,
+> (7) cores 70/20/10 disciplinadas, tipografia Montserrat 14-16pt body,
+> (8) cover + executive summary auto-gerado + closing com CTA explicito.
+> Bloquear entrega se final_acceptance < 6/7 testes passando.
+
+### Tabela de validators
+
+| Validator | Modulo | Severidade | Bloqueante |
+|-----------|--------|------------|------------|
+| Pyramid Principle | `pyramid_validator.validate_pyramid_coherence` | high | sim |
+| MECE entre secoes | `mece_validator` | medium | warning |
+| Action title formula | `audit.validate_action_title` | high | sim |
+| Anatomia 4 elementos | `anatomy_validator` | high | sim |
+| One message per slide | `one_message_validator.detect_multi_message` | medium | warning |
+| Bullet quality | `bullet_validator` | medium | warning |
+| Lang executiva | `lang_validator.detect_weak_language` | medium | warning |
+| Spacing/margens | `spacing_audit` | medium | warning |
+| Cores 70/20/10 | `color_proportion_validator.audit_slide_color_proportion` | medium | warning |
+| Strategic bold <30% | `color_proportion_validator.audit_strategic_bold` | low | warning |
+| WCAG AA contrast | `audit.check_text_contrast` | high | sim |
+| Source line categorical | `audit.check_source_line_for_categorical` | medium | warning |
+| Layout repetition | `audit.detect_layout_repetition_from_kinds` | medium | warning |
+| Arbitrary label wrap | `audit.detect_arbitrary_label_wrap` | high | sim |
+| Intra-slide overlap | `audit.detect_intra_slide_overlap` | high | sim |
+| Chart V01-V13 | `chart_validator.ChartSpecValidator` | varia | parcial |
+| Chart anti-patterns AP01-AP08 | `chart_validator.ChartAntiPatternDetector` | varia | warning |
+| Final acceptance (7 testes) | `final_acceptance.run_final_acceptance` | high | sim (>=6/7) |
+
+### Tabela de exhibits canonical (19 tipos)
+
+`matrix_2x2`, `matrix_3x3`, `timeline_horizontal`, `timeline_vertical`,
+`process_flow`, `quadrant`, `waterfall`, `pyramid`, `stack_bar`, `bullet_list`,
+`kpi_row`, `table`, `callout`, `one_pager`, `histogram`, `funnel`,
+`driver_tree`, `raci_matrix`, `exec_summary`.
+
+Ver detalhes em `lib/configs/slide_template.yaml`.
+
+### Tabela de chart types canonical (18 tipos)
+
+`bar_horizontal`, `bar_vertical`, `bar_stacked`, `bar_grouped`, `line`,
+`line_multi`, `area`, `area_stacked`, `pie`, `donut`, `waterfall`, `bullet`,
+`heatmap`, `scatter`, `bubble`, `histogram`, `sparkline`, `combo`.
+
+Roadmap: implementacao do modulo `lib/charts/` segue SPEC chart-CEO em
+`docs/specs/ag-5-documentos-graficos-ceo/SPEC.md`. Atualmente o sistema valida
+specs (V01-V13) e detecta anti-patterns (AP01-AP08) via `chart_validator.py`.
+
+### Tabela de storylines canonical (6 templates)
+
+| ID | Nome | Blocos |
+|----|------|--------|
+| scqa | SCQA McKinsey | situation -> complication -> question -> answer |
+| problem_solution | Problema -> Solucao | problem -> root_cause -> solution -> impact |
+| recommendation_first | Pyramid: recomendacao primeiro | recommendation -> evidencia 1/2/3 |
+| before_after | Antes vs Depois | before -> gap -> intervention -> after |
+| chronological | Cronologico | past -> present -> future -> decision |
+| comparative | Comparativo | option_a -> option_b -> criteria -> recommendation |
+
+Detalhes em `lib/storyline_templates.py` + `lib/configs/slide_template.yaml`.
+
+### Padrao de resposta YAML
+
+Os modos `criar` e `revisar` emitem resposta YAML estruturada via
+`lib/response_schema.py`:
+
+- `emit_criar(payload)` -> YAML com deck_metadata, storyline_aplicado, outline,
+  chart_specs, validators_aplicados, final_acceptance_score, audit_warnings
+- `emit_revisar(payload)` -> YAML com deck_path, num_slides, issues_blocking,
+  issues_warning, chart_audit, sugestoes_correcao, score_geral
+
+Schemas Pydantic v2 garantem validacao + conformidade com SPEC chart-CEO.
+
+### Anti-patterns detectados (32 anti-padroes em 26 detectors)
+
+Cobertura unificada via:
+
+- `audit.detect_anti_patterns()` — detectors slide-level (AP-09 titulo
+  generico, AP-10 bullet >2 linhas, AP-11 paralelismo, AP-18 capitalization,
+  AP-20 titulo >14 palavras, bullet >18 palavras legacy)
+- `chart_validator.ChartAntiPatternDetector` — chart-specific (AP01-AP08)
+- `audit.audit_deck_full()` — output unificado para o modo `revisar`
+  (slide_checklist + deck_checklist + anti_patterns + score_geral)
+
+### Final acceptance (7 testes obrigatorios)
+
+`lib/final_acceptance.py::run_final_acceptance` executa 7 testes da secao 36
+do guia mestre. Bloqueio formal se `tests_passed < 6/7`. Componentes:
+
+1. Decision clarity (existe recomendacao explicita)
+2. Audience match (tom alinhado com audience)
+3. Storyline coherence (5-9 blocos sem buracos)
+4. Pyramid principle deck-level
+5. Briefing match (deck cobre todos os topicos do briefing)
+6. Visual ratio >= 30%
+7. Source presence em slides com dado
+
+### Configs canonicals YAML (PR 5.3)
+
+| Arquivo | Conteudo |
+|---------|----------|
+| `lib/configs/visual_style.yaml` | Tipografia, cores 70/20/10, spacing, paletas chart |
+| `lib/configs/slide_template.yaml` | 6 canonical slides + 19 exhibits + 18 charts + 6 storylines |
+| `lib/configs/principles.yaml` | 22 regras canonical + hierarchy_4_levels (decisao/storyline/slide/design) |
+
 ## Dependencias por Skill
 
 | Skill | Python | Node.js | Sistema |

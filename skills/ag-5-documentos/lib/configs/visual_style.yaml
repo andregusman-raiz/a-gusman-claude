@@ -1,0 +1,68 @@
+# Visual Style canonical (PR 5.3 — secao 26 do guia mestre executive)
+#
+# Source of truth para tipografia, cores, espacamento, e paletas de chart.
+# Consumido por: mckinsey_pptx.py, color_proportion_validator, chart_validator,
+#                 spacing_audit, anatomy_validator.
+
+version: 1
+last_updated: "2026-04-26"
+source: "secao 26 do guia mestre — visual style canonical"
+
+typography:
+  font_family: Montserrat
+  fallback: Helvetica
+  sizes:
+    h1: 28
+    h2: 24
+    h3: 20
+    body: 14
+    body_sm: 12
+    caption: 10
+  line_spacing: 1.15
+  strategic_bold_max_pct: 0.30  # max 30% do texto pode estar em bold
+
+colors:
+  palette: "70_20_10"
+  proportions:
+    neutral_pct: 0.70
+    brand_pct: 0.20
+    accent_pct: 0.10
+  primary_accent: "#F7941D"  # rAIz orange
+  secondary_accent: "#5B7FBF"
+  semantic:
+    problem: "#E63946"
+    gain: "#10B981"
+    attention: "#F59E0B"
+    secondary: "#718096"
+
+spacing:
+  margin_in: 0.5
+  min_margin_in: 0.4
+  line_spacing: 1.15
+  gutter_in: 0.25
+  card_padding_in: 0.2
+
+charts:
+  palette_categorical:
+    - "#F7941D"
+    - "#5B7FBF"
+    - "#10B981"
+    - "#A78BFA"
+    - "#F59E0B"
+  palette_diverging:
+    negative: "#E63946"
+    neutral: "#E5E7EB"
+    positive: "#10B981"
+  palette_sequential:
+    - "#FEEDD5"
+    - "#FBC785"
+    - "#F7A04E"
+    - "#F7941D"
+    - "#C97818"
+  max_categories_pie: 5
+  truncated_axis_warning: true
+
+slide_dimensions:
+  width_in: 13.333
+  height_in: 7.5
+  aspect_ratio: "16:9"

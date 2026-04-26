@@ -13,9 +13,24 @@
 #   - Severity refere-se a falha (regra violada). Bloqueio formal acontece via
 #     final_acceptance + audit gates conforme severity.
 
-version: 1
-last_updated: "2026-04-25"
-source: "secao 35 do guia mestre — 22 regras canonical"
+version: 2
+last_updated: "2026-04-26"
+source: "secao 35 do guia mestre — 22 regras canonical (PR 5.3 adiciona hierarchy_4_levels)"
+
+# PR 5.3 — Hierarquia canonical de 4 niveis (secao 35 do guia)
+hierarchy_4_levels:
+  - level: 1
+    name: decisao
+    description: "A decisao que o deck pretende informar/justificar"
+  - level: 2
+    name: storyline
+    description: "Sequencia narrativa de 5-9 blocos (scqa, problem_solution, etc.)"
+  - level: 3
+    name: slide
+    description: "Cada slide tem 1 mensagem (action_title + evidencia + visual)"
+  - level: 4
+    name: design
+    description: "Tokens, cores, tipografia, espacamento — disciplina visual"
 
 sempre:
   - id: SEMPRE-01
