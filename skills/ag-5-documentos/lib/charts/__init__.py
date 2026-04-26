@@ -28,9 +28,11 @@ from .base import (
 from .bar_chart import BarChart
 from .builder import ChartBuilder
 from .bullet_chart import BulletChart
+from .combo_chart import ComboChart
 from .donut_chart import DonutChart
 from .infographic_chart import InfographicChart
 from .line_chart import LineChart
+from .stacked_bar_chart import StackedBarChart
 from .waterfall_chart import WaterfallChart
 
 
@@ -52,8 +54,11 @@ CHART_REGISTRY = {
     "waterfall":     WaterfallChart,
     "bullet":        BulletChart,
     "infographic":   InfographicChart,
-    # PR-C/D/E will append here:
-    # "stacked_bar", "stacked100_bar", "combo",
+    # Composition / combo family (PR-C)
+    "stacked_bar":     StackedBarChart,
+    "stacked100_bar":  StackedBarChart,
+    "combo":           ComboChart,
+    # PR-D/E will append here:
     # "scatter", "heatmap",
     # "treemap", "driver_tree", "slope",
 }
@@ -75,4 +80,6 @@ __all__ = [
     "WaterfallChart",
     "BulletChart",
     "InfographicChart",
+    "StackedBarChart",
+    "ComboChart",
 ]
