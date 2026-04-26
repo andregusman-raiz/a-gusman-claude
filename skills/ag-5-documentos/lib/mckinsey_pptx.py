@@ -4,7 +4,8 @@ Todos os helpers aceitam um `Brand` (via palette_overrides.get_brand()). Se
 omitido, usam raiz() como default.
 
 Regras embutidas:
-  - Fonte default: IBM Plex Sans (raiz) ou override do brand
+  - Fonte default: Montserrat (raiz, guia mestre 16.2/16.3) com fallback
+    automatico para Helvetica se .ttf nao instalado (via pptx_utils)
   - Action title: auto-detecta 1 ou 2 linhas em >92 chars (empirico 24pt/12.3in)
   - Takeaway bar: barra lateral accent + texto italic+bold
   - Source line: italico cinza acima do footer
@@ -22,7 +23,11 @@ from pptx.oxml.ns import qn
 from pptx.util import Emu, Inches, Pt
 
 from .palette_overrides import Brand, get_brand
-from .raiz_tokens import FONT_SIZE, rgb
+from .pptx_utils import resolve_font_family
+from .raiz_tokens import FONT_BODY, FONT_SIZE, rgb
+
+# Resolve uma vez no import: Montserrat se instalado, senao Helvetica.
+_DEFAULT_FONT = resolve_font_family(FONT_BODY, fallback="Helvetica")
 
 # ---------------------------------------------------------------------------
 # Deck-wide constants (16:9, 13.333in x 7.5in)
@@ -79,7 +84,7 @@ def add_tb(slide, x, y, w, h, text: str, *,
            color: str = "#1A202C",
            align: PP_ALIGN = PP_ALIGN.LEFT,
            anchor: MSO_ANCHOR = MSO_ANCHOR.TOP,
-           font: str = "IBM Plex Sans",
+           font: str = _DEFAULT_FONT,
            line_spacing: float = 1.15):
     """Textbox com tipografia consistente. Suporta \\n para multi-linhas."""
     tb = slide.shapes.add_textbox(x, y, w, h)
