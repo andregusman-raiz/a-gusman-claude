@@ -200,9 +200,9 @@ STRONG_REPLACEMENTS: dict = {
 # em deck educacional/corporativo. Detectar 2+ dentro do mesmo deck = warning.
 # ---------------------------------------------------------------------------
 SYNONYM_GROUPS: List[List[str]] = [
-    # Educacional — venda/captacao/matricula
+    # Educacional — venda/captacao/matricula/leads (funil comercial)
     ["venda", "vendas", "captacao", "captacoes", "matricula", "matriculas",
-     "conversao", "conversoes"],
+     "conversao", "conversoes", "lead", "leads", "prospect", "prospects"],
     # Aluno/cliente/familia
     ["aluno", "alunos", "cliente", "clientes", "familia", "familias",
      "responsavel", "responsaveis"],
