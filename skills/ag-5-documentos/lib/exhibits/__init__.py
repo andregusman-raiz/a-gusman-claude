@@ -28,6 +28,7 @@ from .matrix_2x2 import render as render_matrix_2x2, EXAMPLE_INPUT as MATRIX_EXA
 from .process_flow import render as render_process_flow, EXAMPLE_INPUT as FLOW_EXAMPLE
 from .quote_slide import render as render_quote_slide, EXAMPLE_INPUT as QUOTE_EXAMPLE
 from .risk_heatmap import render as render_risk_heatmap, EXAMPLE_INPUT as RISK_EXAMPLE
+from .scqa_slide import render as render_scqa, EXAMPLE_INPUT as SCQA_EXAMPLE
 from .section_divider import render as render_section_divider, EXAMPLE_INPUT as SECTION_EXAMPLE
 from .stack_hierarchy import render as render_stack_hierarchy, EXAMPLE_INPUT as STACK_EXAMPLE
 from .timeline_horizontal import render as render_timeline_horizontal, EXAMPLE_INPUT as TIMELINE_EXAMPLE
@@ -43,6 +44,7 @@ RENDER_REGISTRY = {
     "process_flow":          render_process_flow,
     "quote_slide":           render_quote_slide,
     "risk_heatmap":          render_risk_heatmap,
+    "scqa":                  render_scqa,
     "section_divider":       render_section_divider,
     "stack_hierarchy":       render_stack_hierarchy,
     "timeline_horizontal":   render_timeline_horizontal,
@@ -57,6 +59,7 @@ EXAMPLE_INPUTS = {
     "process_flow":          FLOW_EXAMPLE,
     "quote_slide":           QUOTE_EXAMPLE,
     "risk_heatmap":          RISK_EXAMPLE,
+    "scqa":                  SCQA_EXAMPLE,
     "section_divider":       SECTION_EXAMPLE,
     "stack_hierarchy":       STACK_EXAMPLE,
     "timeline_horizontal":   TIMELINE_EXAMPLE,
@@ -74,6 +77,7 @@ __all__ = [
     "render_process_flow",
     "render_quote_slide",
     "render_risk_heatmap",
+    "render_scqa",
     "render_section_divider",
     "render_stack_hierarchy",
     "render_timeline_horizontal",
