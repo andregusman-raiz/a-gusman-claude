@@ -133,6 +133,37 @@ def meaning_color(meaning: str, variant: str = "base") -> str:
     return base
 
 
+# ---------------------------------------------------------------------------
+# PR-F retrofit (chart-CEO SPEC) — re-export chart palettes from charts.base.
+#
+# Allows external callers to import from `palette_overrides.raiz` without
+# pulling in matplotlib (heavy import). The re-export here is lazy via a
+# helper function, so simple users still get import-time access via:
+#
+#     from lib.palette_overrides.raiz import CHART_PALETTE_CATEGORICAL
+#
+# These constants come ultimately from raiz_tokens (no hex hardcoded).
+# ---------------------------------------------------------------------------
+CHART_PALETTE_CATEGORICAL = [
+    rz.RAIZ_ORANGE,        # primary highlight
+    rz.RAIZ_TEAL,          # secondary
+    rz.SIDEBAR,            # tertiary neutral dark
+    rz.RAIZ_ORANGE_LIGHT,  # quaternary soft
+    rz.FG_MUTED,           # quinary grey
+]
+CHART_PALETTE_DIVERGING = [rz.STATUS_DANGER, rz.BG_LIGHT, rz.STATUS_SUCCESS]
+CHART_PALETTE_SEQUENTIAL = [rz.RAIZ_TEAL_LIGHT, rz.RAIZ_TEAL, rz.RAIZ_TEAL_DARK]
+
+
+def chart_palette(name: str = "categorical"):
+    """Resolve a chart palette name to a list of hex strings."""
+    if name == "diverging":
+        return list(CHART_PALETTE_DIVERGING)
+    if name == "sequential":
+        return list(CHART_PALETTE_SEQUENTIAL)
+    return list(CHART_PALETTE_CATEGORICAL)
+
+
 __all__ = [
     "ACCENT_STRONG",   "ACCENT_STRONG_DARK",  "ACCENT_STRONG_LIGHT",
     "ACCENT_MODERATE", "ACCENT_MODERATE_DARK","ACCENT_MODERATE_LIGHT",
@@ -146,4 +177,9 @@ __all__ = [
     "MEANING_ATTENTION", "MEANING_ATTENTION_DARK", "MEANING_ATTENTION_LIGHT",
     "MEANING_SECONDARY", "MEANING_SECONDARY_DARK", "MEANING_SECONDARY_LIGHT",
     "meaning_color",
+    # PR-F retrofit — chart palettes
+    "CHART_PALETTE_CATEGORICAL",
+    "CHART_PALETTE_DIVERGING",
+    "CHART_PALETTE_SEQUENTIAL",
+    "chart_palette",
 ]
