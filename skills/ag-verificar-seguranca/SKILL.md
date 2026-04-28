@@ -1,6 +1,6 @@
 ---
 name: ag-verificar-seguranca
-description: "Auditoria de seguranca, qualidade e conformidade. OWASP Top 10, secrets scan, dependency audit. Use antes de deploy."
+description: "Auditoria de seguranca e conformidade — detecta SQL injection, XSS, CSRF (OWASP Top 10), varre secrets hardcoded, audita dependencias vulneraveis, verifica RLS. Use when running a security review, vulnerability scan, pre-deploy check, CVE audit, or checking for leaked secrets."
 model: sonnet
 argument-hint: "[projeto-path]"
 disable-model-invocation: true
@@ -24,7 +24,6 @@ Use the **Agent tool** with:
 Projeto: [CWD or user-provided path]
 Focus: [OWASP, secrets, deps, all]
 
-
 Executar auditoria de seguranca conforme foco solicitado. Verificar OWASP Top 10, secrets expostos, dependencias vulneraveis, RLS, e conformidade.
 Gerar relatorio com severidade e recomendacoes.
 ```
@@ -34,6 +33,7 @@ Gerar relatorio com severidade e recomendacoes.
 - After spawning, confirm to the user
 - READ-ONLY audit — does NOT fix issues, only reports findings
 - Supports focus modes: OWASP, secrets, deps, or all
+- After agent completes, verify audit-report.md exists with findings for all focus areas requested
 
 ## Output
 
@@ -73,22 +73,7 @@ Agent({
 - [ ] OWASP Top 10 coberto (A01-A10)?
 - [ ] Todas as issues tem remediacao sugerida?
 - [ ] Findings P0/P1 registrados como GitHub Issues via ag-registrar-issue?
+- [ ] Se quality gate falhar: re-run focused audit on failing area before reporting
 
-### Auditoria de Resiliencia
-Para cada dependencia externa (API, DB, servico), verificar:
-- [ ] **Circuit Breaker** presente? (evita cascading failure)
-- [ ] **Retry com backoff exponencial**? (com jitter, sem retry em 4xx)
-- [ ] **Timeout configurado**? (connection + read + total)
-- [ ] **Fallback definido**? (cache stale, valor padrao, degradacao)
-- [ ] **Health Check** implementado? (liveness + readiness)
-- [ ] **Idempotencia** em operacoes de escrita? (retry seguro)
-
-### Classificacao de Severidade — Resiliencia
-
-| Achado | Severidade |
-|--------|-----------|
-| Chamada externa sem timeout | P0 — CRITICO |
-| Retry sem backoff (loop infinito possivel) | P0 — CRITICO |
-| Sem circuit breaker em dependencia critica | P1 — ALTO |
-| Sem fallback para servico opcional | P2 — MEDIO |
-| Health check incompleto (so liveness) | P3 — BAIXO |
+### Resiliencia (dependencias externas)
+Verificar para cada API/DB/servico: timeout configurado (P0 se ausente), retry com backoff exponencial (P0 se loop infinito), circuit breaker em deps criticas (P1), fallback para servicos opcionais (P2), health checks liveness+readiness (P3).

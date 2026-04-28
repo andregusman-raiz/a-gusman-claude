@@ -1,6 +1,6 @@
 ---
 name: ag-refatorar-codigo
-description: "Reestruturacao sem mudanca de comportamento. Extrair modulo, renomear em cascata, reorganizar. Cada passo com commit. Use when refactoring code structure."
+description: "Reestruturacao sem mudanca de comportamento. Extrair modulo, renomear em cascata, reorganizar. Cada passo com commit. Use when refactoring code structure, extracting modules, renaming symbols across files, reorganizing project layout, or applying extract method/class patterns."
 model: sonnet
 argument-hint: "[modulo ou padrao a refatorar]"
 disable-model-invocation: true
@@ -24,12 +24,6 @@ Use the **Agent tool** with:
 Projeto: [CWD or user-provided path]
 Escopo: [module or pattern to refactor from $ARGUMENTS]
 
-
-## Output
-- refactor-report.md com analise antes/depois
-- Commits incrementais (1 por step de refatoracao)
-- Testes existentes continuam passando (zero regressao)
-
 Protocolo incremental:
 1. Mudar UMA coisa → Rodar testes → Pass → Commit
 2. Repetir ate completar escopo
@@ -43,9 +37,11 @@ Worktree isolation ativo.
 ## Important
 - ALWAYS spawn as Agent subagent — do NOT execute inline
 - After spawning, confirm to the user that the refactor agent is running
-- REFUSES to refactor without existing passing tests
+- REFUSES to refactor without existing passing tests — tests are the safety net
 - Each step is a separate commit for safe rollback
 - Uses worktree isolation
+- NEVER mix refactoring and feature changes in the same commit
+- After agent completes, verify refactor-report.md exists and all tests still pass
 
 ### Code Smell → Refactoring Map
 
@@ -58,9 +54,3 @@ Worktree isolation ativo.
 | Parametros demais (>3) | Introduce Parameter Object | Clean Code limit |
 | Feature Envy | Move Method | Metodo usa mais dados de outra classe |
 | Duplicacao | Extract Method + reuse | DRY |
-
-### Regras de Ouro para Refatoracao
-1. **NUNCA refatorar sem testes passando** — testes sao a rede de seguranca
-2. **NUNCA misturar refactoring e feature no mesmo commit** — impossibilita rollback
-3. **Cada passo deve manter testes verdes** — se quebraram, reverter imediatamente
-4. **Preferir refatoracoes pequenas e incrementais** — 5 commits pequenos > 1 commit grande

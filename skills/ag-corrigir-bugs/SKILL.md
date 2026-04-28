@@ -1,6 +1,6 @@
 ---
 name: ag-corrigir-bugs
-description: "Bugfix unificado com auto-routing. Triage (classificar bugs), Fix (1 bug + 5 gates), Batch (2-5 bugs em sprints), Parallel (6+ bugs em Agent Teams). Substitui ag-corrigir-bugs/24/25/26."
+description: "Bugfix unificado com auto-routing. Triage (classificar bugs), Fix (1 bug + 5 gates), Batch (2-5 bugs em sprints), Parallel (6+ bugs em Agent Teams). Use when fixing bugs, debugging errors, resolving defects, triaging issues, or batch-fixing multiple broken features."
 model: sonnet
 argument-hint: "[--triage|--fix|--batch|--parallel] [bugs ou path para diagnostico]"
 disable-model-invocation: true
@@ -40,7 +40,6 @@ Bugs: [lista de bugs — IDs, descricoes, path para diagnostico, ou inline]
 Branch: [branch atual ou nome para criar]
 Diagnostico: [path para bug_triage.md gerado por mode triage, se disponivel]
 
-
 Executar bugfix no modo indicado (ou auto-detect baseado na quantidade de bugs).
 Seguir todas as quality gates do modo selecionado.
 ```
@@ -53,6 +52,14 @@ Seguir todas as quality gates do modo selecionado.
 - For `--batch`: uses worktree isolation
 - For `--parallel`: uses Agent Teams with exclusive file ownership
 - Gates are blocking: if any gate fails, fix before proceeding
+- After agent completes, verify all targeted bugs have resolution status (fixed, escalated, or deferred)
+
+### Quality Gates (5 gates per fix)
+1. Root cause identified with evidence (file:line + reproduction)
+2. Fix targets root cause, not symptom
+3. Tests added or updated covering the bug scenario
+4. Existing tests still pass (zero regression)
+5. No new warnings or lint errors introduced
 
 ## Escalacao: Issues para Bugs Nao Resolvidos
 
@@ -72,13 +79,3 @@ Agent({
 Se um bug falha todas as tentativas de fix (gate nao passa):
 - Registrar via ag-registrar-issue com contexto das tentativas falhadas
 - Continuar com proximo bug (nao bloquear batch/parallel)
-
-## Migration Note
-
-This agent replaces:
-- ag-B-25 (diagnosticar-bugs) → mode `--triage`
-- ag-corrigir-bugs (fix-verificar) → mode `--fix`
-- ag-corrigir-bugs-batch → mode `--batch`
-- ag-B-24 (bugfix-paralelo) → mode `--parallel`
-
-All functionality, anti-patterns, quality gates, and workflows from the original agents are preserved in the merged agent definition.
