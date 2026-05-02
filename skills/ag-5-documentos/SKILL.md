@@ -19,6 +19,35 @@ metadata:
 /ag-5-documentos [modo] [path ou descricao]
 ```
 
+## Docs Location (OBRIGATORIO em todos os modos)
+
+Antes de salvar qualquer doc gerado, resolver `PROJECT_ROOT`:
+
+```bash
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+[ "$PROJECT_ROOT" = "$HOME/Claude" ] && {
+  # Workspace raiz nao e projeto. Perguntar qual projeto ao usuario.
+  # Listar opcoes: ls ~/Claude/GitHub/ ~/Claude/projetos/
+  exit 1
+}
+```
+
+Mapa de destinos por modo (todos relativos a `$PROJECT_ROOT`):
+- `executive`/`pptx`/`docx`/`pdf` → `$PROJECT_ROOT/docs/reports/<slug>.{pptx,docx,pdf}`
+- `spec` → `$PROJECT_ROOT/docs/specs/<slug>-spec.md`
+- `prd` → `$PROJECT_ROOT/docs/specs/<slug>-prd.md`
+- `adr` → `$PROJECT_ROOT/docs/adr/ADR-NNN-<slug>.md`
+- `report` → `$PROJECT_ROOT/docs/reports/<slug>.md` (textual) ou `$PROJECT_ROOT/docs/diagnosticos/` (tecnico)
+- `data-dict` → `$PROJECT_ROOT/docs/data-dictionaries/<schema>.md`
+- `api-doc` → `$PROJECT_ROOT/docs/api/<spec>.md`
+- `diagram` → `$PROJECT_ROOT/docs/diagrams/<slug>.{md,svg,png}`
+- `changelog` → `$PROJECT_ROOT/CHANGELOG.md`
+- `readme` → `$PROJECT_ROOT/README.md`
+
+Excecao legitima cross-project: salvar em `~/Claude/docs/workspace/...` com flag `--workspace-doc`.
+
+NUNCA salvar em `~/Claude/docs/` raiz — hook `docs-location-guard.sh` bloqueia. Detalhes: `~/Claude/.claude/shared/patterns/docs-location.md`.
+
 ## ⚠️ Pipeline 7-fase OBRIGATORIO (modo `executive` e `pptx --executive`)
 
 > **Atualizado em 2026-04-25** com P0/P1 da auditoria rigorosa

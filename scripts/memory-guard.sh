@@ -12,7 +12,7 @@ NC='\033[0m'
 # 1. Hard limit: max Claude CLI processes (MOST IMPORTANT CHECK)
 # Only count actual "claude" binary processes, not subprocesses that have "claude" in path
 CLAUDE_COUNT=$(ps aux | awk '$11 ~ /\/claude$/ || $11 == "claude"' | wc -l | tr -d ' ')
-MAX_CLAUDE=12
+MAX_CLAUDE=${CLAUDE_SESSION_LIMIT:-18}
 
 if [ "$CLAUDE_COUNT" -ge "$MAX_CLAUDE" ]; then
   echo -e "${RED}BLOCKED: $CLAUDE_COUNT sessoes Claude ativas (max: $MAX_CLAUDE)${NC}"
@@ -23,7 +23,7 @@ fi
 
 # 2. Hard limit: max Node processes (MCPs + tools)
 NODE_COUNT=$(pgrep -f "node" 2>/dev/null | wc -l | tr -d ' ')
-MAX_NODE=30
+MAX_NODE=${CLAUDE_NODE_PROC_LIMIT:-60}
 
 if [ "$NODE_COUNT" -ge "$MAX_NODE" ]; then
   echo -e "${RED}WARNING: $NODE_COUNT processos Node (max: $MAX_NODE). Cleaning...${NC}"

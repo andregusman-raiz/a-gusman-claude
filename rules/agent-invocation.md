@@ -21,7 +21,7 @@ paths:
 - 3+ independent tasks that need coordination
 - Each teammate gets exclusive file ownership (NO overlap)
 - TeamDelete IMMEDIATELY after teammates finish (memory safety)
-- Max 4 teammates (memory constraint: 36GB MacBook)
+- Max 6 teammates (memory constraint: 36GB MacBook — verificar `memory_pressure` antes de exceder 4)
 
 ## Worktree Isolation (code changes with rollback safety)
 - Use `isolation: "worktree"` when code changes might conflict or need rollback

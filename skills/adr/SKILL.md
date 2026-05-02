@@ -15,17 +15,27 @@ Criar ADRs (Architecture Decision Records) padronizados — registro permanente 
 
 > ADR responde "POR QUE escolhemos X em vez de Y". E um registro historico, nao um documento de planejamento.
 
+## Docs Location (OBRIGATORIO)
+
+```bash
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+[ "$PROJECT_ROOT" = "$HOME/Claude" ] && { echo "Erro: workspace raiz, nao projeto. ADRs cross-project vao em .claude/shared/adr/"; exit 1; }
+DEST="$PROJECT_ROOT/docs/adr/ADR-{NNN}-{slug}.md"
+```
+
+NUNCA salvar em `~/Claude/docs/adr/` — bloqueado por hook. Detalhes: `~/Claude/.claude/shared/patterns/docs-location.md`.
+
 ## Naming Convention
 
-- Projeto: `docs/adr/ADR-{NNN}-{slug}.md`
-- Workspace: `.claude/shared/adr/ADR-{NNN}-{slug}.md`
+- Projeto: `$PROJECT_ROOT/docs/adr/ADR-{NNN}-{slug}.md`
+- Workspace (cross-project): `.claude/shared/adr/ADR-{NNN}-{slug}.md`
 - Numero auto-incrementado a partir do ultimo ADR existente no diretorio
 
 ## Auto-Incremento
 
 ```bash
-# Detectar proximo numero
-LAST=$(ls docs/adr/ADR-*.md 2>/dev/null | sort -V | tail -1 | grep -oP 'ADR-\K\d+')
+# Detectar proximo numero (apos resolver PROJECT_ROOT)
+LAST=$(ls "$PROJECT_ROOT"/docs/adr/ADR-*.md 2>/dev/null | sort -V | tail -1 | grep -oP 'ADR-\K\d+')
 NEXT=$(printf "%03d" $((${LAST:-0} + 1)))
 ```
 
@@ -81,11 +91,12 @@ Escolhemos **Opcao [X]** porque [rationale principal em 1-2 frases].
 
 ## Workflow
 
-1. Criar diretorio `docs/adr/` se nao existir
-2. Detectar proximo numero de ADR (auto-incremento)
-3. Gerar slug a partir do titulo (lowercase, hifens, max 50 chars)
-4. Preencher template com contexto, opcoes e decisao
-5. Salvar em `docs/adr/ADR-{NNN}-{slug}.md`
+1. Resolver `PROJECT_ROOT` (ver "Docs Location" no topo) — abortar se for `~/Claude`
+2. Criar diretorio `$PROJECT_ROOT/docs/adr/` se nao existir
+3. Detectar proximo numero de ADR (auto-incremento)
+4. Gerar slug a partir do titulo (lowercase, hifens, max 50 chars)
+5. Preencher template com contexto, opcoes e decisao
+6. Salvar em `$PROJECT_ROOT/docs/adr/ADR-{NNN}-{slug}.md`
 
 ## Quando Criar ADR
 
