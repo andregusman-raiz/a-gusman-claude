@@ -10,6 +10,10 @@ disable-model-invocation: true
 
 Spawn the `ag-documentar-projeto` agent to create and maintain project documentation: README, API docs, guides, changelog, and ADRs.
 
+## Docs Location (OBRIGATORIO)
+
+Antes de salvar qualquer arquivo, resolver `PROJECT_ROOT` via `git rev-parse --show-toplevel` (ou usar o path do argumento). Se for `$HOME/Claude` (workspace raiz) — PARAR e perguntar qual projeto. Detalhes: `~/Claude/.claude/shared/patterns/docs-location.md`. Hook `docs-location-guard.sh` bloqueia escrita em `~/Claude/docs/`.
+
 ## Invocation
 
 Use the **Agent tool** with:

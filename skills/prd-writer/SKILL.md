@@ -15,11 +15,21 @@ Criar PRDs (Product Requirements Documents) padronizados — o documento que ant
 
 > PRD responde "O QUE e POR QUE". SPEC responde "COMO".
 
+## Docs Location (OBRIGATORIO)
+
+```bash
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+[ "$PROJECT_ROOT" = "$HOME/Claude" ] && { echo "Erro: workspace raiz, nao projeto"; exit 1; }
+DEST="$PROJECT_ROOT/docs/specs/{name}-prd.md"
+```
+
+NUNCA salvar em `~/Claude/docs/specs/` — bloqueado por hook. Detalhes: `~/Claude/.claude/shared/patterns/docs-location.md`.
+
 ## Naming Convention
 
-- Feature: `docs/specs/{feature-name}-prd.md`
-- Produto: `docs/specs/{product-name}-prd.md`
-- Issue: `docs/specs/issue-{N}-prd.md`
+- Feature: `$PROJECT_ROOT/docs/specs/{feature-name}-prd.md`
+- Produto: `$PROJECT_ROOT/docs/specs/{product-name}-prd.md`
+- Issue: `$PROJECT_ROOT/docs/specs/issue-{N}-prd.md`
 
 ## Template: PRD Completo
 
@@ -122,10 +132,10 @@ Como saber que funcionou? (metricas mensuráveis, nao feelings)
 1. **PRIMEIRO**: Ler `~/Claude/assets/design-library/catalog.md` — verificar se existe Modulo ou Produto que resolve o problema
    - Se sim: referenciar no PRD em "Pesquisa e Referencias" com link para solution spec
    - Extrair requisitos ja resolvidos (evita especificar do zero o que ja existe)
-2. Se existir `docs/ai-state/findings.md` — ler para contexto de pesquisa previa
+2. Se existir `$PROJECT_ROOT/docs/ai-state/findings.md` — ler para contexto de pesquisa previa
 3. Se existir issue GitHub — extrair contexto com `gh issue view N`
 4. Gerar PRD no template correto (completo se M+, minimal se S)
-5. Salvar em `docs/specs/{name}-prd.md`
+5. Salvar em `$PROJECT_ROOT/docs/specs/{name}-prd.md` (resolver PROJECT_ROOT primeiro — ver topo)
 6. PRD alimenta ag-especificar-solucao (SPEC tecnica)
 
 ## Checklist de Completude

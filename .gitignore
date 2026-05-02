@@ -8,6 +8,12 @@ docs/ai-state/findings.md
 # Skills workspace (generated eval data)
 skills-workspace/*/runs/
 skills-workspace/*/results/
+skills-workspace/*/launchd-stderr.log
+skills-workspace/*/launchd-stdout.log
+
+# Runtime locks and nested context
+scheduled_tasks.lock
+.claude/
 
 # OS files
 .DS_Store

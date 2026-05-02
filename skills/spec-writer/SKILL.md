@@ -13,11 +13,26 @@ metadata:
 
 Criar SPECs tecnicas padronizadas para features, issues e refactors.
 
+## Docs Location (OBRIGATORIO)
+
+Antes de salvar, resolver `PROJECT_ROOT` e validar:
+
+```bash
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+if [ "$PROJECT_ROOT" = "$HOME/Claude" ]; then
+  # PARAR — estou no workspace raiz, nao em projeto. Perguntar qual projeto.
+  exit 1
+fi
+DEST="$PROJECT_ROOT/docs/specs/{name}-spec.md"
+```
+
+NUNCA salvar em `~/Claude/docs/specs/` — hook `docs-location-guard.sh` bloqueia. Detalhes: `~/Claude/.claude/shared/patterns/docs-location.md`.
+
 ## Naming Convention
 
-- Feature: `docs/specs/{feature-name}-spec.md`
-- Issue: `docs/specs/issue-{N}-spec.md`
-- Refactor: `docs/specs/refactor-{scope}-spec.md`
+- Feature: `$PROJECT_ROOT/docs/specs/{feature-name}-spec.md`
+- Issue: `$PROJECT_ROOT/docs/specs/issue-{N}-spec.md`
+- Refactor: `$PROJECT_ROOT/docs/specs/refactor-{scope}-spec.md`
 
 ## Template: SPEC Completa
 
@@ -193,7 +208,7 @@ Antes de considerar SPEC pronta:
 ## Regras de Uso
 
 1. TODA issue implementada precisa de SPEC (nem bug simples escapa — usar minimal)
-2. SPECs vivem em `docs/specs/` e sao permanentes (nao deletar apos merge)
+2. SPECs vivem em `$PROJECT_ROOT/docs/specs/` e sao permanentes (nao deletar apos merge). NUNCA em `~/Claude/docs/specs/`.
 3. Criterios de aceite devem ser verificaveis automaticamente quando possivel
 4. Edge cases obrigatorios — minimo 3 por SPEC
 5. Out of Scope previne scope creep — sempre listar o que NAO sera feito
