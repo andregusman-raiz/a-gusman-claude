@@ -88,16 +88,18 @@ MacBook Pro M5 36GB RAM:
 
 | Cenário | Sessões | Subagents/sessão | Total |
 |---------|---------|------------------|-------|
-| Conservador | 2 | 2 | ~16GB |
-| Normal | 3 | 3 | ~27GB |
-| Agressivo | 4 | 3 | ~36GB |
-| **MAX (nunca exceder)** | **5** | **2** | **~35GB** |
+| Conservador | 1 | 4 | ~19GB |
+| Normal | 1 | 6 | ~25GB |
+| Agressivo | 2 | 5 | ~44GB (monitorar) |
+| **MAX (nunca exceder)** | **2** | **6** | **~50GB (override env)** |
 
-**Dentro de cada sessão (Agent Teams):**
-- Max 4 teammates simultâneos
+**Dentro de cada sessão (Agent Teams + subagents):**
+- **Max 6 subagents/teammates simultâneos por sessão** (era 4)
 - Cada teammate **sem subagents próprios** (flat, não nested)
 - `TeamDelete` **IMEDIATO** após teammates terminarem
-- Preferir sequencial (ex: `ag-corrigir-bugs`) quando < 6 tasks
+- Preferir sequencial (ex: `ag-corrigir-bugs`) quando < 8 tasks
+- **Acima de 6 simultâneos → BLOQUEADO** sem confirmação explícita do usuário
+- Subir para 6 simultâneos só com `memory_pressure` em **normal** (verificar antes de spawnar 5º+)
 
 **Monitoramento:**
 ```bash
