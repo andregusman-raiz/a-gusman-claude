@@ -13,6 +13,17 @@ metadata:
 
 Gerar relatorios estruturados e profissionais em Markdown.
 
+## Docs Location (OBRIGATORIO)
+
+```bash
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+[ "$PROJECT_ROOT" = "$HOME/Claude" ] && { echo "Erro: workspace raiz, nao projeto"; exit 1; }
+DEST="$PROJECT_ROOT/docs/{reports|diagnosticos}/<slug>.md"
+```
+
+Decidir entre `reports/` (executivo, sumario, sprint review) vs `diagnosticos/` (tecnico, RCA, analise de bug).
+NUNCA salvar em `~/Claude/docs/` — bloqueado por hook. Detalhes: `~/Claude/.claude/shared/patterns/docs-location.md`.
+
 ## Estrutura Padrao
 
 ```markdown
