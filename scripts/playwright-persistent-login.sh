@@ -49,7 +49,7 @@ Projetos disponiveis:
   jusraiz                 https://app.jusraiz.com
   salarios-platform       http://localhost:3000
   bi-raiz                 http://localhost:3000
-  biraiz                  https://biraiz.raizeducacao.com.br
+  biraiz                  \$BIRAIZ_URL (default: https://biraiz.\${COMPANY_DOMAIN:-example.com})
   supabase-studio         https://supabase.com/dashboard
   vercel-dashboard        https://vercel.com/dashboard
   hubspot                 https://app.hubspot.com
@@ -71,6 +71,8 @@ EOF
       ;;
   esac
 done
+
+BIRAIZ_URL="${BIRAIZ_URL:-https://biraiz.${COMPANY_DOMAIN:-example.com}}"
 
 PROJECT="${1:-}"
 URL="${2:-}"
@@ -101,7 +103,7 @@ get_default_url() {
     jusraiz)               echo "https://app.jusraiz.com" ;;
     salarios-platform)     echo "http://localhost:3000" ;;
     bi-raiz)               echo "http://localhost:3000" ;;
-    biraiz)                echo "https://biraiz.raizeducacao.com.br" ;;
+    biraiz)                echo "$BIRAIZ_URL" ;;
     supabase-studio)       echo "https://supabase.com/dashboard" ;;
     vercel-dashboard)      echo "https://vercel.com/dashboard" ;;
     hubspot)               echo "https://app.hubspot.com" ;;
