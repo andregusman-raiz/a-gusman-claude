@@ -386,10 +386,16 @@ fi
 
 # ── Summary ────────────────────────────────────────────────────────────────────
 echo ""
-AGENT_COUNT=$(ls "${REPO_DIR}/agents/"*.md 2>/dev/null | wc -l | tr -d ' ')
-SKILL_COUNT=$(ls -d "${REPO_DIR}/skills/"*/ 2>/dev/null | wc -l | tr -d ' ')
-RULE_COUNT=$(ls "${REPO_DIR}/rules/"*.md 2>/dev/null | wc -l | tr -d ' ')
-PATTERN_COUNT=$(ls "${REPO_DIR}/shared/patterns/"*.md 2>/dev/null | wc -l | tr -d ' ')
+# Note: pipefail is on, and ls returns non-zero when the glob has no match.
+# Wrap each in a subshell that always exits 0 so the count is just "0" instead of aborting.
+count_glob() {
+  local pattern="$1"
+  ( ls $pattern 2>/dev/null || true ) | wc -l | tr -d ' '
+}
+AGENT_COUNT=$(count_glob "${REPO_DIR}/agents/*.md")
+SKILL_COUNT=$(count_glob "${REPO_DIR}/skills/*/")
+RULE_COUNT=$(count_glob "${REPO_DIR}/rules/*.md")
+PATTERN_COUNT=$(count_glob "${REPO_DIR}/shared/patterns/*.md")
 
 echo -e "${GREEN}${BOLD}Installation complete!${NC}"
 echo ""
