@@ -22,6 +22,23 @@ prettier, tsconfig), .env.example, gitignore, CI base, README.
 /ag-criar-projeto [stack] [nome] → Direto com defaults inteligentes
 ```
 
+## Pre-Flight Obrigatório (gha-minimal)
+
+ANTES de gerar QUALQUER `.github/workflows/*.yml`, ler:
+
+```bash
+Read ~/Claude/.claude/rules/gha-minimal.md
+```
+
+**Default:** projeto novo NÃO recebe `.github/workflows/ci.yml`. Vercel CI cobre typecheck/lint/test em PRs.
+
+GHA só se enquadra na whitelist W1-W4 de `gha-minimal.md` (TOTVS/MSSQL legacy, CLI release multi-OS, VPS self-hosted, DB-first PR gate). Caso aplicável, header obrigatório no YAML:
+
+```yaml
+# JUSTIFICATIVA-GHA: <W1|W2|W3|W4> — <descrição>
+# ALTERNATIVA-DESCARTADA: <opção nativa avaliada e razão>
+```
+
 ## Shared Layer (OBRIGATORIO)
 
 Antes de gerar qualquer scaffolding, copiar templates de `~/.claude/shared/`:
@@ -34,8 +51,12 @@ cp -r ~/.claude/shared/templates/roadmap/ <project>/roadmap/templates/
 mkdir -p <project>/tests/e2e/shared/
 cp -r ~/.claude/shared/templates/e2e/ <project>/tests/e2e/shared/
 
-# 3. Templates de CI
-cp -r ~/.claude/shared/templates/ci-workflows/ <project>/.github/workflows/
+# 3. CI: NÃO copiar ci-workflows/ por default — Vercel CI cobre.
+#    Em vez disso, gerar localmente:
+#    - .husky/pre-commit (typecheck + lint via lint-staged)
+#    - vercel.json com buildCommand: "bun run check && bun run build"
+#    - package.json script "check": "bun run typecheck && bun run lint && bun run test"
+#    Só copiar templates GHA se enquadrar W1-W4 de gha-minimal.md
 
 # 4. Templates de database (se Supabase)
 cp -r ~/.claude/shared/templates/database/ <project>/supabase/templates/
@@ -58,11 +79,11 @@ Patterns em `~/.claude/shared/patterns/` e gotchas em `~/.claude/shared/gotchas/
 - Configs completas (linter, formatter, types)
 - `.env.example` documentado
 - `.gitignore` apropriado
-- `README.md` com seção de setup
+- `README.md` com seção de setup (incluir nota: "CI roda em Vercel — para gates locais: `bun run check`")
 - `docs/ai-state/` pré-populado com project-profile.json
 - `roadmap/` pre-populado com templates do .shared/
 - `tests/e2e/shared/` com base fixtures do .shared/
-- `.github/workflows/` com CI templates do .shared/
+- `.husky/pre-commit` + `vercel.json` (NÃO `.github/workflows/ci.yml` por default)
 - Git inicializado com primeiro commit
 
 ## Knowledge Search Setup

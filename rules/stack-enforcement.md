@@ -23,6 +23,9 @@ Antes de instalar qualquer dependência nova ou escolher tecnologia:
 | AI | AI Gateway + AI SDK v6 | API keys diretas |
 | Charts | Recharts | Chart.js |
 | Testes | Vitest + Playwright | Jest (novo), Cypress |
+| CI/CD | Vercel CI nativo + pre-commit (husky/lint-staged) | GHA custom workflows |
+| Cron / scheduled jobs | Supabase pg_cron, Railway cron, Vercel Cron | GHA `schedule` |
+| Security scan | GitHub Advanced Security + Dependabot (native) | GHA custom (codeql/secret-scan/OWASP) |
 
 ## Plugin skills canonical por stack area (ADR-0001)
 
@@ -51,10 +54,13 @@ Para cada escolha na tabela acima, use a skill oficial correspondente:
 | Infra não-Vercel (Railway) | `railway:use-railway` |
 | UI criativa | `frontend-design:frontend-design` |
 | Figma → código | `figma:figma-implement-design` |
+| CI/CD GHA (whitelisted only) | `.claude/rules/gha-minimal.md` (consultar antes) |
 
 ## Enforcement
 
 - ag-6-iniciar DEVE aplicar o template padrão ao criar projeto E invocar skills canonicals
+- ag-6-iniciar **NÃO** DEVE gerar `.github/workflows/ci.yml` por default (Vercel CI cobre)
 - ag-1-construir DEVE verificar deps antes de instalar
 - Se lib rejeitada for detectada em `npm install` → alertar o usuário
 - Ao configurar AI feature: preferir `vercel:ai-sdk` antes de escrever call direto a provider
+- Ao criar workflow GHA: consultar `.claude/rules/gha-minimal.md` (whitelist + justificativa obrigatória no YAML)
