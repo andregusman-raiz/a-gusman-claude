@@ -21,6 +21,7 @@ metadata:
 # 1. Carregar regras de stack no contexto (Read obrigatório)
 Read ~/Claude/.claude/rules/stack-enforcement.md
 Read ~/Claude/.claude/rules/package-manager.md
+Read ~/Claude/.claude/rules/gha-minimal.md
 
 # 2. Carregar design system Raiz (Read obrigatório se projeto tem UI)
 Read ~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md
@@ -38,6 +39,8 @@ test -f bun.lock && PM=bun || PM=npm   # NUNCA pnpm sem ADR
 - [ ] Tokens Raiz mapeados em `tailwind.config` (#F7941D, #5BB5A2)
 - [ ] Sentry SDK no plano
 - [ ] Vitest + Playwright no plano
+- [ ] **NÃO gerar `.github/workflows/ci.yml`** — Vercel CI cobre. Gerar `.husky/pre-commit` + `vercel.json` com `buildCommand` (ver `gha-minimal.md`)
+- [ ] Workflow GHA SOMENTE se enquadra na whitelist W1-W4 de `gha-minimal.md` (com header `JUSTIFICATIVA-GHA:`)
 
 **Se usuário pediu lib FORA whitelist:**
 1. PARAR e perguntar: "X não está na whitelist Raiz. Justificativa? Criamos ADR?"
