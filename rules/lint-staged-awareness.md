@@ -69,8 +69,15 @@ branch-strategy.md). Exceptions:
 
 ## Enforcement
 - Hook `lint-staged-preview.sh` (PostToolUse) — alerta quando eslint --fix muda arquivo
+- Hook `repo-lock.sh pre-bash` (PreToolUse Bash) — BLOQUEIA `git stash/checkout/switch/reset/clean/restore/rebase/merge/worktree` se outro PID Claude tem lock no repo. Previne stash contention que corrompeu branch state em 3 incidentes documentados (sessions q9 + worktree-paralel + clm-rebuild)
 - Rule `incremental-commits.md` — auto-fix de unused imports via bash-guards.sh
 - Rule `edit-persistence-safety.md` — verificar `git diff` apos edicoes
+
+## Bypass do repo-lock pre-bash
+Use APENAS quando certeza de zero contention:
+```bash
+REPO_LOCK_BYPASS=1 git stash pop
+```
 
 ## Debugging quando "linter reverteu"
 1. `git reflog -10` — ver historia de HEAD
