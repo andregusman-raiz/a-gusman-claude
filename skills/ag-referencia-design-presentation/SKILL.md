@@ -247,6 +247,6 @@ Prioridade sugerida (cobre 80% dos projetos novos):
 
 - Fonte original: vibeui.online (86 prompts curados)
 - Design library local: `~/Claude/assets/design-library/`
-- Raiz Design System: `~/Claude/assets/UI_UX/raiz-educacao-design-system.md`
+- Raiz Design System: `~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md`
 - Skill complementar (módulos internos): design-library/solutions + `~/Claude/assets/design-library/catalog.md`
 - Machine wrapper: `/ag-11-ux-ui` (consulta esta skill antes de gerar layout)

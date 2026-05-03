@@ -37,7 +37,7 @@ Avalia a qualidade visual/UX de um projeto comparando o que foi implementado con
 1. Playwright MCP disponivel (para screenshots)
 2. App rodando (localhost ou URL deployada)
 3. Design Library acessivel em `~/Claude/assets/design-library/`
-4. Design System em `~/Claude/assets/UI_UX/raiz-educacao-design-system.md`
+4. Design System em `~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md`
 
 ## Pipeline (5 fases)
 
@@ -103,7 +103,7 @@ Para cada tela capturada:
 Para cada tela, avaliar 6 dimensoes (0-10 cada):
 
 #### D1: Token Compliance (cores, fonts, spacing)
-Ler `~/Claude/assets/UI_UX/raiz-educacao-design-system.md` e verificar no screenshot + snapshot:
+Ler `~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md` e verificar no screenshot + snapshot:
 - [ ] Cores da marca (Orange #F7941D, Teal #5BB5A2) presentes?
 - [ ] IBM Plex Sans como font principal?
 - [ ] Spacing consistente com escala 4px?
