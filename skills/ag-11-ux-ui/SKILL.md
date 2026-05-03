@@ -89,7 +89,7 @@ dashboard, workflow, chat, marketing-site, admin-panel, form-wizard, data-table,
 
 ANTES de gerar qualquer design system ou componente, consultar:
 
-1. **Design System Oficial**: `~/Claude/assets/UI_UX/raiz-educacao-design-system.md` — tokens, cores, tipografia, spacing (para projetos rAIz)
+1. **Design System Oficial**: `~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md` — tokens, cores, tipografia, spacing (para projetos rAIz)
 2. **Catalogo de Solucoes**: `~/Claude/assets/design-library/catalog.md` — 24 solucoes curadas
 3. **Solution Specs**: `~/Claude/assets/design-library/solutions/NN-id/spec.md` — props, layout, CSS, deps
 4. **Componentes Base**: `~/Claude/assets/design-library/catalog/src/components/ui/` — 13 shadcn customizados
