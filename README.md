@@ -20,42 +20,69 @@ Claude Code is powerful but generic. This framework adds:
 
 ## Quick Start
 
+Three install paths — pick whichever matches what you already have. Full guide in [INSTALL.md](INSTALL.md).
+
+### A. Already have Claude Code or Cowork? Paste a prompt
+
+Open Claude and paste the prompt in [`prompts/install-prompt.md`](prompts/install-prompt.md). Claude detects your OS, installs every dependency, and runs the right installer. Works on macOS, Linux, WSL, and Windows.
+
+### B. Shell one-liner (no Claude Code yet)
+
+**macOS / Linux / WSL**
+
 ```bash
-# One-line install (clones repo + symlinks into .claude/ + auto-update hook)
 curl -fsSL https://raw.githubusercontent.com/andregusman-raiz/a-gusman-claude/main/install.sh | bash
-
-# Or clone manually
-git clone https://github.com/andregusman-raiz/a-gusman-claude.git ~/.gusman-claude
-bash ~/.gusman-claude/install.sh
-
-# Start Claude Code and use any machine
-claude
-# Then type: /ag-0-orquestrador [describe what you want]
-# Or directly: /ag-1-construir implement user auth
 ```
 
-### What install.sh does
+**Windows (PowerShell)**
 
-1. **Clones** the repo to `~/.gusman-claude/` (the source of truth)
-2. **Symlinks** `agents/`, `skills/`, `rules/`, `hooks/`, `shared/` into your `.claude/`
-3. **Installs auto-update hook** that `git pull`s latest on every session start (~1h throttle)
+```powershell
+irm https://raw.githubusercontent.com/andregusman-raiz/a-gusman-claude/main/install.ps1 | iex
+```
+
+### C. Clone first, audit, then install
+
+```bash
+git clone https://github.com/andregusman-raiz/a-gusman-claude.git ~/.gusman-claude
+less ~/.gusman-claude/install.sh
+bash ~/.gusman-claude/install.sh
+```
+
+### What the installer does
+
+1. **Pre-flights deps** — detects OS, asks once before installing missing `git`, `node>=20`, `gh`, Claude Code CLI via Homebrew / apt / dnf / pacman / winget
+2. **Clones** the repo to `~/.gusman-claude/` (or `%USERPROFILE%\.gusman-claude\` on Windows)
+3. **Symlinks** (or junctions on Windows) `agents/`, `skills/`, `rules/`, `hooks/`, `shared/` into your `.claude/`
+4. **Installs auto-update hook** that `git pull`s latest on every session start (~1h throttle)
 
 **Your files are never touched**: `settings.local.json`, `projects/`, memory — all yours.
+
+### After install
+
+```bash
+claude                                 # start Claude Code
+# inside Claude:
+/ag-0-orquestrador analyze this project
+```
+
+Optional MCP auth: `gh auth login`, then `claude mcp list` to see what's configured.
 
 ### Auto-update
 
 Every time you start Claude Code, a SessionStart hook checks for updates:
 - Runs `git pull --ff-only` in background (never blocks startup)
 - Throttled to max once per hour
-- To disable: `bash install.sh --no-auto-update` or delete `.claude/hooks/auto-update.sh`
+- To disable: `bash install.sh --no-auto-update` (or `-NoAutoUpdate` on Windows)
 - To update manually: `cd ~/.gusman-claude && git pull`
 
 ### Uninstall
 
 ```bash
-bash ~/.gusman-claude/install.sh --uninstall
-# Removes symlinks and repo. Your settings/memory preserved.
+bash ~/.gusman-claude/install.sh --uninstall                                   # Unix
+powershell -File $HOME\.gusman-claude\install.ps1 -Uninstall                   # Windows
 ```
+
+Removes symlinks/junctions and the cloned repo. Settings and memory preserved.
 
 ## Architecture — 13 Machines
 
