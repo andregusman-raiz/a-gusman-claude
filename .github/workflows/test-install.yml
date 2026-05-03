@@ -1,0 +1,119 @@
+# JUSTIFICATIVA-GHA: W4 — install.sh / install.ps1 sao entrypoints cross-platform;
+# precisam ser exercitados em runners reais (Ubuntu/macOS/Windows) para garantir
+# que deteccao de OS, idempotencia e symlinks/junctions funcionam em cada SO.
+# ALTERNATIVA-DESCARTADA: Vercel CI nao roda macOS/Windows; pre-commit local nao cobre
+# matrix multi-OS. Sem este workflow, regressoes de install so aparecem em producao.
+#
+# SECURITY NOTE: This workflow does NOT consume any untrusted github.event.* inputs
+# (issue titles, PR bodies, commit messages, etc). It only runs install scripts
+# from the checked-out tree against ephemeral runners. No injection surface.
+
+name: Test Install Cross-Platform
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'install.sh'
+      - 'install.ps1'
+      - '.github/workflows/test-install.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'install.sh'
+      - 'install.ps1'
+      - '.github/workflows/test-install.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-unix:
+    name: Install on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint install.sh syntax
+        run: bash -n install.sh
+
+      - name: Run install.sh against this checkout (skip deps, no auto-update)
+        run: |
+          mkdir -p "$HOME"
+          ln -s "$(pwd)" "$HOME/.gusman-claude" || true
+          [ -d .git ] || git init -q
+          bash install.sh --skip-deps --no-auto-update --dest "$HOME/.claude"
+
+      - name: Verify symlinks created
+        run: |
+          test -L "$HOME/.claude/agents" || (echo "FAIL: agents not symlinked"; exit 1)
+          test -L "$HOME/.claude/skills" || (echo "FAIL: skills not symlinked"; exit 1)
+          test -L "$HOME/.claude/rules"  || (echo "FAIL: rules not symlinked";  exit 1)
+          test -L "$HOME/.claude/hooks"  || (echo "FAIL: hooks not symlinked";  exit 1)
+          echo "OK: all symlinks created"
+
+      - name: Verify idempotency (re-run does not break)
+        run: bash install.sh --skip-deps --no-auto-update --dest "$HOME/.claude"
+
+      - name: Test uninstall removes symlinks
+        run: |
+          bash install.sh --uninstall --dest "$HOME/.claude"
+          test ! -L "$HOME/.claude/agents" || (echo "FAIL: agents still linked"; exit 1)
+          echo "OK: uninstall cleaned up"
+
+  test-windows:
+    name: Install on windows-latest
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint install.ps1 syntax
+        shell: pwsh
+        run: |
+          $errors = $null
+          $tokens = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            "$PWD\install.ps1", [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host $_ }
+            exit 1
+          }
+          Write-Host "OK: install.ps1 parsed cleanly"
+
+      - name: Run install.ps1 (skip deps, no auto-update)
+        shell: pwsh
+        run: |
+          $repoDir = Join-Path $HOME ".gusman-claude"
+          if (Test-Path $repoDir) { Remove-Item $repoDir -Recurse -Force }
+          New-Item -ItemType Junction -Path $repoDir -Target $PWD | Out-Null
+          if (-not (Test-Path ".git")) { git init -q }
+          .\install.ps1 -SkipDeps -NoAutoUpdate -Yes -Dest "$HOME\.claude"
+
+      - name: Verify junctions created
+        shell: pwsh
+        run: |
+          $items = @('agents','skills','rules','hooks')
+          foreach ($i in $items) {
+            $p = Join-Path "$HOME\.claude" $i
+            if (-not (Test-Path $p)) { Write-Host "FAIL: $i not present"; exit 1 }
+            $info = Get-Item $p -Force
+            if (-not $info.LinkType) { Write-Host "FAIL: $i is not a junction"; exit 1 }
+          }
+          Write-Host "OK: all junctions created"
+
+      - name: Verify idempotency
+        shell: pwsh
+        run: .\install.ps1 -SkipDeps -NoAutoUpdate -Yes -Dest "$HOME\.claude"
+
+      - name: Test uninstall
+        shell: pwsh
+        run: |
+          .\install.ps1 -Uninstall -Dest "$HOME\.claude"
+          $p = Join-Path "$HOME\.claude" "agents"
+          if (Test-Path $p) { Write-Host "FAIL: agents still present"; exit 1 }
+          Write-Host "OK: uninstall cleaned up"
