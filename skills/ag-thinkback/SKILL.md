@@ -5,7 +5,6 @@ model: sonnet
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write
 argument-hint: "[--session (sessao atual) | --file path (arquivo especifico) | --decision 'descricao']"
-disable-model-invocation: true
 ---
 
 # ag-thinkback — Decision Replay & Learning

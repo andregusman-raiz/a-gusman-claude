@@ -5,7 +5,6 @@ model: haiku
 context: fork
 allowed-tools: Read, Glob, Grep, Bash
 argument-hint: "[--session (atual) | --project (projeto) | --trends (evolucao)]"
-disable-model-invocation: true
 ---
 
 # ag-insights — Insights & Metricas
