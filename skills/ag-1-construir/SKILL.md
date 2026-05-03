@@ -13,6 +13,36 @@ metadata:
 
 # CONSTRUIR — Maquina Autonoma de Construcao
 
+## Pre-Flight Stack/UI Guard (modo `ui` ou primeira UI no projeto)
+
+**Quando ativar:**
+- `mode=ui` explícito
+- Projeto novo (< 5 commits) E vai criar componente UI
+- Primeira vez tocando arquivo `.tsx`/`.css` no projeto
+
+**Antes de gerar UI, executar Read explícito:**
+
+```bash
+Read ~/Claude/.claude/rules/stack-enforcement.md
+Read ~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md
+```
+
+**Validações inegociáveis:**
+- [ ] Tokens Raiz no `tailwind.config` (#F7941D, #5BB5A2) — NÃO defaults indigo
+- [ ] `lucide-react` instalado e usado — NUNCA emojis em UI
+- [ ] IBM Plex Sans + Mono via next/font ou Google Fonts
+- [ ] `shadcn/ui` instalado (`npx shadcn@latest init`)
+- [ ] Cards usam `border-0 shadow-sm` (não combinar border + shadow)
+- [ ] Touch targets ≥ 44px
+- [ ] Focus ring `2px solid #F7941D`
+- [ ] `aria-label` em botões de ícone, skip link, `aria-current` em breadcrumb
+- [ ] Transições 150-300ms transform/opacity + `prefers-reduced-motion`
+
+**Pre-flight para install de deps:**
+- [ ] PM verificado: `bun.lock` → `bun`, `package-lock.json` → `npm` (NUNCA pnpm)
+- [ ] Lib na whitelist? Se não → ADR + perguntar usuário ANTES de instalar
+- [ ] Hook `stack-deny-list.sh` BLOQUEIA pnpm/yarn/turbo automaticamente
+
 ## Inline KB — SDD Templates (Opus 4.7 ADR-0001 P1.2)
 
 > Templates inline para eliminar Read round-trip nas fases de PRD/SPEC/PLAN. Versão completa das skills `prd-writer`, `spec-writer`, `adr`.

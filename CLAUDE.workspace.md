@@ -4,6 +4,88 @@
 
 ---
 
+## ⚠️ STACK CANÔNICA — Projeto Novo (NÃO IGNORAR)
+
+Esta seção é **bloqueadora** para qualquer scaffolding de projeto novo. Hooks `stack-deny-list.sh` e `new-project-guard.sh` impedem desvios sem ADR.
+
+### Whitelist de Tooling
+
+| Categoria | Permitido | PROIBIDO sem ADR |
+|---|---|---|
+| Package manager | `bun` (preferido), `npm`, `npx` | `pnpm`, `yarn` |
+| Monorepo | `bun workspaces` | `turbo`, `nx`, `lerna` |
+| Framework | Next.js (App Router), Vite + React, Astro | Remix novo, SvelteKit (sem aprovação) |
+| Componentes | `shadcn/ui` (obrigatório) | MUI, Chakra, Mantine |
+| Ícones | `lucide-react` (obrigatório) | Heroicons, react-icons, **emojis em UI** |
+| Fontes | IBM Plex Sans + IBM Plex Mono (next/font ou Google Fonts) | system, Inter, Roboto |
+| Estilo | Tailwind + tokens Raiz | CSS-in-JS, styled-components |
+| Auth | Supabase Auth, Clerk | NextAuth (sem ADR), Auth0 (sem ADR) |
+| DB | Supabase, Neon | MongoDB, Firebase, Prisma direto |
+| Cache | Vercel Runtime Cache | Redis self-hosted |
+| Email | Resend | SendGrid |
+| Testes | Vitest + Playwright (ambos obrigatórios) | Jest novo, Cypress |
+| Monitoramento | Sentry SDK (obrigatório) | (nada substitui) |
+| AI | Vercel AI Gateway + AI SDK v6 | API keys diretas, Langchain |
+| Charts | Recharts | Chart.js, D3 |
+
+### Tokens Visuais (Design System Raiz)
+
+Path canônico: `~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md`
+
+```
+Cores principais:
+  --raiz-orange:  #F7941D   ← primária
+  --raiz-teal:    #5BB5A2   ← secundária
+  --raiz-dark:    #1A1A1A
+  --raiz-gray-50: #F8F9FA
+
+Fontes:
+  body:  "IBM Plex Sans"
+  mono:  "IBM Plex Mono"
+
+Touch target mínimo: 44px
+Cards: border-0 shadow-sm  (NÃO combinar border + shadow)
+Focus ring: 2px solid #F7941D (NÃO indigo padrão)
+Transições: 150-300ms transform/opacity, respeitar prefers-reduced-motion
+A11y: aria-label em botões de ícone, skip link, aria-current em breadcrumb
+```
+
+### Workflow Obrigatório para Projeto Novo
+
+```
+1. /ag-6-iniciar projeto [desc]
+   └── Skill carrega stack-enforcement.md + design-system.md ANTES de scaffold
+
+2. Scaffolding usa bun create OU npx create-next-app
+   └── Hook new-project-guard.sh valida e injeta regras
+
+3. Instalar dependências (canonical):
+   bun add -d shadcn @types/node typescript
+   npx shadcn@latest init
+   bun add lucide-react @sentry/nextjs
+
+4. Configurar Tailwind com tokens Raiz (NÃO usar defaults)
+
+5. Configurar IBM Plex via next/font ou Google Fonts
+
+6. SEMPRE perguntar antes de instalar lib fora whitelist
+   └── Hook stack-deny-list.sh BLOQUEIA pnpm/turbo/yarn
+```
+
+### Bypass (uso restrito)
+
+```bash
+export STACK_GUARD_BYPASS=1   # bypass apenas desta sessão
+```
+
+Justificativa exigida em ADR (`docs/adr/`) antes de bypass virar permanente.
+
+### Para Projetos EXISTENTES
+
+Esta seção NÃO se aplica a projetos com `CLAUDE.md` próprio + `> 5 commits`. Hooks detectam projeto novo automaticamente — em projetos consolidados, são silent.
+
+---
+
 ## Matriz de Decisao — Skill vs Agent vs Machine vs Team
 
 Use esta matriz ANTES de escolher como executar uma tarefa. Regra de ouro:
