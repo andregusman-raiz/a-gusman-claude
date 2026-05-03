@@ -329,14 +329,14 @@ for item in "${SYMLINKS[@]}"; do
     rm "$target"
     ln -s "$src" "$target"
     ok "updated: ${item}/ -> repo"
-    ((LINKED++))
+    LINKED=$((LINKED + 1))
   elif [[ -d "$target" ]]; then
     warn "skipped: ${item}/ (exists, not a symlink — rename to ${item}.bak to use repo version)"
-    ((SKIPPED++))
+    SKIPPED=$((SKIPPED + 1))
   else
     ln -s "$src" "$target"
     ok "linked:  ${item}/ -> repo"
-    ((LINKED++))
+    LINKED=$((LINKED + 1))
   fi
 done
 

@@ -51,10 +51,10 @@ jobs:
 
       - name: Verify symlinks created
         run: |
-          test -L "$HOME/.claude/agents" || (echo "FAIL: agents not symlinked"; exit 1)
           test -L "$HOME/.claude/skills" || (echo "FAIL: skills not symlinked"; exit 1)
           test -L "$HOME/.claude/rules"  || (echo "FAIL: rules not symlinked";  exit 1)
           test -L "$HOME/.claude/hooks"  || (echo "FAIL: hooks not symlinked";  exit 1)
+          test -L "$HOME/.claude/shared" || (echo "FAIL: shared not symlinked"; exit 1)
           echo "OK: all symlinks created"
 
       - name: Verify idempotency (re-run does not break)
@@ -63,7 +63,8 @@ jobs:
       - name: Test uninstall removes symlinks
         run: |
           bash install.sh --uninstall --dest "$HOME/.claude"
-          test ! -L "$HOME/.claude/agents" || (echo "FAIL: agents still linked"; exit 1)
+          test ! -L "$HOME/.claude/skills" || (echo "FAIL: skills still linked"; exit 1)
+          test ! -L "$HOME/.claude/hooks"  || (echo "FAIL: hooks still linked";  exit 1)
           echo "OK: uninstall cleaned up"
 
   test-windows:
@@ -97,7 +98,7 @@ jobs:
       - name: Verify junctions created
         shell: pwsh
         run: |
-          $items = @('agents','skills','rules','hooks')
+          $items = @('skills','rules','hooks','shared')
           foreach ($i in $items) {
             $p = Join-Path "$HOME\.claude" $i
             if (-not (Test-Path $p)) { Write-Host "FAIL: $i not present"; exit 1 }
@@ -114,6 +115,6 @@ jobs:
         shell: pwsh
         run: |
           .\install.ps1 -Uninstall -Dest "$HOME\.claude"
-          $p = Join-Path "$HOME\.claude" "agents"
-          if (Test-Path $p) { Write-Host "FAIL: agents still present"; exit 1 }
+          $p = Join-Path "$HOME\.claude" "skills"
+          if (Test-Path $p) { Write-Host "FAIL: skills still present"; exit 1 }
           Write-Host "OK: uninstall cleaned up"
