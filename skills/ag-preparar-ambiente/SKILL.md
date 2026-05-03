@@ -21,16 +21,34 @@ O Infraestrutor. Gera tudo que um dev precisa para rodar o projeto.
 ```
 /ag-preparar-ambiente setup → Diagnóstico: o que falta?
 /ag-preparar-ambiente docker → Dockerfile + docker-compose
-/ag-preparar-ambiente ci [github|gitlab] → Pipeline de CI/CD
+/ag-preparar-ambiente ci → CI nativo (Vercel CI + husky), NÃO gera GHA por default
+/ag-preparar-ambiente ci --gha-w[1-4] → SOMENTE se enquadrar whitelist gha-minimal.md
 /ag-preparar-ambiente env → Auditar env vars
 /ag-preparar-ambiente diagnosticar → Debug de pipeline quebrada
+```
+
+## Regra GHA-mínimo (obrigatória no modo `ci`)
+
+ANTES de gerar QUALQUER workflow, ler `~/Claude/.claude/rules/gha-minimal.md`.
+
+**Default no modo `ci`:**
+- Gerar `.husky/pre-commit` com `lint-staged` rodando typecheck + lint
+- Gerar `package.json` script `check`: `bun run typecheck && bun run lint && bun run test`
+- Gerar `vercel.json` com `buildCommand: "bun run check && bun run build"`
+- NÃO gerar `.github/workflows/ci.yml`
+
+**Workflow GHA SOMENTE se enquadrar W1-W4** (TOTVS/MSSQL legacy, CLI release multi-OS, VPS self-hosted, DB-first PR gate). Header obrigatório:
+```yaml
+# JUSTIFICATIVA-GHA: <W1|W2|W3|W4> — <descrição>
+# ALTERNATIVA-DESCARTADA: <opção nativa e razão>
 ```
 
 ## O que gera
 
 - Dockerfile multi-stage otimizado
 - docker-compose com dev environment completo
-- Pipeline CI (lint → typecheck → test → build)
+- **CI local-first**: `.husky/pre-commit` + `vercel.json` (Vercel CI cobre PR/deploy)
+- GHA workflow APENAS se whitelisted (W1-W4)
 - `.env.example` documentado
 - Scripts de setup automatizados
 
