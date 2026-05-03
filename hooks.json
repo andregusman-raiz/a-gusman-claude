@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/auto-update.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/new-project-detector.sh 2>/dev/null || true"
           }
         ]
       }
@@ -26,6 +30,14 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/parallel-agent-guard.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/stack-deny-list.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/new-project-guard.sh"
           }
         ]
       },
