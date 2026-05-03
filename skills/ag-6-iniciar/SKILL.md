@@ -13,6 +13,37 @@ metadata:
 
 # INICIAR — Maquina Autonoma de Inicializacao
 
+## Pre-Flight Obrigatório (modo `projeto`)
+
+**ANTES de qualquer scaffolding, executar:**
+
+```bash
+# 1. Carregar regras de stack no contexto (Read obrigatório)
+Read ~/Claude/.claude/rules/stack-enforcement.md
+Read ~/Claude/.claude/rules/package-manager.md
+
+# 2. Carregar design system Raiz (Read obrigatório se projeto tem UI)
+Read ~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md
+
+# 3. Validar package manager
+test -f bun.lock && PM=bun || PM=npm   # NUNCA pnpm sem ADR
+```
+
+**Validações inegociáveis ANTES de scaffolding:**
+- [ ] PM = bun OU npm (não pnpm/yarn/turbo)
+- [ ] Framework decidido (Next.js App Router | Vite + React | Astro)
+- [ ] shadcn/ui no plano de instalação
+- [ ] lucide-react no plano (NUNCA emojis em UI)
+- [ ] IBM Plex Sans + Mono no plano de fontes
+- [ ] Tokens Raiz mapeados em `tailwind.config` (#F7941D, #5BB5A2)
+- [ ] Sentry SDK no plano
+- [ ] Vitest + Playwright no plano
+
+**Se usuário pediu lib FORA whitelist:**
+1. PARAR e perguntar: "X não está na whitelist Raiz. Justificativa? Criamos ADR?"
+2. Se autorizado → criar `docs/adr/<n>-<slug>.md` antes de instalar
+3. NUNCA decidir sozinho
+
 ## Invocacao
 
 ```
