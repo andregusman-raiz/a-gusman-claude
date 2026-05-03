@@ -5,7 +5,6 @@ model: sonnet
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, LSP
 argument-hint: "[path do projeto ou area para analisar]"
-disable-model-invocation: true
 ---
 
 # ag-advisor — Advisor Proativo
