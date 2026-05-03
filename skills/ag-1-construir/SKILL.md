@@ -226,7 +226,7 @@ Consultar em TODAS as fases, nao apenas na hora de desenhar tela.
 3. **Se Produto existe** (ex: `bi-data-explorer`): Avaliar se faz sentido fork/adaptar em vez de construir do zero
 4. **Se Componente UI existe**: Copiar/adaptar TSX do `catalog/src/components/` em vez de criar do zero
 5. **Na SPEC**: Referenciar explicitamente (`Baseado em: design-library/solutions/NN-id`) com adaptacoes
-6. **Durante BUILD**: Usar tokens do Design System (`~/Claude/assets/UI_UX/raiz-educacao-design-system.md`)
+6. **Durante BUILD**: Usar tokens do Design System (`~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md`)
 7. **Se NAO existe solucao**: Documentar gap na SPEC para futura adicao ao catalogo
 
 **Matching rapido (necessidade → solucao):**

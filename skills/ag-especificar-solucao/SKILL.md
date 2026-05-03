@@ -45,7 +45,7 @@ Criar SPEC tecnica implementavel cobrindo:
 - Decisoes tecnicas com rationale
 - **Solucoes da Design Library**: verificar ~/Claude/assets/design-library/catalog.md
   Se existe solucao catalogada, referenciar na SPEC: "Baseado em: design-library/solutions/NN-id"
-  Se UI envolvida, aplicar tokens de ~/Claude/assets/UI_UX/raiz-educacao-design-system.md
+  Se UI envolvida, aplicar tokens de ~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md
 
 Ler docs/ai-state/findings.md e errors-log.md antes de comecar.
 Max 200 linhas por SPEC (dividir se maior).
