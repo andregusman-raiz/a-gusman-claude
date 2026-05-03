@@ -5,7 +5,6 @@ model: sonnet
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, LSP
 argument-hint: "[path ou area para scan | --deep para analise profunda]"
-disable-model-invocation: true
 ---
 
 # ag-cacar-bugs — Bug Hunter Proativo

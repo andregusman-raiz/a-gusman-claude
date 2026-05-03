@@ -5,7 +5,6 @@ model: sonnet
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write
 argument-hint: "[sessao ou projeto para retrospectiva]"
-disable-model-invocation: true
 ---
 
 # ag-retrospectiva — Retrospectiva

@@ -2,7 +2,6 @@
 name: ag-saude-sessao
 description: "Health check de sessao. Verifica processos concorrentes, config corruption, stashes orfaos, worktrees abandonados. Executa ANTES de qualquer trabalho para prevenir perda de dados. Use at session start or when environment seems broken."
 model: haiku
-disable-model-invocation: true
 ---
 
 # ag-saude-sessao — Saude da Sessao
