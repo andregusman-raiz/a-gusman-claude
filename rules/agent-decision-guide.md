@@ -55,6 +55,7 @@ paths:
 - **Benchmark SaaS (crawl + SPEC)** → `/ag-10-benchmark-software [nome] [url]`
 - **Design UI/UX (componentes, paletas, layouts)** → `/ag-11-ux-ui [action] [element]`---
 - **Otimizar SQL / consultar dados (TOTVS RM / Zeev / PostgreSQL)** → `/ag-12-sql-totvs-zeev [query ou contexto]`
+- **Limpar dead code (componentes orfaos, unused imports, state morto, comentarios sem WHY)** → `/ag-13-limpar-codigo [--triage-only | --apply-quick-wins | --full-pipeline | --create-issues]`
 ## Plugins (atalhos rapidos, sem pipeline)
 
 | Sinal | Plugin |
