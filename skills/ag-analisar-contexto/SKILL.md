@@ -1,7 +1,7 @@
 ---
 name: ag-analisar-contexto
 description: "Analisa padroes de codigo, debitos tecnicos, riscos arquiteturais. Produz diagnostico com prioridades P0-P3. Use when analyzing code quality, tech debt, or architectural risks."
-model: opus
+model: sonnet
 argument-hint: "[projeto-path]"
 ---
 

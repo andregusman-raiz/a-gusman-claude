@@ -1,7 +1,7 @@
 ---
 name: ag-0-orquestrador
 description: "Entry point do sistema. Recebe qualquer pedido, classifica, roteia para a melhor combinação de skills/agents/plugins, e monitora. Vai além do óbvio — sugere combos compostos, ativa auxiliares proativos, e delega a plugins canonicals (ADR-0001) quando apropriado."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[o que voce quer fazer]"
 allowed-tools: Read, Glob, Grep, Bash, Agent, Skill

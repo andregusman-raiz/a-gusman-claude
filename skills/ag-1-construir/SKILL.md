@@ -1,7 +1,7 @@
 ---
 name: ag-1-construir
 description: "Maquina autonoma de construcao. Feature, refactor, UI, issue, integracao, otimizacao — recebe objetivo, entrega PR pronto. Padrao MERIDIAN: fases, convergencia, state, self-healing."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[objetivo ou issue #N] [--resume] [--skip-review] [--audit-only]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage

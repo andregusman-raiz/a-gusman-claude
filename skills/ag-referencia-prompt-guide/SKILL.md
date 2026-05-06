@@ -1,6 +1,6 @@
 ---
 name: ag-referencia-prompt-guide
-description: Guia canônico de como escrever prompts que geram UI de alta qualidade em Claude/Cursor/Lovable/v0. Estrutura em 6 blocos (Contexto → Layout → Estilo → Referências → Constraints → Entregável), templates por alvo (Claude/Cursor/v0/Lovable), exemplos reais para as 14 categorias do design-library. Invocar ANTES de pedir geração de UI para AI builder ou ao documentar fluxos de vibe coding.
+description: "Guia canonico de prompts para gerar UI em Claude/Cursor/Lovable/v0. Estrutura 6 blocos (Contexto/Layout/Estilo/Refs/Constraints/Entregavel). Invocar ANTES de pedir geracao de UI."
 metadata:
   filePattern:
     - "**/app/(marketing)/**"
@@ -15,7 +15,6 @@ metadata:
 > Inspirado em GlowUp UI (glowupui.io) e validado com o design-library rAIz.
 > Complementa `/ag-referencia-design-presentation` (taxonomia de 86 layouts).
 > Uso: antes de qualquer geração de UI via Claude/Cursor/Lovable/v0.
-
 ---
 
 ## Princípio
