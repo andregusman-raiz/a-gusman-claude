@@ -61,3 +61,15 @@ Usar o certo para cada situacao.
 
 ### Railway: canonical de infra não-Vercel (ADR-0001)
 - Railway projects/services/DBs/deploy → `railway:use-railway`
+
+### Dead code / refactor: ag-13 vs simplify plugin
+- **Dead code elimination (orphan components, unused imports, dead state, dead comments)** → `/ag-13-limpar-codigo`
+  - Pipeline 5-fases (Discovery → Multi-tool Scan → AST Custom → Confidence Ranking → Apply Fixes)
+  - Ensemble Knip + ts-prune + ESLint + AST custom + bundle analyzer
+  - Confidence tiers (HIGH/MEDIUM/LOW), PRs atomicos por categoria, GitHub issues opt-in
+- **Simplificar logica de codigo recente (reuso, qualidade, eficiencia)** → `simplify` (plugin)
+  - Foco em codigo recem-modificado, nao detecta dead code
+  - Sem ensemble de tools, sem confidence tiers
+- **Tech debt geral (mix de issues)** → `/ag-2-corrigir debt [area]`
+  - Quando o problema e heterogeneo e ag-13 / simplify nao se encaixam sozinhos
+- Em duvida: `/ag-13-limpar-codigo --triage-only` primeiro — se findings sao majoritariamente dead code, seguir com ag-13. Se sao logica complicada, usar simplify.
