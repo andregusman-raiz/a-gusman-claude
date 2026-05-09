@@ -1,15 +1,7 @@
 ---
 name: ag-13-limpar-codigo
-description: |
-  Maquina autonoma de limpeza de dead code. Detecta componentes nunca renderizados, unused imports,
-  state morto (useState sem leitura/write), comentarios sem explicacao, exports nao importados,
-  arquivos orfaos e deps nao usadas. Ensemble Knip + ts-prune + ESLint + AST custom + bundle analyzer
-  com confidence tiers (HIGH/MEDIUM/LOW). Pipeline 5-fases (Discovery -> Multi-tool Scan -> AST Custom
-  -> Confidence Ranking -> Apply Fixes), gera diagnostico + plano P0-P5 + GitHub issues, aplica fixes
-  em PRs atomicos por categoria com quality gates entre batches. Use quando: (1) tech debt, (2)
-  preparar projeto para hand-off, (3) reduzir bundle size, (4) cleanup pos-spike de features, (5)
-  auditoria de saude do codigo. Padrao MERIDIAN.
-model: opus
+description: "Maquina autonoma de limpeza de dead code (Knip + AST + bundle, confidence tiers, PRs atomicos). Use para tech debt, hand-off, reducao de bundle, cleanup pos-spike, auditoria de saude."
+model: sonnet
 context: fork
 argument-hint: "[--triage-only | --apply-quick-wins | --full-pipeline | --create-issues | --resume | categoria:components|imports|state|comments]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage, LSP

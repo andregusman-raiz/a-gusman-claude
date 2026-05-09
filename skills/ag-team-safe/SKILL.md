@@ -1,7 +1,7 @@
 ---
 name: ag-team-safe
 description: "Wrapper para criar Agent Teams com isolamento de worktree OBRIGATORIO em todos os teammates que fazem escrita. Previne corrupcao de working tree por edits concorrentes."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[objetivo] [--teammates N] [--repo path]"
 allowed-tools: Read, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage

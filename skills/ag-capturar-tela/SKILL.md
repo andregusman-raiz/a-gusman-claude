@@ -1,6 +1,6 @@
 ---
 name: ag-capturar-tela
-description: "Captura tela e controla mouse/teclado em apps nativos macOS via router 3-tier: macos-use (Accessibility tree, semantico — preferido) -> macos-automator (AppleScript/JXA) -> computer-use (coordenada, fallback). Use quando o usuario quer ver a tela, analisar app nativo, ler texto, clicar em elementos, ou navegar fora do browser. Para apps BROWSER, preferir Playwright MCP."
+description: "Captura tela e controla mouse/teclado em apps nativos macOS via router 3-tier (macos-use > macos-automator > computer-use). Para apps BROWSER, preferir Playwright MCP."
 model: sonnet
 context: fork
 argument-hint: "[o que analisar/fazer na tela | regiao: x,y,w,h | monitor: N | clicar em X]"
@@ -62,7 +62,6 @@ Agent({
 4. Se tier 2 falha (sem automation suite, recipe nao existe): TIER 3 (coordenada)
 5. NUNCA pular direto pra tier 3 — sempre tentar 1 e 2 antes
 ```
-
 ---
 
 ## Tier 1: macos-use (preferido)

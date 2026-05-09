@@ -83,3 +83,231 @@ Ao revisar codigo, verificar:
 - **suggestion**: Melhoria recomendada. Nao impede merge.
 - **nit**: Estilo/preferencia. Ignoravel.
 - **question**: Pedir esclarecimento antes de decidir.
+
+---
+
+## Heuristica Multi-Responsabilidade
+
+> Detecta funcoes/metodos inchados que violam o Single Responsibility Principle.
+> Complemento a ag-13-limpar-codigo (dead code) e simplify (logica recente) — nao duplicar.
+> Aplicar ao revisar qualquer arquivo do diff que contenha funcoes/metodos.
+
+### Composicao com outros tools
+
+| Cenario | Tool correto |
+|---------|-------------|
+| Funcao grande com multipla responsabilidade | **ag-revisar-codigo** (esta heuristica) |
+| Codigo morto / imports nao usados / dead state | **ag-13-limpar-codigo** |
+| Logica recente complexa / reuso ruim | **simplify** |
+| Tech debt misto | **ag-2-corrigir debt** |
+
+---
+
+### Pattern 1 — TAMANHO: Funcao > 50 linhas
+
+**Severidade:** `WARN`
+
+**Sinal:** Uma funcao com mais de 50 linhas (excluindo docstring e comentarios) provavelmente
+executa mais de uma responsabilidade. Funcoes longas sao dificeis de testar, nomear e reutilizar.
+
+**Detector (grep/contagem):**
+```bash
+# Heuristica: contar linhas entre abertura e fechamento de funcao
+# Em TypeScript/JavaScript — funcoes >= 50 linhas
+awk '/^[[:space:]]*(async )?function |[[:space:]](async )?\(.*\)[[:space:]]*=>|[[:space:]]*(public|private|protected)[[:space:]]+(async )?[a-zA-Z]/{start=NR} start && NR-start>50{print FILENAME ":" start " funcao >50 linhas"; start=0}' arquivo.ts
+```
+
+**Exemplo positivo (viola — deve flagrar):**
+```typescript
+async function processEnrollment(studentId: string, courseId: string) {
+  // valida input
+  if (!studentId || !courseId) throw new Error('...');
+  // busca dados do aluno
+  const student = await db.query('SELECT ...');
+  // busca dados do curso
+  const course = await db.query('SELECT ...');
+  // calcula preco com desconto
+  const base = course.price;
+  const discount = student.scholarship ? 0.5 : 0;
+  const total = base * (1 - discount);
+  // envia email de confirmacao
+  await mailer.send({ to: student.email, subject: '...', body: '...' });
+  // registra no CRM
+  await crm.createDeal({ studentId, courseId, value: total });
+  // ... mais 40 linhas de logica misturada
+}
+```
+
+**Exemplo negativo (OK — nao flagrar):**
+```typescript
+async function enrollStudent(studentId: string, courseId: string) {
+  const price = await calculateEnrollmentPrice(studentId, courseId);
+  await createEnrollmentRecord(studentId, courseId, price);
+  await notifyEnrollment(studentId, courseId);
+}
+```
+
+**Refactor sugerido:** Extrair sub-responsabilidades em funcoes nomeadas (`validateInput`,
+`fetchEnrollmentData`, `calculatePrice`, `sendConfirmation`). Cada funcao = 1 verbo + 1 substantivo.
+
+---
+
+### Pattern 2 — ANINHAMENTO: Nesting > 3 niveis
+
+**Severidade:** `WARN`
+
+**Sinal:** Nesting de 4+ niveis (if dentro de for dentro de if dentro de try, etc.) indica
+complexidade ciclomatica alta. Dificil de testar — cada nivel adiciona um caminho a cobrir.
+
+**Detector (contagem de indent):**
+```bash
+# Detecta linhas com 4+ niveis de indentacao (2 spaces por nivel = 8+ espacos)
+grep -n "^        \{" arquivo.ts | head -5
+# Ou para tabs:
+grep -n "^\t\t\t\t" arquivo.ts | head -5
+```
+
+**Exemplo positivo (viola — deve flagrar):**
+```typescript
+function processPayments(payments: Payment[]) {
+  for (const payment of payments) {          // nivel 1
+    if (payment.status === 'pending') {       // nivel 2
+      try {                                   // nivel 3
+        if (payment.amount > 0) {             // nivel 4 ← WARN
+          if (payment.method === 'pix') {     // nivel 5 ← WARN
+            // logica aqui
+          }
+        }
+      } catch (e) { ... }
+    }
+  }
+}
+```
+
+**Exemplo negativo (OK — nao flagrar):**
+```typescript
+function processPayments(payments: Payment[]) {
+  const pending = payments.filter(isPending);
+  for (const payment of pending) {
+    await processPayment(payment);            // max 2 niveis
+  }
+}
+```
+
+**Refactor sugerido:** Early return / guard clauses, extrair logica interna em funcao nomeada,
+substituir if/else aninhado por tabela de casos ou Strategy pattern.
+
+---
+
+### Pattern 3 — MISTURA I/O + LOGICA: HTTP/DB/filesystem junto com logica de dominio
+
+**Severidade:** `ALERT`
+
+**Sinal:** Funcao que faz chamada HTTP, query DB ou acesso ao filesystem E tambem executa
+logica de dominio (calculos, transformacoes, regras de negocio). Viola SRP de forma mais
+grave: impossivel testar a logica de dominio sem mockar infraestrutura.
+
+**Detector (grep combinado):**
+```bash
+# Funcao que tem fetch/axios/supabase E logica aritmetica/condicional ao mesmo tempo
+grep -n "fetch\|axios\|supabase\|prisma\|fs\." arquivo.ts
+grep -n "calculate\|compute\|validate\|transform\|map\|filter\|reduce" arquivo.ts
+# Se as duas listas tem linhas proximas dentro de uma mesma funcao → ALERT
+```
+
+**Exemplo positivo (viola — deve flagrar como ALERT):**
+```typescript
+async function getStudentDiscount(studentId: string): Promise<number> {
+  const student = await db.from('students').select('*').eq('id', studentId).single(); // I/O
+  const enrollments = await db.from('enrollments').select('count').eq('student_id', studentId); // I/O
+  // logica de dominio misturada com I/O:
+  if (enrollments.count > 3 && student.scholarship_type === 'full') {
+    return 0.8;
+  } else if (enrollments.count > 1) {
+    return 0.5;
+  }
+  return 0;
+}
+```
+
+**Exemplo negativo (OK — separado corretamente):**
+```typescript
+// I/O isolado:
+async function fetchStudentData(studentId: string) {
+  const student = await db.from('students').select('*').eq('id', studentId).single();
+  const count = await db.from('enrollments').select('count').eq('student_id', studentId);
+  return { student, enrollmentCount: count };
+}
+
+// Logica de dominio pura (testavel sem DB):
+function calculateDiscount(scholarshipType: string, enrollmentCount: number): number {
+  if (enrollmentCount > 3 && scholarshipType === 'full') return 0.8;
+  if (enrollmentCount > 1) return 0.5;
+  return 0;
+}
+```
+
+**Refactor sugerido:** Separar em camadas — funcao de acesso a dados (repository/query) e
+funcao de logica de dominio pura. A funcao de dominio recebe dados como parametro (nao busca).
+
+---
+
+### Pattern 4 — MUITOS PARAMETROS: Funcao com > 3 parametros sem objeto agrupador
+
+**Severidade:** `WARN`
+
+**Sinal:** Funcao com 4+ parametros posicionais sugere que ela esta recebendo dados de
+multiplas responsabilidades, ou que o conceito nao esta encapsulado em um tipo proprio.
+Parametros posicionais sao frageis (ordem importa, dificulta chamada e refactor).
+
+**Detector (grep/regex):**
+```bash
+# TypeScript: funcao com 4+ parametros tipados
+grep -n "function \|=> {" arquivo.ts | grep -E "\([^)]{80,}\)"
+# Heuristica: linha de assinatura com mais de 3 virgulas entre os parens
+grep -Pn "(?:function |=> \{)[^{]*,[^{]*,[^{]*,[^{]*[{]" arquivo.ts
+```
+
+**Exemplo positivo (viola — deve flagrar):**
+```typescript
+function createEnrollment(
+  studentId: string,
+  courseId: string,
+  startDate: Date,
+  discount: number,
+  paymentMethod: string
+) { ... }
+```
+
+**Exemplo negativo (OK — nao flagrar):**
+```typescript
+// Objeto agrupador — nao flagrar:
+function createEnrollment(data: CreateEnrollmentDTO) { ... }
+
+// Builder pattern — nao flagrar:
+enrollmentBuilder.forStudent(studentId).inCourse(courseId).withDiscount(discount).build();
+
+// Parametros optional/keyword com < 4 obrigatorios — nao flagrar:
+function createEnrollment(studentId: string, courseId: string, options?: EnrollmentOptions) { ... }
+```
+
+**Refactor sugerido:** Criar interface/type para o conjunto de parametros
+(`CreateEnrollmentInput`, `EnrollmentConfig`). Se parametros pertencem a dominios distintos,
+pode indicar que a funcao tem multiplas responsabilidades (ver Pattern 1 + 3).
+
+---
+
+### Aplicacao durante o review
+
+Para cada funcao/metodo no diff, verificar os 4 patterns em sequencia:
+
+```
+1. Contar linhas → > 50? → WARN (tamanho)
+2. Medir nesting → > 3 niveis? → WARN (aninhamento)
+3. Mistura I/O + logica? → ALERT (separacao de camadas)
+4. Mais de 3 parametros posicionais? → WARN (encapsulamento)
+```
+
+Reportar somente se confidence >= 80. Incluir: numero da linha, nome da funcao, pattern violado,
+evidencia concreta (ex: "linha 47: nesting nivel 5, `if` dentro de `for` dentro de `try` dentro
+de `if`"), e sugestao de refactor especifica para o contexto.

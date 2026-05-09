@@ -46,6 +46,16 @@ Output do `/ag-retrospectiva` deve atualizar:
 
 Se usuário diz "agora chega" / "encerrar" / "fim" → ag-0 sugere automaticamente.
 
+### Integração com --7fase
+
+O modo `--7fase` do ag-0-orquestrador inclui **Fase 7 FINALIZE** como gatilho automático de retrospectiva ao final do pipeline. Quando `--7fase` conclui todos os PRs:
+
+1. `/ag-retrospectiva` é invocado automaticamente (sem precisar do `session-retro-check.sh`)
+2. Output alimenta `feedback_*.md` + handoff `session-YYYY-MM-DD.md`
+3. Padrões identificados nas 7 fases (especialmente decisões do BRAINSTORM e aprendizados do TDD) devem ser priorizados no update de MEMORY
+
+Referência: seção `## Modo --7fase` em `~/.claude/skills/ag-0-orquestrador/SKILL.md`.
+
 ## Anti-padrões
 
 - NÃO rodar retrospectiva automaticamente sem perguntar

@@ -1,6 +1,6 @@
 ---
 name: ag-referencia-redesign-workflow
-description: Workflow de redesign de UI a partir de screenshot ou URL. Input -> captura via Chrome DevTools MCP -> análise via Claude multimodal -> output estruturado (categoria + variante do design-library + preset estético + prompt otimizado). Complementa /ag-referencia-design-presentation (86 layouts) e /ag-referencia-prompt-guide (estrutura 6-blocos). Usar quando: (a) usuario fornece URL/screenshot e quer recriar com identidade rAIz, (b) quer refresh estetico de app existente, (c) quer migrar UI de outro design system para nossas variantes.
+description: "Workflow de redesign de UI a partir de screenshot/URL via Chrome DevTools MCP + Claude multimodal. Output: categoria + variante design-library + preset + prompt. Use para recriar UI com identidade rAIz."
 metadata:
   filePattern:
     - "**/redesign/**"
@@ -12,7 +12,6 @@ metadata:
 
 > Diferencial real vs GlowUp UI: inputar screenshot/URL e receber **mapeamento preciso** para nossa biblioteca interna (86 variantes) + **prompt pronto** para regerar.
 > Complementa /ag-referencia-design-presentation (taxonomia) e /ag-referencia-prompt-guide (estrutura de prompt).
-
 ---
 
 ## Quando usar
