@@ -1,7 +1,7 @@
 ---
 name: ag-2-corrigir
 description: "Maquina autonoma de correcao. Bugs, erros TypeScript, tech debt — auto-detecta modo, diagnostica, corrige, verifica em loop convergente. Produz PR com fix verificado."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[bug ou lista] [--resume] [--skip-pr] [--triage-only]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage

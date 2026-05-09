@@ -1,7 +1,7 @@
 ---
 name: ag-7-qualidade
 description: "Maquina autonoma de qualidade (wrapper MERIDIAN). Descobre app, testa 5 dimensoes (ALIVE/REAL/WORKS/LOOKS/FEELS), corrige, re-testa ate convergencia MQS >= 85. Quality Certificate."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[URL ou path] [--threshold N] [--audit-only] [--resume] [--scope rotas]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage

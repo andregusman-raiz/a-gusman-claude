@@ -1,7 +1,7 @@
 ---
 name: ag-1-construir
 description: "Maquina autonoma de construcao. Feature, refactor, UI, issue, integracao, otimizacao — recebe objetivo, entrega PR pronto. Padrao MERIDIAN: fases, convergencia, state, self-healing."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[objetivo ou issue #N] [--resume] [--skip-review] [--audit-only]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage
@@ -172,7 +172,58 @@ Read ~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md
 /construir integrar sistema SophiA                     # Incorporacao
 /construir --resume                                    # Retomar run
 /construir --audit-only adicionar feature X            # So SPEC, sem build
+/construir feature 'calculo de juros' --tdd            # TDD strict (financeiro/preditivo)
+/construir refatorar logica de matriculas --tdd        # TDD strict em refactor critico
 ```
+
+## Modo --tdd (TDD Strict Mode)
+
+**Pipeline Red-Green-Refactor obrigatorio, carrega `/ag-referencia-tdd` automaticamente.**
+
+### O que muda com --tdd
+
+Ativa TDD Strict antes da fase BUILD: a skill `ag-referencia-tdd` e carregada e o pipeline RED-GREEN-REFACTOR substitui o fluxo padrao de implementacao.
+
+```
+ASSESS → PRD → SPEC → [ADVERSARIO] → ADR → PLAN → [TDD-LOOP] → VERIFY → REVIEW → SHIP
+                                                               ↑           │
+                                                               └───────────┘ (ciclos RED-GREEN-REFACTOR)
+```
+
+**TDD-LOOP (cada comportamento da SPEC):**
+1. **RED**: escrever teste que descreve o comportamento → rodar → confirmar falha com erro coerente
+2. **GREEN**: implementar minimo para passar → todos os testes passam
+3. **REFACTOR**: melhorar com testes verdes → testes continuam passando
+4. **COMMIT**: `test: red — X` / `feat: green — X` / `refactor: Y` — 1 ciclo = 1-3 commits
+
+### Quando usar --tdd
+
+| Dominio | Razao |
+|---------|-------|
+| Calculos financeiros (juros, parcelas, acordos, descontos) | Erro custa dinheiro real |
+| Pipelines preditivos e scoring | M16 Baseline Parity (quality-systems.md) exige |
+| Dados regulatorios (LGPD, fiscal, compliance) | Falha gera passivo juridico |
+| Logica de autorizacao / permissoes / RLS | Falha = brecha de seguranca |
+| Refactors de logica critica com comportamento ja documentado | Garantir nao-regressao |
+
+### Quando NAO usar --tdd
+
+| Cenario | Alternativa |
+|---------|------------|
+| Scaffolding / boilerplate (sem logica de dominio) | Build padrao |
+| Prototipos descartaveis (< 1h de vida) | `--draft` |
+| Exploracao de API desconhecida (spike) | `--draft` + testes depois |
+| UI puramente visual (layout, cores) | `ag-4-teste-final ux-qat` |
+| Scripts one-shot sem logica reutilizavel | Build padrao |
+
+### Diferenca --tdd vs --validado
+
+| Flag | Estrategia | Quando |
+|------|-----------|--------|
+| `--validado` | Builder + Validator paralelos; codigo primeiro, validacao concorrente | Feature com spec clara, dominio nao-critico |
+| `--tdd` | Teste primeiro + ciclo strict RED-GREEN-REFACTOR; commit por ciclo | Dominio sensivel, refactor critico, logica financeira/regulatoria |
+
+> Referencia completa: `/ag-referencia-tdd` | Templates: Vitest TS, pytest Python, Playwright E2E
 
 ## Guard de escopo — Multi-PR auto-delegate
 
@@ -321,3 +372,5 @@ CONSTRUIR COMPLETO
 - "dashboard esta lento" → /construir otimizar dashboard
 - "redesign da tela Z" → /construir ui Z
 - "integrar sistema W" → /construir integrar W
+- "logica de calculo financeiro / scoring / compliance" → /construir feature X --tdd
+- "refatorar calculo critico com risco de regressao" → /construir refatorar Y --tdd

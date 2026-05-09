@@ -1,7 +1,7 @@
 ---
 name: ag-9-auditar
 description: "Auditoria completa de software (wrapper FORTRESS). Roda MERIDIAN + SENTINEL + ARCHITECT + CONDUCTOR + LIGHTHOUSE em sequencia. Fortress Score = laudo completo."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[URL ou path] [--resume]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage

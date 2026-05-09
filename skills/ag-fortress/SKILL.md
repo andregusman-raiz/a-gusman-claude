@@ -1,7 +1,7 @@
 ---
 name: ag-fortress
 description: "Orquestrador supremo. Roda MERIDIAN+SENTINEL+ARCHITECT+CONDUCTOR+LIGHTHOUSE em sequencia. Fortress Score (FS) = laudo completo do software."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[URL ou path] [--skip machine] [--threshold N]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage

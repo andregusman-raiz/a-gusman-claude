@@ -1,6 +1,6 @@
 ---
 name: ag-escanear-morto-codigo
-description: "Sub-agent de scan multi-tool para dead code. Executa Knip + ts-prune + depcheck + ESLint + Madge + bundle analyzer em paralelo, mais AST custom para 4 categorias especificas (componentes orfaos, useState morto, props nao usados, comentarios sem WHY). Read-only. Output JSON unificado para ag-13-limpar-codigo."
+description: "Sub-agent de scan multi-tool dead code (Knip + ts-prune + depcheck + ESLint + Madge + bundle + AST custom). Read-only. Output JSON para ag-13-limpar-codigo."
 model: sonnet
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, LSP

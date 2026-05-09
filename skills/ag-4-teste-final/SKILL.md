@@ -1,7 +1,7 @@
 ---
 name: ag-4-teste-final
 description: "Maquina autonoma de teste final. QAT textual, UX-QAT visual, benchmark comparativo, ciclo test-fix-retest, E2E batch — PDCA convergente com scores."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[qat|ux-qat|benchmark|ciclo|e2e] [URL ou path] [--threshold N] [--resume]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage

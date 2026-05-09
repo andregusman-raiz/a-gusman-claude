@@ -1,7 +1,7 @@
 ---
 name: ag-avaliar-experiencia
 description: "Maquina autonoma de Developer Experience. 5D (SETUP/DOCS/TYPES/TESTS/CI), onboarding em 10min, docs, TypeScript DX, testes, CI. DXS >= 80."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[path do projeto] [--threshold N] [--resume]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList

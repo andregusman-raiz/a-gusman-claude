@@ -577,3 +577,155 @@ Before delivering UI code, verify these items:
 - [ ] Form inputs have labels
 - [ ] Color is not the only indicator
 - [ ] `prefers-reduced-motion` respected
+
+---
+
+## Modo --clone <URL>
+
+Atalho single-command para clonar landing pages e sites estaticos. Orquestra
+`ag-referencia-redesign-workflow` + captura via Chrome DevTools MCP + scaffold Raiz-first.
+
+### Invocacao
+
+```
+/ag-11-ux-ui --clone https://stripe.com
+/ag-11-ux-ui --clone https://linear.app --headed
+```
+
+### Pipeline: 5 fases obrigatorias
+
+#### Fase 1 — PRE-FLIGHT
+
+1. Validar URL (HTTPS preferencial; HTTP aceito com aviso)
+2. Detectar tipo de site via response headers e page source:
+   - Checar `Content-Type`, `X-Powered-By`, scripts carregados (`three.js`, `gsap`, frameworks pesados)
+   - Checar `<meta name="generator">` e scripts `src` no `<head>`
+3. **Guard SPA (modo interativo):** se detectado Three.js / GSAP / React SPA com estado complexo / dashboard interativo:
+   ```
+   AVISO: Site detectado como SPA — clone pode falhar em interacoes complexas.
+   Continuar com clone estatico (captura visual + estrutura HTML)? [s/n]
+   ```
+   - Aceito: prossegue com escopo reduzido (captura visual + scaffold inspirado)
+   - Recusado: redirecionar para `/ag-11-ux-ui design` passando screenshot como input
+
+#### Fase 2 — CAPTURA
+
+Usar **Chrome DevTools MCP** (`chrome-devtools-mcp:chrome-devtools`) para:
+
+| O que capturar | Tool |
+|---------------|------|
+| Screenshot full-page | `mcp__plugin_chrome-devtools-mcp_chrome-devtools__take_screenshot` |
+| DOM tree estruturado | `mcp__plugin_chrome-devtools-mcp_chrome-devtools__take_snapshot` |
+| CSS computado dos elementos principais | `mcp__plugin_chrome-devtools-mcp_chrome-devtools__evaluate_script` |
+| Lista de imagens e assets | `mcp__plugin_chrome-devtools-mcp_chrome-devtools__evaluate_script` |
+
+Script para extrair CSS computado e assets:
+```javascript
+// CSS dos elementos principais (hero, nav, footer, CTA)
+const elements = ['header', 'nav', 'section:first-of-type', 'footer', '[class*="hero"]', '[class*="cta"]'];
+elements.map(sel => {
+  const el = document.querySelector(sel);
+  if (!el) return null;
+  const cs = getComputedStyle(el);
+  return { selector: sel, bg: cs.backgroundColor, color: cs.color, font: cs.fontFamily, fontSize: cs.fontSize };
+});
+
+// Assets
+Array.from(document.images).map(img => ({ src: img.src, alt: img.alt, w: img.naturalWidth }));
+```
+
+#### Fase 3 — ANALISE
+
+1. Carregar `/ag-referencia-redesign-workflow` para carregar taxonomia VibeUI e padroes de layout
+2. Categorizar layout usando taxonomia VibeUI (hero-centric, pricing, auth, dashboard, etc.)
+3. Mapear paleta detectada → tokens Raiz design system:
+
+| Paleta detectada | Token Raiz sugerido |
+|-----------------|-------------------|
+| Laranja / amber | `--raiz-orange: #F7941D` |
+| Teal / verde-agua | `--raiz-teal: #5BB5A2` |
+| Dark / cinza escuro | `--raiz-dark: #1A1A1A` |
+| Branco / off-white | `--raiz-gray-50: #F8F9FA` |
+| Outros | Mapear para o token Raiz mais proximo cromaticamente |
+
+4. Documentar divergencias intencionais (cores da marca original que nao mapeiam para tokens Raiz)
+
+#### Fase 4 — SCAFFOLD
+
+Stack default (per `stack-enforcement.md`):
+
+| Camada | Tecnologia |
+|--------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Estilo | Tailwind CSS + shadcn/ui |
+| Tokens | CSS variables `--raiz-*` (design system Raiz) |
+| Fontes | IBM Plex Sans + IBM Plex Mono via `next/font` |
+| Icons | `lucide-react` (nunca emojis) |
+| PM | `bun` (se bun.lock existir) ou `npm` |
+
+Estrutura de output:
+```
+<PROJECT_ROOT>/clones/<dominio-clonado>/
+├── app/
+│   ├── layout.tsx          # IBM Plex fonts + CSS vars Raiz
+│   ├── page.tsx            # Landing page clonada
+│   └── globals.css         # --raiz-* tokens + reset
+├── components/
+│   └── ...                 # Componentes extraidos da analise
+├── public/
+│   └── ...                 # Assets copiados (logo, imagens)
+├── package.json
+├── tailwind.config.ts      # Tokens Raiz mapeados
+├── next.config.ts
+└── README.md               # Link ao site original + diff de design
+```
+
+Validacoes inegociaveis antes de scaffold:
+- [ ] `tailwind.config.ts` contem tokens `--raiz-orange: #F7941D` e `--raiz-teal: #5BB5A2`
+- [ ] IBM Plex Sans + Mono importadas via `next/font`
+- [ ] Cards usam `border-0 shadow-sm` (nunca combinar border + shadow)
+- [ ] Touch targets >= 44px
+- [ ] Focus ring `2px solid #F7941D`
+- [ ] `aria-label` em botoes de icone
+
+#### Fase 5 — ENTREGAVEIS
+
+| Artefato | Descricao |
+|---------|-----------|
+| Projeto Next.js rodavel | `cd clones/<dominio> && npm run dev` funciona na porta livre |
+| `README.md` | Link ao site original, diff de design, instrucoes de execucao |
+| Screenshot side-by-side | Original vs clone (via `browser_take_screenshot` Playwright MCP) |
+| Log de mapeamento de tokens | Paleta original → tokens Raiz (o que mudou e por que) |
+
+### Quando usar --clone
+
+| Caso de uso | Adequado? |
+|-------------|----------|
+| Landing pages estaticas (marketing, institucional) | Sim |
+| Sites com hero + pricing + CTA simples | Sim |
+| Inspiracao rapida para novo projeto | Sim (scaffold base) |
+| SPAs com estado complexo (Three.js, dashboards) | Nao — usar `/ag-11-ux-ui design` com screenshot |
+| Sites com login / auth wall | Nao — captura bloqueada |
+| Sites com APIs proprietarias | Nao — funcionalidade nao replicavel |
+| Apps moveis (iOS/Android) | Nao — usar `ag-capturar-tela` + `/ag-11-ux-ui design` |
+
+### Diferenca vs ag-referencia-redesign-workflow puro
+
+| | `ag-referencia-redesign-workflow` | `--clone` |
+|--|----------------------------------|----------|
+| Tipo | Skill de referencia (carregada on-demand) | Sub-comando que orquestra |
+| Input | Screenshot / contexto manual | URL direta |
+| Captura | Manual (usuario traz screenshot) | Automatica via Chrome DevTools MCP |
+| Scaffold | Nao incluido | Incluso (Next.js + Raiz tokens + README) |
+| Entregavel | Analise + recomendacoes de redesign | Projeto rodavel + diff visual |
+| Quando usar | Redesign iterativo, analise de design, etapa-a-etapa | Clone rapido one-shot |
+
+`ag-referencia-redesign-workflow` continua valido para uso manual etapa-por-etapa e para redesigns que partem de screenshot ja existente.
+
+### Flags opcionais
+
+| Flag | Comportamento |
+|------|--------------|
+| `--headed` | Abre Chrome em modo visivel para acompanhar captura |
+| `--skip-spa-check` | Pula deteccao de SPA (force clone) |
+| `--port <N>` | Dev server na porta especificada (default: proxima porta livre) |

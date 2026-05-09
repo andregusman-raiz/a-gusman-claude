@@ -1,6 +1,6 @@
 ---
 name: ag-referencia-design-presentation
-description: Taxonomia de 86 layouts de apresentação/marketing (hero, pricing, auth, nav, CTA, testimonials, footer, FAQ, onboarding, blog, contact, stats, bento, states) adaptada do VibeUI. Consultar ANTES de construir landing pages, onboarding flows, auth screens, ou qualquer UI de camada de apresentação. Complementa o design-library/solutions (que cobre módulos verticais de produto).
+description: "Taxonomia de 86 layouts apresentacao/marketing (hero, pricing, auth, nav, CTA, etc) adaptada do VibeUI. Consultar ANTES de landing pages, onboarding, auth screens."
 metadata:
   filePattern:
     - "**/app/(marketing)/**"
@@ -17,7 +17,6 @@ metadata:
 > 86 padrões de layouts de apresentação, agrupados em 14 categorias.
 > Base: VibeUI (vibeui.online) curado + integração com design-library/solutions.
 > Uso: ag-11-ux-ui, ag-1-construir ui, ag-6-iniciar projeto (landing), ag-6-iniciar projeto (auth).
-
 ---
 
 ## Como usar

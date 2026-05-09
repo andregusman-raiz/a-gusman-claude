@@ -2,7 +2,7 @@
 name: ag-10-benchmark-software
 description: Maquina de benchmark de software. Crawl SaaS plataformas — navigate all pages, screenshot, analyze with AI, generate detailed SPEC
 user_invocable: true
-model: opus
+model: sonnet
 ---
 
 # ag-10-benchmark-software — BENCHMARK Machine
