@@ -212,6 +212,93 @@ Input do usuario:
 
 ---
 
+## Modo --7fase (Feature Grande / Domínio Sensível)
+
+Workflow Brainstorm→Spec→Plan→TDD→Subagents→Review→Finalize para features com 3+ PRs ou domínios sensíveis.
+
+### Quando usar --7fase
+
+| Cenário | Usar --7fase | Alternativa |
+|---------|-------------|------------|
+| Feature com 3+ PRs interdependentes | Sim | — |
+| Projeto novo (< 5 commits, domínio desconhecido) | Sim | ag-6-iniciar + ag-1 |
+| Domínio sensível: financeiro, auth, compliance, preditivo | Sim | ag-1 --tdd (single-PR) |
+| Bug simples / refactor pontual | Não | ag-2-corrigir direto |
+| Feature single-PR com spec clara | Não | ag-1-construir |
+| Spike / exploração descartável | Não | ag-6-iniciar explorar |
+
+### Diferença vs SDD puro
+
+SDD (PRD→SPEC→Execução→Review) é o **núcleo** — --7fase ADICIONA:
+- **Frontend**: Fase 1 BRAINSTORM (mesa-redonda mini antes do SDD)
+- **Backend**: Fase 7 FINALIZE (retrospectiva + memory update após entrega)
+- **Orquestração**: Fase 5 SUBAGENTS (worktree paralelo para PRs independentes)
+
+```
+SDD puro:     PRD → SPEC → Execução → Review
+--7fase: [BRAINSTORM] → PRD → SPEC → PLAN → [TDD] → [SUBAGENTS] → REVIEW → [FINALIZE]
+                          └─────── SDD núcleo (fases 2-3) ─────────┘
+```
+
+### As 7 Fases
+
+**Fase 1 — BRAINSTORM** (mini mesa-redonda, ~5min)
+- Invoca `/ag-mesa-redonda` com 2 perspectivas fixas: PM + Arquiteto
+- Timebox implícito: máx 5 iterações de debate
+- Output: decisões-chave, riscos identificados, stack confirmada
+- Skip se: spec já existe e foi aprovada pelo usuário
+
+**Fase 2 — SPEC** (SDD núcleo, via ag-1-construir internamente)
+- PRD via `prd-writer` (contexto do brainstorm alimenta)
+- SPEC via `spec-writer` + `ag-adversario` (review adversarial)
+- ADR se decisão arquitetural com 2+ alternativas
+
+**Fase 3 — PLAN** (fatiamento multi-PR)
+- Invoca `/ag-planejar-execucao` com SPEC como input
+- Output: execution-plan com N PRs sequenciados + grafo de dependências
+- Gate: plano aprovado pelo usuário antes de prosseguir
+
+**Fase 4 — TDD** (ciclos Red-Green-Refactor)
+- Delega para `/ag-1-construir --tdd` para cada PR do plano
+- Requer PR2 do sistema ativo (modo --tdd disponível em ag-1)
+- Aplica apenas para domínios sensíveis (financeiro, auth, preditivo, compliance)
+- Para UI/scaffolding sem lógica de domínio: ag-1 padrão (sem --tdd)
+
+**Fase 5 — SUBAGENTS** (orquestração paralela)
+- Se plano tem 2+ PRs independentes: invoca `/ag-team-safe` com worktree por PR
+- Se PRs são sequenciais: ag-1 serial (sem team)
+- Pre-flight obrigatório: `repo-health.sh` + `memory_pressure`
+
+**Fase 6 — REVIEW** (qualidade + segurança)
+- `/ag-revisar-codigo` em todos os PRs do plano
+- Se feature toca auth/financeiro/LGPD: + `/ag-9-auditar` light (só dimensões relevantes)
+- Gate: score aceitável antes de FINALIZE
+
+**Fase 7 — FINALIZE** (encerramento)
+- `/ag-retrospectiva` para destilar decisões e aprendizados da sessão
+- Atualizar `MEMORY.md` / `feedback_*.md` com padrões identificados
+- Confirmar que todos os PRs foram mergeados e deploy validado
+
+### Exemplo de uso
+
+```
+/ag-0-orquestrador --7fase "feature de auth multi-tenant com roles por escola"
+/ag-0-orquestrador --7fase "pipeline de scoring de inadimplência"
+/ag-0-orquestrador --7fase "integrar Layers + HubSpot com reconciliação automática"
+```
+
+### Invocação direta (avançado)
+
+```bash
+# Usuário pode pular brainstorm se spec já existir
+/ag-0-orquestrador --7fase --skip-brainstorm "feature X [spec: docs/specs/x-spec.md]"
+
+# Pular FINALIZE (sessão não encerra hoje)
+/ag-0-orquestrador --7fase --skip-finalize "feature X"
+```
+
+---
+
 ## Combos Beyond-Obvious (sugerir proativamente)
 
 Quando intent + contexto cruzarem os gatilhos abaixo, ag-0 PROPÕE o combo (não roda automaticamente — pergunta antes).
