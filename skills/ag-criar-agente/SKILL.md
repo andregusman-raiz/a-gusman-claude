@@ -1,6 +1,6 @@
 ---
 name: ag-criar-agente
-description: "Cria novos agentes completos (agent + command + skill opcional) seguindo todas as convencoes do sistema. Gera frontmatter, instrucoes, quality gate, anti-patterns e registra no catalogo do ag-0-orquestrador. Use when creating new agents, adding agents to the system, or when the user wants a new agXX."
+description: "Cria novos agentes completos (agent + command + skill opcional). Gera frontmatter, instrucoes, quality gates. Use para criar agents novos, adicionar agXX ao sistema."
 model: sonnet
 argument-hint: "[nome e descricao do agente]"
 disable-model-invocation: true

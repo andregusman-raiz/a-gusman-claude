@@ -1,7 +1,7 @@
 ---
 name: ag-8-seguranca
 description: "Maquina autonoma de seguranca (wrapper SENTINEL). Security + load testing + LGPD compliance. 6 dimensoes, modo hybrid, convergencia SSS >= 80. Security Certificate."
-model: opus
+model: sonnet
 context: fork
 argument-hint: "[URL ou path] [--threshold N] [--audit-only] [--resume]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage

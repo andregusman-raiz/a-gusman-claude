@@ -1,11 +1,6 @@
 ---
 name: ag-12-sql-totvs-zeev
-description: |
-  Maquina de otimizacao SQL e consulta de dados. Otimiza queries para SQL Server (TOTVS RM), PostgreSQL (Neon),
-  e consulta APIs Zeev BPM. Use quando: (1) otimizar query lenta, (2) revisar SQL para anti-patterns,
-  (3) gerar queries eficientes para relatórios, (4) análise de dados massivos,
-  (5) consultar dados de processos Zeev, (6) cruzar dados TOTVS RM + Zeev.
-  Baseado em AltimateAI/data-engineering-skills + práticas SQL Server + KB unificada MECE.
+description: "Maquina de otimizacao SQL e consulta de dados (TOTVS RM SQL Server + Neon PostgreSQL + Zeev BPM). Use para queries lentas, anti-patterns, relatorios, analise massiva, processos Zeev."
 metadata:
   filePattern:
     - "**/*.sql"
@@ -98,7 +93,6 @@ while True:
 - `SELECT * FROM INFORMATION_SCHEMA.TABLES` para discovery
 - NULL-safe filter: `WHERE (col <> 'X' OR col IS NULL)` (SQL Server exclui NULL silencioso)
 - Tabelas `Tabela_*` já tem regras de negócio decoded (não replicar em SQL raw)
-
 ---
 
 ## Knowledge Base Unificada (OBRIGATÓRIO consultar)

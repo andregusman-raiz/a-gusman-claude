@@ -1,6 +1,6 @@
 ---
 name: ag-aplicar-fix-codigo
-description: "Sub-agent applier de fixes de dead code. Recebe findings de ag-escanear-morto-codigo, aplica em PRs atomicos por categoria, com quality gates entre batches (typecheck + lint + test + build + bundle delta). Self-healing: regressao -> revert + alternativa. Confidence-aware: HIGH auto-aplica, MEDIUM requer approval, LOW nunca aplica. Invocado por ag-13-limpar-codigo."
+description: "Sub-agent applier de fixes dead code. Recebe findings de ag-escanear-morto-codigo, aplica em PRs atomicos com quality gates. Confidence-aware. Invocado por ag-13-limpar-codigo."
 model: sonnet
 context: fork
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, LSP
