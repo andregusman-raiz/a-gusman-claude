@@ -468,9 +468,22 @@ ls ~/.claude/projects/-Users-andregusmandeoliveira-Claude/memory/feedback_*.md 2
 
 # Decisoes anteriores deste orquestrador (rotas que funcionaram/falharam)
 tail -20 ~/Claude/docs/ai-state/orq-decisions.jsonl 2>/dev/null
+
+# Model outcomes por categoria (multi-armed bandit conservador)
+# Se win_rate(sonnet) < 50% em >= 5 obs para esta categoria → sugerir opus
+python3 ~/Claude/.claude/scripts/update-model-outcomes.py --suggest "ag-2-corrigir:totvs" 2>/dev/null || echo "sonnet"
 ```
 
 A saida desses comandos VAI para o contexto de decisao. NAO rotear sem fazer este sweep em pedidos nao-triviais (qualquer pedido > 10 palavras OU que envolve construir/corrigir/auditar).
+
+**Model Routing Adaptativo**: ao encerrar delegacao para machine (apos Verification Gate), registrar outcome:
+```bash
+# Sucesso (artifact existiu, score OK)
+python3 ~/Claude/.claude/scripts/update-model-outcomes.py <categoria> sonnet success 2>/dev/null || true
+
+# Falha (2+ retries, blocker, score abaixo threshold)
+python3 ~/Claude/.claude/scripts/update-model-outcomes.py <categoria> sonnet fail 2>/dev/null || true
+```
 
 Pular pre-flight contextual SO em: comando atomico (`/commit`), continuacao explicita, factual ("quanto custou?"), `--go` no prompt.
 

@@ -23,6 +23,11 @@ Filosofia:
 - Soft-fail: erros de parsing nunca bloqueiam (return 0).
 - stop_hook_active=true significa que o hook ja bloqueou uma vez nesta cadeia
   — retornar 0 para nao causar loop infinito.
+
+Anti-Hallucination Gate (inspirado em Ruflo Issue #640):
+- Detecta quando Claude declara "testes passaram" / "zero erros" mas NAO
+  executou nenhum check verificavel no transcript.
+- Verifica divergencia entre declaracao de sucesso e ausencia de evidence.
 """
 import json
 import os
@@ -33,6 +38,21 @@ import sys
 CODE_EXT = re.compile(r"\.(ts|tsx|js|jsx|mjs|cjs|py|rs|go)$", re.IGNORECASE)
 
 EDIT_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
+
+# Anti-Hallucination: padroes onde Claude DECLARA sucesso de check sem evidencia
+CLAIM_SUCCESS_PATTERNS = re.compile(
+    r"\b(?:testes?\s+(?:passaram|passando|passam|verde|ok|passam todos)"
+    r"|(?:zero|0)\s+(?:erros?|errors?|warnings?)"
+    r"|typecheck\s+(?:passou|ok|limpo|clean|green|verde)"
+    r"|lint\s+(?:passou|ok|limpo|clean|green|verde)"
+    r"|build\s+(?:passou|ok|sucesso|success|green|verde)"
+    r"|all\s+tests?\s+pass(?:ing|ed)?"
+    r"|no\s+(?:errors?|type\s+errors?|lint\s+errors?)"
+    r"|verificacao\s+(?:passou|ok|concluida)"
+    r"|checks?\s+(?:passaram|passed|ok|verde|green)"
+    r"|CI\s+(?:verde|green|passou|passed))\b",
+    re.IGNORECASE,
+)
 
 CHECK_PATTERNS = re.compile(
     r"\b(?:tsc|typecheck|type-check|tsgo)\b"
@@ -99,6 +119,25 @@ Bypass legitimo (so se aplicavel):
   - export COMPLETION_GATE_DISABLED=1 (sessao)
 """
 
+HALLUCINATION_BLOCK_TEMPLATE = """BLOQUEADO pelo Anti-Hallucination Gate (completion-gate.py).
+
+Voce declarou "{claim}" mas NAO executou nenhum check verificavel no transcript.
+
+  Arquivos editados ({n_edits}): {edits}
+  Check executado no transcript: NENHUM
+
+Declaracoes de sucesso sem evidencia = anti-pattern Ruflo Issue #640.
+
+ACAO OBRIGATORIA: Execute o check real e mostre o output:
+
+  bun run typecheck && bun run lint && bun run test
+  npm run typecheck && npm run lint && npm run test
+
+So declare "passou" depois de VER o output do comando.
+
+Bypass: export COMPLETION_GATE_DISABLED=1
+"""
+
 
 def read_transcript(path: str):
     msgs = []
@@ -135,10 +174,12 @@ def find_turn_start(msgs):
 
 def extract_turn_signals(msgs, start_idx):
     """Coleta no turno: arquivos editados (codigo), comandos bash de check,
-    texto agregado do assistente."""
+    texto agregado do assistente, e bash tool results (evidencia real de check)."""
     edits = []
     ran_check = False
+    has_check_output = False  # Anti-hallucination: output real de check
     assistant_text_parts = []
+    bash_tool_ids = set()  # IDs de Bash calls que matcharam CHECK_PATTERNS
 
     for m in msgs[start_idx:]:
         t = m.get("type")
@@ -154,6 +195,7 @@ def extract_turn_signals(msgs, start_idx):
                 elif c.get("type") == "tool_use":
                     name = c.get("name", "")
                     inp = c.get("input", {}) or {}
+                    tool_id = c.get("id", "")
                     if name in EDIT_TOOLS:
                         path = (
                             inp.get("file_path")
@@ -166,6 +208,8 @@ def extract_turn_signals(msgs, start_idx):
                         cmd = inp.get("command", "") or ""
                         if CHECK_PATTERNS.search(cmd):
                             ran_check = True
+                            if tool_id:
+                                bash_tool_ids.add(tool_id)
         elif t == "user":
             content = m.get("message", {}).get("content", "")
             if isinstance(content, list):
@@ -174,16 +218,20 @@ def extract_turn_signals(msgs, start_idx):
                         isinstance(c, dict)
                         and c.get("type") == "tool_result"
                     ):
-                        result_content = c.get("content", "")
-                        if isinstance(result_content, list):
-                            for rc in result_content:
-                                if (
-                                    isinstance(rc, dict)
-                                    and rc.get("type") == "text"
-                                ):
-                                    pass
+                        # Anti-hallucination: verificar se tool_result e de check real
+                        tool_use_id = c.get("tool_use_id", "")
+                        if tool_use_id and tool_use_id in bash_tool_ids:
+                            result_content = c.get("content", "")
+                            if isinstance(result_content, list):
+                                for rc in result_content:
+                                    if isinstance(rc, dict) and rc.get("type") == "text":
+                                        text = rc.get("text", "")
+                                        if text.strip():
+                                            has_check_output = True
+                            elif isinstance(result_content, str) and result_content.strip():
+                                has_check_output = True
 
-    return edits, ran_check, "\n".join(assistant_text_parts)
+    return edits, ran_check, has_check_output, "\n".join(assistant_text_parts)
 
 
 def get_last_user_text(msgs):
@@ -240,15 +288,9 @@ def main() -> int:
         return 0
 
     start = find_turn_start(msgs)
-    edits, ran_check, assistant_text = extract_turn_signals(msgs, start)
+    edits, ran_check, has_check_output, assistant_text = extract_turn_signals(msgs, start)
 
     if not edits:
-        return 0
-
-    if ran_check:
-        return 0
-
-    if not DONE_PATTERNS.search(assistant_text):
         return 0
 
     edits_unique = []
@@ -260,6 +302,27 @@ def main() -> int:
     edits_display = ", ".join(edits_unique[:5])
     if len(edits_unique) > 5:
         edits_display += f" (+{len(edits_unique) - 5} mais)"
+
+    # Anti-Hallucination Gate: Claude declarou sucesso de check sem executar nada?
+    # Detecta claims como "testes passaram", "zero erros", "typecheck ok" sem evidencia real
+    if ran_check and not has_check_output:
+        claim_match = CLAIM_SUCCESS_PATTERNS.search(assistant_text)
+        if claim_match:
+            claim_text = claim_match.group(0)
+            msg = HALLUCINATION_BLOCK_TEMPLATE.format(
+                claim=claim_text,
+                n_edits=len(edits_unique),
+                edits=edits_display,
+            )
+            print(msg, file=sys.stderr)
+            return 2
+
+    # Gate original: editou codigo mas nao rodou nenhum check
+    if ran_check:
+        return 0
+
+    if not DONE_PATTERNS.search(assistant_text):
+        return 0
 
     msg = BLOCK_TEMPLATE.format(
         n_edits=len(edits_unique), edits=edits_display

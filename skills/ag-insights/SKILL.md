@@ -146,8 +146,50 @@ Escrever em `docs/ai-state/insights-[data].md`:
 ```
 ```
 
+## Flag --dedup-memory (Dedup de MEMORY.md)
+
+Quando chamado com `--dedup-memory`, ag-insights executa analise de duplicatas no MEMORY.md:
+
+```bash
+# Contar entradas similares nos arquivos de memory
+MEMORY_DIR="$HOME/.claude/projects/-Users-andregusmandeoliveira-Claude/memory"
+
+# Listar todos os arquivos de feedback/memory
+find "$MEMORY_DIR" -name "*.md" -type f | while read f; do
+  echo "=== $f ==="
+  wc -l "$f"
+done
+
+# Procurar entradas duplicadas por titulo
+grep -h "^##" "$MEMORY_DIR"/*.md 2>/dev/null | sort | uniq -d
+
+# Procurar entradas similares (mesmo topico, datas diferentes)
+grep -h "^##\|^#" "$MEMORY_DIR"/*.md 2>/dev/null | sort | uniq -c | sort -rn | head -20
+```
+
+Output: Relatorio de duplicatas potenciais com sugestao de consolidacao.
+NAO remover automaticamente — apenas reportar para o usuario decidir.
+
+Exemplo de output `--dedup-memory`:
+```
+MEMORY Dedup Report — 2026-05-10
+  Total arquivos: 42
+  Total linhas: 1847
+  Titulos duplicados: 3
+  Possiveis duplicatas (cosine sim > 0.85): 7
+
+  Candidatos a consolidacao:
+  1. feedback_neon_large_queries.md + feedback_neon_only.md
+     Overlap: "paginar queries >10K rows" (ambos mencionam)
+  2. reference_totvs_integration.md + reference_totvs_kb_structure.md
+     Overlap: "PFFINANC" (3 referencias duplicadas)
+
+  Acao sugerida: /ag-retrospectiva --consolidate-memory
+```
+
 ## Important
 - ALWAYS spawn as Agent subagent — do NOT execute inline
 - Uses haiku model (fast, cheap — just data collection)
 - READ-ONLY — collects metrics, does NOT modify code
+- `--dedup-memory`: advisory only — reporta, NAO remove automaticamente
 - Trends mode requires at least 2 previous reports for comparison
