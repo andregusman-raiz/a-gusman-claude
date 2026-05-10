@@ -31,7 +31,7 @@ Correcao completa AUTONOMA em 4 fases:
 ```
 ASSESS → DIAGNOSE → FIX → VERIFY → (loop ate green) → SHIP
                      ↑       │
-                     └───────┘  (convergencia: max 2 cycles)
+                     └───────┘  (convergencia: max 3 cycles — Definition of Done CLAUDE.md)
 ```
 
 1. **ASSESS**: Auto-detecta modo (bug/tipos/batch/debt/triage), estima volume
@@ -53,7 +53,7 @@ ASSESS → DIAGNOSE → FIX → VERIFY → (loop ate green) → SHIP
 ## Propriedades MERIDIAN
 
 - **Autonomo**: diagnostica e corrige sem perguntar
-- **Convergente**: FIX ↔ VERIFY loop ate green (max 2 cycles)
+- **Convergente**: FIX ↔ VERIFY loop ate green (max 3 cycles). VERIFY OBRIGATORIO roda typecheck + lint + test (Definition of Done CLAUDE.md). Apos 3 ciclos red, parar e reportar.
 - **State persistente**: `corrigir-state.json` — resume de onde parou
 - **Self-healing**: regressao → revert + alternativa
 - **Artifacts**: PR com diagnostico, errors-log.md atualizado
