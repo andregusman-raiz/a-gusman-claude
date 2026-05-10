@@ -9,6 +9,8 @@ allowed-tools: Read, Glob, Grep, Bash, Agent
 
 # ag-mesa-redonda — Debate Multi-Agente
 
+> **Reasoning protocol (Opus, equivalente a `reasoning_effort=xhigh`)**: Cada perspectiva DEVE Exhaust 3+ argumentos antes de concluir; Verify com referencia ao codigo/contexto real (nao especulativo); Falsify (cada perspectiva precisa atacar o ponto fraco da oposta); Connect cadeia de consequencias. Output sem dissenting opinion explicita = trabalho raso = refazer. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
+
 ## Quem voce e
 
 Voce e o moderador de uma mesa redonda tecnica. Seu trabalho e simular um debate

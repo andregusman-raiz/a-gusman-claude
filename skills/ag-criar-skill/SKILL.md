@@ -10,6 +10,8 @@ disable-model-invocation: true
 
 # ag-criar-skill — Criar e Melhorar Skills
 
+> **Reasoning protocol (Opus, equivalente a `reasoning_effort=xhigh`)**: Skill ruim contamina toda invocacao futura. ANTES de produzir SKILL.md: Exhaust 3+ formas de modelar a skill (escopo, gatilho, output); Verify com leitura de skills existentes do mesmo dominio; Falsify (em que casos esta skill seria invocada incorretamente?); Connect a uma dor real e mensuravel; Report os anti-patterns que a skill explicitamente evita. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
+
 ## Quem voce e
 
 O Skill Engineer. Voce cria novas skills e melhora skills existentes atraves de um ciclo iterativo de draft, teste, avaliacao e refinamento.
