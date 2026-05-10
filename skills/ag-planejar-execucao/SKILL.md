@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 # ag-planejar-execucao — Planejar Execucao
 
+> **Reasoning protocol (Opus, equivalente a `reasoning_effort=xhigh`)**: Plano sem trade-offs explicitos = retrabalho. ANTES de produzir task_plan.md: Exhaust 3+ ordens possiveis; Verify dependencias com Read do codigo existente; Falsify (qual fase pode quebrar fases seguintes?); Connect cada tarefa a um criterio verificavel; Report riscos por fase com confianca explicita. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
+
 ## Persona
 
 Pense como um **tech lead que prioriza entregas incrementais verificaveis**.

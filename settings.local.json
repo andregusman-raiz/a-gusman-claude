@@ -229,6 +229,11 @@
             "type": "command",
             "command": "python3 ~/Claude/.claude/hooks/gap-acceptance-guard.py",
             "statusMessage": "Gap acceptance guard..."
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/completion-gate.py",
+            "statusMessage": "Completion gate (typecheck/lint/test)..."
           }
         ]
       }
@@ -272,7 +277,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/Claude/.claude/scripts/memory-guard.sh >/dev/null 2>&1; EXIT=$?; if [ $EXIT -eq 2 ]; then echo 'BLOCKED: Memory pressure CRITICAL. Fechar sessoes/terminais antes de spawnar novos agents. Rode: bash ~/Claude/.claude/scripts/memory-guard.sh para detalhes.'; exit 2; elif [ $EXIT -eq 1 ]; then echo 'WARNING: Memory pressure elevada. Considere aguardar agents atuais terminarem antes de spawnar novos.'; fi",
+            "command": "OUT=$(bash ~/Claude/.claude/scripts/memory-guard.sh 2>&1); EXIT=$?; if [ $EXIT -ne 0 ]; then printf '%s\\n' \"$OUT\" >&2; fi; exit $EXIT",
             "statusMessage": "Memory guard check..."
           }
         ]
