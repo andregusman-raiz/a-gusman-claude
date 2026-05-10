@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HOME_DIR="${HOME:-/Users/andregusmandeoliveira}"
+HOME_DIR="${HOME:?HOME env var must be set}"
 WORKSPACE="${WORKSPACE:-$HOME_DIR/Claude}"
 CODEX_ALIAS="$HOME_DIR/Codex"
 LOCAL_CODEX="$WORKSPACE/.Codex"
