@@ -218,6 +218,11 @@
             "type": "command",
             "command": "bash ~/Claude/.claude/scripts/cleanup-orphans.sh 2>/dev/null",
             "statusMessage": "Cleaning orphaned processes..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/scripts/session-health.sh --quiet 2>/dev/null || true",
+            "statusMessage": "Session health check..."
           }
         ]
       }
@@ -234,6 +239,11 @@
             "type": "command",
             "command": "python3 ~/Claude/.claude/hooks/completion-gate.py",
             "statusMessage": "Completion gate (typecheck/lint/test)..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/stop-consolidate.sh 2>/dev/null || true",
+            "statusMessage": "Auto-consolidating session learnings..."
           }
         ]
       }

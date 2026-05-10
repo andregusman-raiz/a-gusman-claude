@@ -34,11 +34,62 @@ ASSESS → DIAGNOSE → FIX → VERIFY → (loop ate green) → SHIP
                      └───────┘  (convergencia: max 3 cycles — Definition of Done CLAUDE.md)
 ```
 
+### Emissao de Phase Tags (observabilidade)
+
+Emitir linha de status a cada transicao de fase:
+
+```
+[ASSESS ✓] modo=bug ciclos_max=3
+[DIAGNOSE ✓] causa_raiz="null ref em adapter" confianca=alta hipoteses=3
+[FIX →] aplicando fix em 2 arquivos...
+[VERIFY ✓] typecheck=0 lint=0 tests=8/8 ciclo=1/3
+[SHIP ✓] branch=fix/X PR=#43
+```
+
+Se VERIFY falha: `[VERIFY ✗] ciclo=2/3 erros=3 → voltando para FIX`
+
 1. **ASSESS**: Auto-detecta modo (bug/tipos/batch/debt/triage), estima volume
-2. **DIAGNOSE**: Causa raiz, categoriza, prioriza (ag-depurar-erro se obscuro)
+2. **DIAGNOSE**: Causa raiz, categoriza, prioriza (ag-depurar-erro se obscuro). Listar 3+ hipoteses concorrentes (Deep Reasoning Directive).
 3. **FIX**: Corrige (ag-corrigir-bugs/B-53 conforme modo). Loop convergente.
 4. **VERIFY**: Typecheck + lint + testes. Se red → volta para FIX.
 5. **SHIP**: PR com diagnostico e evidencia.
+
+### ReasoningBank — Fix Strategy Persistence
+
+Ao encerrar fix bem-sucedido (VERIFY verde), extrair e persistir o pattern:
+
+```bash
+# Append em meridian-kb/fix-strategies.json (criar se nao existe)
+FIX_ENTRY=$(python3 -c "
+import json, sys, datetime
+entry = {
+  'ts': '$(date -u +%Y-%m-%dT%H:%M:%SZ)',
+  'sintoma': 'SINTOMA_AQUI',
+  'causa_raiz': 'CAUSA_AQUI',
+  'fix_aplicado': 'FIX_AQUI',
+  'arquivos': [],
+  'modo': 'MODO_AQUI',
+  'ciclos': 1
+}
+print(json.dumps(entry))
+")
+mkdir -p meridian-kb
+STRATEGIES_FILE="meridian-kb/fix-strategies.json"
+if [ -f "\$STRATEGIES_FILE" ]; then
+  python3 -c "
+import json
+with open('\$STRATEGIES_FILE') as f:
+  data = json.load(f)
+data['strategies'].append(\$FIX_ENTRY)
+with open('\$STRATEGIES_FILE', 'w') as f:
+  json.dump(data, f, indent=2)
+"
+else
+  echo '{ \"strategies\": [\$FIX_ENTRY] }' > "\$STRATEGIES_FILE"
+fi
+```
+
+**ANTES de diagnosticar:** Buscar fix similar em `meridian-kb/fix-strategies.json` por sintoma/causa. Se match encontrado, usar como hipotese inicial (confianca elevada).
 
 ## Modos (auto-detectados)
 
