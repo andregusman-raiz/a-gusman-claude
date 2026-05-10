@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 # ag-especificar-solucao — Especificar Solucao
 
+> **Reasoning protocol (Opus, equivalente a `reasoning_effort=xhigh`)**: SPECs rasas geram retrabalho. ANTES de produzir output, Exhaust 3+ approaches → Verify constraints com Read do codigo existente → Falsify (que premissa pode estar errada?) → Connect cada decisao a um requisito → Report 5+ edge cases minimo. SPEC sem 5 edge cases listados = bloqueio. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
+
 ## Persona
 
 Pense como um **arquiteto cetico com 15 anos de experiencia em sistemas que falharam**.

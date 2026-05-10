@@ -1,18 +1,23 @@
 # ag-0-orquestrador — Machine & Agent Catalog
 
-## 9 Machines (User-Facing)
+## 14 Machines (User-Facing)
 
 | Machine | Comando | Modos | Agents internos |
 |---------|---------|-------|-----------------|
-| **ag-1-construir** | `/construir` | feature, issue, refactor, otimizar, ui, integrar | ag-especificar-solucao, P-07, B-08, B-10, B-11, B-52, Q-12, Q-13, Q-14, D-18, I-32→35, M-51 |
+| **ag-0-orquestrador** | `/ag-0-orquestrador` | (default) classifier, `--7fase` multi-fase, `--resume` retomar goal | self |
+| **ag-1-construir** | `/construir` | feature, issue, refactor, otimizar, ui, integrar, --validado, --tdd | ag-especificar-solucao, P-07, B-08, B-10, B-11, B-52, Q-12, Q-13, Q-14, D-18, I-32→35, M-51 |
 | **ag-2-corrigir** | `/corrigir` | bug, tipos, batch, debt, triage | ag-depurar-erro, B-23, B-53 |
 | **ag-3-entregar** | `/entregar` | preview, producao, rollback | ag-versionar-codigo, D-27, D-38, D-19, D-20 |
 | **ag-4-teste-final** | `/teste-final` | qat, ux-qat, benchmark, ciclo, e2e | ag-testar-qualidade-qat, Q-41, Q-42, Q-43, Q-44, Q-45, Q-39, Q-51 |
-| **ag-5-documentos** | `/documentos` | projeto, office, organizar, ortografia | ag-documentar-projeto, W-29, W-30, W-31 |
+| **ag-5-documentos** | `/documentos` | projeto, office, organizar, ortografia, executive | ag-documentar-projeto, W-29, W-30, W-31 |
 | **ag-6-iniciar** | `/iniciar` | projeto, ambiente, explorar, pesquisar | ag-criar-projeto, P-02, P-03, P-05 |
 | **ag-7-qualidade** | `/qualidade` | (wrapper MERIDIAN) | ag-meridian |
 | **ag-8-seguranca** | `/seguranca` | (wrapper SENTINEL) | ag-sentinel |
 | **ag-9-auditar** | `/auditar` | (wrapper FORTRESS) | ag-fortress → M-60, Q-61, Q-62, Q-63, Q-64 |
+| **ag-10-benchmark-software** | `/ag-10-benchmark-software` | crawl SaaS + screenshot + AI analysis + SPEC | self |
+| **ag-11-ux-ui** | `/ag-11-ux-ui` | design system, componentes, paletas, layouts, shadcn | ag-revisar-ux, ag-avaliar-ux-design-library |
+| **ag-12-sql-totvs-zeev** | `/ag-12-sql-totvs-zeev` | otimizar SQL Server (TOTVS RM) + PostgreSQL (Neon) + Zeev BPM | self |
+| **ag-13-limpar-codigo** | `/ag-13-limpar-codigo` | --triage-only, --apply-quick-wins, --full-pipeline, --create-issues | ag-escanear-morto-codigo, ag-aplicar-fix-codigo |
 
 ## Shortcuts (Machine-Based)
 

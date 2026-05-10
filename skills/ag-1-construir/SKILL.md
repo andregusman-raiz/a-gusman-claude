@@ -223,6 +223,8 @@ ASSESS → PRD → SPEC → [ADVERSARIO] → ADR → PLAN → [TDD-LOOP] → VER
 | `--validado` | Builder + Validator paralelos; codigo primeiro, validacao concorrente | Feature com spec clara, dominio nao-critico |
 | `--tdd` | Teste primeiro + ciclo strict RED-GREEN-REFACTOR; commit por ciclo | Dominio sensivel, refactor critico, logica financeira/regulatoria |
 
+**Recomendacao default (anti-incompletude — espelha pattern Boris Cherny)**: para size M/L/XL e qualquer feature com 3+ arquivos novos, ATIVAR `--validado` por default. Spawnar validator concorrente reduz "entregas incompletas" detectadas pelo usuario. Pular `--validado` apenas em: Size S, refactor trivial, hotfix isolado.
+
 > Referencia completa: `/ag-referencia-tdd` | Templates: Vitest TS, pytest Python, Playwright E2E
 
 ## Guard de escopo — Multi-PR auto-delegate
@@ -252,7 +254,7 @@ Executa construcao completa AUTONOMA em 9 fases:
 ```
 ASSESS → PRD → SPEC → [ADVERSARIO] → ADR → PLAN → BUILD → VERIFY → REVIEW → SHIP
                                                     ↑        │
-                                                    └────────┘  (convergencia: max 2 cycles)
+                                                    └────────┘  (convergencia: max 3 cycles — ver Definition of Done CLAUDE.md)
 ```
 
 1. **ASSESS**: Detecta modo (feature/issue/refactor/optimize/ui/integrate), size gate. **Consulta `/ag-referencia-stack-decisions`** para validar stack antes de prosseguir.
@@ -262,7 +264,7 @@ ASSESS → PRD → SPEC → [ADVERSARIO] → ADR → PLAN → BUILD → VERIFY �
 4. **ADR**: Registra decisoes arquiteturais (skill adr). Skip: Size S, SPEC sem decisoes tecnicas com 2+ alternativas. **Se dep fora do stack aprovado → ADR obrigatorio.**
 5. **PLAN**: Cria plano de execucao (ag-planejar-execucao internamente, skip para Size S)
 6. **BUILD**: Implementa (ag-implementar-codigo/B-10/B-11/B-52/I-35 conforme modo). **Antes de `npm install` qualquer dep nova → verificar stack-enforcement rule.**
-7. **VERIFY**: Verifica completude vs SPEC + testes (ag-validar-execucao + ag-testar-codigo). Loop convergente.
+7. **VERIFY**: Verifica completude vs SPEC + testes (ag-validar-execucao + ag-testar-codigo). Loop convergente. **OBRIGATORIO**: rodar `bun run typecheck && bun run lint && bun run test` (ou equivalente) ANTES de declarar fase concluida — Definition of Done do CLAUDE.md. Se vermelho → BUILD novamente (max 3 ciclos). Apos 3 ciclos red, parar e reportar status real ao usuario.
 8. **REVIEW**: Code review (ag-revisar-codigo, +ag-verificar-seguranca se 10+ arquivos, +ag-avaliar-ux-design-library se UI com app rodando)
 9. **SHIP**: Branch + PR com referencia a PRD, SPEC e ADRs
 
