@@ -1,0 +1,14 @@
+{
+  "started_at": "2026-05-10T20:00:00Z",
+  "diagnostic_dir": "/Users/andregusmandeoliveira/Claude/GitHub/data-engine-app/docs/diagnosticos",
+  "max_concurrent_agents": 6,
+  "last_scan": "2026-05-10T22:10:00Z",
+  "scan_iterations": 5,
+  "memory_status": "38% free system-wide (healthy)",
+  "panels_total": 23,
+  "panels_done": 18,
+  "panels_in_flight": 5,
+  "panels_queued": 0,
+  "open_prs": [2636, 2637, 2638, 2639, 2640, 2641, 2642, 2643, 2644, 2645, 2646, 2647, 2648, 2649, 2650, 2651, 2652, 2653, 2654],
+  "in_flight_agents": ["fix-funnel (P12)", "fix-pesquisa-satisfacao (P20)", "fix-pessoas-rh (P21)", "fix-quadro-docente (P22)", "fix-zeev (P23)"]
+}

@@ -257,6 +257,24 @@ ASSESS → PRD → SPEC → [ADVERSARIO] → ADR → PLAN → BUILD → VERIFY �
                                                     └────────┘  (convergencia: max 3 cycles — ver Definition of Done CLAUDE.md)
 ```
 
+### Emissao de Phase Tags (SPARC-style — observabilidade)
+
+A cada transicao de fase, emitir linha de status com formato padrao. Isso permite
+ao usuario acompanhar progresso sem ler todo o output e facilita deteccao de fases
+travadas:
+
+```
+[ASSESS ✓] modo=feature size=M deps=0 stack=ok
+[SPEC →] gerando especificacao tecnica...
+[SPEC ✓] scope=3_arquivos edge_cases=5 adversario=pendente
+[BUILD →] implementando 3 arquivos...
+[VERIFY ✓] typecheck=0 lint=0 tests=12/12 ciclos=1
+[SHIP ✓] branch=feat/X PR=#42 url=https://github.com/.../pull/42
+```
+
+Formato: `[FASE STATUS]` onde STATUS = `→` (em progresso) ou `✓` (concluido) ou `✗` (falhou).
+Emitir SEMPRE — nao e opcional, e o mecanismo de observabilidade da machine.
+
 1. **ASSESS**: Detecta modo (feature/issue/refactor/optimize/ui/integrate), size gate. **Consulta `/ag-referencia-stack-decisions`** para validar stack antes de prosseguir.
 2. **PRD**: Cria documento de produto (skill prd-writer). Skip: Size S, refactor, optimize, `--skip-prd`, PRD ja existe
 3. **SPEC**: Cria especificacao tecnica (ag-especificar-solucao internamente). Referencia PRD se existir. **Valida deps propostas contra stack aprovado.**
