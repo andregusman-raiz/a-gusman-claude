@@ -1,0 +1,2966 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "source": "raw/specs/openapi.json (Swagger 2.0)",
+    "totalEndpoints": 98,
+    "totalModels": 261,
+    "baseUrls": {
+      "nativeApiV2": "https://raizeducacao.zeev.it/api/2/",
+      "nativeApiV2Staging": "https://hmlraizeducacao.zeev.it/api/2/",
+      "dataApi": "https://metabases.raizeducacao.com.br/api-dados"
+    },
+    "auth": {
+      "nativeApi": "Bearer token (impersonation flow)",
+      "dataApi": "X-API-Key header"
+    }
+  },
+  "endpoints": [
+    {
+      "path": "/api/2/assignments",
+      "method": "GET",
+      "summary": "Listar as atribuições de atividades pendentes da pessoa relacionada ao token de autenticação (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "pageNumber",
+        "recordsPerPage",
+        "flowId",
+        "serviceId",
+        "appCode",
+        "mobileEnabledOnly"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/{assignmentid}",
+      "method": "GET",
+      "summary": "Obter uma atribuição de atividade especifica (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "assignmentId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/{assignmentid}",
+      "method": "PUT",
+      "summary": "Finalizar tarefa atribuída a uma pessoa por código identificador da atribuição de atividade (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "assignmentId",
+        "instanceTaskEnvelope"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/{assignmentid}/actions",
+      "method": "GET",
+      "summary": "Listar as ações de conclusão possíveis de uma atribuição de atividade específica (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "assignmentId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/forward",
+      "method": "POST",
+      "summary": "Encaminhar tarefas pendentes de um usuário para outro usuário (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "model"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/instance/{instanceid}/{code}",
+      "method": "PUT",
+      "summary": "Finalizar tarefa atribuída a pessoa por código da instância e código original/integração ou apelido do elemento da tarefa pendente (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "instanceId",
+        "code",
+        "instanceTaskEnvelope"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/report",
+      "method": "POST",
+      "summary": "Listar todas atribuições de atividades pendentes do sistema de acordo com filtros (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "assignmentFilter"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/report/count",
+      "method": "POST",
+      "summary": "Contar todas as atribuições de atividades pendentes do sistema de acordo com filtros (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "assignmentFilter"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/user/{userid}",
+      "method": "GET",
+      "summary": "Listar as atividades atribuidas a uma pessoa por código (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "userId",
+        "pageNumber",
+        "recordsPerPage",
+        "flowId",
+        "serviceId",
+        "appCode",
+        "mobileEnabledOnly"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/user/{username}",
+      "method": "GET",
+      "summary": "Listar as atividades atribuidas a uma pessoa por username (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "username",
+        "pageNumber",
+        "recordsPerPage",
+        "flowId",
+        "serviceId",
+        "appCode",
+        "mobileEnabledOnly"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/assignments/user/{username}/count",
+      "method": "GET",
+      "summary": "Contar as atividades atribuidas a uma pessoa por username (Auth)",
+      "tags": [
+        "Assignments / Atribuições de atividades a pessoas"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "username",
+        "flowId",
+        "serviceId",
+        "appCode",
+        "mobileEnabledOnly"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/files/createfile",
+      "method": "POST",
+      "summary": "Gerar um documento PDF ou DOCX populando-o com informações e variáveis da instância da solicitação",
+      "tags": [
+        "Files / Anexos"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "fileModel"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/files/instance-task",
+      "method": "POST",
+      "summary": "Adicionar um anexo de no máximo 50mb a uma instância de tarefa por código identificador da instância da tarefa",
+      "tags": [
+        "Files / Anexos"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "file"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/flows/{flowid}/design/elements",
+      "method": "GET",
+      "summary": "Lista os elementos que compoem o design do aplicativo (Auth)",
+      "tags": [
+        "Flows / Aplicativos"
+      ],
+      "domain": "03-fluxos",
+      "parameters": [
+        "flowId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/flows/{flowid}/design/form",
+      "method": "GET",
+      "summary": "Lista os campos de formularios associados ao aplicativo (Auth)",
+      "tags": [
+        "Flows / Aplicativos"
+      ],
+      "domain": "03-fluxos",
+      "parameters": [
+        "flowId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/flows/{flowid}/design/users",
+      "method": "GET",
+      "summary": "Lista as pessoas que compõem o design do aplicativo (Auth)",
+      "tags": [
+        "Flows / Aplicativos"
+      ],
+      "domain": "03-fluxos",
+      "parameters": [
+        "flowId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/flows/{flowid}/export",
+      "method": "GET",
+      "summary": "Exportar um aplicativo para formato intercambiável (Auth)",
+      "tags": [
+        "Flows / Aplicativos"
+      ],
+      "domain": "03-fluxos",
+      "parameters": [
+        "flowId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/flows/edit",
+      "method": "GET",
+      "summary": "Lista de aplicativos que posso editar (Auth)",
+      "tags": [
+        "Flows / Aplicativos"
+      ],
+      "domain": "03-fluxos",
+      "parameters": [
+        "flowId",
+        "flowName",
+        "flowVersion",
+        "deploy",
+        "categoryId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/flows/import",
+      "method": "POST",
+      "summary": "Importar um aplicativo a partir de formato intercambiável (Auth)",
+      "tags": [
+        "Flows / Aplicativos"
+      ],
+      "domain": "03-fluxos",
+      "parameters": [
+        "model"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/formvalues/{frominstanceid}/copy-to/{toinstanceid}",
+      "method": "PATCH",
+      "summary": "Copia os valores de campos de formulário entre instâncias (Auth)",
+      "tags": [
+        "FormValues / Valores de campos do formulário"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "fromInstanceId",
+        "toInstanceId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/formvalues/{instanceid}",
+      "method": "PATCH",
+      "summary": "Atualizar campos de formulário da instância (Auth)",
+      "tags": [
+        "FormValues / Valores de campos do formulário"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "instanceId",
+        "formValuesEnvelope"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/formvalues/{instanceid}/history/clear",
+      "method": "PATCH",
+      "summary": "Apaga o histórico do preenchimento dos campos do formulário em todas as tarefas concluídas, se o campo estiver em tabela todas as linhas serão apagadas (Auth)",
+      "tags": [
+        "FormValues / Valores de campos do formulário"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "instanceId",
+        "formFieldsEnvelope"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/geo/countries",
+      "method": "GET",
+      "summary": "Lista todos os países cadastrados, com a opção de filtrar por palavra chave com similaridade pelo nome",
+      "tags": [
+        "Países / Estados / Cidades"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "name"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/geo/countries/{countryid}/states",
+      "method": "GET",
+      "summary": "Lista todos os estados de um país com a opção de filtrar por palavra chave com similaridade pelo nome do estado",
+      "tags": [
+        "Países / Estados / Cidades"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "countryId",
+        "name"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/geo/states/{stateid}/cities",
+      "method": "GET",
+      "summary": "Lista todas as cidades de um estado com a opção de filtrar por palavra chave com similaridade pelo nome da cidade",
+      "tags": [
+        "Países / Estados / Cidades"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "stateId",
+        "name"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/groups",
+      "method": "GET",
+      "summary": "Listar todos os grupos de manutenção do sistema (Auth)",
+      "tags": [
+        "Groups / Grupos de manutenção"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "name"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/groups/{groupid}",
+      "method": "GET",
+      "summary": "Obter grupo de manutenção pelo código identificador (Auth)",
+      "tags": [
+        "Groups / Grupos de manutenção"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "groupId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/groups/{groupid}/permissions",
+      "method": "GET",
+      "summary": "Listar as permissões associadas ao grupo (Auth)",
+      "tags": [
+        "Groups / Grupos de manutenção"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "groupId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/groups/{groupid}/users",
+      "method": "GET",
+      "summary": "Listar as pessoas vinculadas ao grupo (Auth)",
+      "tags": [
+        "Groups / Grupos de manutenção"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "groupId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/groups/code/{groupcode}",
+      "method": "GET",
+      "summary": "Obter grupo de manutenção pelo código original / integração (Auth)",
+      "tags": [
+        "Groups / Grupos de manutenção"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "groupCode"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/groups/code/{groupcode}/users",
+      "method": "GET",
+      "summary": "Listar as pessoas vinculadas ao grupo por código de original / integração (Auth)",
+      "tags": [
+        "Groups / Grupos de manutenção"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "groupCode"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/instances",
+      "method": "GET",
+      "summary": "Listar todas instâncias de solicitações em que a pessoa relacionada ao token é o requisitante",
+      "tags": [
+        "Instances / Instâncias de solicitações"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "instanceId",
+        "formFieldNames",
+        "startDateBegin",
+        "startDateEnd",
+        "isActive",
+        "showPendingInstanceTasks",
+        "showFinishedInstanceTasks",
+        "showPendingAssignees",
+        "recordsPerPage",
+        "pageNumber",
+        "useCache"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/instances",
+      "method": "POST",
+      "summary": "Criar uma nova instância de solicitação",
+      "tags": [
+        "Instances / Instâncias de solicitações"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "instancesEnvelope"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/instances/{instanceid}",
+      "method": "GET",
+      "summary": "Obter dados da instância específica por código identificador da instância da solicitação",
+      "tags": [
+        "Instances / Instâncias de solicitações"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "instanceId",
+        "formFieldNames",
+        "showPendingInstanceTasks",
+        "showFinishedInstanceTasks",
+        "showPendingAssignees",
+        "useCache"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/instances/{instanceid}/cancel",
+      "method": "PATCH",
+      "summary": "Cancelar uma instância de solicitação por código da solicitação",
+      "tags": [
+        "Instances / Instâncias de solicitações"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "instanceId",
+        "cancelEnvelope"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/instances/{instanceid}/cancel/undo",
+      "method": "PATCH",
+      "summary": "Reverter cancelamento de uma instância de solicitação por código da solicitação",
+      "tags": [
+        "Instances / Instâncias de solicitações"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "instanceId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/instances/report",
+      "method": "GET",
+      "summary": "Listar todas instâncias de solicitações que a pessoa relacionada ao token possui permissão de consultar de acordo com filtros",
+      "tags": [
+        "Instances / Instâncias de solicitações"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "startDateIntervalBegin",
+        "startDateIntervalEnd",
+        "endDateIntervalBegin",
+        "endDateIntervalEnd",
+        "lastTaskEndDateIntervalBegin",
+        "lastTaskEndDateIntervalEnd",
+        "simulation",
+        "active",
+        "instanceId",
+        "flowId",
+        "flowUid",
+        "serviceId",
+        "serviceUid",
+        "allowOpenUrlsForFilesInForm",
+        "requesterUsername",
+        "formFieldNames",
+        "showPendingInstanceTasks",
+        "showFinishedInstanceTasks",
+        "showPendingAssignees",
+        "recordsPerPage",
+        "pageNumber",
+        "useCache",
+        "taskId",
+        "requesterTeamId",
+        "currentRequesterTeamId",
+        "responsibleAppTeamId",
+        "taskStatus"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/instances/report",
+      "method": "POST",
+      "summary": "Listar todas instâncias de solicitações que a pessoa relacionada ao token possui permissão de consultar de acordo com filtros",
+      "tags": [
+        "Instances / Instâncias de solicitações"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "instancesFilter"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/instances/report/count",
+      "method": "POST",
+      "summary": "Contar as instâncias de solicitações que a pessoa relacionada ao token possui permissão de consultar de acordo com filtros",
+      "tags": [
+        "Instances / Instâncias de solicitações"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "instancesFilter"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/instances/subprocess",
+      "method": "POST",
+      "summary": "Criar um novo subprocesso a partir de uma solicitação.",
+      "tags": [
+        "Instances / Instâncias de solicitações"
+      ],
+      "domain": "03-fluxos",
+      "parameters": [
+        "instancesEnvelope"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/integrations/{integrationuid}/execute",
+      "method": "GET",
+      "summary": "Executar uma integração a partir do UID, retornando os valores transformados da mesma.",
+      "tags": [
+        "Integrations / Integrações"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "integrationUID",
+        "instanceId",
+        "serviceId",
+        "flowId",
+        "fieldId",
+        "filter"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/integrations/{integrationuid}/execute",
+      "method": "POST",
+      "summary": "Executar uma integração a partir do UID, retornando os valores transformados da mesma.",
+      "tags": [
+        "Integrations / Integrações"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "integrationUID",
+        "executeIntegrationModel.instanceId",
+        "executeIntegrationModel.serviceId",
+        "executeIntegrationModel.flowId",
+        "executeIntegrationModel.fieldId",
+        "executeIntegrationModel.filter"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/messages",
+      "method": "POST",
+      "summary": "Adicionar mensagem a uma instância de solicitação por código identificador da instância da solicitação.",
+      "tags": [
+        "Messages / Mensagens"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "message"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/messages/instance/{instanceid}",
+      "method": "GET",
+      "summary": "Listar mensagems de uma instância de solicitação",
+      "tags": [
+        "Messages / Mensagens"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "instanceId",
+        "useCache"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/messages/instance-task",
+      "method": "POST",
+      "summary": "Adicionar mensagem a uma instância de tarefa por código identificador da instância da tarefa",
+      "tags": [
+        "Messages / Mensagens"
+      ],
+      "domain": "02-tarefas",
+      "parameters": [
+        "message"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/positions",
+      "method": "GET",
+      "summary": "Listar funções que a pessoa relacionada ao token tem permissão de visualizar (Auth)",
+      "tags": [
+        "Positions / Funções"
+      ],
+      "domain": "05-admin",
+      "parameters": [],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/positions",
+      "method": "POST",
+      "summary": "Criar uma função (Auth)",
+      "tags": [
+        "Positions / Funções"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "positionEnvelope"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/positions/{positionid}",
+      "method": "GET",
+      "summary": "Obter função específica pelo código (Auth)",
+      "tags": [
+        "Positions / Funções"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "positionId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/positions/{positionid}/activate",
+      "method": "PATCH",
+      "summary": "Ativar uma função pelo identificador (Auth)",
+      "tags": [
+        "Positions / Funções"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "positionId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/positions/{positionid}/deactivate",
+      "method": "PATCH",
+      "summary": "Desativar uma função pelo identificador (Auth)",
+      "tags": [
+        "Positions / Funções"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "positionId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/positions/code/{positioncode}",
+      "method": "GET",
+      "summary": "Obter função pelo código original / integração (Auth)",
+      "tags": [
+        "Positions / Funções"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "positionCode"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/positions/code/{positioncode}/users",
+      "method": "GET",
+      "summary": "Listar as pessoas associadas a essa função (Auth)",
+      "tags": [
+        "Positions / Funções"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "positionCode"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/requests",
+      "method": "GET",
+      "summary": "Listar aplicativos e serviços que podem ser iniciados pela pessoa autenticada",
+      "tags": [
+        "Requests / Solicitações"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "teamId",
+        "keywords",
+        "appCode",
+        "mobileEnabledOnly"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/requests/flows",
+      "method": "GET",
+      "summary": "Listar aplicativos que podem ser iniciados pela pessoa autenticada",
+      "tags": [
+        "Requests / Solicitações"
+      ],
+      "domain": "03-fluxos",
+      "parameters": [
+        "teamId",
+        "keywords",
+        "appCode",
+        "mobileEnabledOnly"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/requests/services",
+      "method": "GET",
+      "summary": "Listar serviços que podem ser iniciados pela pessoa autenticada",
+      "tags": [
+        "Requests / Solicitações"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "teamId",
+        "keywords",
+        "appCode",
+        "mobileEnabledOnly"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/services/{serviceid}",
+      "method": "GET",
+      "summary": "Retorna o JSON de exportação do serviço informado (Auth)",
+      "tags": [
+        "Services / Serviços"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "serviceId",
+        "flowContents",
+        "tutorialContents"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/services/import",
+      "method": "POST",
+      "summary": "Importar um novo serviço (Auth)",
+      "tags": [
+        "Services / Serviços"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "model"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/teams",
+      "method": "GET",
+      "summary": "Listar times que a pessoa relacionada ao token tem permissão de visualizar (Auth)",
+      "tags": [
+        "Teams / Times"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "name"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/teams",
+      "method": "POST",
+      "summary": "Criar um time (Auth)",
+      "tags": [
+        "Teams / Times"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "teamEnvelope"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/teams/{teamid}",
+      "method": "GET",
+      "summary": "Obter time pelo código identificador (Auth)",
+      "tags": [
+        "Teams / Times"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "teamId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/teams/{teamid}/activate",
+      "method": "PATCH",
+      "summary": "Ativar um time pelo identificador (Auth)",
+      "tags": [
+        "Teams / Times"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "teamId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/teams/{teamid}/deactivate",
+      "method": "PATCH",
+      "summary": "Desativar um time pelo identificador (Auth)",
+      "tags": [
+        "Teams / Times"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "teamId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/teams/{teamid}/positions",
+      "method": "GET",
+      "summary": "Listar as funções relacionadas ao time (Auth)",
+      "tags": [
+        "Teams / Times"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "teamId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/teams/code/{teamcode}",
+      "method": "GET",
+      "summary": "Obter time pelo código original / integração (Auth)",
+      "tags": [
+        "Teams / Times"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "teamCode"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/teams/code/{teamcode}/{positioncode}/users",
+      "method": "GET",
+      "summary": "Listar as pessoas associadas a esse time com a posição definida (Auth)",
+      "tags": [
+        "Teams / Times"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "teamCode",
+        "positionCode"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/teams/code/{teamcode}/users",
+      "method": "GET",
+      "summary": "Listar as pessoas associadas a esse time (Auth)",
+      "tags": [
+        "Teams / Times"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "teamCode"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/tokens",
+      "method": "GET",
+      "summary": "Obter o dados e token temporário da pessoa autenticada atualmente",
+      "tags": [
+        "Tokens / Segurança"
+      ],
+      "domain": "06-autenticacao",
+      "parameters": [],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/tokens",
+      "method": "POST",
+      "summary": "Obter token temporário a partir de usuário e senha",
+      "tags": [
+        "Tokens / Segurança"
+      ],
+      "domain": "06-autenticacao",
+      "parameters": [
+        "userCredentials"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/tokens/impersonate/{userid}",
+      "method": "GET",
+      "summary": "Personificar e obter o token temporário de outra pessoa a partir de seu código (Auth)",
+      "tags": [
+        "Tokens / Segurança"
+      ],
+      "domain": "06-autenticacao",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/tokens/impersonate/{username}",
+      "method": "GET",
+      "summary": "Personificar e obter o token temporário de outra pessoa a partir de seu username (Auth)",
+      "tags": [
+        "Tokens / Segurança"
+      ],
+      "domain": "06-autenticacao",
+      "parameters": [
+        "username"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users",
+      "method": "GET",
+      "summary": "Listar as pessoas do sistema (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "pageNumber",
+        "isActive"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users",
+      "method": "POST",
+      "summary": "Cadastrar uma pessoa, com grupos de manutenção, times e funções relacionados (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userModel"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}",
+      "method": "GET",
+      "summary": "Obter pessoa por código (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}",
+      "method": "DELETE",
+      "summary": "Excluir uma pessoa por código (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "204",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/absent/enter",
+      "method": "PATCH",
+      "summary": "Definir pessoa como em ausência temporária por código (Auth)",
+      "tags": [
+        "Ausência temporária"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId",
+        "absenceModel"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/absent/leave",
+      "method": "PATCH",
+      "summary": "Tirar uma pessoa de ausência temporária por código (Auth)",
+      "tags": [
+        "Ausência temporária"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/account/activate",
+      "method": "PATCH",
+      "summary": "Ativar uma pessoa por código (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/account/deactivate",
+      "method": "PATCH",
+      "summary": "Desativar uma pessoa por código (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/account/lock",
+      "method": "PATCH",
+      "summary": "Bloquear o acesso de uma pessoa ao sistema por código (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/account/unlock",
+      "method": "PATCH",
+      "summary": "Desbloquear o acesso de uma pessoa ao sistema por código (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/groups",
+      "method": "GET",
+      "summary": "Listar grupos de manutenção por código da pessoa (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/groups/{groupid}",
+      "method": "POST",
+      "summary": "Adicionar um grupo de manutenção a uma pessoa (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId",
+        "groupId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/groups/{groupid}",
+      "method": "DELETE",
+      "summary": "Excluir um grupo de manutenção de uma pessoa (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId",
+        "groupId"
+      ],
+      "responses": [
+        "204",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/groups/copy/{newuserid}",
+      "method": "POST",
+      "summary": "Copia todos os grupos de manutenção de uma pessoa para outra (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId",
+        "newUserId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/password/change-link",
+      "method": "GET",
+      "summary": "Pegar link e chave de alteração de senha (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/password/force-change",
+      "method": "PATCH",
+      "summary": "Forçar pessoa a alterar sua senha no próximo login (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/password/request-reset",
+      "method": "POST",
+      "summary": "Enviar e-mail para pessoa definir nova senha (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "01-solicitacoes",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/positions",
+      "method": "GET",
+      "summary": "Listar posições e times por código da pessoa (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/positions/{positionid}/{teamid}",
+      "method": "POST",
+      "summary": "Adicionar um time e função a uma pessoa (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId",
+        "positionId",
+        "teamId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/positions/{positionid}/{teamid}",
+      "method": "DELETE",
+      "summary": "Excluir um time e função de uma pessoa (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId",
+        "positionId",
+        "teamId"
+      ],
+      "responses": [
+        "204",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/positions/copy/{newuserid}",
+      "method": "POST",
+      "summary": "Copia todos os times e funções de uma pessoa para outra (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId",
+        "newUserId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/transfer/{newuserid}",
+      "method": "POST",
+      "summary": "Transferir a propriedade de dados de uma pessoa para outra (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId",
+        "newUserId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{userid}/welcome",
+      "method": "POST",
+      "summary": "Enviar instruções de boas vindas à pessoa (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userId"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/{username}",
+      "method": "GET",
+      "summary": "Obter pessoa por username (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "username"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/temp",
+      "method": "GET",
+      "summary": "Listar todas as pessoas da área de transferência (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/temp",
+      "method": "POST",
+      "summary": "Sincronizar e inserir as pessoas da área de transferência selecionados (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userModel"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/temp/import",
+      "method": "POST",
+      "summary": "Transformar pessoas temporárias em pessoas finais (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "userNamesModel"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    },
+    {
+      "path": "/api/2/users/username/{username}",
+      "method": "GET",
+      "summary": "Obter pessoa por username (Auth)",
+      "tags": [
+        "People / Pessoas"
+      ],
+      "domain": "05-admin",
+      "parameters": [
+        "username"
+      ],
+      "responses": [
+        "200",
+        "400",
+        "401",
+        "403",
+        "404",
+        "429",
+        "500"
+      ]
+    }
+  ],
+  "models": {
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetAssignmentsModelResult": {
+      "fieldCount": 12
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetTasks_Responsibles": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetTasks_Flows": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetTasks_Instances": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetTasks_Services": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetTasks_InstanceTask": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetTasks_Tasks": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetTasks_Tasks_Elements": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Base.ApiModels.Suport.ErrorResponse": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Base.ApiModels.Suport.Error": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.FinalizeInstanceTaskModel": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.FinalizeInstanceTaskModel+FinalizeInstanceTaskModel_FormFields": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.FinalizeInstanceTaskModel+FinalizeInstanceTaskModel_Messages": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.FinalizeInstanceTaskModel+FinalizeInstanceTaskModel_Files": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.FinalizeInstanceTaskModelExample": {
+      "fieldCount": 0
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetAssignmentsActionsModelResult": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.CountAssignmentsModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.GetAssignmentsModel": {
+      "fieldCount": 10
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.ForwardTasksModel": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.ForwardTasksModelResult": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.ForwardTasksModelResult+ForwardTasksWarningsModelResult": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Assignments.CountAssignmentsModel": {
+      "fieldCount": 8
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.Absence.EnterAbsenceModelExternal": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.EnterAbsenceUserModelResult": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.LeaveAbsenceUserModelResult": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Files.CreateFileModel": {
+      "fieldCount": 10
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Files.CreateFileModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Files.AddFileToInstanceTaskModel": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Files.AddFileToInstanceTaskModelResult": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Flows.GetFlowExportModelResult": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Flows.Design.ResumeFormModelResult": {
+      "fieldCount": 19
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Flows.Design.ResumeFlowUserModelResult": {
+      "fieldCount": 9
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Flows.Design.ListDesignElementsModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Base.ApiModels.Suport.IModelResult": {
+      "fieldCount": 0
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Flows.FlowCanEditModelResult": {
+      "fieldCount": 18
+    },
+    "Orquestra.Models.Workflow.ApiModels.Internal.BPMS._10.Flows.ImportFlowModel": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.Internal.BPMS._10.Flows.ImportFlowModelResult": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.FormValues.UpdateFormValuesModel": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.FormValues.UpdateFormValuesModel+UpdateFormValuesModel_FormValues": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.FormValues.UpdateFormValuesModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.FormValues.ClearFormHistoryValuesModel": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.FormValues.CopyFormValuesModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Groups.GetGroupsDetailModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Groups.GetGroupsModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Groups.GetGroupUsersModelResult": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Groups.GetGroupPermissionsModelResult": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModel": {
+      "fieldCount": 27
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.FormFieldsFilterEntity": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult": {
+      "fieldCount": 21
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_Flows": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_Services": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_FormFieldValues": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_Requesters": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_InstanceTasks": {
+      "fieldCount": 13
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_Requesters+GetReportInstancesModelResult_RequesterTeams": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_Requesters+GetReportInstancesModelResult_RequesterPositions": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_InstanceTasks+GetReportInstancesModelResult_Tasks": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_InstanceTaskExecutor": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_InstanceTaskAssignees": {
+      "fieldCount": 7
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_InstanceTaskAssignees+GetReportInstancesModelResult_InstanceTaskAssignees_Team": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetReportInstancesModelResult+GetReportInstancesModelResult_InstanceTaskAssignees+GetReportInstancesModelResult_InstanceTaskAssignees_Position": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModel": {
+      "fieldCount": 29
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult": {
+      "fieldCount": 21
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_Flows": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_Services": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_FormFieldValues": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_Requesters": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_InstanceTasks": {
+      "fieldCount": 13
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_Requesters+PostReportInstancesModelResult_RequesterTeams": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_Requesters+PostReportInstancesModelResult_RequesterPositions": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_InstanceTasks+PostReportInstancesModelResult_Tasks": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_InstanceTaskExecutor": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_InstanceTaskAssignees": {
+      "fieldCount": 7
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_InstanceTaskAssignees+PostReportInstancesModelResult_InstanceTaskAssignees_Team": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.PostReportInstancesModelResult+PostReportInstancesModelResult_InstanceTaskAssignees+PostReportInstancesModelResult_InstanceTaskAssignees_Position": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult": {
+      "fieldCount": 20
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_Flows": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_Services": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_FormFieldValues": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_Requesters": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_InstanceTasks": {
+      "fieldCount": 13
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_Requesters+GetInstancesModelResult_RequesterTeams": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_Requesters+GetInstancesModelResult_RequesterPositions": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_InstanceTasks+GetInstancesModelResult_Tasks": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_InstanceTaskExecutor": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_InstanceTaskAssignees": {
+      "fieldCount": 7
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_InstanceTaskAssignees+GetInstancesModelResult_InstanceTaskAssignees_Team": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.GetInstancesModelResult+GetInstancesModelResult_InstanceTaskAssignees+GetInstancesModelResult_InstanceTaskAssignees_Position": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CreateInstancesModel": {
+      "fieldCount": 9
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CreateInstancesModel+CreateInstancesModel_FormFields": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CreateInstancesModel+CreateInstancesModel_Messages": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CreateInstancesModel+CreateInstancesModel_Files": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CreateInstancesModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CreateInstancesSubprocessModel": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CreateInstancesSubprocessModel+CreateInstancesSubprocessModel_FormFields": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CreateInstancesSubprocessModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CountInstancesModel": {
+      "fieldCount": 15
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CountInstancesModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CancelInstanceModel": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.CancelInstanceModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Instances.UndoCancelInstanceModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Integrations.ExecuteIntegrationModel": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Integrations.IntegrationExecutionTransformedModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Integrations.IntegrationExecutionAttributeModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Shared.Base.Models.Models.ErrorWrapper`1[[Orquestra.Models.Workflow.ApiModels.External._20.Integrations.IntegrationExecutionErrorInfoModelResult, Orquestra.Models.Workflow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Integrations.IntegrationExecutionErrorInfoModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Messages.GetMessagesModelResult": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Messages.GetMessagesModelResult+GetMessagesModelResult_Instances": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Messages.GetMessagesModelResult+GetMessagesModelResult_Users": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Messages.GetMessagesModelResult+GetMessagesModelResult_TaskInstances": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Messages.GetMessagesModelResult+GetMessagesModelResult_Users_Original": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Messages.GetMessagesModelResult+GetMessagesModelResult_Tasks": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Messages.AddMessageToInstanceModel": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Messages.AddMessageModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Messages.AddMessageToInstanceTaskModel": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Geo.GetCountriesModelResult": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Geo.GetCitiesModelResult": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Geo.GetStatesModelResult": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Users.GetUserTempModelResult": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.PostInsertTempUserModel": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.PostInsertTempUserModelResult": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersDetailedModelResult": {
+      "fieldCount": 25
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersDetailedModelResult+GetUsersDetailedModelResult_Substituting": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersDetailedModelResult+GetUsersDetailedModelResult_Substitute": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersDetailedModelResult+GetUsersDetailedModelResult_Groups": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersDetailedModelResult+GetUsersDetailedModelResult_UserPositions": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersDetailedModelResult+GetUsersDetailedModelResult_UserPositions+GetUsersDetailedModelResult_Leadership": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersDetailedModelResult+GetUsersDetailedModelResult_UserPositions+GetUsersDetailedModelResult_UserPositions_Positions": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersDetailedModelResult+GetUsersDetailedModelResult_UserPositions+GetUsersDetailedModelResult_UserPositions_Areas": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUserGroupsModelResult": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUserPositionsModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUserPositionsModelResult+GetUserPositionsModelResult_Positions": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUserPositionsModelResult+GetUserPositionsModelResult_Areas": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetLinkAndKeyChangePasswordModelResult": {
+      "fieldCount": 2
+    },
+    "Microsoft.AspNet.OData.Query.ODataQueryOptions`1[[Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersModelResult, Orquestra.Models.Workflow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]": {
+      "fieldCount": 14
+    },
+    "Microsoft.AspNet.OData.ODataQueryContext": {
+      "fieldCount": 7
+    },
+    "Microsoft.AspNet.OData.Query.ODataRawQueryOptions": {
+      "fieldCount": 11
+    },
+    "Microsoft.AspNet.OData.Query.SelectExpandQueryOption": {
+      "fieldCount": 6
+    },
+    "Microsoft.AspNet.OData.Query.ApplyQueryOption": {
+      "fieldCount": 4
+    },
+    "Microsoft.AspNet.OData.Query.FilterQueryOption": {
+      "fieldCount": 4
+    },
+    "Microsoft.AspNet.OData.Query.OrderByQueryOption": {
+      "fieldCount": 5
+    },
+    "Microsoft.AspNet.OData.Query.SkipQueryOption": {
+      "fieldCount": 4
+    },
+    "Microsoft.AspNet.OData.Query.SkipTokenQueryOption": {
+      "fieldCount": 5
+    },
+    "Microsoft.AspNet.OData.Query.TopQueryOption": {
+      "fieldCount": 4
+    },
+    "Microsoft.AspNet.OData.Query.CountQueryOption": {
+      "fieldCount": 4
+    },
+    "Microsoft.AspNet.OData.Query.Validators.ODataQueryValidator": {
+      "fieldCount": 0
+    },
+    "Microsoft.AspNet.OData.Query.DefaultQuerySettings": {
+      "fieldCount": 7
+    },
+    "Microsoft.OData.Edm.IEdmModel": {
+      "fieldCount": 6
+    },
+    "Microsoft.OData.Edm.IEdmType": {
+      "fieldCount": 1
+    },
+    "Microsoft.OData.Edm.IEdmNavigationSource": {
+      "fieldCount": 4
+    },
+    "Microsoft.AspNet.OData.Routing.ODataPath": {
+      "fieldCount": 5
+    },
+    "System.IServiceProvider": {
+      "fieldCount": 0
+    },
+    "Microsoft.AspNet.OData.Query.Validators.SelectExpandQueryValidator": {
+      "fieldCount": 0
+    },
+    "Microsoft.OData.UriParser.SelectExpandClause": {
+      "fieldCount": 2
+    },
+    "Microsoft.OData.UriParser.Aggregation.ApplyClause": {
+      "fieldCount": 1
+    },
+    "Microsoft.AspNet.OData.Query.Validators.FilterQueryValidator": {
+      "fieldCount": 0
+    },
+    "Microsoft.OData.UriParser.FilterClause": {
+      "fieldCount": 3
+    },
+    "Microsoft.AspNet.OData.Query.OrderByNode": {
+      "fieldCount": 1
+    },
+    "Microsoft.AspNet.OData.Query.Validators.OrderByQueryValidator": {
+      "fieldCount": 0
+    },
+    "Microsoft.OData.UriParser.OrderByClause": {
+      "fieldCount": 5
+    },
+    "Microsoft.AspNet.OData.Query.Validators.SkipQueryValidator": {
+      "fieldCount": 0
+    },
+    "Microsoft.AspNet.OData.Query.Validators.SkipTokenQueryValidator": {
+      "fieldCount": 0
+    },
+    "Microsoft.AspNet.OData.Query.ODataQuerySettings": {
+      "fieldCount": 6
+    },
+    "Microsoft.AspNet.OData.Query.ODataQueryOptions": {
+      "fieldCount": 14
+    },
+    "Microsoft.AspNet.OData.Query.Validators.TopQueryValidator": {
+      "fieldCount": 0
+    },
+    "Microsoft.AspNet.OData.Query.Validators.CountQueryValidator": {
+      "fieldCount": 0
+    },
+    "Microsoft.OData.Edm.IEdmSchemaElement": {
+      "fieldCount": 3
+    },
+    "Microsoft.OData.Edm.Vocabularies.IEdmVocabularyAnnotation": {
+      "fieldCount": 4
+    },
+    "Microsoft.OData.Edm.Vocabularies.IEdmDirectValueAnnotationsManager": {
+      "fieldCount": 0
+    },
+    "Microsoft.OData.Edm.IEdmEntityContainer": {
+      "fieldCount": 4
+    },
+    "Microsoft.OData.Edm.IEdmNavigationPropertyBinding": {
+      "fieldCount": 3
+    },
+    "Microsoft.OData.Edm.IEdmPathExpression": {
+      "fieldCount": 3
+    },
+    "Microsoft.OData.UriParser.ODataPathSegment": {
+      "fieldCount": 2
+    },
+    "Microsoft.OData.UriParser.SelectItem": {
+      "fieldCount": 0
+    },
+    "Microsoft.OData.UriParser.Aggregation.TransformationNode": {
+      "fieldCount": 1
+    },
+    "Microsoft.OData.UriParser.SingleValueNode": {
+      "fieldCount": 2
+    },
+    "Microsoft.OData.UriParser.RangeVariable": {
+      "fieldCount": 3
+    },
+    "Microsoft.OData.Edm.IEdmTypeReference": {
+      "fieldCount": 2
+    },
+    "Microsoft.OData.Edm.Vocabularies.IEdmTerm": {
+      "fieldCount": 6
+    },
+    "Microsoft.OData.Edm.Vocabularies.IEdmVocabularyAnnotatable": {
+      "fieldCount": 0
+    },
+    "Microsoft.OData.Edm.IEdmExpression": {
+      "fieldCount": 1
+    },
+    "Microsoft.OData.Edm.IEdmEntityContainerElement": {
+      "fieldCount": 3
+    },
+    "Microsoft.OData.Edm.IEdmNavigationProperty": {
+      "fieldCount": 8
+    },
+    "Microsoft.OData.Edm.IEdmReferentialConstraint": {
+      "fieldCount": 1
+    },
+    "Microsoft.OData.Edm.IEdmStructuredType": {
+      "fieldCount": 5
+    },
+    "Microsoft.OData.Edm.EdmReferentialConstraintPropertyPair": {
+      "fieldCount": 2
+    },
+    "Microsoft.OData.Edm.IEdmProperty": {
+      "fieldCount": 4
+    },
+    "Microsoft.OData.Edm.IEdmStructuralProperty": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersModelResult": {
+      "fieldCount": 17
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.GetUsersModelResult+GetUsersModelResult_Leadership": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Users.AddUserModel": {
+      "fieldCount": 15
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Users.AddUserModel+AddUserModel_TeamsAndPositions": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Users.AddUserModel+AddUserModel_Groups": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Users.AddUserModel+AddUserModel_WelcomeMessage": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Users.AddUserModel+AddUserModel_TeamsAndPositions+AddUserModel_TeamsAndPositions_Items": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Users.AddUserModel+AddUserModel_Groups+AddUserModel_Groups_Items": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Base.ApiModels.External._20.Users.AddUserModelResult": {
+      "fieldCount": 12
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.PostTempUsersToRealUserModel": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.PostTempUsersToRealUserModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.SendWelcomeModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.AddGroupToUserModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.TransferOwnershipModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.ResetPasswordModelResult": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.CopyGroupsModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.CopyPositionsModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.AddUserPositionToUserModelResult": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.LockUserModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.UnLockUserModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.ActivateUserModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.DeactivateUserModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Users.ForcePasswordChangeModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Positions.GetPositionsModelResult": {
+      "fieldCount": 7
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Positions.AddPositionModel": {
+      "fieldCount": 7
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Positions.AddPositionModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Positions.GetPositionsDetailModelResult": {
+      "fieldCount": 7
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Positions.GetPositionUsersModelResult": {
+      "fieldCount": 8
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Positions.GetPositionUsersModelResult+GetPositionUsersModelResult_Position": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Positions.GetPositionUsersModelResult+GetPositionUsersModelResult_Team": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Positions.ActivatePositionModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Positions.DeactivatePositionModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.Ecternal._20.Requests.GetRequestsModelResult": {
+      "fieldCount": 20
+    },
+    "Orquestra.Models.Workflow.ApiModels.Ecternal._20.Requests.GetRequestsModelResult+GetRequestsModelResult_Flows": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.Ecternal._20.Requests.GetRequestsModelResult+GetRequestsModelResult_Services": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.Ecternal._20.Requests.GetRequestsModelResult+GetRequestsModelResult_Teams": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Requests.GetFlowsModelResult": {
+      "fieldCount": 13
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Requests.GetFlowsModelResult+GetFlowsModelResult_Teams": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Requests.GetServicesModelResult": {
+      "fieldCount": 15
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Requests.GetServicesModelResult+GetServicesModelResult_Flows": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Requests.GetServicesModelResult+GetServicesModelResult_Teams": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.GetServicesModelResult": {
+      "fieldCount": 16
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.GetServicesModelResult+GetServicesModelResultTeams": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.GetServicesModelResult+GetServicesModelResultFlows": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.GetServicesModelResult+GetServiceModelResultTutorial": {
+      "fieldCount": 6
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.GetServicesModelResult+GetServiceModelResultAuthorization": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.GetServicesModelResult+GetServiceModelResultForm": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.GetServicesModelResult+GetServiceModelResultRequest": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.GetServicesModelResult+GetServiceModelResultEdit": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.GetServicesModelResult+GetServiceModelResultReport": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.ServiceImportModel": {
+      "fieldCount": 10
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.ServiceTeamImportModel": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.ServiceFlowImportModel": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.ServiceTutorialImportModel": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.ServiceFlowFormImportModel": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Services.ServiceImportModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.GetTeamsDetailModelResult": {
+      "fieldCount": 13
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.GetTeamsDetailModelResult+GetTeamsDetailModelResult_Parent": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.GetTeamsModelResult": {
+      "fieldCount": 13
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.GetTeamsModelResult+GetTeamsModelResult_Parent": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.AddTeamModel": {
+      "fieldCount": 9
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.AddTeamModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.GetTeamPositionsModelResult": {
+      "fieldCount": 5
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.GetTeamUsersModelResult": {
+      "fieldCount": 8
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.GetTeamUsersModelResult+GetTeamUsersModelResult_Position": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.GetTeamUsersModelResult+GetTeamUsersModelResult_Team": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.ActivateTeamModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Teams.DeactivateTeamModelResult": {
+      "fieldCount": 1
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Tokens.GetActualTokenModelResult": {
+      "fieldCount": 3
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Tokens.GetTokenByCredentialsModel": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Tokens.GetTokenByCredentialsModelResult": {
+      "fieldCount": 4
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Tokens.GetImpersonateTokenModelResult": {
+      "fieldCount": 2
+    },
+    "Orquestra.Models.Workflow.ApiModels.External._20.Tokens.GetImpersonateTokenModelResult+GetImpersonateUser_Details": {
+      "fieldCount": 4
+    }
+  }
+}

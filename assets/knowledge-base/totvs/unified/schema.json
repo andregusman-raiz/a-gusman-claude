@@ -1,0 +1,1764 @@
+{
+  "version": "2.0",
+  "generated_from": "raiz-data-engine code analysis",
+  "generated_at": "2026-04-11",
+  "tables_total": 54,
+  "note": "54 TOTVS MSSQL tables queried in raiz-data-engine. Updated 2026-04-11 (Dia 2): added PFCOMPL, SCONTRATO, SNOTAS, PCARGO, PFHSTAFT, PFUFERIAS, PFVALETR, TTDO via code audit vs nlq._KNOWN_TABLES_MSSQL whitelist. 13 Neon PostgreSQL tables NOT included here.",
+  "domains": [
+    "estrutura",
+    "educacional",
+    "matriculas",
+    "financeiro",
+    "rh",
+    "contabil",
+    "compras",
+    "estoque",
+    "ponto",
+    "smt",
+    "obz",
+    "kpis"
+  ],
+  "tables": [
+    {
+      "name": "GCOLIGADA",
+      "description": "Coligadas (companies/schools). Master structural table.",
+      "row_count_estimate": 32,
+      "domains_used": [
+        "estrutura",
+        "rh",
+        "financeiro",
+        "matriculas"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "NOME",
+        "CGC",
+        "ATIVO"
+      ],
+      "joins": [],
+      "pii_columns": [
+        "CGC",
+        "NOME"
+      ],
+      "files": [
+        "dominio/estrutura.py",
+        "dominio/financeiro/provider.py",
+        "dominio/matriculas/provider.py",
+        "dominio/rh/provider.py"
+      ]
+    },
+    {
+      "name": "GFILIAL",
+      "description": "Filiais (branches) per coligada.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "estrutura"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODFILIAL",
+        "NOME",
+        "CGC"
+      ],
+      "joins": [
+        {
+          "to": "GCOLIGADA",
+          "on": "CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [
+        "CGC",
+        "NOME"
+      ],
+      "files": [
+        "dominio/estrutura.py"
+      ]
+    },
+    {
+      "name": "PSECAO",
+      "description": "Secoes/departamentos (HR sections). Schema drift: PK is CODIGO (not CODSECAO — CODSECAO only exists on PFUNC as the FK).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "estrutura"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODIGO",
+        "DESCRICAO"
+      ],
+      "primary_key": [
+        "CODCOLIGADA",
+        "CODIGO"
+      ],
+      "joins": [
+        {
+          "to": "GCOLIGADA",
+          "on": "CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "PFUNC",
+          "on": "CODIGO = CODSECAO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/estrutura.py",
+        "api/rh.py"
+      ]
+    },
+    {
+      "name": "PFUNCAO",
+      "description": "Cargos/funcoes (job positions). Replaces PCARGO in this TOTVS RM instance. PK is (CODCOLIGADA, CODIGO). NOTE: PFUNCAO has NO CODFUNCAO column — join via PFUNCAO.CODIGO = PFUNC.CODFUNCAO.",
+      "row_count_estimate": 715,
+      "domains_used": [
+        "estrutura",
+        "rh"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODIGO",
+        "NOME",
+        "CBO",
+        "INATIVA"
+      ],
+      "primary_key": [
+        "CODCOLIGADA",
+        "CODIGO"
+      ],
+      "joins": [
+        {
+          "to": "GCOLIGADA",
+          "on": "CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "PFUNC",
+          "on": "CODIGO = CODFUNCAO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "api/rh.py",
+        "dominio/rh/folha_detalhada.py"
+      ]
+    },
+    {
+      "name": "PFUNC",
+      "description": "Funcionarios (employee master). Central HR table. CODSITUACAO is CHAR: 'A'=Ativo, 'D'=Demitido, 'I'=Afastado, 'P'=Pendente, 'T'=Transferido. Schema drift: uses CODFUNCAO (not CODCARGO — CODCARGO does NOT exist on this instance). Cargo name via LEFT JOIN PFUNCAO ON PFUNCAO.CODIGO = PFUNC.CODFUNCAO.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "rh",
+        "educacional",
+        "ponto",
+        "smt"
+      ],
+      "columns_used": [
+        "CHAPA",
+        "CODCOLIGADA",
+        "CODFILIAL",
+        "CODPESSOA",
+        "CODSITUACAO",
+        "CODSECAO",
+        "CODFUNCAO",
+        "SALARIO",
+        "DATAADMISSAO",
+        "DATADEMISSAO",
+        "PISPASEP",
+        "CODCATEGORIA"
+      ],
+      "joins": [
+        {
+          "to": "PPESSOA",
+          "on": "CODPESSOA = CODIGO"
+        },
+        {
+          "to": "PSECAO",
+          "on": "CODSECAO = CODIGO AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "PFUNCAO",
+          "on": "CODFUNCAO = CODIGO AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "GCOLIGADA",
+          "on": "CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [
+        "CHAPA"
+      ],
+      "files": [
+        "dominio/rh/headcount.py",
+        "dominio/rh/provider.py",
+        "dominio/rh/complementar.py",
+        "dominio/rh/folha_detalhada.py",
+        "dominio/rh/motor_docente.py",
+        "dominio/educacional/professores.py",
+        "dominio/educacional/turmas.py",
+        "dominio/ponto/provider.py",
+        "dominio/smt/provider.py"
+      ]
+    },
+    {
+      "name": "PPESSOA",
+      "description": "Pessoas (person master). Shared by employees, students, contacts.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "rh",
+        "educacional",
+        "ponto",
+        "smt"
+      ],
+      "columns_used": [
+        "CODIGO",
+        "NOME",
+        "CPF",
+        "EMAIL",
+        "SEXO",
+        "DTNASCIMENTO",
+        "TELEFONE1",
+        "TELEFONE2"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CODIGO = CODPESSOA"
+        },
+        {
+          "to": "SALUNO",
+          "on": "CODIGO = CODPESSOA"
+        }
+      ],
+      "pii_columns": [
+        "NOME",
+        "CPF",
+        "EMAIL",
+        "SEXO",
+        "DTNASCIMENTO",
+        "TELEFONE1",
+        "TELEFONE2"
+      ],
+      "files": [
+        "dominio/rh/headcount.py",
+        "dominio/rh/provider.py",
+        "dominio/rh/complementar.py",
+        "dominio/rh/folha_detalhada.py",
+        "dominio/educacional/alunos.py",
+        "dominio/educacional/professores.py",
+        "dominio/educacional/turmas.py",
+        "dominio/ponto/provider.py",
+        "dominio/smt/provider.py"
+      ]
+    },
+    {
+      "name": "PFFINANC",
+      "description": "Holerite/folha de pagamento (payroll financial events). Each row = 1 event (rubrica) per employee per period.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "rh"
+      ],
+      "columns_used": [
+        "CHAPA",
+        "CODCOLIGADA",
+        "NROPERIODO",
+        "CODEVENTO",
+        "VALOR",
+        "TIPO",
+        "ANOCOMP",
+        "MESCOMP"
+      ],
+      "joins": [
+        {
+          "to": "PEVENTO",
+          "on": "CODEVENTO = CODIGO AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/rh/folha.py",
+        "dominio/rh/folha_detalhada.py"
+      ]
+    },
+    {
+      "name": "PEVENTO",
+      "description": "Eventos de folha (payroll event definitions). PROVDESCBASE: P=Provento, D=Desconto, B=Base.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "rh"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODIGO",
+        "DESCRICAO",
+        "PROVDESCBASE"
+      ],
+      "joins": [
+        {
+          "to": "PFFINANC",
+          "on": "CODIGO = CODEVENTO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/rh/folha_detalhada.py"
+      ]
+    },
+    {
+      "name": "PFDEPEND",
+      "description": "Dependentes de funcionarios (employee dependents). PII-heavy.",
+      "row_count_estimate": 61773,
+      "domains_used": [
+        "rh"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CHAPA",
+        "NOME",
+        "GRAUPARENTESCO",
+        "DTNASCIMENTO",
+        "CPF",
+        "INCIRRF",
+        "INCSALFAM",
+        "INCASSISTMEDICA",
+        "SEXO"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [
+        "NOME",
+        "CPF",
+        "DTNASCIMENTO",
+        "SEXO"
+      ],
+      "files": [
+        "dominio/rh/complementar.py"
+      ]
+    },
+    {
+      "name": "PFHSTSAL",
+      "description": "Historico salarial (salary history).",
+      "row_count_estimate": 217499,
+      "domains_used": [
+        "rh"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CHAPA",
+        "DTMUDANCA",
+        "SALARIO",
+        "MOTIVO"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/rh/complementar.py"
+      ]
+    },
+    {
+      "name": "PFUFERIASPER",
+      "description": "Ferias dos funcionarios (vacation periods).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "rh"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CHAPA",
+        "DATAINICIO",
+        "DATAFIM",
+        "NRODIASFERIAS",
+        "SITUACAOFERIAS"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/rh/folha_detalhada.py"
+      ]
+    },
+    {
+      "name": "SALUNO",
+      "description": "Alunos (student master). Links to PPESSOA via CODPESSOA.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "RA",
+        "CODPESSOA"
+      ],
+      "joins": [
+        {
+          "to": "PPESSOA",
+          "on": "CODPESSOA = CODIGO"
+        },
+        {
+          "to": "SMATRICPL",
+          "on": "RA = RA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/alunos.py"
+      ]
+    },
+    {
+      "name": "SMATRICPL",
+      "description": "Matriculas (enrollment records). Core enrollment table. CODSTATUS: 1=Pre, 2=Matriculado, 3=Ativo, 4=Cancelado, 5=Transferido, 12=Desistente. COL=10 has extra status codes.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "matriculas",
+        "financeiro",
+        "kpis"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODFILIAL",
+        "RA",
+        "IDPERLET",
+        "CODSTATUS",
+        "CODTURMA",
+        "CODTIPOMAT",
+        "IDHABILITACAOFILIAL"
+      ],
+      "joins": [
+        {
+          "to": "SPLETIVO",
+          "on": "IDPERLET = IDPERLET AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SHABILITACAOFILIAL",
+          "on": "IDHABILITACAOFILIAL = IDHABILITACAOFILIAL"
+        },
+        {
+          "to": "SALUNO",
+          "on": "RA = RA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/matriculas/provider.py",
+        "dominio/matriculas/evasao.py",
+        "dominio/matriculas/funil.py",
+        "dominio/matriculas/garantia_vaga.py",
+        "dominio/matriculas/integral.py",
+        "dominio/matriculas/sem_financeiro.py",
+        "dominio/matriculas/material_didatico.py",
+        "dominio/educacional/alunos.py",
+        "dominio/educacional/ocorrencias.py",
+        "dominio/educacional/turmas.py",
+        "dominio/financeiro/base_renovavel_inadimplente.py",
+        "dominio/financeiro/ticket.py",
+        "dominio/kpis/educacional_agregado.py",
+        "dominio/kpis/historico.py"
+      ]
+    },
+    {
+      "name": "SPLETIVO",
+      "description": "Periodos letivos (academic cycles/years). CODPERLET = '2024', '2025', '2026'.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "matriculas",
+        "financeiro",
+        "kpis"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "IDPERLET",
+        "CODPERLET"
+      ],
+      "joins": [
+        {
+          "to": "SMATRICPL",
+          "on": "IDPERLET = IDPERLET AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "STURMADISC",
+          "on": "IDPERLET = IDPERLET AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/alunos.py",
+        "dominio/educacional/frequencia.py",
+        "dominio/educacional/notas.py",
+        "dominio/educacional/ocorrencias.py",
+        "dominio/educacional/professores.py",
+        "dominio/educacional/turmas.py",
+        "dominio/financeiro/base_renovavel_inadimplente.py",
+        "dominio/financeiro/bolsistas.py",
+        "dominio/financeiro/curva_ticket.py",
+        "dominio/financeiro/ticket.py",
+        "dominio/kpis/educacional_agregado.py",
+        "dominio/kpis/historico.py",
+        "dominio/matriculas/evasao.py",
+        "dominio/matriculas/funil.py",
+        "dominio/matriculas/garantia_vaga.py",
+        "dominio/matriculas/integral.py",
+        "dominio/matriculas/material_didatico.py",
+        "dominio/matriculas/provider.py",
+        "dominio/matriculas/sem_financeiro.py"
+      ]
+    },
+    {
+      "name": "SHABILITACAOFILIAL",
+      "description": "Habilitacao filial (grade/course/shift assignment per enrollment). Links enrollment to course+grade+shift.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "matriculas",
+        "financeiro"
+      ],
+      "columns_used": [
+        "IDHABILITACAOFILIAL",
+        "CODCOLIGADA",
+        "CODCURSO",
+        "CODGRADE",
+        "CODTURNO"
+      ],
+      "joins": [
+        {
+          "to": "SMATRICPL",
+          "on": "IDHABILITACAOFILIAL = IDHABILITACAOFILIAL"
+        },
+        {
+          "to": "SCURSO",
+          "on": "CODCURSO = CODCURSO AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SGRADE",
+          "on": "CODGRADE = CODGRADE AND CODCOLIGADA = CODCOLIGADA AND CODCURSO = CODCURSO"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/alunos.py",
+        "dominio/educacional/turmas.py",
+        "dominio/financeiro/base_renovavel_inadimplente.py",
+        "dominio/financeiro/ticket.py",
+        "dominio/kpis/historico.py",
+        "dominio/matriculas/evasao.py",
+        "dominio/matriculas/funil.py",
+        "dominio/matriculas/garantia_vaga.py",
+        "dominio/matriculas/integral.py",
+        "dominio/matriculas/sem_financeiro.py"
+      ]
+    },
+    {
+      "name": "SCURSO",
+      "description": "Cursos (academic programs: Educacao Infantil, EFI, EFII, EM).",
+      "row_count_estimate": 17,
+      "domains_used": [
+        "educacional",
+        "matriculas",
+        "financeiro",
+        "kpis"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODCURSO",
+        "NOME"
+      ],
+      "joins": [
+        {
+          "to": "SHABILITACAOFILIAL",
+          "on": "CODCURSO = CODCURSO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/alunos.py",
+        "dominio/educacional/turmas.py",
+        "dominio/financeiro/base_renovavel_inadimplente.py",
+        "dominio/financeiro/ticket.py",
+        "dominio/kpis/historico.py",
+        "dominio/matriculas/evasao.py",
+        "dominio/matriculas/funil.py",
+        "dominio/matriculas/garantia_vaga.py",
+        "dominio/matriculas/integral.py",
+        "dominio/matriculas/sem_financeiro.py"
+      ]
+    },
+    {
+      "name": "SGRADE",
+      "description": "Grades curriculares (curriculum grids).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODCURSO",
+        "CODGRADE",
+        "DESCRICAO"
+      ],
+      "joins": [
+        {
+          "to": "SHABILITACAOFILIAL",
+          "on": "CODGRADE = CODGRADE AND CODCOLIGADA = CODCOLIGADA AND CODCURSO = CODCURSO"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/alunos.py",
+        "dominio/educacional/turmas.py"
+      ]
+    },
+    {
+      "name": "STURMA",
+      "description": "Turmas (class groups). Links to SPLETIVO for cycle and SHABILITACAOFILIAL for course.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODTURMA",
+        "NOME",
+        "IDHABILITACAOFILIAL",
+        "IDPERLET"
+      ],
+      "joins": [
+        {
+          "to": "SPLETIVO",
+          "on": "IDPERLET = IDPERLET AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SHABILITACAOFILIAL",
+          "on": "IDHABILITACAOFILIAL = IDHABILITACAOFILIAL"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/turmas.py"
+      ]
+    },
+    {
+      "name": "STURMADISC",
+      "description": "Turma-disciplina (class-subject assignments). Central educational operations table.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "kpis",
+        "ponto"
+      ],
+      "columns_used": [
+        "IDTURMADISC",
+        "CODCOLIGADA",
+        "CODTURMA",
+        "CODDISC",
+        "CODPROF",
+        "CAPACIDADE",
+        "MAXALUNOS",
+        "CODTURNO",
+        "IDPERLET",
+        "DESCRICAO"
+      ],
+      "joins": [
+        {
+          "to": "SDISCIPLINA",
+          "on": "CODDISC = CODDISC AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SPLETIVO",
+          "on": "IDPERLET = IDPERLET AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SPROFESSORTURMA",
+          "on": "IDTURMADISC = IDTURMADISC AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SNOTAETAPA",
+          "on": "IDTURMADISC = IDTURMADISC AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SFREQUENCIA",
+          "on": "IDTURMADISC = IDTURMADISC AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SHORARIOTURMA",
+          "on": "IDTURMADISC = IDTURMADISC AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/provider.py",
+        "dominio/educacional/frequencia.py",
+        "dominio/educacional/notas.py",
+        "dominio/educacional/professores.py",
+        "dominio/educacional/turmas.py",
+        "dominio/kpis/educacional_agregado.py",
+        "dominio/ponto/provider.py"
+      ]
+    },
+    {
+      "name": "SDISCIPLINA",
+      "description": "Disciplinas (subjects/courses).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "kpis",
+        "ponto"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODDISC",
+        "NOME"
+      ],
+      "joins": [
+        {
+          "to": "STURMADISC",
+          "on": "CODDISC = CODDISC AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/frequencia.py",
+        "dominio/educacional/notas.py",
+        "dominio/educacional/professores.py",
+        "dominio/educacional/turmas.py",
+        "dominio/kpis/educacional_agregado.py",
+        "dominio/ponto/provider.py"
+      ]
+    },
+    {
+      "name": "SNOTAETAPA",
+      "description": "Notas por etapa (grades per evaluation period). TIPOETAPA: 1=Regular, 3=Recuperacao.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "kpis"
+      ],
+      "columns_used": [
+        "RA",
+        "IDTURMADISC",
+        "CODCOLIGADA",
+        "CODETAPA",
+        "TIPOETAPA",
+        "NOTAFALTA",
+        "AULASDADAS",
+        "CODCONCEITO"
+      ],
+      "joins": [
+        {
+          "to": "STURMADISC",
+          "on": "IDTURMADISC = IDTURMADISC AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/provider.py",
+        "dominio/educacional/frequencia.py",
+        "dominio/educacional/notas.py",
+        "dominio/kpis/educacional_agregado.py"
+      ]
+    },
+    {
+      "name": "SFREQUENCIA",
+      "description": "Frequencia diaria (daily attendance). PRESENCA: P=Presente, F=Falta, FJ=Justificada, FA=Abonada. MSSQL-only (SOAP has bugs).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "kpis"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "RA",
+        "IDTURMADISC",
+        "DATA",
+        "PRESENCA",
+        "JUSTIFICADA"
+      ],
+      "joins": [
+        {
+          "to": "STURMADISC",
+          "on": "IDTURMADISC = IDTURMADISC AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/provider.py",
+        "dominio/educacional/frequencia.py",
+        "dominio/kpis/educacional_agregado.py"
+      ]
+    },
+    {
+      "name": "SOCORRENCIAS",
+      "description": "Ocorrencias de alunos (student incidents).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "RA",
+        "CODOCORRENCIA",
+        "DATAOCORRENCIA",
+        "DESCRICAO",
+        "PROVIDENCIA",
+        "CODTIPOOCORRENCIA"
+      ],
+      "joins": [
+        {
+          "to": "STIPOOCORRENCIA",
+          "on": "CODTIPOOCORRENCIA = CODTIPOOCORRENCIA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/ocorrencias.py"
+      ]
+    },
+    {
+      "name": "STIPOOCORRENCIA",
+      "description": "Tipos de ocorrencia (incident types lookup).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODTIPOOCORRENCIA",
+        "DESCRICAO"
+      ],
+      "joins": [
+        {
+          "to": "SOCORRENCIAS",
+          "on": "CODTIPOOCORRENCIA = CODTIPOOCORRENCIA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/ocorrencias.py"
+      ]
+    },
+    {
+      "name": "SPROFESSOR",
+      "description": "Professores (teacher records). Links CODPROF to CHAPA.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "ponto"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODPROF",
+        "CHAPA",
+        "CODPESSOA"
+      ],
+      "joins": [
+        {
+          "to": "SPROFESSORTURMA",
+          "on": "CODPROF = CODPROF AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "PPESSOA",
+          "on": "CODPESSOA = CODIGO"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/ponto/provider.py"
+      ]
+    },
+    {
+      "name": "SPROFESSORTURMA",
+      "description": "Professor-turma assignment (teacher-class link).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "kpis",
+        "ponto"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "IDPROFESSORTURMA",
+        "IDTURMADISC",
+        "CODPROF"
+      ],
+      "joins": [
+        {
+          "to": "STURMADISC",
+          "on": "IDTURMADISC = IDTURMADISC AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SPROFESSOR",
+          "on": "CODPROF = CODPROF AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/educacional/professores.py",
+        "dominio/educacional/turmas.py",
+        "dominio/kpis/educacional_agregado.py",
+        "dominio/ponto/provider.py"
+      ]
+    },
+    {
+      "name": "SHORARIOTURMA",
+      "description": "Horarios de turma (class schedules). Links to STURMADISC.",
+      "row_count_estimate": 125667,
+      "domains_used": [
+        "ponto"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "IDHORARIOTURMA",
+        "IDTURMADISC",
+        "DATAINICIAL",
+        "DATAFINAL"
+      ],
+      "joins": [
+        {
+          "to": "STURMADISC",
+          "on": "IDTURMADISC = IDTURMADISC AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SHORARIOPROFESSOR",
+          "on": "IDHORARIOTURMA = IDHORARIOTURMA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/ponto/provider.py"
+      ]
+    },
+    {
+      "name": "SHORARIOPROFESSOR",
+      "description": "Horarios de professor (teacher schedule assignments).",
+      "row_count_estimate": 88485,
+      "domains_used": [
+        "ponto"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "IDHORARIOTURMA",
+        "IDPROFESSORTURMA"
+      ],
+      "joins": [
+        {
+          "to": "SHORARIOTURMA",
+          "on": "IDHORARIOTURMA = IDHORARIOTURMA AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SPROFESSORTURMA",
+          "on": "IDPROFESSORTURMA = IDPROFESSORTURMA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/ponto/provider.py"
+      ]
+    },
+    {
+      "name": "FLAN",
+      "description": "Lancamentos financeiros (financial transactions/parcels). STATUSLAN: 0=Aberta, 1=Baixada/Paga, 2=Cancelada, 3=Renegociada. Core financial table.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "financeiro",
+        "matriculas"
+      ],
+      "columns_used": [
+        "IDLAN",
+        "CODCOLIGADA",
+        "CODFILIAL",
+        "CODCFO",
+        "CODNATFINANCEIRA",
+        "DATAVENCIMENTO",
+        "DATAEMISSAO",
+        "DATAPAGAMENTO",
+        "DATABAIXA",
+        "VALORORIGINAL",
+        "VALORPAGO",
+        "VALORBAIXADO",
+        "VALORDESCONTO",
+        "STATUSLAN",
+        "TIPO",
+        "CODTDO",
+        "RA"
+      ],
+      "joins": [
+        {
+          "to": "GCOLIGADA",
+          "on": "CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "GNATFINANCEIRA",
+          "on": "CODNATFINANCEIRA = CODNATFINANCEIRA AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "FTDO",
+          "on": "CODTDO = CODTDO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/financeiro/provider.py",
+        "dominio/financeiro/inadimplencia.py",
+        "dominio/financeiro/receita.py",
+        "dominio/financeiro/base_renovavel_inadimplente.py",
+        "dominio/matriculas/sem_financeiro.py"
+      ]
+    },
+    {
+      "name": "FTDO",
+      "description": "Tipos de documento financeiro (financial document types). 005=Boleto, 002=NFS, 008=1a Cota, 037=Anuidade.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "financeiro"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODTDO",
+        "DESCRICAO"
+      ],
+      "joins": [
+        {
+          "to": "FLAN",
+          "on": "CODTDO = CODTDO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/financeiro/receita.py"
+      ]
+    },
+    {
+      "name": "GNATFINANCEIRA",
+      "description": "Naturezas financeiras (financial nature/classification).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "financeiro"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODNATFINANCEIRA",
+        "DESCRICAO",
+        "TIPO"
+      ],
+      "joins": [
+        {
+          "to": "FLAN",
+          "on": "CODNATFINANCEIRA = CODNATFINANCEIRA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/financeiro/provider.py"
+      ]
+    },
+    {
+      "name": "SPARCELA",
+      "description": "Parcelas educacionais (educational payment installments). Linked to SSERVICO for service type.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "financeiro",
+        "matriculas"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "RA",
+        "IDPARCELA",
+        "IDPERLET",
+        "CODSERVICO",
+        "VALOR",
+        "DESCONTO",
+        "DATAVENCIMENTO"
+      ],
+      "joins": [
+        {
+          "to": "SPLETIVO",
+          "on": "IDPERLET = IDPERLET AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SSERVICO",
+          "on": "CODSERVICO = CODSERVICO AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "SBOLSALAN",
+          "on": "IDPARCELA = IDPARCELA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/financeiro/bolsistas.py",
+        "dominio/financeiro/curva_ticket.py",
+        "dominio/financeiro/ticket.py",
+        "dominio/matriculas/integral.py",
+        "dominio/matriculas/material_didatico.py"
+      ]
+    },
+    {
+      "name": "SBOLSALAN",
+      "description": "Bolsas/descontos por parcela (scholarship deductions per installment).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "financeiro"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "IDPARCELA",
+        "VALOR"
+      ],
+      "joins": [
+        {
+          "to": "SPARCELA",
+          "on": "IDPARCELA = IDPARCELA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/financeiro/bolsistas.py",
+        "dominio/financeiro/curva_ticket.py",
+        "dominio/financeiro/ticket.py"
+      ]
+    },
+    {
+      "name": "SSERVICO",
+      "description": "Servicos educacionais (educational services: Mensalidade, Material, Integral, etc.).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "financeiro",
+        "matriculas"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODSERVICO",
+        "NOME"
+      ],
+      "joins": [
+        {
+          "to": "SPARCELA",
+          "on": "CODSERVICO = CODSERVICO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/financeiro/bolsistas.py",
+        "dominio/financeiro/curva_ticket.py",
+        "dominio/financeiro/ticket.py",
+        "dominio/matriculas/integral.py",
+        "dominio/matriculas/material_didatico.py"
+      ]
+    },
+    {
+      "name": "CPARTIDA",
+      "description": "Lancamentos contabeis (GL journal entries). Core accounting table. DEBITO/CREDITO = account code.",
+      "row_count_estimate": 5600000,
+      "domains_used": [
+        "contabil",
+        "obz",
+        "kpis"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "DEBITO",
+        "CREDITO",
+        "VALOR",
+        "DATA",
+        "CODCCUSTO",
+        "COMPLEMENTO",
+        "CODLOTE"
+      ],
+      "joins": [
+        {
+          "to": "CCONTA",
+          "on": "COALESCE(DEBITO, CREDITO) = CODCONTA AND CODCOLIGADA = 0"
+        },
+        {
+          "to": "GCCUSTO",
+          "on": "CODCCUSTO = CODCCUSTO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/contabil/provider.py",
+        "dominio/kpis/contabil_agregado.py",
+        "dominio/obz/contas.py"
+      ]
+    },
+    {
+      "name": "CCONTA",
+      "description": "Plano de contas (chart of accounts). CODCOLIGADA=0 for shared accounts.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "contabil"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODCONTA",
+        "DESCRICAO",
+        "REDUZIDO"
+      ],
+      "joins": [
+        {
+          "to": "CPARTIDA",
+          "on": "CODCONTA = COALESCE(DEBITO, CREDITO)"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/contabil/provider.py"
+      ]
+    },
+    {
+      "name": "GCCUSTO",
+      "description": "Centros de custo (cost centers).",
+      "row_count_estimate": 10433,
+      "domains_used": [
+        "contabil",
+        "kpis"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODCCUSTO",
+        "NOME"
+      ],
+      "joins": [
+        {
+          "to": "CPARTIDA",
+          "on": "CODCCUSTO = CODCCUSTO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/contabil/provider.py",
+        "dominio/kpis/contabil_agregado.py"
+      ]
+    },
+    {
+      "name": "FCFO",
+      "description": "Clientes/Fornecedores (customers/suppliers). PAESSION: F=Fornecedor, C=Cliente.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "compras"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODCFO",
+        "NOMEFANTASIA",
+        "NOME",
+        "CGCCFO",
+        "RUA",
+        "BAIRRO",
+        "CIDADE",
+        "ESTADO",
+        "TELEFONE",
+        "EMAIL",
+        "ATIVO",
+        "PAESSION"
+      ],
+      "joins": [
+        {
+          "to": "TMOV",
+          "on": "CODCFO = CODCFO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [
+        "NOME",
+        "NOMEFANTASIA",
+        "CGCCFO",
+        "EMAIL",
+        "TELEFONE"
+      ],
+      "files": [
+        "dominio/compras/provider.py"
+      ]
+    },
+    {
+      "name": "TMOV",
+      "description": "Movimentos/ordens (purchase orders, invoices, stock movements).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "compras",
+        "estoque"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "IDMOV",
+        "CODTMV",
+        "NUMEROMOV",
+        "DATAEMISSAO",
+        "DATAENTREGA",
+        "CODCFO",
+        "CODCOLCFO",
+        "VALORBRUTO",
+        "VALORDESCONTO",
+        "VALORLIQUIDO",
+        "STATUS"
+      ],
+      "joins": [
+        {
+          "to": "FCFO",
+          "on": "CODCFO = CODCFO AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "TITMMOV",
+          "on": "IDMOV = IDMOV"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/compras/provider.py",
+        "dominio/estoque/provider.py"
+      ]
+    },
+    {
+      "name": "TITMMOV",
+      "description": "Itens de movimento (movement line items).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "estoque"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "IDMOV",
+        "CODPRD",
+        "QUANTIDADE",
+        "PRECOUNITARIO"
+      ],
+      "joins": [
+        {
+          "to": "TMOV",
+          "on": "IDMOV = IDMOV"
+        },
+        {
+          "to": "TPRODUTO",
+          "on": "CODPRD = CODPRD AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/estoque/provider.py"
+      ]
+    },
+    {
+      "name": "TPRODUTO",
+      "description": "Produtos (product catalog).",
+      "row_count_estimate": 140378,
+      "domains_used": [
+        "compras",
+        "estoque"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODPRD",
+        "CODIGOPRD",
+        "DESCRICAO",
+        "CODUNDCONTROLE",
+        "CODTIPOPRODUTO",
+        "PRECOULTCOMPRA",
+        "PRECOMEDIO",
+        "ATIVO"
+      ],
+      "joins": [
+        {
+          "to": "TITMMOV",
+          "on": "CODPRD = CODPRD AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/compras/provider.py",
+        "dominio/estoque/provider.py"
+      ]
+    },
+    {
+      "name": "ASALDOBANCOHOR",
+      "description": "Banco de horas - saldo (time bank balance).",
+      "row_count_estimate": 36205,
+      "domains_used": [
+        "ponto"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CHAPA",
+        "INICIOPER",
+        "FIMPER",
+        "EXTRAANT",
+        "ATRASOANT",
+        "FALTAANT",
+        "EXTRAATU",
+        "ATRASOATU",
+        "FALTAATU"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/ponto/provider.py"
+      ]
+    },
+    {
+      "name": "ASALDOBANCOHORFUNDETALHE",
+      "description": "Banco de horas - detalhe por funcionario (detailed time bank per employee).",
+      "row_count_estimate": 69559,
+      "domains_used": [
+        "ponto"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CHAPA",
+        "INICIOPERMES",
+        "FIMPERMES",
+        "CODEVENTOPONTO",
+        "CODEVENTO",
+        "VALORATUAL",
+        "VALORLANCADO",
+        "VALORCOMPENSADO",
+        "VALORPERIODO",
+        "PERCENTUALINCIDENCIA"
+      ],
+      "joins": [],
+      "pii_columns": [],
+      "files": [
+        "dominio/ponto/provider.py"
+      ]
+    },
+    {
+      "name": "VATESTADO",
+      "description": "Atestados medicos (medical certificates).",
+      "row_count_estimate": 882,
+      "domains_used": [
+        "smt"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODATESTADO",
+        "DTINICIO",
+        "DTFIM",
+        "DIASAFASTAMENTO",
+        "CODTIPOATESTADO",
+        "CID",
+        "OBSERVACAO"
+      ],
+      "joins": [
+        {
+          "to": "VCHAPAATESTADO",
+          "on": "CODATESTADO = CODATESTADO AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "VTIPOATESTADO",
+          "on": "CODTIPOATESTADO = CODTIPOATESTADO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [
+        "CID"
+      ],
+      "files": [
+        "dominio/smt/provider.py"
+      ]
+    },
+    {
+      "name": "VCHAPAATESTADO",
+      "description": "Link atestado-funcionario (medical certificate to employee link).",
+      "row_count_estimate": 876,
+      "domains_used": [
+        "smt"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODATESTADO",
+        "CHAPA"
+      ],
+      "joins": [
+        {
+          "to": "VATESTADO",
+          "on": "CODATESTADO = CODATESTADO AND CODCOLIGADA = CODCOLIGADA"
+        },
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/smt/provider.py"
+      ]
+    },
+    {
+      "name": "VTIPOATESTADO",
+      "description": "Tipos de atestado (medical certificate types).",
+      "row_count_estimate": 11,
+      "domains_used": [
+        "smt"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODTIPOATESTADO",
+        "DESCRICAO"
+      ],
+      "joins": [
+        {
+          "to": "VATESTADO",
+          "on": "CODTIPOATESTADO = CODTIPOATESTADO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/smt/provider.py"
+      ]
+    },
+    {
+      "name": "PFCOMPL",
+      "description": "Complementos salariais (benefícios: VR, plano saúde, odonto). Linked to PFUNC by (CODCOLIGADA, CHAPA).",
+      "row_count_estimate": 19813,
+      "domains_used": [
+        "rh"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CHAPA",
+        "OPCAOVR",
+        "PLANOODONTO",
+        "PLSAUDE",
+        "DUTVRMES",
+        "MATSODEXO",
+        "MATFETRANSPOR"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/rh/complementar.py",
+        "api/rh.py",
+        "db/models.py"
+      ]
+    },
+    {
+      "name": "SCONTRATO",
+      "description": "Contratos de matrícula escolar. Parity source with SMATRICPL + SPLETIVO + SHABILITACAOFILIAL. Linked to aluno via RA.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "matriculas",
+        "financeiro"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "RA",
+        "CODCONTRATO",
+        "CODPLANOPGTO",
+        "TIPOCONTRATO",
+        "CODCCUSTO",
+        "ASSINADO",
+        "DIAFIXO",
+        "STATUS",
+        "TIPOBOLSA",
+        "NOMEALUNO"
+      ],
+      "joins": [
+        {
+          "to": "SMATRICPL",
+          "on": "RA = RA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [
+        "NOMEALUNO"
+      ],
+      "files": [
+        "dominio/matriculas/provider.py",
+        "dominio/matriculas/totvs_parity.py"
+      ]
+    },
+    {
+      "name": "SNOTAS",
+      "description": "Notas escolares (grade records) por etapa e turma-disciplina. Linked to STURMADISC via IDTURMADISC and to aluno via RA.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "educacional",
+        "kpis"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "IDTURMADISC",
+        "RA",
+        "TIPOETAPA",
+        "CODCONCEITO",
+        "NOTA",
+        "CODPROVA",
+        "CODETAPA",
+        "IDGRUPO"
+      ],
+      "joins": [
+        {
+          "to": "STURMADISC",
+          "on": "IDTURMADISC = IDTURMADISC"
+        },
+        {
+          "to": "SALUNO",
+          "on": "RA = RA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/kpis/rules_outros.py",
+        "api/nlq.py"
+      ]
+    },
+    {
+      "name": "PCARGO",
+      "description": "Cargos (job positions). Schema drift: in some instances replaced by PFUNCAO. Linked to PFUNC via CODCARGO.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "estrutura",
+        "rh"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODCARGO",
+        "NOME"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CODCARGO = CODCARGO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/estrutura.py"
+      ]
+    },
+    {
+      "name": "PFHSTAFT",
+      "description": "Histórico de afastamentos com CID, motivo eSocial, tipo detalhado. Linked to PFUNC via (CODCOLIGADA, CHAPA).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "rh",
+        "ponto"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CHAPA",
+        "DTINICIO",
+        "DTFINAL",
+        "TIPO",
+        "MOTIVO",
+        "OBSERVACAO",
+        "CID"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [
+        "CID",
+        "OBSERVACAO"
+      ],
+      "files": [
+        "api/rh.py",
+        "db/models.py"
+      ]
+    },
+    {
+      "name": "PFUFERIAS",
+      "description": "Períodos aquisitivos de férias. Linked to PFUNC via (CODCOLIGADA, CHAPA).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "rh"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CHAPA",
+        "INICIOPERAQUIS",
+        "FIMPERAQUIS",
+        "SALDO",
+        "PERIODOABERTO",
+        "PERIODOPERDIDO",
+        "MOTIVOPERDA"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "api/rh.py",
+        "db/models.py"
+      ]
+    },
+    {
+      "name": "PFVALETR",
+      "description": "Vale transporte por funcionário — linhas, datas, viagens. Linked to PFUNC via (CODCOLIGADA, CHAPA).",
+      "row_count_estimate": null,
+      "domains_used": [
+        "rh"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CHAPA",
+        "CODLINHA",
+        "DTINICIO",
+        "DTFIM",
+        "NROVIAGENS"
+      ],
+      "joins": [
+        {
+          "to": "PFUNC",
+          "on": "CHAPA = CHAPA AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "api/rh.py",
+        "db/models.py"
+      ]
+    },
+    {
+      "name": "TTDO",
+      "description": "Tipo de documento (boleto, NFS, etc). Used via JOIN com FLAN por CODTDO para classificação financeira.",
+      "row_count_estimate": null,
+      "domains_used": [
+        "financeiro"
+      ],
+      "columns_used": [
+        "CODCOLIGADA",
+        "CODTDO",
+        "DESCRICAO"
+      ],
+      "joins": [
+        {
+          "to": "FLAN",
+          "on": "CODTDO = CODTDO AND CODCOLIGADA = CODCOLIGADA"
+        }
+      ],
+      "pii_columns": [],
+      "files": [
+        "dominio/financeiro/receita.py",
+        "dominio/financeiro/endividamento.py",
+        "api/financeiro.py"
+      ]
+    }
+  ]
+}

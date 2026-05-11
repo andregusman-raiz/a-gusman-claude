@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "project": "raiz-platform"
+  },
+  "envVars": {
+    "HUBSPOT_CLIENT_ID": {
+      "description": "OAuth App Client ID"
+    },
+    "HUBSPOT_CLIENT_SECRET": {
+      "description": "OAuth App Client Secret (never expose)"
+    }
+  },
+  "apiRoutes": [
+    {
+      "route": "/api/auth/hubspot",
+      "method": "GET",
+      "purpose": "Initiate OAuth flow"
+    },
+    {
+      "route": "/api/auth/hubspot/callback",
+      "method": "GET",
+      "purpose": "OAuth callback"
+    },
+    {
+      "route": "/api/auth/hubspot/refresh",
+      "method": "POST",
+      "purpose": "Token refresh"
+    },
+    {
+      "route": "/api/auth/hubspot/status",
+      "method": "GET",
+      "purpose": "Connection status"
+    },
+    {
+      "route": "/api/hubspot/webhook",
+      "method": "POST",
+      "purpose": "Webhook receiver"
+    },
+    {
+      "route": "/api/social-media/hubspot",
+      "method": "POST",
+      "purpose": "Social sync"
+    },
+    {
+      "route": "/api/social-media/hubspot/escalate",
+      "method": "POST",
+      "purpose": "Escalate to HubSpot"
+    }
+  ],
+  "types": {
+    "file": "src/types/external/hubspot.types.ts",
+    "objects": [
+      "HubSpotContact",
+      "HubSpotCompany",
+      "HubSpotDeal",
+      "HubSpotTicket",
+      "HubSpotAssociations",
+      "HubSpotPaging"
+    ]
+  },
+  "helpers": {
+    "file": "src/app/api/hubspot/_helpers.ts",
+    "features": [
+      "Rate limiting (Upstash)",
+      "Error handling",
+      "Pagination parsing",
+      "Auth wrappers"
+    ]
+  },
+  "oauthScopes": [
+    "crm.objects.contacts.read/write",
+    "crm.objects.companies.read/write",
+    "crm.objects.deals.read/write",
+    "crm.objects.owners.read",
+    "crm.lists.read",
+    "crm.schemas.*.read",
+    "tickets"
+  ]
+}

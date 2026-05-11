@@ -1,0 +1,1482 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Public App Crm Cards",
+    "description": "Allows an app to extend the CRM UI by surfacing custom cards in the sidebar of record pages. These cards are defined up-front as part of app configuration, then populated by external data fetch requests when the record page is accessed by a user.",
+    "version": "v3",
+    "x-hubspot-product-tier-requirements": {
+      "marketing": "FREE",
+      "sales": "FREE",
+      "service": "FREE",
+      "cms": "FREE",
+      "commerce": "FREE",
+      "crmHub": "FREE",
+      "dataHub": "FREE"
+    },
+    "x-hubspot-api-use-case": "Add a custom card to contact records that displays data from your external bug tracking software.",
+    "x-hubspot-related-documentation": [
+      {
+        "name": "Custom Cards Guide",
+        "url": "https://developers.hubspot.com/docs/guides/api/crm/extensions/crm-cards"
+      }
+    ],
+    "x-hubspot-introduction": "Create custom cards to data from external systems on CRM records. Requires a public public app. These CRM cards are different from the UI extensions you can create with projects."
+  },
+  "servers": [
+    {
+      "url": "https://api.hubapi.com"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Cards"
+    },
+    {
+      "name": "SampleResponse"
+    }
+  ],
+  "paths": {
+    "/crm/v3/extensions/cards-dev/sample-response": {
+      "get": {
+        "tags": [
+          "SampleResponse"
+        ],
+        "summary": "Get sample card detail response",
+        "description": "Returns an example card detail response. This is the payload with displayed details for a card that will be shown to a user. An app should send this in response to the data fetch request.",
+        "operationId": "get-/crm/v3/extensions/cards-dev/sample-response_getCardsSampleResponse",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegratorCardPayloadResponse"
+                },
+                "example": {
+                  "allItemsLinkUrl": "https://example.com/all-items-link-url",
+                  "cardLabel": "Tickets",
+                  "responseVersion": "v3",
+                  "sections": [
+                    {
+                      "actions": [
+                        {
+                          "httpMethod": "POST",
+                          "label": "action-hook-label",
+                          "propertyNamesIncluded": [
+                            "email",
+                            "firstName"
+                          ],
+                          "type": "ACTION_HOOK",
+                          "url": "https://example.com/action-hook-frame"
+                        },
+                        {
+                          "confirmation": {
+                            "cancelButtonLabel": "Cancel",
+                            "confirmButtonLabel": "Continue",
+                            "prompt": "action-confirmation-body-prompt"
+                          },
+                          "httpMethod": "POST",
+                          "label": "confirmation-hook-label",
+                          "type": "ACTION_HOOK",
+                          "url": "https://example.com/confirmation-action-hook"
+                        },
+                        {
+                          "height": 480,
+                          "label": "iframe-action-label",
+                          "propertyNamesIncluded": [
+                            "property1",
+                            "property2",
+                            "property3"
+                          ],
+                          "type": "IFRAME",
+                          "url": "https://example.com/iframe-action-label",
+                          "width": 640
+                        }
+                      ],
+                      "id": "123",
+                      "linkUrl": "http://example.com/1",
+                      "title": "API-22: APIs working too fast",
+                      "tokens": [
+                        {
+                          "dataType": "DATE",
+                          "label": "test_label",
+                          "name": "created",
+                          "value": "2016-08-04"
+                        }
+                      ]
+                    }
+                  ],
+                  "topLevelActions": {
+                    "primary": {
+                      "height": 480,
+                      "label": "test_label_primary",
+                      "type": "IFRAME",
+                      "url": "https://example.com/primary-iframe",
+                      "width": 640
+                    },
+                    "secondary": [
+                      {
+                        "height": 480,
+                        "label": "test_label_secondary",
+                        "type": "IFRAME",
+                        "url": "https://example.com/secondary-iframe",
+                        "width": 640
+                      }
+                    ],
+                    "settings": {
+                      "height": 480,
+                      "label": "Edit",
+                      "propertyNamesIncluded": [
+                        "some_crm_property"
+                      ],
+                      "type": "IFRAME",
+                      "url": "https://example.com/iframe-contents",
+                      "width": 640
+                    }
+                  },
+                  "totalCount": 1
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": []
+      }
+    },
+    "/crm/v3/extensions/cards-dev/{appId}": {
+      "get": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Get all cards",
+        "description": "Returns a list of cards for a given app.",
+        "operationId": "get-/crm/v3/extensions/cards-dev/{appId}_getAll",
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "description": "The ID of the target app.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCardListResponse"
+                },
+                "example": {
+                  "results": [
+                    {
+                      "actions": {
+                        "baseUrls": [
+                          "https://www.example.com/hubspot"
+                        ]
+                      },
+                      "createdAt": "2020-02-26T18:30:53.451Z",
+                      "display": {
+                        "properties": [
+                          {
+                            "dataType": "STRING",
+                            "label": "Pets Name",
+                            "name": "pet_name"
+                          }
+                        ]
+                      },
+                      "fetch": {
+                        "objectTypes": [
+                          {
+                            "name": "contacts",
+                            "propertiesToSend": [
+                              "email",
+                              "firstname"
+                            ]
+                          }
+                        ],
+                        "targetUrl": "https://www.example.com/hubspot/target"
+                      },
+                      "id": "123",
+                      "title": "PetSpot",
+                      "updatedAt": "2020-02-26T18:30:53.451Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "developer_hapikey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Create a new card",
+        "description": "Defines a new card that will become active on an account when this app is installed.",
+        "operationId": "post-/crm/v3/extensions/cards-dev/{appId}_create",
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "description": "The ID of the target app.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The new card definition.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCardResponse"
+                },
+                "example": {
+                  "actions": {
+                    "baseUrls": [
+                      "https://www.example.com/hubspot"
+                    ]
+                  },
+                  "createdAt": "2019-10-30T03:30:17.883Z",
+                  "display": {
+                    "properties": [
+                      {
+                        "dataType": "STRING",
+                        "label": "Pet's Name",
+                        "name": "pet_name"
+                      }
+                    ]
+                  },
+                  "fetch": {
+                    "objectTypes": [
+                      {
+                        "name": "contacts",
+                        "propertiesToSend": [
+                          "email",
+                          "firstname"
+                        ]
+                      }
+                    ],
+                    "targetUrl": "https://www.example.com/hubspot/target"
+                  },
+                  "title": "PetSpot",
+                  "updatedAt": "2019-11-30T03:30:17.883Z"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "developer_hapikey": []
+          }
+        ]
+      }
+    },
+    "/crm/v3/extensions/cards-dev/{appId}/views/migrate": {
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "operationId": "post-/crm/v3/extensions/cards-dev/{appId}/views/migrate_/crm/v3/extensions/cards-dev/{appId}/views/migrate",
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardMigrateViewsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardMigrateViewsResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "developer_hapikey": []
+          }
+        ]
+      }
+    },
+    "/crm/v3/extensions/cards-dev/{appId}/{cardId}": {
+      "get": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Get a card.",
+        "description": "Returns the definition for a card with the given ID.",
+        "operationId": "get-/crm/v3/extensions/cards-dev/{appId}/{cardId}_getById",
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "description": "The ID of the target app.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "cardId",
+            "in": "path",
+            "description": "The ID of the target card.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCardResponse"
+                },
+                "example": {
+                  "actions": {
+                    "baseUrls": [
+                      "https://www.example.com/hubspot"
+                    ]
+                  },
+                  "createdAt": "2019-10-30T03:30:17.883Z",
+                  "display": {
+                    "properties": [
+                      {
+                        "dataType": "STRING",
+                        "label": "Pets Name",
+                        "name": "pet_name"
+                      }
+                    ]
+                  },
+                  "fetch": {
+                    "objectTypes": [
+                      {
+                        "name": "contacts",
+                        "propertiesToSend": [
+                          "email",
+                          "firstname"
+                        ]
+                      }
+                    ],
+                    "targetUrl": "https://www.example.com/hubspot/target"
+                  },
+                  "title": "PetSpot",
+                  "updatedAt": "2019-11-30T03:30:17.883Z"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "developer_hapikey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Delete a card",
+        "description": "Permanently deletes a card definition with the given ID. Once deleted, data fetch requests for this card will no longer be sent to your service. This can't be undone.",
+        "operationId": "delete-/crm/v3/extensions/cards-dev/{appId}/{cardId}_archive",
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "description": "The ID of the target app.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "cardId",
+            "in": "path",
+            "description": "The ID of the card to delete.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content",
+            "content": {}
+          },
+          "default": {
+            "description": "",
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "developer_hapikey": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Update a card",
+        "description": "Update a card definition with new details.",
+        "operationId": "patch-/crm/v3/extensions/cards-dev/{appId}/{cardId}_update",
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "description": "The ID of the target app.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "cardId",
+            "in": "path",
+            "description": "The ID of the card to update.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Card definition fields to be updated.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardPatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCardResponse"
+                },
+                "example": {
+                  "actions": {
+                    "baseUrls": [
+                      "https://www.example.com/hubspot"
+                    ]
+                  },
+                  "createdAt": "2019-10-30T03:30:17.883Z",
+                  "display": {
+                    "properties": [
+                      {
+                        "dataType": "STRING",
+                        "label": "Pets Name",
+                        "name": "pet_name"
+                      }
+                    ]
+                  },
+                  "fetch": {
+                    "objectTypes": [
+                      {
+                        "name": "contacts",
+                        "propertiesToSend": [
+                          "email",
+                          "firstname"
+                        ]
+                      }
+                    ],
+                    "targetUrl": "https://www.example.com/hubspot/target"
+                  },
+                  "title": "PetSpot",
+                  "updatedAt": "2019-11-30T03:30:17.883Z"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "security": [
+          {
+            "developer_hapikey": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CardCreateRequest": {
+        "required": [
+          "actions",
+          "display",
+          "fetch",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "actions": {
+            "$ref": "#/components/schemas/CardActions"
+          },
+          "display": {
+            "$ref": "#/components/schemas/CardDisplayBody"
+          },
+          "fetch": {
+            "$ref": "#/components/schemas/CardFetchBody"
+          },
+          "title": {
+            "type": "string",
+            "description": "The top-level title for this card. Displayed to users in the CRM UI."
+          }
+        },
+        "description": "State of card definition to be created",
+        "example": {
+          "actions": {
+            "baseUrls": [
+              "https://www.example.com/hubspot"
+            ]
+          },
+          "display": {
+            "properties": [
+              {
+                "dataType": "STRING",
+                "label": "Pets Name",
+                "name": "pet_name"
+              }
+            ]
+          },
+          "fetch": {
+            "objectTypes": [
+              {
+                "name": "contacts",
+                "propertiesToSend": [
+                  "email",
+                  "firstname"
+                ]
+              }
+            ],
+            "targetUrl": "https://www.example.com/hubspot/target"
+          },
+          "title": "PetSpot"
+        }
+      },
+      "CardFetchBodyPatch": {
+        "required": [
+          "objectTypes"
+        ],
+        "type": "object",
+        "properties": {
+          "cardType": {
+            "type": "string",
+            "description": "A deprecated field to determine the type of card returned.",
+            "enum": [
+              "EXTERNAL",
+              "SERVERLESS"
+            ]
+          },
+          "objectTypes": {
+            "type": "array",
+            "description": "An array of CRM object types where this card should be displayed. HubSpot will call your target URL whenever a user visits a record page of the types defined here.",
+            "items": {
+              "$ref": "#/components/schemas/CardObjectTypeBody"
+            }
+          },
+          "serverlessFunction": {
+            "type": "string",
+            "description": "A deprecated field to specify serverless functionality with the card"
+          },
+          "targetUrl": {
+            "type": "string",
+            "description": "URL to a service endpoint that will respond with details for this card. HubSpot will call this endpoint each time a user visits a CRM record page where this card should be displayed."
+          }
+        },
+        "description": "Variant of CardFetchBody with fields as optional for patches"
+      },
+      "CardDisplayProperty": {
+        "required": [
+          "dataType",
+          "label",
+          "name",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "dataType": {
+            "type": "string",
+            "description": "Type of data represented by this property.",
+            "enum": [
+              "BOOLEAN",
+              "CURRENCY",
+              "DATE",
+              "DATETIME",
+              "EMAIL",
+              "LINK",
+              "NUMERIC",
+              "STATUS",
+              "STRING"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "description": "The label for this property as you'd like it displayed to users."
+          },
+          "name": {
+            "type": "string",
+            "description": "An internal identifier for this property. This value must be unique TODO."
+          },
+          "options": {
+            "type": "array",
+            "description": "An array of available options that can be displayed. Only used in when `dataType` is `STATUS`.",
+            "items": {
+              "$ref": "#/components/schemas/DisplayOption"
+            }
+          }
+        },
+        "description": "Definition for a card display property."
+      },
+      "IntegratorObjectResult": {
+        "required": [
+          "actions",
+          "id",
+          "title",
+          "tokens"
+        ],
+        "type": "object",
+        "properties": {
+          "actions": {
+            "type": "array",
+            "description": "A list of actions associated with the card, which can include action hooks, confirmation action hooks, or iframes.",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ActionHookActionBody"
+                },
+                {
+                  "$ref": "#/components/schemas/IFrameActionBody"
+                }
+              ]
+            }
+          },
+          "id": {
+            "type": "string",
+            "description": "The unique identifier for the card."
+          },
+          "linkUrl": {
+            "type": "string",
+            "description": "A URL used on the title of the card"
+          },
+          "title": {
+            "type": "string",
+            "description": "The top-level title for this card. Displayed to users in the CRM UI."
+          },
+          "tokens": {
+            "type": "array",
+            "description": "A collection of tokens representing specific properties related to the card.",
+            "items": {
+              "$ref": "#/components/schemas/ObjectToken"
+            }
+          }
+        }
+      },
+      "CardFetchBody": {
+        "required": [
+          "objectTypes",
+          "targetUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "cardType": {
+            "type": "string",
+            "description": "A deprecated field to determine the type of card returned.",
+            "enum": [
+              "EXTERNAL",
+              "SERVERLESS"
+            ]
+          },
+          "objectTypes": {
+            "type": "array",
+            "description": "An array of CRM object types where this card should be displayed. HubSpot will call your target URL whenever a user visits a record page of the types defined here.",
+            "items": {
+              "$ref": "#/components/schemas/CardObjectTypeBody"
+            }
+          },
+          "serverlessFunction": {
+            "type": "string",
+            "description": "A deprecated field to specify serverless functionality with the card"
+          },
+          "targetUrl": {
+            "type": "string",
+            "description": "URL to a service endpoint that will respond with details for this card. HubSpot will call this endpoint each time a user visits a CRM record page where this card should be displayed."
+          }
+        },
+        "description": "Configuration for this card's data fetch request."
+      },
+      "CardObjectTypeBody": {
+        "required": [
+          "name",
+          "propertiesToSend"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "An internal identifier for this property. This value must be unique TODO.",
+            "enum": [
+              "companies",
+              "contacts",
+              "deals",
+              "marketing_events",
+              "tickets"
+            ]
+          },
+          "propertiesToSend": {
+            "type": "array",
+            "description": "An array of properties that should be sent to this card's target URL when the data fetch request is made. Must be valid properties for the corresponding CRM object type.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Error": {
+        "required": [
+          "category",
+          "correlationId",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "The error category"
+          },
+          "context": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Context about the error condition",
+            "example": "{invalidPropertyName=[propertyValue], missingScopes=[scope1, scope2]}"
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "A unique identifier for the request. Include this value with any error reports or support tickets",
+            "format": "uuid",
+            "example": "aeb5f871-7f07-4993-9211-075dc63e7cbf"
+          },
+          "errors": {
+            "type": "array",
+            "description": "further information about the error",
+            "items": {
+              "$ref": "#/components/schemas/ErrorDetail"
+            }
+          },
+          "links": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "A map of link names to associated URIs containing documentation about the error or recommended remediation steps"
+          },
+          "message": {
+            "type": "string",
+            "description": "A human readable message describing the error along with remediation steps where appropriate",
+            "example": "An error occurred"
+          },
+          "subCategory": {
+            "type": "string",
+            "description": "A specific category that contains more specific detail about the error"
+          }
+        },
+        "example": {
+          "message": "Invalid input (details will vary based on the error)",
+          "correlationId": "aeb5f871-7f07-4993-9211-075dc63e7cbf",
+          "category": "VALIDATION_ERROR",
+          "links": {
+            "knowledge-base": "https://www.hubspot.com/products/service/knowledge-base"
+          }
+        }
+      },
+      "PublicCardFetchBody": {
+        "required": [
+          "objectTypes",
+          "targetUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "objectTypes": {
+            "type": "array",
+            "description": "An array of CRM object types where this card should be displayed. HubSpot will call your target URL whenever a user visits a record page of the types defined here.",
+            "items": {
+              "$ref": "#/components/schemas/CardObjectTypeBody"
+            }
+          },
+          "targetUrl": {
+            "type": "string",
+            "description": "URL to a service endpoint that will respond with details for this card. HubSpot will call this endpoint each time a user visits a CRM record page where this card should be displayed."
+          }
+        }
+      },
+      "TopLevelActions": {
+        "required": [
+          "secondary"
+        ],
+        "type": "object",
+        "properties": {
+          "primary": {
+            "description": "Defines the primary action for a card, which can be either an action hook or an iframe.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ActionHookActionBody"
+              },
+              {
+                "$ref": "#/components/schemas/IFrameActionBody"
+              }
+            ]
+          },
+          "secondary": {
+            "type": "array",
+            "description": "Specifies a list of secondary actions for a card, each of which can be an action hook or an iframe.",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ActionHookActionBody"
+                },
+                {
+                  "$ref": "#/components/schemas/IFrameActionBody"
+                }
+              ]
+            }
+          },
+          "settings": {
+            "$ref": "#/components/schemas/IFrameActionBody"
+          }
+        }
+      },
+      "DisplayOption": {
+        "required": [
+          "label",
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "The label for this property as you'd like it displayed to users."
+          },
+          "name": {
+            "type": "string",
+            "description": "An internal identifier for this property. This value must be unique TODO."
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of status.",
+            "enum": [
+              "DANGER",
+              "DEFAULT",
+              "INFO",
+              "SUCCESS",
+              "WARNING"
+            ]
+          }
+        },
+        "description": "Option definition for STATUS dataTypes."
+      },
+      "ActionHookActionBody": {
+        "title": "ACTION_HOOK",
+        "required": [
+          "httpMethod",
+          "propertyNamesIncluded",
+          "type",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "confirmation": {
+            "$ref": "#/components/schemas/ActionConfirmationBody"
+          },
+          "httpMethod": {
+            "type": "string",
+            "description": "The HTTP method to be used when making the call, which can be set to GET, POST, PUT, DELETE, or PATCH. If using GET or DELETE",
+            "enum": [
+              "CONNECT",
+              "DELETE",
+              "GET",
+              "HEAD",
+              "OPTIONS",
+              "PATCH",
+              "POST",
+              "PUT",
+              "TRACE"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "description": "The label for this property as you'd like it displayed to users."
+          },
+          "propertyNamesIncluded": {
+            "type": "array",
+            "description": "A list of property names that will be included on the action. See the documentation for more information",
+            "items": {
+              "type": "string"
+            }
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of status.",
+            "default": "ACTION_HOOK",
+            "enum": [
+              "ACTION_HOOK"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL endpoint that will be called when the action is triggered."
+          }
+        }
+      },
+      "ErrorDetail": {
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "The status code associated with the error detail"
+          },
+          "context": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Context about the error condition",
+            "example": "{missingScopes=[scope1, scope2]}"
+          },
+          "in": {
+            "type": "string",
+            "description": "The name of the field or parameter in which the error was found."
+          },
+          "message": {
+            "type": "string",
+            "description": "A human readable message describing the error along with remediation steps where appropriate"
+          },
+          "subCategory": {
+            "type": "string",
+            "description": "A specific category that contains more specific detail about the error"
+          }
+        }
+      },
+      "ObjectToken": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "dataType": {
+            "type": "string",
+            "description": "Type of data represented by this property.",
+            "enum": [
+              "BOOLEAN",
+              "CURRENCY",
+              "DATE",
+              "DATETIME",
+              "EMAIL",
+              "LINK",
+              "NUMERIC",
+              "STATUS",
+              "STRING"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "description": "The label for this property as you'd like it displayed to users."
+          },
+          "name": {
+            "type": "string",
+            "description": "An internal identifier for this property. This value must be unique TODO."
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the property"
+          }
+        }
+      },
+      "PublicCardResponse": {
+        "required": [
+          "actions",
+          "auditHistory",
+          "display",
+          "fetch",
+          "id",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "actions": {
+            "$ref": "#/components/schemas/CardActions"
+          },
+          "auditHistory": {
+            "type": "array",
+            "description": "A list of actions performed on the card, including creation, deletion, and updates.",
+            "items": {
+              "$ref": "#/components/schemas/CardAuditResponse"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time when the card was created.",
+            "format": "date-time"
+          },
+          "display": {
+            "$ref": "#/components/schemas/CardDisplayBody"
+          },
+          "fetch": {
+            "$ref": "#/components/schemas/PublicCardFetchBody"
+          },
+          "id": {
+            "type": "string",
+            "description": "The unique id of the card."
+          },
+          "title": {
+            "type": "string",
+            "description": "The top-level title for this card. Displayed to users in the CRM UI."
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "The date and time when the card was last updated.",
+            "format": "date-time"
+          }
+        }
+      },
+      "CardMigrateViewsResponse": {
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "A human readable message describing the error along with remediation steps where appropriate"
+          }
+        }
+      },
+      "ActionConfirmationBody": {
+        "required": [
+          "cancelButtonLabel",
+          "confirmButtonLabel",
+          "prompt"
+        ],
+        "type": "object",
+        "properties": {
+          "cancelButtonLabel": {
+            "type": "string",
+            "description": "The label for the button that cancels the action."
+          },
+          "confirmButtonLabel": {
+            "type": "string",
+            "description": "The label for the button that confirms the action."
+          },
+          "prompt": {
+            "type": "string",
+            "description": "The message displayed to the user to confirm the action."
+          }
+        }
+      },
+      "IFrameActionBody": {
+        "title": "IFRAME",
+        "required": [
+          "height",
+          "propertyNamesIncluded",
+          "type",
+          "url",
+          "width"
+        ],
+        "type": "object",
+        "properties": {
+          "height": {
+            "type": "integer",
+            "description": "The height of the iframe in pixels.",
+            "format": "int32"
+          },
+          "label": {
+            "type": "string",
+            "description": "The label for this property as you'd like it displayed to users."
+          },
+          "propertyNamesIncluded": {
+            "type": "array",
+            "description": "A list of property names that will be included on the url of the iframe.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of status.",
+            "default": "IFRAME",
+            "enum": [
+              "IFRAME"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL endpoint that will be loaded in the iframe when triggered."
+          },
+          "width": {
+            "type": "integer",
+            "description": "The width of the iframe in pixels.",
+            "format": "int32"
+          }
+        }
+      },
+      "IntegratorCardPayloadResponse": {
+        "required": [
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "allItemsLinkUrl": {
+            "type": "string",
+            "description": "URL to a page the integrator has built that displays all details for this card. This URL will be displayed to users under a `See more [x]` link if there are more than five items in your response, where `[x]` is the value of `itemLabel`."
+          },
+          "cardLabel": {
+            "type": "string",
+            "description": "The label to be used for the `allItemsLinkUrl` link (e.g. 'See more tickets'). If not provided, this falls back to the card's title."
+          },
+          "responseVersion": {
+            "type": "string",
+            "description": "The number version of the response.",
+            "enum": [
+              "v1",
+              "v3"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "description": "A list of up to five valid card sub categories.",
+            "items": {
+              "$ref": "#/components/schemas/IntegratorObjectResult"
+            }
+          },
+          "topLevelActions": {
+            "$ref": "#/components/schemas/TopLevelActions"
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "The total number of card properties that will be sent in this response.",
+            "format": "int32"
+          }
+        },
+        "description": "The card details payload, sent to HubSpot by an app in response to a data fetch request when a user visits a CRM record page."
+      },
+      "PublicCardListResponse": {
+        "required": [
+          "results"
+        ],
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "description": "A list of card responses",
+            "items": {
+              "$ref": "#/components/schemas/PublicCardResponse"
+            }
+          }
+        }
+      },
+      "CardDisplayBody": {
+        "required": [
+          "properties"
+        ],
+        "type": "object",
+        "properties": {
+          "properties": {
+            "type": "array",
+            "description": "Card display properties. These will will be rendered as \"label : value\" pairs in the card UI. See the [example card](#) in the overview docs for more details.",
+            "items": {
+              "$ref": "#/components/schemas/CardDisplayProperty"
+            }
+          }
+        },
+        "description": "Configuration for displayed info on a card"
+      },
+      "CardMigrateViewsRequest": {
+        "required": [
+          "extensionCardId",
+          "legacyCrmCardId"
+        ],
+        "type": "object",
+        "properties": {
+          "extensionCardId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "helpdeskExtensionCardId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "legacyCrmCardId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "CardPatchRequest": {
+        "type": "object",
+        "properties": {
+          "actions": {
+            "$ref": "#/components/schemas/CardActions"
+          },
+          "display": {
+            "$ref": "#/components/schemas/CardDisplayBody"
+          },
+          "fetch": {
+            "$ref": "#/components/schemas/CardFetchBodyPatch"
+          },
+          "title": {
+            "type": "string",
+            "description": "The top-level title for this card. Displayed to users in the CRM UI."
+          }
+        },
+        "description": "Body for a patch with optional fields",
+        "example": {
+          "actions": {
+            "baseUrls": [
+              "https://www.example.com/hubspot"
+            ]
+          },
+          "display": {
+            "properties": [
+              {
+                "dataType": "STRING",
+                "label": "Pets Name",
+                "name": "pet_name"
+              }
+            ]
+          },
+          "fetch": {
+            "objectTypes": [
+              {
+                "name": "contacts",
+                "propertiesToSend": [
+                  "email",
+                  "firstname"
+                ]
+              }
+            ],
+            "targetUrl": "https://www.example.com/hubspot/target"
+          },
+          "title": "PetSpot"
+        }
+      },
+      "CardActions": {
+        "required": [
+          "baseUrls"
+        ],
+        "type": "object",
+        "properties": {
+          "baseUrls": {
+            "type": "array",
+            "description": "A list of URL prefixes that will be accepted for card action URLs. If your data fetch response includes an action URL that doesn't begin with one of these values, it will result in an error and the card will not be displayed.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Configuration for custom user actions on cards.",
+        "example": {
+          "baseUrls": [
+            "https://www.example.com/hubspot"
+          ]
+        }
+      },
+      "CardAuditResponse": {
+        "required": [
+          "actionType",
+          "applicationId",
+          "authSource",
+          "changedAt",
+          "initiatingUserId",
+          "objectTypeId"
+        ],
+        "type": "object",
+        "properties": {
+          "actionType": {
+            "type": "string",
+            "description": "The type of action performed, with possible values: CREATE, DELETE, UPDATE.",
+            "enum": [
+              "CREATE",
+              "DELETE",
+              "UPDATE"
+            ]
+          },
+          "applicationId": {
+            "type": "integer",
+            "description": "The ID of the application associated with the card.",
+            "format": "int32"
+          },
+          "authSource": {
+            "type": "string",
+            "description": "The source of authentication for the action, with possible values: APP, EXTERNAL, INTERNAL.",
+            "enum": [
+              "APP",
+              "EXTERNAL",
+              "INTERNAL"
+            ]
+          },
+          "changedAt": {
+            "type": "integer",
+            "description": "The timestamp indicating when the change occurred.",
+            "format": "int64"
+          },
+          "initiatingUserId": {
+            "type": "integer",
+            "description": "The ID of the user who initiated the action.",
+            "format": "int32"
+          },
+          "objectTypeId": {
+            "type": "integer",
+            "description": "The ID of the card.",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "An error occurred.",
+        "content": {
+          "*/*": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "developer_hapikey": {
+        "type": "apiKey",
+        "name": "hapikey",
+        "in": "query"
+      }
+    }
+  },
+  "x-hubspot-available-client-libraries": [
+    "Node",
+    "Python",
+    "Ruby",
+    "PHP"
+  ],
+  "x-hubspot-product-tier-requirements": {
+    "marketing": "FREE",
+    "sales": "FREE",
+    "service": "FREE",
+    "cms": "FREE",
+    "commerce": "FREE",
+    "crmHub": "FREE",
+    "dataHub": "FREE"
+  }
+}

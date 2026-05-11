@@ -1,0 +1,93 @@
+{
+  "01-academico": {
+    "name": "Acadêmico",
+    "description": "Alunos, matrículas, disciplinas, cursos, turmas, notas, boletins, chamada, horários, avaliações",
+    "endpointCount": 114,
+    "tags": [
+      "AlunoDigital",
+      "Alunos",
+      "AtaNota",
+      "AvaliacaoInstitucional",
+      "Avaliacoes",
+      "Boletins",
+      "Cursos",
+      "Disciplinas",
+      "Escolaridades",
+      "ListaChamada",
+      "MateriaLecionada",
+      "Matriculas",
+      "Ocorrencias",
+      "Periodos",
+      "QuadrosHorarios",
+      "RematriculaCurricular",
+      "Turmas"
+    ]
+  },
+  "02-pessoas": {
+    "name": "Pessoas e Cadastro",
+    "description": "Responsáveis, colaboradores, clientes, dados cadastrais, fotos, ficha de saúde, autorização de retirada",
+    "endpointCount": 68,
+    "tags": [
+      "AutorizacaoRetirada",
+      "Clientes",
+      "Colaboradores",
+      "DadosCadastrais",
+      "EstadosCivis",
+      "FichaSaude",
+      "Fotos",
+      "FotosResponsaveis",
+      "Nacionalidades",
+      "Ocupacoes",
+      "Paises",
+      "Parentescos",
+      "Racas",
+      "Religioes",
+      "Responsaveis",
+      "ResponsaveisAluno"
+    ]
+  },
+  "03-financeiro": {
+    "name": "Financeiro",
+    "description": "Contratos, lançamentos, boletos, integrações bancárias (BB, Itaú, Santander, EfiPay/Gerencianet)",
+    "endpointCount": 32,
+    "tags": [
+      "BancoBrasil",
+      "Boletos",
+      "Contratos",
+      "EfiPay",
+      "Gerencianet",
+      "Itau",
+      "Lancamentos",
+      "Santander"
+    ]
+  },
+  "04-captacao": {
+    "name": "Captação e Processo Seletivo",
+    "description": "Processo seletivo, campanhas, contratação, finalização — funil de matrículas novas",
+    "endpointCount": 14,
+    "tags": [
+      "Campanha",
+      "Contratacao",
+      "Finalizacao",
+      "Processo",
+      "ProcessoSeletivo",
+      "ResumoContratacao"
+    ]
+  },
+  "05-admin": {
+    "name": "Administração e Config",
+    "description": "Empresas, unidades, autenticação, configurações, marketplace, arquivos, catraca",
+    "endpointCount": 30,
+    "tags": [
+      "Arquivos",
+      "Autenticacao",
+      "Catraca",
+      "Configuracoes",
+      "Empresas",
+      "Health",
+      "Introducao",
+      "Marketplace",
+      "Unidades"
+    ]
+  }
+}

@@ -1,0 +1,1156 @@
+{
+  "dataServer": "EduProfessorData",
+  "xsdLength": 34683,
+  "tables": [
+    {
+      "name": "SProfessor",
+      "fields": [
+        {
+          "name": "CHAPA",
+          "caption": "Chapa",
+          "type": "xs:string",
+          "maxLength": 16,
+          "required": false
+        },
+        {
+          "name": "CODPROF",
+          "caption": "Código do Professor",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "NOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "maxLength": 120,
+          "required": true
+        },
+        {
+          "name": "NOMESOCIAL",
+          "caption": "Nome Social",
+          "type": "xs:string",
+          "maxLength": 120,
+          "required": false
+        },
+        {
+          "name": "APELIDO",
+          "caption": "Apelido",
+          "type": "xs:string",
+          "maxLength": 40,
+          "required": false
+        },
+        {
+          "name": "GRAUINSTRUCAO",
+          "caption": "Grau de instrução",
+          "type": "xs:string",
+          "maxLength": 3,
+          "required": false
+        },
+        {
+          "name": "RUA",
+          "caption": "Logradouro",
+          "type": "xs:string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "name": "NUMERO",
+          "caption": "Número",
+          "type": "xs:string",
+          "maxLength": 8,
+          "required": false
+        },
+        {
+          "name": "COMPLEMENTO",
+          "caption": "Complemento",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "BAIRRO",
+          "caption": "Bairro",
+          "type": "xs:string",
+          "maxLength": 80,
+          "required": false
+        },
+        {
+          "name": "ESTADO",
+          "caption": "Estado",
+          "type": "xs:string",
+          "maxLength": 2,
+          "required": false
+        },
+        {
+          "name": "CIDADE",
+          "caption": "Cidade",
+          "type": "xs:string",
+          "maxLength": 32,
+          "required": false
+        },
+        {
+          "name": "CEP",
+          "caption": "CEP",
+          "type": "xs:string",
+          "maxLength": 9,
+          "required": false
+        },
+        {
+          "name": "PAIS",
+          "caption": "País",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "REGPROFISSIONAL",
+          "caption": "Reg. profissional",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "CPF",
+          "caption": "CPF",
+          "type": "xs:string",
+          "maxLength": 14,
+          "required": false
+        },
+        {
+          "name": "TELEFONE1",
+          "caption": "Telefone I",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "TELEFONE2",
+          "caption": "Telefone II",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "UFCARTIDENT",
+          "caption": "UF Identidade",
+          "type": "xs:string",
+          "maxLength": 2,
+          "required": false
+        },
+        {
+          "name": "ORGEMISSORIDENT",
+          "caption": "Órgão emissor",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "TITULOELEITOR",
+          "caption": "Tit. de eleitor",
+          "type": "xs:string",
+          "maxLength": 14,
+          "required": false
+        },
+        {
+          "name": "ZONATITELEITOR",
+          "caption": "Zona",
+          "type": "xs:string",
+          "maxLength": 6,
+          "required": false
+        },
+        {
+          "name": "SECAOTITELEITOR",
+          "caption": "Seção",
+          "type": "xs:string",
+          "maxLength": 6,
+          "required": false
+        },
+        {
+          "name": "CARTEIRATRAB",
+          "caption": "Cart. de trabalho",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "SERIECARTTRAB",
+          "caption": "Série",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "UFCARTTRAB",
+          "caption": "UF Cart. de trabalho",
+          "type": "xs:string",
+          "maxLength": 2,
+          "required": false
+        },
+        {
+          "name": "CARTMOTORISTA",
+          "caption": "Cart. Motorista",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "TIPOCARTHABILIT",
+          "caption": "Tipo",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "CERTIFRESERV",
+          "caption": "Número",
+          "type": "xs:string",
+          "maxLength": 40,
+          "required": false
+        },
+        {
+          "name": "CATEGMILITAR",
+          "caption": "Categoria militar",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "CARTMODELO19",
+          "caption": "Carta modelo 19",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "NROREGGERAL",
+          "caption": "Registro Nacional Migratório (RNM)",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "NRODECRETO",
+          "caption": "Decreto de imigração",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "TIPOVISTO",
+          "caption": "Tipo de visto",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "TELEFONE3",
+          "caption": "Telefone III",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "FAX",
+          "caption": "FAX",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "EXPED",
+          "caption": "Órgão emissor",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "CSM",
+          "caption": "Circunscrição",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "RM",
+          "caption": "Região militar",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "SITMILITAR",
+          "caption": "Situação militar",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "RECURSOREALIZACAOTRAB",
+          "caption": "Recursos para realização do trabalho",
+          "type": "xs:string",
+          "maxLength": 120,
+          "required": false
+        },
+        {
+          "name": "RECURSOACESSIBILIDADE",
+          "caption": "Recursos para acessibilidade ao local de trabalho",
+          "type": "xs:string",
+          "maxLength": 120,
+          "required": false
+        },
+        {
+          "name": "TIPOSANG",
+          "caption": "Tipo sangüíneo",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "NPASSAPORTE",
+          "caption": "Nº do passaporte",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "PAISORIGEM",
+          "caption": "País de origem",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "CERTSERVENTIA",
+          "caption": "Nº de serventia do cartório",
+          "type": "xs:string",
+          "maxLength": 6,
+          "required": false
+        },
+        {
+          "name": "USERID",
+          "caption": "Id. Usuário (USERID)",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "CODMUNICIPIO",
+          "caption": "Código do Município",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "LOCALIDADE",
+          "caption": "Localidade",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "PRIMEIRONOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "maxLength": 40,
+          "required": false
+        },
+        {
+          "name": "SOBRENOMEPAI",
+          "caption": "Sobrenome do pai",
+          "type": "xs:string",
+          "maxLength": 40,
+          "required": false
+        },
+        {
+          "name": "SOBRENOMEMAE",
+          "caption": "Sobrenome da mãe",
+          "type": "xs:string",
+          "maxLength": 40,
+          "required": false
+        },
+        {
+          "name": "CODNATURALIDADE",
+          "caption": "CODNATURALIDADE",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "NUMERORIC",
+          "caption": "Número RIC",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "ORGEMISSORRIC",
+          "caption": "Orgão e UF Emissor RIC",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "ORGEMISSORCNH",
+          "caption": "Orgão Emissor CNH",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "ORGEMISSORRNE",
+          "caption": "UF Emissor",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "MATRICULAOBITO",
+          "caption": "Matrícula da Certidão de Óbito",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "PORTARIANATURALIZACAO",
+          "caption": "Portaria de Naturalização",
+          "type": "xs:string",
+          "maxLength": 16,
+          "required": false
+        },
+        {
+          "name": "CODCLASSIFTRABESTRANG",
+          "caption": "Classificação da condição no Brasil",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "CODPESSOA",
+          "caption": "Pessoa",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "VALORAULA",
+          "caption": "Valor aula",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "CODTITULACAO",
+          "caption": "Titulação",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "HORARIOUTILIZADO",
+          "caption": "Horário utilizado",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODIGO",
+          "caption": "Código",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DTNASCIMENTO",
+          "caption": "Data de nascimento",
+          "type": "xs:dateTime",
+          "required": true
+        },
+        {
+          "name": "ESTADOCIVIL",
+          "caption": "Estado civil",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "SEXO",
+          "caption": "Sexo",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "M"
+        },
+        {
+          "name": "NACIONALIDADE",
+          "caption": "Nacionalidade",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "10"
+        },
+        {
+          "name": "IDIMAGEM",
+          "caption": "ID imagem",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CARTIDENTIDADE",
+          "caption": "Cart. de identidade",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTEMISSAOIDENT",
+          "caption": "Data de emissão",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTCARTTRAB",
+          "caption": "Data de emissão",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "NIT",
+          "caption": "Nit",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DTVENCHABILIT",
+          "caption": "Data de vencimento",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "NATURALIDADE",
+          "caption": "Naturalidade",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "ESTADONATAL",
+          "caption": "Estado natal",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "DATACHEGADA",
+          "caption": "Data de chegada ao Brasil",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "CONJUGEBRASIL",
+          "caption": "Cônjuge no Brasil",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "NATURALIZADO",
+          "caption": "Naturalizado",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "FILHOSBRASIL",
+          "caption": "Filhos no Brasil",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NROFILHOSBRASIL",
+          "caption": "Nº de filhos no Brasil",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DTVENCIDENT",
+          "caption": "Data de venc. RNM",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTVENCCARTTRAB",
+          "caption": "Data de vencimento",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "EMAIL",
+          "caption": "E-Mail",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "INVESTTREINANT",
+          "caption": "Investimento em treinamentos anteriores",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "CORRACA",
+          "caption": "Cor / Raça",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DEFICIENTEFISICO",
+          "caption": "Física",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODUSUARIO",
+          "caption": "Usuário",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "EMPRESA",
+          "caption": "Empresa",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODPROFISSAO",
+          "caption": "Profissão",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODOCUPACAO",
+          "caption": "Cargo",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "CODFILIAL",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODTIPOCURSO",
+          "caption": "CODTIPOCURSO",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "NOMEFUNCAO",
+          "caption": "Função do Folha de pagamento",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTTITELEITOR",
+          "caption": "Data de emissão",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTEXPCML",
+          "caption": "Data de emissão",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "ESTELEIT",
+          "caption": "Estado",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DEFICIENTEFALA",
+          "caption": "Fala",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DEFICIENTEVISUAL",
+          "caption": "Visual",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DEFICIENTEAUDITIVO",
+          "caption": "Auditiva",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DEFICIENTEMENTAL",
+          "caption": "Mental",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DTEMISSPASSAPORTE",
+          "caption": "Emissão",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTVALPASSAPORTE",
+          "caption": "Data de validade",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "IMAGEM",
+          "caption": "IMAGEM",
+          "type": "xs:base64Binary",
+          "required": false
+        },
+        {
+          "name": "CERTNUMERO",
+          "caption": "Número da certidão",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CERTFOLHA",
+          "caption": "Folha do livro da certidão",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CERTUF",
+          "caption": "UF",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CERTLIVRO",
+          "caption": "Livro da certidão",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CERTDATA",
+          "caption": "Data da certidão",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "CERTCARTORIO",
+          "caption": "Cartório",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "TIPOCERTIDAO",
+          "caption": "Tipo de Certidão",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CERTIDISTRITO",
+          "caption": "CERTIDISTRITO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CERTCOMARCA",
+          "caption": "Comarca",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODIGOPT",
+          "caption": "CODIGOPT",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODFREGUESIA",
+          "caption": "CODFREGUESIA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODPOSTAL",
+          "caption": "CODPOSTAL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NUMEROCARTCIDADAO",
+          "caption": "NUMEROCARTCIDADAO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTEMISSAOCARTCIDADAO",
+          "caption": "DTEMISSAOCARTCIDADAO",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "ORGEXPCARTCIDADAO",
+          "caption": "ORGEXPCARTCIDADAO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTVALIDADECARTCIDADAO",
+          "caption": "DTVALIDADECARTCIDADAO",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "POVOINDIGENA",
+          "caption": "Povo indígena",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODMEMOOBS",
+          "caption": "Cód. Observações para o PPP",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "BRPDH",
+          "caption": "Reabilitado(BR)",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "FUMANTE",
+          "caption": "Fumante",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "OBSPESSOA",
+          "caption": "Observações da pessoa",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDIMAGEMDOC",
+          "caption": "ID Imagem do documento",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDIMAGEMDOCV",
+          "caption": "ID Imagem do verso do documento",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "AJUSTATAMANHOFOTO",
+          "caption": "Ajusta tamanho da foto?",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DATAAPROVACAOCURR",
+          "caption": "Data da aprovação do currículo",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "IDBIOMETRIA",
+          "caption": "IDBIOMETRIA",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "ESTADOROW",
+          "caption": "ESTADOROW",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "ROWVALIDA",
+          "caption": "ROWVALIDA",
+          "type": "xs:unsignedShort",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "ALUNO",
+          "caption": "É aluno",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "PROFESSOR",
+          "caption": "É professor",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CANDIDATO",
+          "caption": "É candidato",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "USUARIOBIBLIOS",
+          "caption": "É usuário biblios",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "FUNCIONARIO",
+          "caption": "É funcionário",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "EXFUNCIONARIO",
+          "caption": "É ex-funcionário",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CODIGOMX",
+          "caption": "CODIGOMX",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "TAGSCRIPT",
+          "caption": "Tags de busca",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NROINT",
+          "caption": "NROINT",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CURP",
+          "caption": "CURP",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTVENCIDENTPT",
+          "caption": "Dt. Vencimento",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "CODTIPOBAIRRO",
+          "caption": "Cód. Tipo Bairro",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODORGAOCLASSE",
+          "caption": "Órgão da Classe",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODUFREGISTRO",
+          "caption": "UF Registro Profissional",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODTIPORUA",
+          "caption": "Cód. Tipo Rua",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DTEMISSAORIC",
+          "caption": "Data Emissão RIC",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTEMISSAOCNH",
+          "caption": "Data Emissão CNH",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DATANATURALIZACAO",
+          "caption": "Data Naturalização",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTEMISSAORNE",
+          "caption": "Data Emissão RNM",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "IDPAIS",
+          "caption": "Código do País",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DEFICIENTEINTELECTUAL",
+          "caption": "Intelectual",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "DATAOBITO",
+          "caption": "Data do Óbito",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "FALECIDO",
+          "caption": "Falecido",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "DATAPRIMEIRACNH",
+          "caption": "Data Primeira CNH",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "UFCNH",
+          "caption": "Estado Emissor",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "EMAILPESSOAL",
+          "caption": "Email Pessoal",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "ANO1EMPREGO",
+          "caption": "Ano do Primeiro Emprego",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDADE",
+          "caption": "Idade",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "TIPOPRAZORESIDENCIA",
+          "caption": "Prazo de residência indeterminado",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "DEFICIENTEOUTROS",
+          "caption": "Outros",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CERTDISTRITO",
+          "caption": "CERTDISTRITO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "FIADOR_SGI",
+          "caption": "FIADOR_SGI",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CONJUGE_SGI",
+          "caption": "CONJUGE_SGI",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DEFICIENTEMOBREDUZIDA",
+          "caption": "DEFICIENTEMOBREDUZIDA",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "RECCREATEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "RECCREATEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "RECMODIFIEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "RECMODIFIEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DEFICIENTEOBSERVACAO",
+          "caption": "DEFICIENTEOBSERVACAO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "MUDOUCPF",
+          "caption": "MUDOUCPF",
+          "type": "xs:short",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SProfessorCompl",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "CODPROF",
+          "caption": "CODPROF",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "SENHAPROF",
+          "caption": "SENHAPROF",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

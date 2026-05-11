@@ -1,0 +1,18 @@
+[
+  {
+    "CODCOLIGADA": "2",
+    "CODTIPOMAT": "1",
+    "DESCRICAO": "MATRÍCULA",
+    "CODTIPOCURSO": "1",
+    "PERMITETRANCAMENTO": "0",
+    "INDICADEPENDENCIA": "0"
+  },
+  {
+    "CODCOLIGADA": "2",
+    "CODTIPOMAT": "2",
+    "DESCRICAO": "REMATRÍCULA",
+    "CODTIPOCURSO": "1",
+    "PERMITETRANCAMENTO": "0",
+    "INDICADEPENDENCIA": "0"
+  }
+]

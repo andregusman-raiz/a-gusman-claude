@@ -1,0 +1,185 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "project": "raiz-platform",
+    "path": "~/Claude/GitHub/raiz-platform/"
+  },
+  "services": {
+    "zeev.service.ts": {
+      "purpose": "API de Dados (Financeiro)",
+      "baseUrl": "ZEEV_API_BASE_URL (metabases.raizeducacao.com.br/api-dados)",
+      "auth": "X-API-Key",
+      "endpoints": [
+        "GET /financeiro",
+        "GET /financeiro/{id}",
+        "GET /financeiro/stats/resumo",
+        "GET /health"
+      ],
+      "features": [
+        "In-memory cache (500, 5min)",
+        "Zod validation",
+        "Custom error classes"
+      ]
+    },
+    "zeev-proxy.service.ts": {
+      "purpose": "API Nativa v2 (com impersonation)",
+      "baseUrl": "ZEEV_NATIVE_API_URL",
+      "auth": "Bearer (impersonation flow)",
+      "endpoints": [
+        "POST /tokens/impersonate/{email}",
+        "GET /assignments",
+        "GET /assignments/{id}",
+        "GET /assignments/{id}/actions",
+        "GET /instances",
+        "GET /instances/{id}",
+        "GET /assignments/report",
+        "GET /flows/edit",
+        "GET /groups"
+      ],
+      "features": [
+        "10s timeout",
+        "2x retry on 401/5xx",
+        "8min token cache",
+        "Impersonation"
+      ]
+    }
+  },
+  "apiRoutes": [
+    {
+      "route": "/api/zeev",
+      "method": "GET",
+      "auth": "withAuth",
+      "purpose": "List financial instances"
+    },
+    {
+      "route": "/api/zeev/{id}",
+      "method": "GET",
+      "auth": "withAuth",
+      "purpose": "Get financial instance"
+    },
+    {
+      "route": "/api/zeev/stats",
+      "method": "GET",
+      "auth": "withAuth",
+      "purpose": "Financial statistics"
+    },
+    {
+      "route": "/api/zeev/proxy/health",
+      "method": "GET",
+      "auth": "none",
+      "purpose": "Health check"
+    },
+    {
+      "route": "/api/zeev/proxy/assignments",
+      "method": "GET",
+      "auth": "getAuthUser",
+      "purpose": "User tasks"
+    },
+    {
+      "route": "/api/zeev/proxy/instances",
+      "method": "GET",
+      "auth": "getAuthUser",
+      "purpose": "User requests"
+    },
+    {
+      "route": "/api/zeev/proxy/instances/{id}",
+      "method": "GET",
+      "auth": "getAuthUser",
+      "purpose": "Request detail"
+    },
+    {
+      "route": "/api/zeev/proxy/assignments/{id}/actions",
+      "method": "GET",
+      "auth": "getAuthUser",
+      "purpose": "Task actions"
+    },
+    {
+      "route": "/api/zeev/proxy/assignments/{id}/actions",
+      "method": "PUT",
+      "auth": "getAuthUser",
+      "purpose": "Complete task"
+    },
+    {
+      "route": "/api/zeev/diagnostic",
+      "method": "GET",
+      "auth": "none",
+      "purpose": "Diagnostics"
+    }
+  ],
+  "agentTool": {
+    "name": "zeev_bpm",
+    "actions": [
+      {
+        "name": "list_assignments",
+        "scope": "user",
+        "description": "List pending tasks"
+      },
+      {
+        "name": "list_instances",
+        "scope": "user",
+        "description": "List user requests"
+      },
+      {
+        "name": "get_instance",
+        "scope": "user",
+        "description": "Full request detail"
+      },
+      {
+        "name": "search_ticket",
+        "scope": "user",
+        "description": "Search by code/ID/name"
+      },
+      {
+        "name": "get_actions",
+        "scope": "user",
+        "description": "Available task actions"
+      },
+      {
+        "name": "sla_overview",
+        "scope": "admin",
+        "description": "SLA totals/on-time/late"
+      },
+      {
+        "name": "backlog_by_area",
+        "scope": "admin",
+        "description": "Backlog by flow (top 15)"
+      },
+      {
+        "name": "backlog_by_person",
+        "scope": "admin",
+        "description": "Top 20 most loaded people"
+      },
+      {
+        "name": "aging_report",
+        "scope": "admin",
+        "description": "Age distribution (0-7d/7-30d/30-90d/90d+)"
+      },
+      {
+        "name": "flow_list",
+        "scope": "admin",
+        "description": "Active processes"
+      }
+    ]
+  },
+  "envVars": {
+    "ZEEV_NATIVE_API_URL": {
+      "prod": "https://raizeducacao.zeev.it",
+      "staging": "https://hmlraizeducacao.zeev.it"
+    },
+    "ZEEV_SERVICE_TOKEN": {
+      "description": "Service account token (URL-encoded, permanent)"
+    },
+    "ZEEV_API_BASE_URL": {
+      "description": "Data API base URL"
+    },
+    "ZEEV_API_KEY": {
+      "description": "Data API key (X-API-Key header)"
+    }
+  },
+  "zodSchemas": {
+    "zeev-native.schema.ts": "10 Zod types (ZeevAssignment, ZeevInstance, ZeevFlow, ZeevPerson, etc.)",
+    "zeev.schema.ts": "4 Zod schemas (ZeevFinanceiroInstance, list/stats/health responses)",
+    "zeev.schema.test.ts": "Unit tests for all schemas"
+  }
+}

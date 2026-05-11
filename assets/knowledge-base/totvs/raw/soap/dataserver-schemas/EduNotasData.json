@@ -1,0 +1,501 @@
+{
+  "dataServer": "EduNotasData",
+  "xsdLength": 10533,
+  "tables": [
+    {
+      "name": "SNotas",
+      "fields": [
+        {
+          "name": "TIPOETAPA",
+          "caption": "Tipo da etapa",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": true
+        },
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "CODCONCEITO",
+          "caption": "Conceito",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "COMENTARIO",
+          "caption": "Comentário",
+          "type": "xs:string",
+          "maxLength": 1000000,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "CODPROVA",
+          "caption": "Avaliação",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CODETAPA",
+          "caption": "Etapa",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "Turma disciplina",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "IDGRUPO",
+          "caption": "Grupo de conceitos",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "NOTA",
+          "caption": "Nota",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "NUMACERTOS",
+          "caption": "Número de Acertos",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NOMEETAPA",
+          "caption": "Nome da etapa",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NUMDIARIO",
+          "caption": "NUMDIARIO",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "MEDIA",
+          "caption": "MEDIA",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "DTPROVA",
+          "caption": "DTPROVA",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "VALOR",
+          "caption": "VALOR",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "DESCPROVA",
+          "caption": "DESCPROVA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DISPONIVELALUNOS",
+          "caption": "DISPONIVELALUNOS",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PERMITEENTREGAWEB",
+          "caption": "PERMITEENTREGAWEB",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOME",
+          "caption": "NOME",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOMECIVIL",
+          "caption": "NOMECIVIL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOMESOCIAL",
+          "caption": "NOMESOCIAL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RANOTAS",
+          "caption": "RANOTAS",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOTAETAPA",
+          "caption": "NOTAETAPA",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "CODCONCEITOETAPA",
+          "caption": "CODCONCEITOETAPA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDGRUPONOTAS",
+          "caption": "IDGRUPONOTAS",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "NOTASFALTASWEB",
+          "caption": "NOTASFALTASWEB",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DIBLOQNOTAFALTA",
+          "caption": "DIBLOQNOTAFALTA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODSTATUS",
+          "caption": "CODSTATUS",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DESCRICAO",
+          "caption": "DESCRICAO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "MEDIAETAPA",
+          "caption": "MEDIAETAPA",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "DTINICIODIGITACAO",
+          "caption": "DTINICIODIGITACAO",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTLIMITEDIGITACAO",
+          "caption": "DTLIMITEDIGITACAO",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "ETAPAENCERRADA",
+          "caption": "ETAPAENCERRADA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODFORMULANOTA",
+          "caption": "CODFORMULANOTA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DATAATUAL",
+          "caption": "DATAATUAL",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTINICIALDIGITACAOTURMADISC",
+          "caption": "DTINICIALDIGITACAOTURMADISC",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTFINALDIGITACAOTURMADISC",
+          "caption": "DTFINALDIGITACAOTURMADISC",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "CODFILIAL",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODTIPOCURSO",
+          "caption": "CODTIPOCURSO",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DESCRESULT",
+          "caption": "DESCRESULT",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODDESCRESULT",
+          "caption": "CODDESCRESULT",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DIBLOQNOTAFALTARES",
+          "caption": "DIBLOQNOTAFALTARES",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOTASFALTASWEBRES",
+          "caption": "NOTASFALTASWEBRES",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODPESSOA",
+          "caption": "CODPESSOA",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODPROVATESTIS",
+          "caption": "CODPROVATESTIS",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDTURMADISCORIGEM",
+          "caption": "IDTURMADISCORIGEM",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDHABILITACAOFILIAL",
+          "caption": "IDHABILITACAOFILIAL",
+          "type": "xs:int",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SNotasComentario",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "CODPROVA",
+          "caption": "CODPROVA",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CODETAPA",
+          "caption": "CODETAPA",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "TIPOETAPA",
+          "caption": "TIPOETAPA",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "IDTURMADISC",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "RA",
+          "caption": "RA",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "COMENTARIO",
+          "caption": "COMENTARIO",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "NOTASVIEW",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "IDTURMADISC",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "NUMDIARIO",
+          "caption": "Nº",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "NOME",
+          "caption": "Aluno",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DESCRICAO",
+          "caption": "Status",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOTASFALTASWEB",
+          "caption": "NOTASFALTASWEB",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DIBLOQNOTAFALTA",
+          "caption": "DIBLOQNOTAFALTA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "MEDIAETAPA",
+          "caption": "MEDIAETAPA",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "DTINICIODIGITACAO",
+          "caption": "DTINICIODIGITACAO",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTLIMITEDIGITACAO",
+          "caption": "DTLIMITEDIGITACAO",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTINICIALDIGITACAOTURMADISC",
+          "caption": "DTINICIALDIGITACAOTURMADISC",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTFINALDIGITACAOTURMADISC",
+          "caption": "DTFINALDIGITACAOTURMADISC",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "CODETAPA",
+          "caption": "CODETAPA",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "TIPOETAPA",
+          "caption": "TIPOETAPA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOTAETAPA",
+          "caption": "Nota na etapa",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "CODCONCEITOETAPA",
+          "caption": "Nota na etapa",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODPROVATESTIS",
+          "caption": "Cod. Prova do TOTVS Educacional Avaliação e Pesquisa",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODPESSOA",
+          "caption": "Cod. Pessoa",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDTURMADISCORIGEM",
+          "caption": "Turma disciplina original",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DISPONIVELALUNOS",
+          "caption": "Disponível alunos",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDHABILITACAOFILIAL",
+          "caption": "Habilitação Filial",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NOMESOCIAL",
+          "caption": "Nome Social",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOMECIVIL",
+          "caption": "Aluno",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

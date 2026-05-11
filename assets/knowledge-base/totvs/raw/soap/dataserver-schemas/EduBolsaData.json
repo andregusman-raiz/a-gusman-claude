@@ -1,0 +1,242 @@
+{
+  "dataServer": "EduBolsaData",
+  "xsdLength": 9402,
+  "tables": [
+    {
+      "name": "SBolsa",
+      "fields": [
+        {
+          "name": "CODBOLSA",
+          "caption": "Código",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CODCFO",
+          "caption": "Código do responsável financeiro",
+          "type": "xs:string",
+          "maxLength": 25,
+          "required": false
+        },
+        {
+          "name": "NOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": true
+        },
+        {
+          "name": "VALIDADELIMITADA",
+          "caption": "Bolsa incondicional",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "1"
+        },
+        {
+          "name": "FIES",
+          "caption": "FIES",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "BOLSAFUNC",
+          "caption": "Bolsa de funcionário",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "TIPOSAC",
+          "caption": "Tipo de sacado",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "ATIVA",
+          "caption": "Bolsa ativa",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "S"
+        },
+        {
+          "name": "TIPODESC",
+          "caption": "Tipo de desconto",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": true,
+          "defaultValue": "P"
+        },
+        {
+          "name": "PERMITEALTERARVALOR",
+          "caption": "Permite alterar valor",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "S"
+        },
+        {
+          "name": "NOMERESPONSAVELBOLSACRED",
+          "caption": "Responsável Financeiro",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "CODCLASSIFICACAO",
+          "caption": "Classificação",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "VERIFICAINADIMPLENCIA",
+          "caption": "Verifica inadimplência do outro sacado",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "S"
+        },
+        {
+          "name": "CONTABCOMPETENCIA",
+          "caption": "Compõe contabilização por competência",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "S"
+        },
+        {
+          "name": "ORDEMAPLICDESCANTECIPACAO",
+          "caption": "Aplicar desconto por antecipação",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "A"
+        },
+        {
+          "name": "AFETABASECALCULO",
+          "caption": "Afeta base de cálculo",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Cód. Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "VALOR",
+          "caption": "Desconto (%)",
+          "type": "xs:decimal",
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CODTIPOCURSO",
+          "caption": "Cód. Nível de ensino",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CODCOLCFO",
+          "caption": "Coligada do cliente/fornecedor",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "ORDEMPERDA",
+          "caption": "Ordem de perda",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "RENOVACAOAUTOMATICA",
+          "caption": "RENOVACAOAUTOMATICA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "APLICFORMULA",
+          "caption": "APLICFORMULA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODFORMULAPERCENTUAL",
+          "caption": "Fórmula para percentual",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODFORMULAVALOR",
+          "caption": "Fórmula para valor",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "TIPOCONTABLANOUTROSACADO",
+          "caption": "Tipo contábil do lançamento do outro sacado",
+          "type": "xs:short",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SBOLSACOMPL",
+      "fields": [
+        {
+          "name": "CODBOLSA",
+          "caption": "CODBOLSA",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": true
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "RECCREATEDBY",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "RECMODIFIEDBY",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "RECCREATEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "RECMODIFIEDON",
+          "type": "xs:dateTime",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

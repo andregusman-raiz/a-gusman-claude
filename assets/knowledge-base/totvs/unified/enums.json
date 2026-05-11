@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "totalEnums": 5,
+    "source": "sql-metadata/enums/ + DOC-12 business rules",
+    "note": "Valores reais extraídos do TOTVS RM produção. PII mascarado com ***."
+  },
+  "enums": [
+    {
+      "name": "MARCA_COLIGADA",
+      "description": "Mapeamento Marca (código no Modelo26 Excel) → Coligada TOTVS",
+      "source": "Modelo26_v5.xlsb + SQL Server GCOLIGADA (2026-03-26)",
+      "values": [
+        {
+          "marca": "SAP",
+          "coligada": 8,
+          "filial": 4,
+          "nome": "Colégio Matriz - Barra (Sá Pereira)",
+          "alunos_modelo26": 759
+        },
+        {
+          "marca": "QI",
+          "coligada": 2,
+          "filial": null,
+          "nome": "Colégio QI (múltiplas filiais)",
+          "alunos_modelo26": 3171
+        },
+        {
+          "marca": "CLV",
+          "coligada": null,
+          "filial": null,
+          "nome": "CLV (a mapear)",
+          "alunos_modelo26": 2278
+        },
+        {
+          "marca": "MT",
+          "coligada": 8,
+          "filial": null,
+          "nome": "Matriz (múltiplas filiais)",
+          "alunos_modelo26": 6089
+        },
+        {
+          "marca": "GT",
+          "coligada": 9,
+          "filial": null,
+          "nome": "Global Tree",
+          "alunos_modelo26": 961
+        },
+        {
+          "marca": "AP",
+          "coligada": 18,
+          "filial": null,
+          "nome": "Apogeu (múltiplas coligadas)",
+          "alunos_modelo26": 6793
+        },
+        {
+          "marca": "CGS",
+          "coligada": null,
+          "filial": null,
+          "nome": "CGS (a mapear)",
+          "alunos_modelo26": 941
+        },
+        {
+          "marca": "SP",
+          "coligada": 7,
+          "filial": null,
+          "nome": "Escola Sá Pereira (0 func ativos PFUNC!)",
+          "alunos_modelo26": 795
+        },
+        {
+          "marca": "GEU",
+          "coligada": 11,
+          "filial": null,
+          "nome": "Grupo Educacional Unificado",
+          "alunos_modelo26": 1276
+        },
+        {
+          "marca": "SD",
+          "coligada": 25,
+          "filial": null,
+          "nome": "Colégio Sarah Dawsey",
+          "alunos_modelo26": 684
+        }
+      ]
+    }
+  ]
+}

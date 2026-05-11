@@ -1,0 +1,119 @@
+{
+  "01-framework": {
+    "name": "Framework (Global)",
+    "description": "Tabelas globais do TOTVS RM — empresas, filiais, pessoas, usuários, permissões",
+    "module": "G (Global)",
+    "tables": [
+      "GColigada",
+      "GFilial",
+      "GPERMIS",
+      "GUSRPERFIL",
+      "GUSUARIO"
+    ]
+  },
+  "02-educacional-estrutura": {
+    "name": "Educacional — Estrutura Curricular",
+    "description": "Cursos, habilitações, grades curriculares, disciplinas — configuração da oferta acadêmica",
+    "module": "S (Educacional/Classis)",
+    "tables": [
+      "SCURSOCOMPL",
+      "SCurso",
+      "SDISCGRADE",
+      "SDISCGRADECOMPL",
+      "SDISCIPLINA",
+      "SDiscGrade",
+      "SGRADECOMPL",
+      "SGrade",
+      "SHABILITACAOCOMPL",
+      "SHabilitacao",
+      "SOptativas"
+    ]
+  },
+  "03-educacional-operacao": {
+    "name": "Educacional — Operação",
+    "description": "Turmas, horários, notas, etapas, planos de aula, infraestrutura — operação do dia-a-dia",
+    "module": "S (Educacional/Classis)",
+    "tables": [
+      "ILocal",
+      "NOTASVIEW",
+      "SBLOCO",
+      "SBLOCOCOMPL",
+      "SHorarioTurma",
+      "SNotaEtapa",
+      "SNotaEtapaComentario",
+      "SNotas",
+      "SNotasComentario",
+      "SPREDIOCOMPL",
+      "SPlanoAula",
+      "SPlanoAulaArquivo",
+      "SPredio",
+      "SSALACOMPL",
+      "SSala",
+      "STURMACOMPL",
+      "STURMADISCCOMPL",
+      "STurma",
+      "STurmaDisc"
+    ]
+  },
+  "04-educacional-pessoas": {
+    "name": "Educacional — Pessoas",
+    "description": "Alunos, professores, matrículas, frequência, ocorrências — pessoas no contexto educacional",
+    "module": "S (Educacional/Classis)",
+    "tables": [
+      "AlunosFreq",
+      "PARAMS",
+      "PlanoAulaFreq",
+      "SFREQUENCIA",
+      "SMatricula",
+      "SMatriculaCompl",
+      "SOCORRENCIAALUNOARQ",
+      "SOCORRENCIAALUNOCOMPL",
+      "SOcorrenciaAluno",
+      "SPROFESSORTURMA",
+      "SPROFESSORTURMACOMPL",
+      "SProfessor",
+      "SProfessorCompl",
+      "SResponsavel"
+    ]
+  },
+  "05-financeiro": {
+    "name": "Financeiro Educacional",
+    "description": "Contratos, parcelas, bolsas, lançamentos — fluxo financeiro do módulo educacional",
+    "module": "S+F (Educacional+Fluxus)",
+    "tables": [
+      "SBOLSACOMPL",
+      "SBOLSARETROATIVACONTRATO",
+      "SBolsa",
+      "SCONTRATOACESSOS",
+      "SContrato",
+      "SParcela",
+      "SResponsavelContrato"
+    ]
+  },
+  "06-rh-folha": {
+    "name": "RH / Folha de Pagamento",
+    "description": "Funcionários, complementos, histórico salarial, estabilidade — módulo Labore/FOP",
+    "module": "P (Labore/FOP)",
+    "tables": [
+      "PEstabilidadeProvisoria",
+      "PFCOMPL",
+      "PFHSTHOR",
+      "PFHSTSEC",
+      "PFHSTUTILIZAPONTOAHGORA",
+      "PFunc",
+      "PPendenciaDemissional",
+      "VPCOMPL"
+    ]
+  },
+  "07-auxiliares": {
+    "name": "Tabelas Auxiliares (Lookups)",
+    "description": "Status de matrícula, tipos, turnos — tabelas de domínio configuráveis por escola",
+    "module": "S (Educacional)",
+    "tables": [
+      "SStatus",
+      "SStatusItinerarioFormativo",
+      "STipoMatricula",
+      "STurno"
+    ]
+  }
+}

@@ -1,0 +1,642 @@
+{
+  "dataServer": "EduContratoData",
+  "xsdLength": 23666,
+  "tables": [
+    {
+      "name": "SContrato",
+      "fields": [
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "CODCONTRATO",
+          "caption": "Cód. do contrato",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true,
+          "defaultValue": " "
+        },
+        {
+          "name": "CODPLANOPGTO",
+          "caption": "Código do plano de pagamento",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "TIPOCONTRATO",
+          "caption": "Tipo do contrato",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": true,
+          "defaultValue": "P"
+        },
+        {
+          "name": "CODCCUSTO",
+          "caption": "Custo",
+          "type": "xs:string",
+          "maxLength": 25,
+          "required": false
+        },
+        {
+          "name": "ASSINADO",
+          "caption": "Assinado",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "DIAFIXO",
+          "caption": "Dia fixo",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "STATUS",
+          "caption": "Cancelado",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "TIPOBOLSA",
+          "caption": "Tipo da bolsa",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": true,
+          "defaultValue": "S"
+        },
+        {
+          "name": "NOMEALUNO",
+          "caption": "Aluno",
+          "type": "xs:string",
+          "maxLength": 120,
+          "required": false
+        },
+        {
+          "name": "NOMEHABILITACAO",
+          "caption": "Habilitação",
+          "type": "xs:string",
+          "maxLength": 150,
+          "required": false
+        },
+        {
+          "name": "NOMECURSO",
+          "caption": "Curso",
+          "type": "xs:string",
+          "maxLength": 500,
+          "required": false
+        },
+        {
+          "name": "NOMETURNO",
+          "caption": "Turno",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "CODTURMA",
+          "caption": "Turma",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "CODPERLET",
+          "caption": "Período letivo",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "NOMEPLANOPGTO",
+          "caption": "Nome do plano de pagamento",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "DESCRICAOPLANOPGTO",
+          "caption": "Descrição do plano de pagamento",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "DESCGRADE",
+          "caption": "Matriz curricular",
+          "type": "xs:string",
+          "maxLength": 255,
+          "required": false
+        },
+        {
+          "name": "STATUSCONT",
+          "caption": "Status da contabilização",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "USARSOLICITACAO",
+          "caption": "Utilizar contrato em solicitações do aluno pelo portal",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "PERIODOCONTABIL",
+          "caption": "Controle contábil",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "A"
+        },
+        {
+          "name": "USARPESQEXT",
+          "caption": "Utilizar contrato em solicitações de Pesquisa/Extensão",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODPLANOPGTOPERSONALIZ",
+          "caption": "Plano de pagamento modelo",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "CODUSUARIOPERSONALIZ",
+          "caption": "Usuário responsável pela personalização",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "CONSIDERADESCANTECIPACAO",
+          "caption": "Considera desconto por antecipação",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "S"
+        },
+        {
+          "name": "CONSIDERADESCANTECIPACAOBOLSA",
+          "caption": "Considerar o valor do desconto por antecipação no valor base para calcular o valor da(s) bolsa(s).",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "NOMETURMA",
+          "caption": "Nome da turma",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Cód. Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Id. Período letivo",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "IDHABILITACAOFILIAL",
+          "caption": "Matriz aplicada",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DTCONTRATO",
+          "caption": "Data do contrato",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTASSINATURA",
+          "caption": "Data da assinatura",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DIAVENCIMENTO",
+          "caption": "Dia de vencimento",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "Filial",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CODTIPOCURSO",
+          "caption": "Cód. Nível de ensino",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "DTCANCELAMENTO",
+          "caption": "Data de cancelamento",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "IDOPERACAO",
+          "caption": "Id. Operação",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "VALORSERVICO",
+          "caption": "Valor dos serviços contabilizados",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "DESCONTO",
+          "caption": "Desconto contabilizado",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "VALORBOLSA",
+          "caption": "Valor das bolsas contabilizadas",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "CODCURSO",
+          "caption": "Código do curso",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODHABILITACAO",
+          "caption": "Código da habilitação",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODGRADE",
+          "caption": "Código da matriz curricular",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTCOMPETENCIAINICIAL",
+          "caption": "Data de competência inicial",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTCOMPETENCIAFINAL",
+          "caption": "Data de competência final",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "IDCLASSEVALORPROTHEUS",
+          "caption": "Classe de valor",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDITEMCONTABILPROTHEUS",
+          "caption": "Item contábil",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "VALORBASEPERSONALIZ",
+          "caption": "Valor base do contrato pré-personalização",
+          "type": "xs:decimal",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "VALORCONTRATOAPOSPERSONALIZ",
+          "caption": "Valor do contrato após personalização",
+          "type": "xs:decimal",
+          "required": false,
+          "defaultValue": "0"
+        },
+        {
+          "name": "DATAPERSONALIZ",
+          "caption": "Última data de personalização",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTCOMPETENCIAINICIALMOV",
+          "caption": "Data de competência inicial",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTCOMPETENCIAFINALMOV",
+          "caption": "Data de competência final",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTCONTRATO1",
+          "caption": "DTCONTRATO1",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "IDOPERACAO1",
+          "caption": "IDOPERACAO1",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "ALUNO",
+          "caption": "ALUNO",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SResponsavelContrato",
+      "fields": [
+        {
+          "name": "CODCONTRATO",
+          "caption": "Cód. do contrato",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "RESPMOVIMENTO",
+          "caption": "Responsável financeiro do movimento",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "DADOSACADEMICOS",
+          "caption": "Responsável financeiro com acesso aos dados acadêmicos",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Cód. Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Período letivo",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODCOLCFO",
+          "caption": "Coligada do cliente/fornecedor",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CODCFO",
+          "caption": "Código do responsável financeiro",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "PERCENTUAL",
+          "caption": "Percentual",
+          "type": "xs:decimal",
+          "required": true
+        },
+        {
+          "name": "NOMECLIFOR",
+          "caption": "Responsável Financeiro",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SBOLSARETROATIVACONTRATO",
+      "fields": [
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "CODCONTRATO",
+          "caption": "Cód. do contrato",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "CLASSIFICACAO",
+          "caption": "Classificação",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "FORMAUTILIZACAO",
+          "caption": "Forma de utilização do crédito",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "FORMAAPROVEITAMENTO",
+          "caption": "Forma de aproveitamento do crédito",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODBOLSA",
+          "caption": "Cód. da bolsa",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": true
+        },
+        {
+          "name": "NOMEBOLSA",
+          "caption": "Nome",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": true
+        },
+        {
+          "name": "CODSERVICO",
+          "caption": "Cód. do serviço",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "NOMESERVICO",
+          "caption": "Nome Serviço",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Cód. Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Id. Período letivo",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "IDBOLSAALUNO",
+          "caption": "Id. Bolsa Aluno",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "VALOR",
+          "caption": "Valor do crédito/débito gerado",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "VALORRESTANTE",
+          "caption": "Valor restante do crédito/débito gerado",
+          "type": "xs:decimal",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SCONTRATOACESSOS",
+      "fields": [
+        {
+          "name": "CODCONTRATO",
+          "caption": "Cód. do contrato",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Cód. Coligada",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Período letivo",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "STATUS",
+          "caption": "Permitir Acesso",
+          "type": "xs:boolean",
+          "required": true,
+          "defaultValue": "false"
+        },
+        {
+          "name": "NOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "CODUSUARIO",
+          "caption": "Código do usuário",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "TIPORELACIONAMENTO",
+          "caption": "Tipo de Relacionamento",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "RECCREATEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "RECCREATEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "RECMODIFIEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "RECMODIFIEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "CODPESSOA",
+          "caption": "CODPESSOA",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODCOLCFO",
+          "caption": "CODCOLCFO",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODCFO",
+          "caption": "CODCFO",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

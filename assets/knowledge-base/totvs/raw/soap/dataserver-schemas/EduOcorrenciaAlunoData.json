@@ -1,0 +1,246 @@
+{
+  "dataServer": "EduOcorrenciaAlunoData",
+  "xsdLength": 8593,
+  "tables": [
+    {
+      "name": "SOcorrenciaAluno",
+      "fields": [
+        {
+          "name": "RA",
+          "caption": "Registro Acadêmico",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "TIPOETAPA",
+          "caption": "Tipo da etapa",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODPROF",
+          "caption": "Código do professor",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "DISPONIVELWEB",
+          "caption": "Disponível Web",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "Usuário de cadastro",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "Usuário de alteração",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "RESPONSAVELCIENTE",
+          "caption": "Responsável ciente da ocorrência?",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODUSUARIOCIENTE",
+          "caption": "Cód. usuário responsável",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDOCORALUNO",
+          "caption": "Id. Ocorrência",
+          "type": "xs:int",
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CODOCORRENCIAGRUPO",
+          "caption": "Código do Grupo de ocorrência",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CODOCORRENCIATIPO",
+          "caption": "Código do Tipo de ocorrência",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Id. Período letivo",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "Id. Turma / Disciplina",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODETAPA",
+          "caption": "Código da Etapa",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DATAOCORRENCIA",
+          "caption": "Data e hora da ocorrência",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "OBSERVACOES",
+          "caption": "Observações",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODPERLET",
+          "caption": "Período letivo",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DESCGRUPOOCOR",
+          "caption": "Grupo de Ocorrência",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DESCTIPOOCOR",
+          "caption": "Tipo de Ocorrência",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "Data de cadastro",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "Data de alteração",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTRESPONSAVELCIENTE",
+          "caption": "Data que ficou ciente",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "NOMEUSUARIOCIENTE",
+          "caption": "Responsável ciente pela ocorrência",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "OBSERVACOESINTERNAS",
+          "caption": "Observações internas",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "POSSUIARQUIVO",
+          "caption": "POSSUIARQUIVO",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SOCORRENCIAALUNOARQ",
+      "fields": [
+        {
+          "name": "NOMEARQUIVO",
+          "caption": "Nome do arquivo",
+          "type": "xs:string",
+          "maxLength": 255,
+          "required": true
+        },
+        {
+          "name": "DESCARQUIVO",
+          "caption": "Descrição",
+          "type": "xs:string",
+          "maxLength": 500,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDARQUIVOOCORALUNO",
+          "caption": "Id. Arquivo",
+          "type": "xs:int",
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "IDOCORALUNO",
+          "caption": "Id. Ocorrência",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "ARQUIVO",
+          "caption": "Arquivo",
+          "type": "xs:base64Binary",
+          "required": false
+        },
+        {
+          "name": "TAMANHOARQUIVO",
+          "caption": "Tamanho do arquivo (KB)",
+          "type": "xs:float",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SOCORRENCIAALUNOCOMPL",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDOCORALUNO",
+          "caption": "IDOCORALUNO",
+          "type": "xs:int",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

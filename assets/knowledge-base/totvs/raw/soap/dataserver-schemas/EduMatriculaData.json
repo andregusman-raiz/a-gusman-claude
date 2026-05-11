@@ -1,0 +1,633 @@
+{
+  "dataServer": "EduMatriculaData",
+  "xsdLength": 16717,
+  "tables": [
+    {
+      "name": "SMatricula",
+      "fields": [
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "CODSUBTURMA",
+          "caption": "Código da Subturma",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "OBSHISTORICO",
+          "caption": "Observação do histórico",
+          "type": "xs:string",
+          "maxLength": 255,
+          "required": false
+        },
+        {
+          "name": "USUARIO",
+          "caption": "Usuário",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "TIPODISCIPLINA",
+          "caption": "Tipo de disciplina",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "NOMEALUNO",
+          "caption": "Aluno",
+          "type": "xs:string",
+          "maxLength": 120,
+          "required": false
+        },
+        {
+          "name": "CODPERLET",
+          "caption": "Período letivo",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "COBPOSTERIORMATRIC",
+          "caption": "Considerar no cálculo de cobrança somente para parcelas com vencimento igual ou posterior a data da matrícula",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CODTURMA",
+          "caption": "Turma",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "NOMESTATUS",
+          "caption": "Situação de matrícula",
+          "type": "xs:string",
+          "maxLength": 30,
+          "required": false
+        },
+        {
+          "name": "MATRICULAISOLADA",
+          "caption": "Matrícula isolada",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "Turma disciplina",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODSTATUS",
+          "caption": "Situação de matrícula",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODSTATUSRES",
+          "caption": "Resultado",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Id. Período letivo",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDHABILITACAOFILIAL",
+          "caption": "Matriz aplicada",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NUMDIARIO",
+          "caption": "Número no diário",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DTMATRICULA",
+          "caption": "Data de matrícula",
+          "type": "xs:dateTime",
+          "required": false,
+          "defaultValue": "2026-03-26T00:00:00"
+        },
+        {
+          "name": "TIPOMAT",
+          "caption": "Tipo de matrícula",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODDISC",
+          "caption": "Cód. da disciplina",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOMEDISC",
+          "caption": "Disciplina",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODMOTIVO",
+          "caption": "Motivo da alteração",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DTALTERACAO",
+          "caption": "Data da alteração",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTALTERACAOSIST",
+          "caption": "Data de alteração no sistema",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "NUMCREDITOSCOB",
+          "caption": "Créditos financeiros",
+          "type": "xs:double",
+          "required": false
+        },
+        {
+          "name": "NUMCREDITOS",
+          "caption": "Créditos acadêmicos",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "NOTA",
+          "caption": "Nota",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "FALTA",
+          "caption": "Falta",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "CODCONCEITO",
+          "caption": "Conceito",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDTURMADISCORIGEM",
+          "caption": "Turma disciplina origem",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDTURMADISCSUBST",
+          "caption": "Turma disciplina substituição",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "FILIAL",
+          "caption": "FILIAL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CONCEITOECTS",
+          "caption": "Classif. ECTS",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "Filial",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODTIPOCURSO",
+          "caption": "Nível de ensino",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NOMENIVELENSINO",
+          "caption": "NOMENIVELENSINO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODFILIALTURMADISC",
+          "caption": "Código filial da disciplina",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODTIPOCURSOTURMADISC",
+          "caption": "Código nível de ensino da disciplina",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "Usuário criador do registro",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "Data de criação do registro",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "Autor da última modificação no registro",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "Data da última modificação no registro",
+          "type": "xs:dateTime",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SMatriculaCompl",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "IDTURMADISC",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "RA",
+          "caption": "RA",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "RECCREATEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "RECCREATEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "RECMODIFIEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "RECMODIFIEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "BIMESTRE_1",
+          "caption": "BIMESTRE_1",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "BIMESTRE_2",
+          "caption": "BIMESTRE_2",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "BIMESTRE_3",
+          "caption": "BIMESTRE_3",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "BIMESTRE_4",
+          "caption": "BIMESTRE_4",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "STurmaDisc",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "IDHABILITACAOFILIAL",
+          "caption": "IDHABILITACAOFILIAL",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NOMEHABILITACAO",
+          "caption": "NOMEHABILITACAO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "IDTURMADISC",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODTURMA",
+          "caption": "CODTURMA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOME",
+          "caption": "NOME",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "IDPERLET",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODDISC",
+          "caption": "CODDISC",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOMEDISC",
+          "caption": "NOMEDISC",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTINICIAL",
+          "caption": "DTINICIAL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTFINAL",
+          "caption": "DTFINAL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NUMCREDITOS",
+          "caption": "NUMCREDITOS",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "NUMCREDITOSCOB",
+          "caption": "NUMCREDITOSCOB",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "MAXALUNOS",
+          "caption": "MAXALUNOS",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "TIPODISCIPLINA",
+          "caption": "TIPODISCIPLINA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NUMMAXALUNOOUTROSCURSOS",
+          "caption": "NUMMAXALUNOOUTROSCURSOS",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "VAGASCALOUROS",
+          "caption": "VAGASCALOUROS",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "STATUSOCUPACAOTURMA",
+          "caption": "STATUSOCUPACAOTURMA",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "IMAGE",
+          "caption": "IMAGE",
+          "type": "xs:base64Binary",
+          "required": false
+        },
+        {
+          "name": "TIPO",
+          "caption": "TIPO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NUMVAGAS",
+          "caption": "NUMVAGAS",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "FILIAL",
+          "caption": "FILIAL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "CODFILIAL",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CH",
+          "caption": "CH",
+          "type": "xs:decimal",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SHorarioTurma",
+      "fields": [
+        {
+          "name": "NOMETURNO",
+          "caption": "Turno",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "HORAINICIAL",
+          "caption": "Hora inicial",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "HORAFINAL",
+          "caption": "Hora final",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "CODSUBTURMA",
+          "caption": "Subturma",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "IDHORARIOTURMA",
+          "caption": "IDHORARIOTURMA",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODHOR",
+          "caption": "CODHOR",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "IDTURMADISC",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DIASEMANA",
+          "caption": "Dia",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DATAINICIAL",
+          "caption": "DATAINICIAL",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DATAFINAL",
+          "caption": "DATAFINAL",
+          "type": "xs:dateTime",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SProfessorTurma",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "IDPROFESSORTURMA",
+          "caption": "IDPROFESSORTURMA",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "IDTURMADISC",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODPROF",
+          "caption": "Cód. Professor",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTINICIO",
+          "caption": "Data inicial",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTFIM",
+          "caption": "Data final",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "TIPOPROF",
+          "caption": "Tipo do professor",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,419 @@
+[
+  {
+    "endpoint": "educational/v1/StudentContexts",
+    "httpStatus": 200,
+    "responseFormat": "list",
+    "total": 0,
+    "hasNext": false,
+    "sampleKeys": [
+      "hasNext",
+      "total",
+      "items"
+    ]
+  },
+  {
+    "endpoint": "educational/v1/ProfessorContexts",
+    "httpStatus": 200,
+    "responseFormat": "list",
+    "total": 0,
+    "hasNext": false,
+    "sampleKeys": [
+      "hasNext",
+      "total",
+      "items"
+    ]
+  },
+  {
+    "endpoint": "educational/v1/Academics/terms",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Courses",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Qualifications",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/CurriculumMatrices",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/DisciplineClasses",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Disciplines",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Periods",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Buildings",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Blocks",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Rooms",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Shifts",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/OccurrenceGroups",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/StudentOccurrences",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Reports",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/SelectionProcesses",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/FinancialAgreements",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/LibrarySearchFields",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/LessonPlans",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/PublishedActivities",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/AreaOfInterestOffered",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Exams",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/ReportViews",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/Publications",
+    "httpStatus": 400,
+    "responseFormat": "error",
+    "error": "Bad Request"
+  },
+  {
+    "endpoint": "educational/v1/OfferedActivities",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/OfferedActivityEnrollments",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/StudentCalendar",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/CandidateFiles",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/CandidateResults",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/DisciplineGrids",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "educational/v1/AppliedMatrices",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "framework/v1/companies",
+    "httpStatus": 200,
+    "responseFormat": "list",
+    "hasNext": true,
+    "fieldNames": [
+      "id",
+      "code",
+      "nickname",
+      "federalId",
+      "name",
+      "phoneNumber",
+      "faxNumber",
+      "email",
+      "street",
+      "number",
+      "neighborhood",
+      "city",
+      "state",
+      "country",
+      "zipCode",
+      "active",
+      "isFluigIntegrated"
+    ],
+    "fieldCount": 17
+  },
+  {
+    "endpoint": "framework/v1/branches",
+    "httpStatus": 200,
+    "responseFormat": "list",
+    "hasNext": true,
+    "fieldNames": [
+      "BranchInternalId",
+      "CompanyCode",
+      "Code",
+      "Description",
+      "Title",
+      "CGC",
+      "StateRegistration",
+      "DDD",
+      "Phone",
+      "Street",
+      "Neighborhood",
+      "Country",
+      "State",
+      "City",
+      "ZipCode",
+      "CityCode",
+      "CNAECode",
+      "DTRE",
+      "Active"
+    ],
+    "fieldCount": 19
+  },
+  {
+    "endpoint": "rh/v1/employeeDataContent",
+    "httpStatus": 400,
+    "responseFormat": "error",
+    "error": "Bad Request"
+  },
+  {
+    "endpoint": "rh/v1/PayrollControl",
+    "httpStatus": 500,
+    "responseFormat": "error",
+    "error": "Internal Server Error"
+  },
+  {
+    "endpoint": "rh/v1/painel-auditoria/period",
+    "httpStatus": 403,
+    "responseFormat": "error",
+    "error": "Forbidden"
+  },
+  {
+    "endpoint": "rh/v1/painel-auditoria/big-numbers",
+    "httpStatus": 403,
+    "responseFormat": "error",
+    "error": "Forbidden"
+  },
+  {
+    "endpoint": "rh/v1/painel-auditoria/employees",
+    "httpStatus": 403,
+    "responseFormat": "error",
+    "error": "Forbidden"
+  },
+  {
+    "endpoint": "rh/v1/painel-auditoria/conformities",
+    "httpStatus": 403,
+    "responseFormat": "error",
+    "error": "Forbidden"
+  },
+  {
+    "endpoint": "rh/v1/painel-auditoria/branches",
+    "httpStatus": 403,
+    "responseFormat": "error",
+    "error": "Forbidden"
+  },
+  {
+    "endpoint": "rh/v1/painel-auditoria/last-update",
+    "httpStatus": 403,
+    "responseFormat": "error",
+    "error": "Forbidden"
+  },
+  {
+    "endpoint": "rh/v1/painel-auditoria/history",
+    "httpStatus": 403,
+    "responseFormat": "error",
+    "error": "Forbidden"
+  },
+  {
+    "endpoint": "rh/v1/employeehistorystatus",
+    "httpStatus": 200,
+    "responseFormat": "list",
+    "hasNext": true,
+    "fieldNames": [
+      "id",
+      "companyId",
+      "employeeId",
+      "dateOfChange",
+      "motiveCode",
+      "newStatusCode"
+    ],
+    "fieldCount": 6
+  },
+  {
+    "endpoint": "rh/v1/employeeHistorySection",
+    "httpStatus": 200,
+    "responseFormat": "list",
+    "hasNext": true,
+    "fieldNames": [
+      "id",
+      "sectionId",
+      "sectionDescription",
+      "motiveDescription",
+      "companyId",
+      "employeeId",
+      "dateOfChange",
+      "motiveCode"
+    ],
+    "fieldCount": 8
+  },
+  {
+    "endpoint": "rh/v1/employeehistoryroles",
+    "httpStatus": 500,
+    "responseFormat": "error",
+    "error": "Internal Server Error"
+  },
+  {
+    "endpoint": "rh/v1/employeehistorydependents",
+    "httpStatus": 500,
+    "responseFormat": "error",
+    "error": "Internal Server Error"
+  },
+  {
+    "endpoint": "rh/v1/employeeassociatedvalues",
+    "httpStatus": 500,
+    "responseFormat": "error",
+    "error": "Internal Server Error"
+  },
+  {
+    "endpoint": "rh/v1/calculatedWarnings",
+    "httpStatus": 200,
+    "responseFormat": "list",
+    "hasNext": true,
+    "fieldNames": [
+      "id",
+      "companyCode",
+      "employeeId",
+      "referenceDate",
+      "workingDayId",
+      "warningCode",
+      "description",
+      "validated",
+      "initialDate",
+      "endDate"
+    ],
+    "fieldCount": 10
+  },
+  {
+    "endpoint": "taf/v1/EsocialEvents",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "taf/v1/EsocialEstablishment",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "taf/v1/EsocialBranches",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "taf/v1/EsocialAudit/auditValues",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "taf/v1/EsocialAudit/status",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  },
+  {
+    "endpoint": "taf/v1/FGTSPerWorkerInLaborProcess",
+    "httpStatus": 404,
+    "responseFormat": "error",
+    "error": "Not Found"
+  }
+]

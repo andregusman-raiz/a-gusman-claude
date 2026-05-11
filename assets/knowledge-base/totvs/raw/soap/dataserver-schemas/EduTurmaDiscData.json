@@ -1,0 +1,474 @@
+{
+  "dataServer": "EduTurmaDiscData",
+  "xsdLength": 15316,
+  "tables": [
+    {
+      "name": "STurmaDisc",
+      "fields": [
+        {
+          "name": "CODTURMA",
+          "caption": "Código da Turma",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CODDISC",
+          "caption": "Cód. Disciplina",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "CODCCUSTO",
+          "caption": "Centro de custo",
+          "type": "xs:string",
+          "maxLength": 25,
+          "required": false
+        },
+        {
+          "name": "APLICACAO",
+          "caption": "Sistema",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODFORMULA",
+          "caption": "Fórmula para cálculo de médias / aprovação",
+          "type": "xs:string",
+          "maxLength": 8,
+          "required": false
+        },
+        {
+          "name": "CODPREDIO",
+          "caption": "Cód. Prédio",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "CODSALA",
+          "caption": "Sala",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "CODEVENTO",
+          "caption": "Evento",
+          "type": "xs:string",
+          "maxLength": 4,
+          "required": false
+        },
+        {
+          "name": "DISCOPCIONAL",
+          "caption": "Disciplina opcional",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "PREALOCACAO",
+          "caption": "Vaga pré-alocada",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODEVENTOFALTA",
+          "caption": "Evento de falta",
+          "type": "xs:string",
+          "maxLength": 4,
+          "required": false
+        },
+        {
+          "name": "CODEVENTOATRASO",
+          "caption": "Evento de atraso",
+          "type": "xs:string",
+          "maxLength": 4,
+          "required": false
+        },
+        {
+          "name": "TIPO",
+          "caption": "Tipo da turma",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODBLOCO",
+          "caption": "Cód. Bloco",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "CODCAMPUS",
+          "caption": "Campus/Polo",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "ADICIONALNOTURNO",
+          "caption": "Noturno",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "ADICIONALEXTRA",
+          "caption": "Extra",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DISPONIVELMATRICULA",
+          "caption": "Exibe na matrícula do portal",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "S"
+        },
+        {
+          "name": "GERENCIAL",
+          "caption": "Gerencial",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "ATIVA",
+          "caption": "Ativa",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": true,
+          "defaultValue": "S"
+        },
+        {
+          "name": "ALIASCOMUNIDADE",
+          "caption": "Alias da comunidade no Fluig",
+          "type": "xs:string",
+          "maxLength": 255,
+          "required": false
+        },
+        {
+          "name": "COMPARTILHADA",
+          "caption": "Compartilhada",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "ESPELHO",
+          "caption": "Espelho",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "MASCARATURMAESPELHO",
+          "caption": "Máscara",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "URLAULAONLINE",
+          "caption": "Aula Online",
+          "type": "xs:string",
+          "maxLength": 2048,
+          "required": false
+        },
+        {
+          "name": "TIPONOTA",
+          "caption": "Tipo de nota",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "Código",
+          "type": "xs:int",
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "Filial",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Id. Período letivo",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODTURNO",
+          "caption": "Turno",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODPLANILHA",
+          "caption": "Planilha",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDHABILITACAOFILIAL",
+          "caption": "Matriz aplicada",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NUMAULASEM",
+          "caption": "Número de aulas",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DURACAOAULA",
+          "caption": "Duração da aula",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "MAXALUNOS",
+          "caption": "Nº máximo de alunos",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODTIPOCURSO",
+          "caption": "Nível de ensino",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DTINICIAL",
+          "caption": "Data inicial",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTFINAL",
+          "caption": "Data final",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "MINALUNOS",
+          "caption": "Nº mínimo de alunos",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CUSTOMEDIO",
+          "caption": "Custo médio",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "NOMEDISC",
+          "caption": "Nome disciplina",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODCURSO",
+          "caption": "Cód. Curso",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODHABILITACAO",
+          "caption": "Cód. Habilitação",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODGRADE",
+          "caption": "Matriz curricular",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "VAGASCALOUROS",
+          "caption": "Vagas para calouros",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NUMMAXALUNOOUTROSCURSOS",
+          "caption": "Núm. máximo de alunos de outros cursos",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "VAGASLISTAESPERA",
+          "caption": "Vagas para a lista de espera",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NUMCREDITOSCOB",
+          "caption": "Número de créditos para cobrança",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "VALORCREDITO",
+          "caption": "Valor do crédito para cobrança",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "COMPLEMENTODISC",
+          "caption": "COMPLEMENTODISC",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DTINICIOMATPRES",
+          "caption": "Data inicial da matrícula presencial",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTFIMMATPRES",
+          "caption": "Data final da matrícula presencial",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTINICIOMATPORTAL",
+          "caption": "Data inicial da matrícula no portal",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DTFIMMATPORTAL",
+          "caption": "Data final da matrícula no portal",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "IDTURMADISCANTIGO",
+          "caption": "Código",
+          "type": "xs:int",
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "NUMMAXALUNOSOUTRASMTZAPLICADAS",
+          "caption": "Nº máx. de alunos de outras matrizes aplicadas",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DECIMAIS",
+          "caption": "Número de casas decimais",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODTIPOCURSOPLETIVO",
+          "caption": "CODTIPOCURSOPLETIVO",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "NOMEFILIAL",
+          "caption": "Nome da filial",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NUMMAXALUNOOUTRACOLIGADA",
+          "caption": "Nº máx. de alunos de outras coligadas",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODAGENDA",
+          "caption": "Agenda Infantil",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODITINERARIOFORMATIVO",
+          "caption": "Cód. Itinerário Formativo",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NOMEITINERARIOFORMATIVO",
+          "caption": "Itinerário formativo",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "ORIGEMCRIACAO",
+          "caption": "ORIGEMCRIACAO",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDFT",
+          "caption": "IDFT",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODPERLET",
+          "caption": "CODPERLET",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "STURMADISCCOMPL",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "IDTURMADISC",
+          "type": "xs:int",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

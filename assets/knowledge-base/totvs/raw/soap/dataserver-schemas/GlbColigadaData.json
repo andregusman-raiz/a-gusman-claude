@@ -1,0 +1,231 @@
+{
+  "dataServer": "GlbColigadaData",
+  "xsdLength": 9167,
+  "tables": [
+    {
+      "name": "GColigada",
+      "fields": [
+        {
+          "name": "NOMEFANTASIA",
+          "caption": "Nome Fantasia",
+          "type": "xs:string",
+          "maxLength": 255,
+          "required": true
+        },
+        {
+          "name": "CGC",
+          "caption": "CNPJ / CPF / CEI",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "NOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "maxLength": 255,
+          "required": true
+        },
+        {
+          "name": "INSCRICAOESTADUAL",
+          "caption": "Inscrição Estadual",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "TELEFONE",
+          "caption": "Telefone",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "FAX",
+          "caption": "Fax",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "EMAIL",
+          "caption": "E-Mail",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "RUA",
+          "caption": "Rua",
+          "type": "xs:string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "name": "NUMERO",
+          "caption": "Número",
+          "type": "xs:string",
+          "maxLength": 8,
+          "required": false
+        },
+        {
+          "name": "COMPLEMENTO",
+          "caption": "Complemento",
+          "type": "xs:string",
+          "maxLength": 30,
+          "required": false
+        },
+        {
+          "name": "BAIRRO",
+          "caption": "Bairro",
+          "type": "xs:string",
+          "maxLength": 30,
+          "required": false
+        },
+        {
+          "name": "CIDADE",
+          "caption": "Cidade",
+          "type": "xs:string",
+          "maxLength": 32,
+          "required": false
+        },
+        {
+          "name": "ESTADO",
+          "caption": "Estado",
+          "type": "xs:string",
+          "maxLength": 2,
+          "required": false
+        },
+        {
+          "name": "PAIS",
+          "caption": "País",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "CEP",
+          "caption": "Cep",
+          "type": "xs:string",
+          "maxLength": 9,
+          "required": false
+        },
+        {
+          "name": "PRODUTORRURAL",
+          "caption": "Produtor Rural",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "ATIVO",
+          "caption": "Ativo",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODEXTERNO",
+          "caption": "Código Externo",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "IMPORTADA",
+          "caption": "Importada Via Aponta",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Código",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "32"
+        },
+        {
+          "name": "CONTROLACGC",
+          "caption": "Hist. CNPJ",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CONTROLE1",
+          "caption": "Controle1",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CONTROLE2",
+          "caption": "Controle2",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CONTROLE3",
+          "caption": "Controle3",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "IDIMAGEM",
+          "caption": "Identificador da Imagem",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IMAGEM",
+          "caption": "Imagem",
+          "type": "xs:base64Binary",
+          "required": false
+        },
+        {
+          "name": "INTEGRADOFLUIG",
+          "caption": "Integrado",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DATALIMITELICENCAS",
+          "caption": "DATALIMITELICENCAS",
+          "type": "xs:dateTime",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "GFilial",
+      "fields": [
+        {
+          "name": "NOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "maxLength": 100,
+          "required": true
+        },
+        {
+          "name": "CGC",
+          "caption": "CNPJ/CPF/CEI",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "Filial",
+          "type": "xs:short",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,312 @@
+{
+  "dataServer": "EduPlanoAulaData",
+  "xsdLength": 10677,
+  "tables": [
+    {
+      "name": "SPlanoAula",
+      "fields": [
+        {
+          "name": "CODPREDIO",
+          "caption": "Cód. Prédio",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "CODSALA",
+          "caption": "Sala",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "CODPROF",
+          "caption": "Professor substituto",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": false
+        },
+        {
+          "name": "CONTEUDO",
+          "caption": "Conteúdo Previsto",
+          "type": "xs:string",
+          "maxLength": 2147483647,
+          "required": false
+        },
+        {
+          "name": "LOCACAO",
+          "caption": "Locação",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "CONTEUDOEFETIVO",
+          "caption": "Conteúdo Realizado",
+          "type": "xs:string",
+          "maxLength": 2147483647,
+          "required": false
+        },
+        {
+          "name": "REPOSICAO",
+          "caption": "Reposição",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "SUBSTITUTO",
+          "caption": "Substituto",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "PAGAMENTOPROF",
+          "caption": "Professor que receberá pela aula",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "HORAINICIAL",
+          "caption": "Início",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "HORAFINAL",
+          "caption": "Término",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "TIPOFALTA",
+          "caption": "Falta",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false
+        },
+        {
+          "name": "CODBLOCO",
+          "caption": "Cód. Bloco",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": false
+        },
+        {
+          "name": "CODSUBTURMA",
+          "caption": "Subturma",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "LICAOCASA",
+          "caption": "Lição de casa",
+          "type": "xs:string",
+          "maxLength": 4000,
+          "required": false
+        },
+        {
+          "name": "CONFIRMADO",
+          "caption": "Confirmado",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "URLAULAONLINE",
+          "caption": "Aula Online",
+          "type": "xs:string",
+          "maxLength": 2048,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "Id. turma/disciplina",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "AULA",
+          "caption": "Aula",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "IDHORARIOTURMA",
+          "caption": "Id. do Horário",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "Filial",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODHOR",
+          "caption": "Código horário",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "DATA",
+          "caption": "Data",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DATAEFETIVA",
+          "caption": "Data",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "HORAINICIALREALIZADO",
+          "caption": "HORAINICIAL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "HORAFINALREALIZADO",
+          "caption": "HORAFINAL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODTURMA",
+          "caption": "Código da Turma",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODDISC",
+          "caption": "Código da disciplina",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "NOMEDISC",
+          "caption": "Nome da disciplina",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "FREQUENCIADISPWEB",
+          "caption": "Frequência disponível para os alunos",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DIASEMANA",
+          "caption": "Dia da semana",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "OBSERVACAO",
+          "caption": "Observação",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDPLANOAULA",
+          "caption": "Id. plano aula",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "TIPOAULA",
+          "caption": "Tipo aula",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Id. Período letivo",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "PREDIO",
+          "caption": "Prédio",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "BLOCO",
+          "caption": "Bloco",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "SALA",
+          "caption": "Sala",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SPlanoAulaArquivo",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDTURMADISC",
+          "caption": "Id. turma/disciplina",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "IDPLANOAULA",
+          "caption": "Id. plano aula",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "IDMATERIALSEC",
+          "caption": "Id. do arquivo da aula",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "PATHARQUIVO",
+          "caption": "Arquivo",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "DESCRICAO",
+          "caption": "Descrição",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "ARQUIVO",
+          "caption": "Arquivo",
+          "type": "xs:base64Binary",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

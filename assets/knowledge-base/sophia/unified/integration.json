@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26"
+  },
+  "projects": {
+    "sophia-educacional-frontend": {
+      "path": "~/Claude/projetos/sophia-educacional-frontend/",
+      "port": 3004,
+      "stack": "Next.js 16, shadcn, Tailwind 4, Zod 4, mock-first",
+      "status": "DONE (208 files, 70 pages, build OK)",
+      "modules": [
+        "Secretaria",
+        "Pedagógico",
+        "Financeiro",
+        "Captação (CRM/funil)",
+        "Régua de Cobrança"
+      ]
+    }
+  },
+  "envVars": {
+    "SOPHIA_API_URL": {
+      "description": "URL da instância (ex: https://escola.sophia.com.br/api/v1)"
+    },
+    "SOPHIA_PARCEIRO_USUARIO": {
+      "description": "Usuário parceiro de integração"
+    },
+    "SOPHIA_PARCEIRO_SENHA": {
+      "description": "Senha parceiro (nunca expor)"
+    }
+  },
+  "swaggerUrl": "https://portal.sophia.com.br/swagger (referência — API real na instância de cada escola)"
+}

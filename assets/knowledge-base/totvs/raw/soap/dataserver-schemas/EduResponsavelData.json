@@ -1,0 +1,78 @@
+{
+  "dataServer": "EduResponsavelData",
+  "xsdLength": 2345,
+  "tables": [
+    {
+      "name": "SResponsavel",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Cód. Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDPARCELA",
+          "caption": "Identificador da parcela",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODCOLCFO",
+          "caption": "Coligada do cliente/fornecedor",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CODCFO",
+          "caption": "Código do responsável financeiro",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "NOMECFO",
+          "caption": "Código do responsável financeiro",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Período letivo",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "CODSERVICO",
+          "caption": "Serviço",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PERCENTUAL",
+          "caption": "Percentual",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "PARCELA",
+          "caption": "PARCELA",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "NOMECLIFOR",
+          "caption": "NOMECLIFOR",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

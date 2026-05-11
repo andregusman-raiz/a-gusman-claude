@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-03-08T21:30:43.110696",
+  "sources": {
+    "totvs/specs/totvs_rm_specs": {
+      "file": "totvs/specs/totvs_rm_specs.jsonl",
+      "records": 263,
+      "size_kb": 273.9,
+      "category": "totvs/specs",
+      "date_range": {
+        "min": "2026-03-05T21:52:07Z",
+        "max": "2026-03-05T21:52:07Z"
+      },
+      "record_types": {
+        "api_spec": 263
+      }
+    },
+    "totvs/tdn/totvs_tdn": {
+      "file": "totvs/tdn/totvs_tdn.jsonl",
+      "records": 187,
+      "size_kb": 1088.9,
+      "category": "totvs/tdn",
+      "date_range": {
+        "min": "2026-03-05T22:14:34.192465+00:00",
+        "max": "2026-03-05T22:14:34.365631+00:00"
+      },
+      "record_types": {
+        "documentation": 187
+      }
+    },
+    "totvs/suporte/totvs_central": {
+      "file": "totvs/suporte/totvs_central.jsonl",
+      "records": 300,
+      "size_kb": 893.4,
+      "category": "totvs/suporte",
+      "date_range": {
+        "min": "2024-08-30T17:22:49Z",
+        "max": "2026-03-05T21:41:36Z"
+      },
+      "record_types": {
+        "support_article": 300
+      }
+    },
+    "zeev/kb/zeev_kb": {
+      "file": "zeev/kb/zeev_kb.jsonl",
+      "records": 374,
+      "size_kb": 1207.8,
+      "category": "zeev/kb",
+      "date_range": {
+        "min": "2026-03-05T22:02:55.194879+00:00",
+        "max": "2026-03-05T22:02:55.194879+00:00"
+      },
+      "record_types": {
+        "documentation": 374
+      }
+    },
+    "zeev/specs/endpoints": {
+      "file": "zeev/specs/endpoints.jsonl",
+      "records": 98,
+      "size_kb": 264.0,
+      "category": "zeev/specs",
+      "date_range": {
+        "min": "2026-03-05T21:51:14Z",
+        "max": "2026-03-05T21:51:14Z"
+      },
+      "record_types": {
+        "api_endpoint": 98
+      }
+    },
+    "hubspot/kb/hubspot_kb": {
+      "file": "hubspot/kb/hubspot_kb.jsonl",
+      "records": 300,
+      "size_kb": 3192.4,
+      "category": "hubspot/kb",
+      "date_range": {
+        "min": "2026-03-05T22:49:01.776885+00:00",
+        "max": "2026-03-05T22:49:01.776885+00:00"
+      },
+      "record_types": {
+        "documentation": 300
+      }
+    },
+    "hubspot/specs/hubspot_specs": {
+      "file": "hubspot/specs/hubspot_specs.jsonl",
+      "records": 72,
+      "size_kb": 155.8,
+      "category": "hubspot/specs",
+      "date_range": {
+        "min": "2026-03-05T22:13:45.954875+00:00",
+        "max": "2026-03-05T22:13:45.954875+00:00"
+      },
+      "record_types": {
+        "api_spec": 72
+      }
+    },
+    "hubspot/guides/hubspot_guides": {
+      "file": "hubspot/guides/hubspot_guides.jsonl",
+      "records": 85,
+      "size_kb": 1365.0,
+      "category": "hubspot/guides",
+      "date_range": {
+        "min": "2026-03-05T22:38:28.504515+00:00",
+        "max": "2026-03-05T22:38:28.504515+00:00"
+      },
+      "record_types": {
+        "developer_guide": 85
+      }
+    }
+  },
+  "processes": {
+    "all": 1679
+  },
+  "record_types": {
+    "api_spec": 335,
+    "documentation": 861,
+    "support_article": 300,
+    "api_endpoint": 98,
+    "developer_guide": 85
+  },
+  "actors": [
+    "Compras",
+    "Contabilidade",
+    "Educacional",
+    "Estoque",
+    "Financeiro",
+    "Fiscal",
+    "RH",
+    "Saude"
+  ],
+  "total_records": 1679,
+  "date_range": {
+    "min": "2024-08-30T17:22:49Z",
+    "max": "2026-03-05T22:49:01.776885+00:00"
+  },
+  "categories": {
+    "totvs/specs": 263,
+    "totvs/tdn": 187,
+    "totvs/suporte": 300,
+    "zeev/kb": 374,
+    "zeev/specs": 98,
+    "hubspot/kb": 300,
+    "hubspot/specs": 72,
+    "hubspot/guides": 85
+  }
+}

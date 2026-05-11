@@ -1,0 +1,437 @@
+{
+  "dataServer": "GlbUsuarioData",
+  "xsdLength": 14533,
+  "tables": [
+    {
+      "name": "GUSUARIO",
+      "fields": [
+        {
+          "name": "CODUSUARIO",
+          "caption": "Usuário",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true,
+          "defaultValue": ""
+        },
+        {
+          "name": "NOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "maxLength": 45,
+          "required": false
+        },
+        {
+          "name": "CODACESSO",
+          "caption": "Código de Acesso",
+          "type": "xs:string",
+          "maxLength": 16,
+          "required": true
+        },
+        {
+          "name": "OBRIGAALTERARSENHA",
+          "caption": "Alterar senha no Próximo Login",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "T"
+        },
+        {
+          "name": "EMAIL",
+          "caption": "E-Mail",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "ACESSONET",
+          "caption": "Permite Acesso ao TOTVS RM Portal",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "F"
+        },
+        {
+          "name": "CODUSUARIOREDE",
+          "caption": "Usuário de rede",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": false
+        },
+        {
+          "name": "DOMINIOREDE",
+          "caption": "Domínio de rede",
+          "type": "xs:string",
+          "maxLength": 256,
+          "required": false
+        },
+        {
+          "name": "LIVEID",
+          "caption": "LIVEID",
+          "type": "xs:string",
+          "maxLength": 150,
+          "required": false
+        },
+        {
+          "name": "USUARIOTWITTER",
+          "caption": "Usuário do Twitter",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "SENHATWITTER",
+          "caption": "Senha do Twitter",
+          "type": "xs:string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "name": "USUARIOFACEBOOK",
+          "caption": "USUARIOFACEBOOK",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "SENHAFACEBOOK",
+          "caption": "SENHAFACEBOOK",
+          "type": "xs:string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "name": "USUARIOLINKEDIN",
+          "caption": "USUARIOLINKEDIN",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "SENHALINKEDIN",
+          "caption": "SENHALINKEDIN",
+          "type": "xs:string",
+          "maxLength": 100,
+          "required": false
+        },
+        {
+          "name": "USERID",
+          "caption": "UserId",
+          "type": "xs:string",
+          "maxLength": 50,
+          "required": false
+        },
+        {
+          "name": "USERIDFLUIGIDENTITY",
+          "caption": "USERIDFLUIGIDENTITY",
+          "type": "xs:string",
+          "maxLength": 32,
+          "required": false
+        },
+        {
+          "name": "IGNORARAUTENTICACAOLDAP",
+          "caption": "Ignorar Integração/Logon LDAP",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "F"
+        },
+        {
+          "name": "NOMESOCIAL",
+          "caption": "Nome Social",
+          "type": "xs:string",
+          "maxLength": 45,
+          "required": false
+        },
+        {
+          "name": "CODEXTERNO",
+          "caption": "Código externo",
+          "type": "xs:string",
+          "maxLength": 255,
+          "required": false
+        },
+        {
+          "name": "STATUS",
+          "caption": "Ativo",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "1"
+        },
+        {
+          "name": "DATAINICIO",
+          "caption": "Início de Validade",
+          "type": "xs:dateTime",
+          "required": true,
+          "defaultValue": "2026-03-26T00:00:00"
+        },
+        {
+          "name": "DATAEXPIRACAO",
+          "caption": "Expiração de Validade",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "CONFIRMABTNOK",
+          "caption": "Confirmação de Operação",
+          "type": "xs:short",
+          "required": false,
+          "defaultValue": "1"
+        },
+        {
+          "name": "SENHA",
+          "caption": "Senha ",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CONTROLE",
+          "caption": "CRC do Usuário",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "ULTIMACOLIGADA",
+          "caption": "Última Coligada Acessada",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DTAEXPSENHA",
+          "caption": "Data de expiração da senha",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DIASEXPSENHA",
+          "caption": "Dias de expiração da senha",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NUMLOGININVALIDO",
+          "caption": "Número de Logins Inválidos",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "DATALOGININVALIDO",
+          "caption": "Data do último login inválido",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "DATAULTIMOACESSO",
+          "caption": "Última tentativa de acesso",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "FULLDETERMINED",
+          "caption": "FULLDETERMINED",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "INTEGRADOFLUIG",
+          "caption": "Integrado",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "DATAULTIMOACESSOVALIDO",
+          "caption": "Último acesso Válido",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "ULTIMASSENHAS",
+          "caption": "Últimas senhas utilizadas pelo usuário",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "INTERNO1",
+          "caption": "INTERNO1",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "RECCREATEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "RECMODIFIEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "RECCREATEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "RECMODIFIEDBY",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "GPERMIS",
+      "fields": [
+        {
+          "name": "CODSISTEMA",
+          "caption": "CODSISTEMA",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": true,
+          "defaultValue": "S"
+        },
+        {
+          "name": "CODUSUARIO",
+          "caption": "CODUSUARIO",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true,
+          "defaultValue": "andre.gusman"
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "SUPERVISOR",
+          "caption": "SUPERVISOR",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CONTROLE",
+          "caption": "CONTROLE",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CRIARELAT",
+          "caption": "CRIARELAT",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "RECCREATEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "RECCREATEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "RECMODIFIEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "RECMODIFIEDON",
+          "type": "xs:dateTime",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "GUSRPERFIL",
+      "fields": [
+        {
+          "name": "CODUSUARIO",
+          "caption": "CODUSUARIO",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true,
+          "defaultValue": "andre.gusman"
+        },
+        {
+          "name": "CODSISTEMA",
+          "caption": "CODSISTEMA",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": true,
+          "defaultValue": "S"
+        },
+        {
+          "name": "CODPERFIL",
+          "caption": "CODPERFIL",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": true
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "INDICE",
+          "caption": "INDICE",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CONTROLE",
+          "caption": "CONTROLE",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "RECCREATEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "RECCREATEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "RECMODIFIEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "RECMODIFIEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "STATUS",
+          "caption": "STATUS",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "IDPERFIL",
+          "caption": "IDPERFIL",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

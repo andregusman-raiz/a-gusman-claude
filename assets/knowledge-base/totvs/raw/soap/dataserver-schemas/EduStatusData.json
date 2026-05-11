@@ -1,0 +1,643 @@
+{
+  "dataServer": "EduStatusData",
+  "xsdLength": 17870,
+  "tables": [
+    {
+      "name": "SStatus",
+      "fields": [
+        {
+          "name": "DESCRICAO",
+          "caption": "Descrição",
+          "type": "xs:string",
+          "maxLength": 30,
+          "required": true
+        },
+        {
+          "name": "PLDIARIO",
+          "caption": "Aluno com esta situação de matrícula é exibido no diário",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLMDSTANTIGODISC",
+          "caption": "Disciplinas com esta situação de matrícula assumem a nova situação de matrícula do período letivo",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLREMATRICULA",
+          "caption": "Opções para matrícula no próximo P. Let",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLBLQALTSITMATSEMFIADORAPROV",
+          "caption": "Bloqueia alteração para este status por falta de fiador aprovado",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLPRMMATITINERARIOPRTMENUEXCL",
+          "caption": "Permite matricular em Itinerários Formativos",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PERMITEALUNOCANCELARDISCPORTAL",
+          "caption": "Permite cancelar disciplina na matrícula",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLITBLQALTSITMATITINERARIOPRT",
+          "caption": "Bloqueia alteração de situação matrícula em itinerário formativo na matrícula online",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PERALTINCITINERMENUEXCMATIFPRT",
+          "caption": "Permite incluir itinerário formativo",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PEREXCITINERARMENUEXCMATIFPRT",
+          "caption": "Permite excluir itinerário formativo",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLALTSTATUSDISCITFORCONTALUMAT",
+          "caption": "Alterar situação de matrícula apenas das disciplinas de itinerário que contam como aluno matriculado na turma",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "CODSTATUS",
+          "caption": "Código",
+          "type": "xs:int",
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CODTIPOCURSO",
+          "caption": "Nível de ensino",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CUCODSTATUSPL",
+          "caption": "Modifica a situação de matrícula do aluno no período letivo atual para",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "PLCODSTATUSCUR",
+          "caption": "Altera situação de matrícula do aluno no curso para",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "PLCODSTATUSDISC",
+          "caption": "Altera situação de matrícula das disciplinas em curso e/ou conta como aluno matriculado para",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "PLCODTIPOALUNO",
+          "caption": "Altera tipo do aluno para",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "PLINDICATRANC",
+          "caption": "Indica trancamento",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CUCONCCURSO",
+          "caption": "Indica conclusão do curso",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CUINDICAJUBILADO",
+          "caption": "Indica jubilamento",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CUINDICATRANSF",
+          "caption": "Indica transferência",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CUPERMITEMATRICPL",
+          "caption": "Permite matricular o aluno em um período letivo",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CURSO",
+          "caption": "No curso",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DICONTCRTES",
+          "caption": "Conta créditos financeiros (cobrança por crédito)",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DICREDITOCURSADO",
+          "caption": "Conta como créditos cursados ou em curso",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DIEMCURSO",
+          "caption": "É uma disciplina em curso",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DIHISTORICO",
+          "caption": "Imprime no histórico",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DIINCALUNODISC",
+          "caption": "Conta como aluno matriculado na turma e turma/disciplina",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DISCIPLINA",
+          "caption": "Na disciplina",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DISPONIVELWEB",
+          "caption": "Visível para seleção no contexto educacional do Portal",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DIVALIDAPRE",
+          "caption": "Pré/correquisito válido",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "LISTAGENSWEB",
+          "caption": "Disponível nas listagens de consulta do professor (ex: Funcionalidade ",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "MATRICULAPROVISORIA",
+          "caption": "Matrícula provisória (processo seletivo)",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "NOTASFALTASWEB",
+          "caption": "Disponível para digitação de notas/faltas",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLATIVO",
+          "caption": "Aluno ativo",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLBLOQFINANC",
+          "caption": "Bloqueia alterações financeiras",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DIBLOQNOTAFALTA",
+          "caption": "Bloquear alterações de notas e faltas",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLBLQALTSITMAT",
+          "caption": "Bloqueia alteração de situação de matrícula",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLCANCELACONTRATO",
+          "caption": "Cancela contrato financeiro",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLDISCAUTOMATICA",
+          "caption": "Matricular automaticamente nas disciplinas da turma",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLETIVO",
+          "caption": "No período letivo",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLEXIGECONTRATO",
+          "caption": "Exige contrato financeiro",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLINCLUIRDISC",
+          "caption": "Bloqueia inclusão/exclusão de disciplinas",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "RESULTADO",
+          "caption": "Status de resultado final",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLPERMITETRANCAMENTO",
+          "caption": "Permite trancamento",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLPRIORIDADE",
+          "caption": "Prioridade matrícula nas disciplinas",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PLORDDISCPERANT",
+          "caption": "Disciplinas de períodos anteriores em ordem",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PLLIMITEDISCPERANT",
+          "caption": "Buscar disciplinas até o limite de",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "PLORDDISCPERPOST",
+          "caption": "Disciplinas de períodos anteriores em ordem",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PLLIMITEDISCPERPOST",
+          "caption": "Buscar disciplinas até o limite de",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "APROVADO",
+          "caption": "Aprovado",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DIINDICATRANC",
+          "caption": "Trancamento da matrícula da disciplina",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLDISPENTURMACAO",
+          "caption": "Status listado no processo de enturmação",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PERALUMATRICWEB",
+          "caption": "Permite ao aluno efetuar matrícula",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PERALUINCDISC",
+          "caption": "Permite incluir disciplina na matrícula",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PERALUEXCDISC",
+          "caption": "Permite excluir disciplina na matrícula",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLCANCELAUSUARIOCORPORE",
+          "caption": "Ação usuário do aluno",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PLCANCELAUSUARIOBIBLIOS",
+          "caption": "Cancela usuário do Gestão Bibliotecária",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CONTABCOMPETENCIA",
+          "caption": "Gera contabilização por competência",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PLCODSTATUSATIV",
+          "caption": "Altera status das atividades complementares do aluno para",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "ENVIAREMAILMUDSITMAT",
+          "caption": "Enviar Email na mudança de situação de matrícula",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "TEMPLATEENVIOEMAIL",
+          "caption": "Template para envio de email",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDRELATORIO",
+          "caption": "Anexar Relatório",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "COLIGADARELATORIO",
+          "caption": "COLIGADARELATORIO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PLBLQALTSITSEMDOC",
+          "caption": "Bloqueia alteração para este status por falta de doc. obrigatórios",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "ABATEPOSTALTERSTATUS",
+          "caption": "Abater valor da disciplina somente para parcelas com vencimento igual ou posterior a data de alteração da situação de matrícula",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DIBLQALTSITMATDISC",
+          "caption": "Bloqueia alteração de situação de matrícula nas disciplinas",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DIBLQALTSITMATDISCPRT",
+          "caption": "Não altera a situação de matrícula na disciplina (apenas para matrícula on-line)",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CODEXTERNO",
+          "caption": "Código Externo",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PLPREENCHEDTMATENCCENSO",
+          "caption": "Data de encerramento da matrícula",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CUSTATUSFLUIGCOMUNIDADE",
+          "caption": "Aluno ativo na comunidade do Fluig",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLSTATUSFLUIGCOMUNIDADE",
+          "caption": "Aluno ativo na comunidade do Fluig",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "DISTATUSFLUIGCOMUNIDADE",
+          "caption": "Aluno ativo na comunidade do Fluig",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CUINDICADESVINCULACAO",
+          "caption": "Indica desvinculação do curso",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLVALINADIMPLMATRICPORTAL",
+          "caption": "Validar inadimplência de aluno na matrícula pelo portal",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "S"
+        },
+        {
+          "name": "EXIBEQUADROAVISO",
+          "caption": "Exibe no Quadro de Avisos quando o parâmetro ",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CODCOLIGADARPTPLETIVOEMAIL",
+          "caption": "Cód. coligada relatório",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "IDRPTPLETIVOEMAIL",
+          "caption": "Anexar Relatório (novo gerador)",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NOVORPTPLETIVOEMAIL",
+          "caption": "Utilizar novo gerador",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PLCODSTATUSDISCITINERARIO",
+          "caption": "Altera situação de matrícula das disciplinas do Itinerário Formativo para:",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "PERALUINCITINERARIO",
+          "caption": "Permite incluir itinerário na matrícula.",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "PERALUEXCITINERARIO",
+          "caption": "Permite excluir itinerário na matrícula.",
+          "type": "xs:string",
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "CUDIPLOMADIGITALSITUACAOMATRIC",
+          "caption": "Situação de matrícula no curso - Diploma Digital",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PLDIPLOMADIGITALSITUACAOMATRIC",
+          "caption": "Situação de matrícula no período letivo - Diploma Digital",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "DIDIPLOMADIGITALSITUACAOMATRIC",
+          "caption": "Situação de matrícula na disciplina - Diploma Digital",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "STATUSMATRICULACANCELDISCPRT",
+          "caption": "Altera situação de matrícula na disciplina para",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "MOTIVOMATDISCCANCELPORTAL",
+          "caption": "Motivo da alteração",
+          "type": "xs:int",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SStatusItinerarioFormativo",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "CODTIPOCURSO",
+          "caption": "Nível de ensino",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODSTATUS",
+          "caption": "Código",
+          "type": "xs:int",
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "CODSTATUSITINERARIOFORMATIVO",
+          "caption": "Código",
+          "type": "xs:int",
+          "required": true,
+          "defaultValue": "0"
+        }
+      ]
+    }
+  ]
+}

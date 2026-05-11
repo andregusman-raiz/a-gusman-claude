@@ -1,0 +1,258 @@
+{
+  "dataServer": "EduParcelaData",
+  "xsdLength": 7827,
+  "tables": [
+    {
+      "name": "SParcela",
+      "fields": [
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "CODCONTRATO",
+          "caption": "Cód. do contrato",
+          "type": "xs:string",
+          "maxLength": 20,
+          "required": true
+        },
+        {
+          "name": "CODSERVICO",
+          "caption": "Cód. do serviço",
+          "type": "xs:string",
+          "maxLength": 10,
+          "required": true
+        },
+        {
+          "name": "TIPODESC",
+          "caption": "Tipo de desconto",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "P"
+        },
+        {
+          "name": "TIPOPARCELA",
+          "caption": "Tipo parcela",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "P"
+        },
+        {
+          "name": "VALORAUTOMATICO",
+          "caption": "Valor calculado pelo número de créditos",
+          "type": "xs:string",
+          "maxLength": 1,
+          "required": false,
+          "defaultValue": "N"
+        },
+        {
+          "name": "NOMESERVICO",
+          "caption": "Serviço",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "ORIGEM",
+          "caption": "Origem",
+          "type": "xs:string",
+          "maxLength": 2,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Cód. Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDPARCELA",
+          "caption": "Identificador da parcela",
+          "type": "xs:int",
+          "required": true,
+          "defaultValue": "0"
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Período letivo",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "PARCELA",
+          "caption": "Parcela",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "COTA",
+          "caption": "Cota",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "VALOR",
+          "caption": "Valor",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "DTVENCIMENTO",
+          "caption": "Dt. vencimento",
+          "type": "xs:dateTime",
+          "required": true
+        },
+        {
+          "name": "DESCONTO",
+          "caption": "Desconto contabilizado",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "DTCOMPETENCIA",
+          "caption": "Dt. competência",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "IDLAN",
+          "caption": "Ref.",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "ORIGEMCONTACORRENTE",
+          "caption": "Origem da conta corrente do aluno",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "VALORORIGINAL",
+          "caption": "Valor Original",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "VLRBOLSAATEVENC",
+          "caption": "Valor bolsa condicional",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "VLRBOLSAPOSVENC",
+          "caption": "Valor bolsa incondicional",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "VLRDESCONTO",
+          "caption": "Valor de desconto",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "VLRLIQUIDO",
+          "caption": "Valor líquido",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "VLRCREDRETROATIVO",
+          "caption": "Valor Crédito Retroativo",
+          "type": "xs:decimal",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDBY",
+          "caption": "RECCREATEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECCREATEDON",
+          "caption": "RECCREATEDON",
+          "type": "xs:dateTime",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDBY",
+          "caption": "RECMODIFIEDBY",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "RECMODIFIEDON",
+          "caption": "RECMODIFIEDON",
+          "type": "xs:dateTime",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SResponsavel",
+      "fields": [
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Cód. Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "IDPARCELA",
+          "caption": "Identificador da parcela",
+          "type": "xs:int",
+          "required": true
+        },
+        {
+          "name": "CODCOLCFO",
+          "caption": "Coligada do cliente/fornecedor",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CODCFO",
+          "caption": "Código do responsável financeiro",
+          "type": "xs:string",
+          "required": true
+        },
+        {
+          "name": "RA",
+          "caption": "R.A.",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODSERVICO",
+          "caption": "Serviço",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "IDPERLET",
+          "caption": "Período letivo",
+          "type": "xs:int",
+          "required": false
+        },
+        {
+          "name": "NOMECLIFOR",
+          "caption": "Responsável Financeiro",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "PERCENTUAL",
+          "caption": "Percentual",
+          "type": "xs:decimal",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

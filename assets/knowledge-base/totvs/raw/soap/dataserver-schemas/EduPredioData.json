@@ -1,0 +1,202 @@
+{
+  "dataServer": "EduPredioData",
+  "xsdLength": 7682,
+  "tables": [
+    {
+      "name": "SPredio",
+      "fields": [
+        {
+          "name": "CODPREDIO",
+          "caption": "Código",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": true
+        },
+        {
+          "name": "NOME",
+          "caption": "Nome",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": true
+        },
+        {
+          "name": "RUA",
+          "caption": "Logradouro",
+          "type": "xs:string",
+          "maxLength": 40,
+          "required": false
+        },
+        {
+          "name": "NUMERO",
+          "caption": "Número",
+          "type": "xs:string",
+          "maxLength": 8,
+          "required": false
+        },
+        {
+          "name": "COMPLEMENTO",
+          "caption": "Complemento",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "BAIRRO",
+          "caption": "Bairro",
+          "type": "xs:string",
+          "maxLength": 80,
+          "required": false
+        },
+        {
+          "name": "ESTADO",
+          "caption": "Estado",
+          "type": "xs:string",
+          "maxLength": 2,
+          "required": false
+        },
+        {
+          "name": "CIDADE",
+          "caption": "Cidade",
+          "type": "xs:string",
+          "maxLength": 32,
+          "required": false
+        },
+        {
+          "name": "CEP",
+          "caption": "CEP",
+          "type": "xs:string",
+          "maxLength": 9,
+          "required": false
+        },
+        {
+          "name": "PAIS",
+          "caption": "País",
+          "type": "xs:string",
+          "maxLength": 16,
+          "required": false
+        },
+        {
+          "name": "TELEFONE",
+          "caption": "Telefone",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "DDD",
+          "caption": "DDD",
+          "type": "xs:string",
+          "maxLength": 4,
+          "required": false
+        },
+        {
+          "name": "FAX",
+          "caption": "Fax",
+          "type": "xs:string",
+          "maxLength": 15,
+          "required": false
+        },
+        {
+          "name": "CONTATO",
+          "caption": "Contato",
+          "type": "xs:string",
+          "maxLength": 40,
+          "required": false
+        },
+        {
+          "name": "EMAIL",
+          "caption": "Email do contato",
+          "type": "xs:string",
+          "maxLength": 60,
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "Coligada",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "Cód. Filial",
+          "type": "xs:short",
+          "required": true
+        },
+        {
+          "name": "CODCAMPUS",
+          "caption": "Campus/Polo",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODCOLIGADAPT",
+          "caption": "CODCOLIGADAPT",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODFILIALPT",
+          "caption": "CODFILIALPT",
+          "type": "xs:short",
+          "required": false
+        },
+        {
+          "name": "CODPREDIOPT",
+          "caption": "CODPREDIOPT",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODFREGUESIA",
+          "caption": "CODFREGUESIA",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODPOSTAL",
+          "caption": "CODPOSTAL",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "CODMUNICIPIO",
+          "caption": "CODMUNICIPIO",
+          "type": "xs:string",
+          "required": false
+        },
+        {
+          "name": "LOCALIDADE",
+          "caption": "LOCALIDADE",
+          "type": "xs:string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "SPREDIOCOMPL",
+      "fields": [
+        {
+          "name": "CODPREDIO",
+          "caption": "CODPREDIO",
+          "type": "xs:string",
+          "maxLength": 5,
+          "required": true
+        },
+        {
+          "name": "CODCOLIGADA",
+          "caption": "CODCOLIGADA",
+          "type": "xs:short",
+          "required": true,
+          "defaultValue": "1"
+        },
+        {
+          "name": "CODFILIAL",
+          "caption": "CODFILIAL",
+          "type": "xs:short",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2795 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "totalEndpoints": 258,
+    "totalModels": 153,
+    "baseUrl": "https://{instancia}.sophia.com.br/api/v1",
+    "auth": "Bearer token (login endpoint, 20min TTL, IP-bound)"
+  },
+  "endpoints": [
+    {
+      "path": "/api/v1/AlunoDigital/ProcessarWebhook",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "AlunoDigital"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/AlunoDigital/ProcessarWebhook",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "AlunoDigital"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Alunos",
+      "method": "GET",
+      "summary": "Retorna os alunos",
+      "tags": [
+        "Alunos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Alunos",
+      "method": "GET",
+      "summary": "Retorna os alunos",
+      "tags": [
+        "Alunos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Alunos/{id}",
+      "method": "GET",
+      "summary": "Retorna os dados do aluno",
+      "tags": [
+        "Alunos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Alunos/{id}",
+      "method": "PUT",
+      "summary": "Altera os dados do aluno",
+      "tags": [
+        "Alunos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Alunos/{id}",
+      "method": "GET",
+      "summary": "Retorna os dados do aluno",
+      "tags": [
+        "Alunos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Alunos/{id}",
+      "method": "PUT",
+      "summary": "Altera os dados do aluno",
+      "tags": [
+        "Alunos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Alunos/ValidarLogin",
+      "method": "POST",
+      "summary": "Autentica um usuário com base no e-mail ou Código externo",
+      "tags": [
+        "Alunos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Alunos/ValidarLogin",
+      "method": "POST",
+      "summary": "Autentica um usuário com base no e-mail ou Código externo",
+      "tags": [
+        "Alunos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Arquivos",
+      "method": "GET",
+      "summary": "Retorna os arquivos disponibilizados para o aluno",
+      "tags": [
+        "Arquivos"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Arquivos",
+      "method": "GET",
+      "summary": "Retorna os arquivos disponibilizados para o aluno",
+      "tags": [
+        "Arquivos"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/AtaNota",
+      "method": "GET",
+      "summary": "Retorna as ata nota",
+      "tags": [
+        "AtaNota"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/AtaNota",
+      "method": "GET",
+      "summary": "Retorna as ata nota",
+      "tags": [
+        "AtaNota"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/AtaNota/{id}/NotaAlunos",
+      "method": "GET",
+      "summary": "Retorna as ata aluno",
+      "tags": [
+        "AtaNota"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/AtaNota/{id}/NotaAlunos",
+      "method": "PUT",
+      "summary": "Atualiza as ata aluno",
+      "tags": [
+        "AtaNota"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/AtaNota/{id}/NotaAlunos",
+      "method": "GET",
+      "summary": "Retorna as ata aluno",
+      "tags": [
+        "AtaNota"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/AtaNota/{id}/NotaAlunos",
+      "method": "PUT",
+      "summary": "Atualiza as ata aluno",
+      "tags": [
+        "AtaNota"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Autenticacao",
+      "method": "POST",
+      "summary": "Autenticação da API",
+      "tags": [
+        "Autenticacao"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Autenticacao",
+      "method": "POST",
+      "summary": "Autenticação da API",
+      "tags": [
+        "Autenticacao"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/AutorizacaoRetirada",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "AutorizacaoRetirada"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/AutorizacaoRetirada",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "AutorizacaoRetirada"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/AutorizacaoRetirada",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "AutorizacaoRetirada"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/AutorizacaoRetirada",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "AutorizacaoRetirada"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/AvaliacaoInstitucional",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "AvaliacaoInstitucional"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/AvaliacaoInstitucional",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "AvaliacaoInstitucional"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/AvaliacaoInstitucional/{codigoAvaliacao}/Usuario/{codigoFisica}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "AvaliacaoInstitucional"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/AvaliacaoInstitucional/{codigoAvaliacao}/Usuario/{codigoFisica}",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "AvaliacaoInstitucional"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/AvaliacaoInstitucional/{codigoAvaliacao}/Usuario/{codigoFisica}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "AvaliacaoInstitucional"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/AvaliacaoInstitucional/{codigoAvaliacao}/Usuario/{codigoFisica}",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "AvaliacaoInstitucional"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/AvaliacaoInstitucional/{codigoAvaliacao}/Usuario/{codigoFisica}/Questoes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "AvaliacaoInstitucional"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/AvaliacaoInstitucional/{codigoAvaliacao}/Usuario/{codigoFisica}/Questoes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "AvaliacaoInstitucional"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Avaliacoes/tiposAvaliacao",
+      "method": "GET",
+      "summary": "Retorna os tipos de avaliação",
+      "tags": [
+        "Avaliacoes"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Avaliacoes/tiposAvaliacao",
+      "method": "GET",
+      "summary": "Retorna os tipos de avaliação",
+      "tags": [
+        "Avaliacoes"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/BancoBrasil/ProcessarWebhook",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "BancoBrasil"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/BancoBrasil/ProcessarWebhook",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "BancoBrasil"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/BancoBrasil/ProcessarWebhook",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "BancoBrasil"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/BancoBrasil/ProcessarWebhook",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "BancoBrasil"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Boletins",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Boletins"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Boletins",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Boletins"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Boletos/{codigoBoleto}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Boletos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Boletos/{codigoBoleto}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Boletos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/rematricula/Campanha",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Campanha"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/{tenant}/api/v1/rematricula/Campanha",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Campanha"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/api/v1/Catraca",
+      "method": "POST",
+      "summary": "Método para inserir movimento do aluno",
+      "tags": [
+        "Catraca"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Catraca",
+      "method": "POST",
+      "summary": "Método para inserir movimento do aluno",
+      "tags": [
+        "Catraca"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Catraca",
+      "method": "GET",
+      "summary": "Método para retornar movimentação do aluno",
+      "tags": [
+        "Catraca"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Catraca",
+      "method": "GET",
+      "summary": "Método para retornar movimentação do aluno",
+      "tags": [
+        "Catraca"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/clientes",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Clientes"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/clientes",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Clientes"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/clientes/{id}/Documentos",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Clientes"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/clientes/{id}/Documentos",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Clientes"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/Colaboradores",
+      "method": "GET",
+      "summary": "Retorna os colaboradores ativos",
+      "tags": [
+        "Colaboradores"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/Colaboradores",
+      "method": "GET",
+      "summary": "Retorna os colaboradores ativos",
+      "tags": [
+        "Colaboradores"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/Configuracoes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Configuracoes"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Configuracoes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Configuracoes"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/Configuracoes/MatriculaOnline",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Configuracoes"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Configuracoes/MatriculaOnline",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Configuracoes"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/Configuracoes/MatriculaOnline/{idUnidade}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Configuracoes"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Configuracoes/MatriculaOnline/{idUnidade}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Configuracoes"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/rematricula/{idOferta}/Contratacao/{idMatricula}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Contratacao"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/api/v1/rematricula/{idOferta}/Contratacao/{idMatricula}",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Contratacao"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/{tenant}/api/v1/rematricula/{idOferta}/Contratacao/{idMatricula}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Contratacao"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/{tenant}/api/v1/rematricula/{idOferta}/Contratacao/{idMatricula}",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Contratacao"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/api/v1/prematricula/{idPreMatricula}/Contratos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Contratos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/prematricula/{idPreMatricula}/Contratos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Contratos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/prematricula/{idPreMatricula}/Contratos/{idAluno}",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "Contratos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/prematricula/{idPreMatricula}/Contratos/{idAluno}",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "Contratos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/prematricula/Contratos/impressao",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Contratos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/prematricula/Contratos/impressao",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Contratos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/Cursos",
+      "method": "GET",
+      "summary": "Retorna os cursos",
+      "tags": [
+        "Cursos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Cursos",
+      "method": "GET",
+      "summary": "Retorna os cursos",
+      "tags": [
+        "Cursos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/DadosCadastrais/{idAluno}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "DadosCadastrais"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/DadosCadastrais/{idAluno}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "DadosCadastrais"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/Disciplinas",
+      "method": "GET",
+      "summary": "Retorna as disciplinas",
+      "tags": [
+        "Disciplinas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Disciplinas",
+      "method": "GET",
+      "summary": "Retorna as disciplinas",
+      "tags": [
+        "Disciplinas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Disciplinas/{idMatricula}",
+      "method": "GET",
+      "summary": "Retorna as disciplinas por matrícula",
+      "tags": [
+        "Disciplinas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Disciplinas/{idMatricula}",
+      "method": "GET",
+      "summary": "Retorna as disciplinas por matrícula",
+      "tags": [
+        "Disciplinas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/EfiPay/ProcessarWebhook",
+      "method": "POST",
+      "summary": "Realiza chamada do método InformarPagamento no servidor de tarefas",
+      "tags": [
+        "EfiPay"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/EfiPay/ProcessarWebhook",
+      "method": "POST",
+      "summary": "Realiza chamada do método InformarPagamento no servidor de tarefas",
+      "tags": [
+        "EfiPay"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/EfiPay/ProcessarWebhook/{idTitulo}",
+      "method": "POST",
+      "summary": "Realiza chamada do método InformarPagamento no servidor de tarefas",
+      "tags": [
+        "EfiPay"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/EfiPay/ProcessarWebhook/{idTitulo}",
+      "method": "POST",
+      "summary": "Realiza chamada do método InformarPagamento no servidor de tarefas",
+      "tags": [
+        "EfiPay"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/Empresas",
+      "method": "GET",
+      "summary": "Retorna as empresas",
+      "tags": [
+        "Empresas"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Empresas",
+      "method": "GET",
+      "summary": "Retorna as empresas",
+      "tags": [
+        "Empresas"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/Escolaridades",
+      "method": "GET",
+      "summary": "Retorna as escolaridades",
+      "tags": [
+        "Escolaridades"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Escolaridades",
+      "method": "GET",
+      "summary": "Retorna as escolaridades",
+      "tags": [
+        "Escolaridades"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/EstadosCivis",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "EstadosCivis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/EstadosCivis",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "EstadosCivis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/FichaSaude",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "FichaSaude"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/FichaSaude",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "FichaSaude"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/FichaSaude",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "FichaSaude"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/FichaSaude",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "FichaSaude"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/rematricula/{idOferta}/Finalizacao",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Finalizacao"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/{tenant}/api/v1/rematricula/{idOferta}/Finalizacao",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Finalizacao"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Fotos",
+      "method": "GET",
+      "summary": "Retorna a foto do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Fotos",
+      "method": "PUT",
+      "summary": "Método para inserir foto do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Fotos",
+      "method": "DELETE",
+      "summary": "Deleta a foto do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Fotos",
+      "method": "GET",
+      "summary": "Retorna a foto do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Fotos",
+      "method": "PUT",
+      "summary": "Método para inserir foto do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Fotos",
+      "method": "DELETE",
+      "summary": "Deleta a foto do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Fotos/FotosReduzida",
+      "method": "GET",
+      "summary": "Retorna a foto reduzida do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Fotos/FotosReduzida",
+      "method": "PUT",
+      "summary": "Método para inserir foto reduzida do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Fotos/FotosReduzida",
+      "method": "DELETE",
+      "summary": "Deleta a foto reduzida do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Fotos/FotosReduzida",
+      "method": "GET",
+      "summary": "Retorna a foto reduzida do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Fotos/FotosReduzida",
+      "method": "PUT",
+      "summary": "Método para inserir foto reduzida do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Fotos/FotosReduzida",
+      "method": "DELETE",
+      "summary": "Deleta a foto reduzida do aluno",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Fotos/FotosReduzida/matricula",
+      "method": "GET",
+      "summary": "Retorna a foto reduzida do aluno com base na matricula",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Fotos/FotosReduzida/matricula",
+      "method": "GET",
+      "summary": "Retorna a foto reduzida do aluno com base na matricula",
+      "tags": [
+        "Fotos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/responsaveis/{id}/fotos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/responsaveis/{id}/fotos",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/responsaveis/{id}/fotos",
+      "method": "DELETE",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/responsaveis/{id}/fotos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/responsaveis/{id}/fotos",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/responsaveis/{id}/fotos",
+      "method": "DELETE",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/responsaveis/{id}/fotos/FotoReduzida",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/responsaveis/{id}/fotos/FotoReduzida",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/responsaveis/{id}/fotos/FotoReduzida",
+      "method": "DELETE",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/responsaveis/{id}/fotos/FotoReduzida",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/responsaveis/{id}/fotos/FotoReduzida",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/responsaveis/{id}/fotos/FotoReduzida",
+      "method": "DELETE",
+      "summary": "",
+      "tags": [
+        "FotosResponsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/Gerencianet/ProcessarWebhook",
+      "method": "POST",
+      "summary": "Realiza chamada do método InformarPagamento no servidor de tarefas",
+      "tags": [
+        "Gerencianet"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/Gerencianet/ProcessarWebhook",
+      "method": "POST",
+      "summary": "Realiza chamada do método InformarPagamento no servidor de tarefas",
+      "tags": [
+        "Gerencianet"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/Gerencianet/ProcessarWebhook/{idTitulo}",
+      "method": "POST",
+      "summary": "Realiza chamada do método InformarPagamento no servidor de tarefas",
+      "tags": [
+        "Gerencianet"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/Gerencianet/ProcessarWebhook/{idTitulo}",
+      "method": "POST",
+      "summary": "Realiza chamada do método InformarPagamento no servidor de tarefas",
+      "tags": [
+        "Gerencianet"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/Health/VersaoAPI",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Health"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Health/VersaoAPI",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Health"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/rematricula/{idOferta}/Introducao",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Introducao"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/rematricula/{idOferta}/Introducao",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Introducao"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/Itau/oauth/token",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Itau"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/Itau/oauth/token",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Itau"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/Itau/ProcessarWebhook/pix",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Itau"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/Itau/ProcessarWebhook/pix",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Itau"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/Itau/ProcessarWebhook/boleto",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Itau"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/Itau/ProcessarWebhook/boleto",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Itau"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Lancamentos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Lancamentos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Lancamentos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Lancamentos"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/ListaChamada/Professor/{idProfessor}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/ListaChamada/Professor/{idProfessor}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/ListaChamada/{idListaChamada}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/ListaChamada/{idListaChamada}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/ListaChamada/Alunos/{idListaChamada}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/ListaChamada/Alunos/{idListaChamada}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/ListaChamada/Alunos",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/ListaChamada/Alunos",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/ListaChamada/ListaChamada",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/ListaChamada/Listachamada",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ListaChamada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Marketplace/ProverTabs",
+      "method": "POST",
+      "summary": "Realiza chamada do método ProverTabs no servidor de tarefas",
+      "tags": [
+        "Marketplace"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Marketplace/ProverTabs",
+      "method": "POST",
+      "summary": "Realiza chamada do método ProverTabs no servidor de tarefas",
+      "tags": [
+        "Marketplace"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/Marketplace/ProverItensTabs",
+      "method": "POST",
+      "summary": "Realiza chamada do método ProverItensTabs no servidor de tarefas",
+      "tags": [
+        "Marketplace"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Marketplace/ProverItensTabs",
+      "method": "POST",
+      "summary": "Realiza chamada do método ProverItensTabs no servidor de tarefas",
+      "tags": [
+        "Marketplace"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/Marketplace/ProcessarVendaMarketplace",
+      "method": "POST",
+      "summary": "Realiza chamada do método ProcessarVendaMarketplace no servidor de tarefas",
+      "tags": [
+        "Marketplace"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Marketplace/ProcessarVendaMarketplace",
+      "method": "POST",
+      "summary": "Realiza chamada do método ProcessarVendaMarketplace no servidor de tarefas",
+      "tags": [
+        "Marketplace"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/MateriaLecionada",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "MateriaLecionada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/MateriaLecionada",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "MateriaLecionada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/MateriaLecionada",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "MateriaLecionada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/MateriaLecionada",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "MateriaLecionada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/MateriaLecionada/{idMatricula}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "MateriaLecionada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/MateriaLecionada/{idMatricula}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "MateriaLecionada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/MateriaLecionada/listaChamada/{idListaChamada}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "MateriaLecionada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/MateriaLecionada/listaChamada/{idListaChamada}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "MateriaLecionada"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Matriculas",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Matriculas",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Matriculas",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Matriculas",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/Matriculas/{idMatricula}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/Matriculas/{idMatricula}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/Matriculas/{idMatricula}/Boletim",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/Matriculas/{idMatricula}/Boletim",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/Matriculas/{idMatricula}/BoletimImpresso",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/Matriculas/{idMatricula}/BoletimImpresso",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/Matriculas/{idMatricula}/FrequenciaCompleto",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/Matriculas/{idMatricula}/FrequenciaCompleto",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/Matriculas/{idMatricula}/NotasAvaliacoes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/Matriculas/{idMatricula}/NotasAvaliacoes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/Matriculas/{idMatricula}/NotasAvaliacoesCompleto",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/Matriculas/{idMatricula}/NotasAvaliacoesCompleto",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Matriculas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Nacionalidades",
+      "method": "GET",
+      "summary": "Retorna as nacionalidades",
+      "tags": [
+        "Nacionalidades"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/Nacionalidades",
+      "method": "GET",
+      "summary": "Retorna as nacionalidades",
+      "tags": [
+        "Nacionalidades"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/Ocorrencias",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Ocorrencias"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/Ocorrencias",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Ocorrencias"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/tipo/Ocorrencias",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Ocorrencias"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/tipo/Ocorrencias",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Ocorrencias"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Ocupacoes",
+      "method": "GET",
+      "summary": "Retorna as ocupações",
+      "tags": [
+        "Ocupacoes"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/Ocupacoes",
+      "method": "GET",
+      "summary": "Retorna as ocupações",
+      "tags": [
+        "Ocupacoes"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/Paises",
+      "method": "GET",
+      "summary": "Retorna os países",
+      "tags": [
+        "Paises"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/Paises",
+      "method": "GET",
+      "summary": "Retorna os países",
+      "tags": [
+        "Paises"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/Parentescos",
+      "method": "GET",
+      "summary": "Retorna os parentescos",
+      "tags": [
+        "Parentescos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/Parentescos",
+      "method": "GET",
+      "summary": "Retorna os parentescos",
+      "tags": [
+        "Parentescos"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/Periodos",
+      "method": "GET",
+      "summary": "Retorna os períodos letivos",
+      "tags": [
+        "Periodos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Periodos",
+      "method": "GET",
+      "summary": "Retorna os períodos letivos",
+      "tags": [
+        "Periodos"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/rematricula/{idOferta}/Processo",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Processo"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/{tenant}/api/v1/rematricula/{idOferta}/Processo",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Processo"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/api/v1/ProcessoSeletivo/inscricao",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "ProcessoSeletivo"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/{tenant}/api/v1/ProcessoSeletivo/inscricao",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "ProcessoSeletivo"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/QuadrosHorarios",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "QuadrosHorarios"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/QuadrosHorarios",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "QuadrosHorarios"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/matricula/{matriculaAluno}/QuadrosHorarios/Detalhados",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "QuadrosHorarios"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/matricula/{matriculaAluno}/QuadrosHorarios/Detalhados",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "QuadrosHorarios"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/alunos/matriculas/{idMatricula}/QuadrosHorarios/Detalhados",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "QuadrosHorarios"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/matriculas/{idMatricula}/QuadrosHorarios/Detalhados",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "QuadrosHorarios"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Racas",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Racas"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/Racas",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Racas"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/Religioes",
+      "method": "GET",
+      "summary": "Retorna as religiões",
+      "tags": [
+        "Religioes"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/Religioes",
+      "method": "GET",
+      "summary": "Retorna as religiões",
+      "tags": [
+        "Religioes"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/Matriculas",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/Matriculas",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/DadosRematricula",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/DadosRematricula",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/Permissoes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/Permissoes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/Documentos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/Documentos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/DocumentosPendentes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/DocumentosPendentes",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/PlanosPagamentos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/PlanosPagamentos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/Disciplinas",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/Disciplinas",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/DadosIniciais",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/DadosIniciais",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/Responsaveis",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/Responsaveis",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/Boletos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/Boletos",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/Relatorio",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/Relatorio",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/AceitarContrato",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/AceitarContrato",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/VerificarHorario",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/VerificarHorario",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/RematriculaCurricular/ConfirmarPreMatricula",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/RematriculaCurricular/ConfirmarPreMatricula",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "RematriculaCurricular"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Responsaveis/{id}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Responsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/Responsaveis/{id}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Responsaveis"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/responsaveis",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/responsaveis",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/responsaveis",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/responsaveis",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/responsavelFinanceiro",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/responsavelFinanceiro",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/responsavelPedagogico",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/responsavelPedagogico",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/alunos/{idAluno}/responsaveis/{idResponsavel}",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/{tenant}/api/v1/alunos/{idAluno}/responsaveis/{idResponsavel}",
+      "method": "PUT",
+      "summary": "",
+      "tags": [
+        "ResponsaveisAluno"
+      ],
+      "domain": "02-pessoas"
+    },
+    {
+      "path": "/api/v1/rematricula/{idOferta}/ResumoContratacao/{idMatricula}",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "ResumoContratacao"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/{tenant}/api/v1/rematricula/{idOferta}/ResumoContratacao/{idMatricula}",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "ResumoContratacao"
+      ],
+      "domain": "04-captacao"
+    },
+    {
+      "path": "/api/v1/Santander/ProcessarWebhook",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Santander"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/Santander/ProcessarWebhook",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Santander"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/Santander/ProcessarWebhook",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Santander"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/{tenant}/api/v1/Santander/ProcessarWebhook",
+      "method": "POST",
+      "summary": "",
+      "tags": [
+        "Santander"
+      ],
+      "domain": "03-financeiro"
+    },
+    {
+      "path": "/api/v1/Turmas",
+      "method": "GET",
+      "summary": "Retorna as turmas",
+      "tags": [
+        "Turmas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Turmas",
+      "method": "GET",
+      "summary": "Retorna as turmas",
+      "tags": [
+        "Turmas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Turmas/detalhada/{codigoTurma}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Turmas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/{tenant}/api/v1/Turmas/detalhada/{codigoTurma}",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Turmas"
+      ],
+      "domain": "01-academico"
+    },
+    {
+      "path": "/api/v1/Unidades",
+      "method": "GET",
+      "summary": "Retorna as unidades ativas",
+      "tags": [
+        "Unidades"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Unidades",
+      "method": "GET",
+      "summary": "Retorna as unidades ativas",
+      "tags": [
+        "Unidades"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/api/v1/Unidades/{idUnidade}/logotipo",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Unidades"
+      ],
+      "domain": "05-admin"
+    },
+    {
+      "path": "/{tenant}/api/v1/Unidades/{idUnidade}/logotipo",
+      "method": "GET",
+      "summary": "",
+      "tags": [
+        "Unidades"
+      ],
+      "domain": "05-admin"
+    }
+  ],
+  "models": {
+    "SGx.API.WebApplication.Models.V1.Alunos.AlunoApiModelRetorno": {
+      "fieldCount": 13
+    },
+    "SGx.API.WebApplication.Models.V1.Turmas.TurmaDescricaoApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Turmas.TurmaMonoApiModelRetorno": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.ResponsavelAlunoApiModel": {
+      "fieldCount": 13
+    },
+    "SGx.API.WebApplication.Models.V1.Disciplinas.DisciplinaApiModelRetorno": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Parentescos.ParentescoApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Turmas.TurmaAvaliacaoModelRetorno": {
+      "fieldCount": 17
+    },
+    "SGx.API.WebApplication.Models.V1.Turmas.TurmaAtaModelRetorno": {
+      "fieldCount": 2
+    },
+    "Microsoft.AspNetCore.Mvc.ProblemDetails": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.AlunoDetalheApiModel": {
+      "fieldCount": 33
+    },
+    "SGx.API.WebApplication.Models.V1.EstadoCivis.EstadoCivilApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Religioes.ReligiaoApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Racas.RacaApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Models.CidadeApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Nacionalidades.NacionalidadeApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Paises.PaisApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Models.BairroApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.PessoaContatoApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.AutenticacaoAlunoApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.AutenticacaoAlunoApiModelRetorno": {
+      "fieldCount": 7
+    },
+    "SGx.API.WebApplication.Models.V1.AgendaEdu.Alunos.AlunoAgendaEduApiModelRetorno": {
+      "fieldCount": 14
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.Arquivos.ArquivoApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.Arquivos.ArquivoModelRetorno": {
+      "fieldCount": 8
+    },
+    "SGx.API.WebApplication.Models.V1.Models.FisicaDescricaoApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.Arquivos.TurmaDisciplinaModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.Arquivos.TurmaModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Notas.AtaNotaApiModelRetorno": {
+      "fieldCount": 17
+    },
+    "SGx.API.WebApplication.Models.V1.Notas.SetorAtaNotaApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Notas.GrupoAtaNotaApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Notas.AtaAlunoApiModelRetorno": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Notas.AtaAlunoApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Autenticacao.LoginApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.AutorizacaoRetiradaAlunoApiModel": {
+      "fieldCount": 8
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.ResponsavelAutorizaRetiradaApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.OutraPessoaRetiradaAlunoApiModel": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.AvaliacaoInstitucional.ModelEntrada.RespostaBaseAvaliacaoInstitucionalModelEntrada": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.AvaliacaoInstitucional.ModelEntrada.RespostaAvaliacaoInstitucionalModelEntrada": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.AvaliacaoInstitucional.ModelEntrada.RespostaComplementarAvaliacaoInstitucionalModelEntrada": {
+      "fieldCount": 4
+    },
+    "SGx.API.Repositorios.Contratos.V1.Avaliacoes.Models.TipoAvaliacaoApi": {
+      "fieldCount": 2
+    },
+    "SGx.API.Repositorios.Contratos.V1.Catracas.Models.CatracaDetalhesApi": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.Cliente.ClienteApiModel": {
+      "fieldCount": 35
+    },
+    "SGx.API.WebApplication.Models.V1.Cliente.ClienteCodigoDescricaoApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Clientes.ContatoClienteApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Clientes.ClienteResponsavelApiModel": {
+      "fieldCount": 37
+    },
+    "SGx.API.WebApplication.Models.V1.Cliente.ClienteInteresseApiModel": {
+      "fieldCount": 7
+    },
+    "SGx.API.WebApplication.Models.V1.Clientes.CampoLivreClienteApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.ContatoReponsavelAlunoApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Clientes.ClienteInteresseCursoApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Clientes.DocumentoClienteApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Colaboradores.ColaboradorApiModelRetorno": {
+      "fieldCount": 11
+    },
+    "SGx.API.WebApplication.Models.V1.Configuracoes.ConfiguracaoApiModel": {
+      "fieldCount": 1
+    },
+    "SGx.API.WebApplication.Models.V1.Configuracoes.ConfiguracaoMatriculaOnlineApiModelRetorno": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Midias.MidiaApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.EscolaAnterior.EscolaAnteriorApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.MatriculaOnline.MatriculaOnlineApiModel": {
+      "fieldCount": 12
+    },
+    "SGx.API.WebApplication.Models.V1.Unidades.UnidadeDescricaoApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.MatriculaOnline.MatriculaOnlineCamposFormularioApiModel": {
+      "fieldCount": 6
+    },
+    "SGx.API.WebApplication.Models.V1.Configuracoes.ConfiguracaoMatriculaOnlineDetalheApiModelRetorno": {
+      "fieldCount": 1
+    },
+    "SGx.API.WebApplication.Models.V1.MatriculaOnline.MatriculaOnlineDisponibilidadeApiModel": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.PeriodosLetivos.PeriodoLetivoDescricaoApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.MatriculaOnline.MatriculaOnlineCursoApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.MatriculaOnline.MatriculaOnlineSerieApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.MatriculaOnline.MatriculaOnlineTurnoApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.ContratacaoApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.MatriculaApiModel": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.CursoApiModel": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.FinanceiroMatriculaAtualApiModel": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.TurnoApiModel": {
+      "fieldCount": 8
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.DemaisVencimentoApiModel": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.FormaPagamentoApiModel": {
+      "fieldCount": 13
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.FinanceiroApiModel": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.CursoAdicionalApiModel": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.ProdutoApiModel": {
+      "fieldCount": 6
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.ServicoApiModel": {
+      "fieldCount": 6
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.DescontoApiModel": {
+      "fieldCount": 9
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.PersonalizacaoFormaPagamentoApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.TurnoSimplificadoApiModel": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.EfetivacaoContratacaoApiModel": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.CursoEfetivacaoContratacaoApiModel": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.ServicoEfetivacaoContratacaoApiModel": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.ProdutoEfetivacaoContratacaoApiModel": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.Contratacao.FinanceiroEfetivacaoContratacaoApiModel": {
+      "fieldCount": 8
+    },
+    "SGx.API.WebApplication.Models.V1.Contratos.ContratoApiModel": {
+      "fieldCount": 9
+    },
+    "SGx.API.WebApplication.Models.V1.Cursos.CursoApiModelRetorno": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Disciplinas.DisciplinaMatriculaApiModelRetorno": {
+      "fieldCount": 7
+    },
+    "SGx.API.WebApplication.Models.V1.Educbank.EducbankApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Empresas.EmpresaApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Escolaridades.EscolaridadeApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.FichaSaudeAlunoApiModel": {
+      "fieldCount": 99
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.FichaSaudeParenteContatarApiModel": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Itau.ItauWebHookPixApiModel": {
+      "fieldCount": 1
+    },
+    "SGx.API.WebApplication.Models.V1.Itau.PixItauWebHookPixApiModel": {
+      "fieldCount": 6
+    },
+    "SGx.API.WebApplication.Models.V1.Itau.ItauWebHookBoletoApiModel": {
+      "fieldCount": 1
+    },
+    "SGx.API.WebApplication.Models.V1.Itau.BoletoItauWebHookBoletoApiModel": {
+      "fieldCount": 29
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.LancamentoAlunoApiModelRetorno": {
+      "fieldCount": 18
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.LancamentoDetalheAlunoApiModel": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.Frequencia.FrequenciaTurmasModelRetorno": {
+      "fieldCount": 19
+    },
+    "SGx.API.Repositorios.Contratos.V1.ListaChamada.Models.FrequenciaAulaApi": {
+      "fieldCount": 5
+    },
+    "SGx.API.Repositorios.Contratos.V1.ListaChamada.Models.ListaChamadaAulaAlunoApi": {
+      "fieldCount": 4
+    },
+    "SGx.API.Repositorios.Contratos.V1.Ocorrencia.OcorrenciaAlunoInputApi": {
+      "fieldCount": 9
+    },
+    "SGx.API.Repositorios.Contratos.V1.ListaChamada.Models.ListaChamadaApi": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Marketplace.Request.RequestTabsApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Marketplace.Request.ContextApiModel": {
+      "fieldCount": 1
+    },
+    "SGx.API.WebApplication.Models.V1.Marketplace.Request.DataTabApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Marketplace.Request.UserApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Marketplace.ChannelApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Marketplace.Request.RequestItensTabsApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Marketplace.Request.DataItensApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Marketplace.CatalogTabApiModel": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Marketplace.MetadataTabApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.MateriaLecionada.MateriaLecionadaDadoModelRetorno": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Matriculas.MatriculasAlunoApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Matriculas.MatriculasAlunoListaApiModelRetorno": {
+      "fieldCount": 15
+    },
+    "SGx.API.WebApplication.Models.V1.Matriculas.MatriculasAlunoInclusaoApiModel": {
+      "fieldCount": 8
+    },
+    "SGx.API.WebApplication.Models.V1.Matriculas.MatriculasDetalheApiModel": {
+      "fieldCount": 16
+    },
+    "SGx.API.WebApplication.Models.V1.Matriculas.MatriculasNotasApiModel": {
+      "fieldCount": 0
+    },
+    "SGx.API.WebApplication.Models.V1.Frequencia.MatriculasFrequenciasApiModelRetorno": {
+      "fieldCount": 7
+    },
+    "SGx.API.WebApplication.Models.V1.Frequencia.FrequenciasApiModelRetorno": {
+      "fieldCount": 6
+    },
+    "SGx.API.WebApplication.Models.V1.Frequencia.FrequenciasDisciplinaApiModelRetorno": {
+      "fieldCount": 8
+    },
+    "SGx.API.WebApplication.Models.V1.Frequencia.FrequenciasChamadaApiModelRetorno": {
+      "fieldCount": 11
+    },
+    "SGx.API.WebApplication.Models.V1.Frequencia.FrequenciasEtapaApiRetorno": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Frequencia.FrequenciasBaseApiModelRetorno": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Matriculas.MatriculasAvaliacoesApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.OcorrenciaAlunoApiModelRetorno": {
+      "fieldCount": 7
+    },
+    "SGx.API.Repositorios.Contratos.V1.Ocorrencia.TipoOcorrenciaApi": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Ocupacoes.OcupacaoApiModel": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Periodos.PeriodoApiModelRetorno": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Rematricula.ProcessoApiModel": {
+      "fieldCount": 10
+    },
+    "SGx.API.WebApplication.Models.V1.Rematricula.CampoCadastroApiModel": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.ProcessoSeletivo.InscricaoProcessoSeletivoApiModel": {
+      "fieldCount": 11
+    },
+    "SGx.API.WebApplication.Models.V1.ProcessoSeletivo.OpcoesCursoApiModel": {
+      "fieldCount": 7
+    },
+    "SGx.API.WebApplication.Models.V1.ProcessoSeletivo.AreasConhecimentoApiModel": {
+      "fieldCount": 3
+    },
+    "SGx.API.Repositorios.Contratos.V1.RematriculaCurricular.Models.AceitarContratoDadosCurricular": {
+      "fieldCount": 1
+    },
+    "SGx.API.Repositorios.Contratos.V1.RematriculaCurricular.Models.AceitarContratoCurricularDadosAssinatura": {
+      "fieldCount": 4
+    },
+    "SGx.API.Repositorios.Contratos.V1.RematriculaCurricular.Models.VerificarHorarioRematriculaCurricular": {
+      "fieldCount": 4
+    },
+    "SGx.API.Repositorios.Contratos.V1.RematriculaCurricular.Models.Disciplinas.DadosDisciplinaRematriculaCurricular": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.ConfirmacaoRematriculaCurricularModelEntrada": {
+      "fieldCount": 13
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.PreMatriculaRematriculaCurricularModelEntrada": {
+      "fieldCount": 10
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.FichaCadastralRematriculaCurricularModelEntrada": {
+      "fieldCount": 30
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.DocumentoCursoRematriculaCurricularModelEntrada": {
+      "fieldCount": 5
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.AvalistaRematriculaCurricularModelEntrada": {
+      "fieldCount": 14
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.DisciplinaContratacaoRematriculaCurricularModelEntrada": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.LocalizacaoRematriculaCurricularModelEntrada": {
+      "fieldCount": 9
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.FamiliaRematriculaCurricularModelEntrada": {
+      "fieldCount": 70
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.ResponsaveisRematriculaCurricularModelEntrada": {
+      "fieldCount": 57
+    },
+    "SGx.API.WebApplication.Models.V1.RematriculaCurricular.ModelsEntrada.Contratacao.PassaporteRematriculaCurricularModelEntrada": {
+      "fieldCount": 4
+    },
+    "SGx.API.WebApplication.Models.V1.Alunos.ResponsavelAlunoDetalheApiModel": {
+      "fieldCount": 37
+    },
+    "SGx.API.WebApplication.Models.V1.AgendaEdu.Alunos.ResponsavelAlunoApiModel": {
+      "fieldCount": 15
+    },
+    "SGx.API.WebApplication.Models.V1.Turmas.TurmaApiModelRetorno": {
+      "fieldCount": 11
+    },
+    "SGx.API.WebApplication.Models.V1.Cursos.CursoDescricaoApiModelRetorno": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Turnos.TurnoDescricaoApiModelRetorno": {
+      "fieldCount": 2
+    },
+    "SGx.API.WebApplication.Models.V1.Turmas.TurmaDisciplinaProfessorApiModelRetorno": {
+      "fieldCount": 3
+    },
+    "SGx.API.WebApplication.Models.V1.Unidades.UnidadeApiModel": {
+      "fieldCount": 6
+    }
+  }
+}

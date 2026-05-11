@@ -1,0 +1,819 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "generated": "2026-03-26",
+    "restEndpoints": 55,
+    "soapDataServers": 29,
+    "soapDataServersScraped": 29,
+    "soapDataServersTotal": "~3900 (23 modulos)",
+    "restWorking": 7,
+    "restDataServerPattern": "/RMSRestDataServer/rest/{DataServer}",
+    "updated": "2026-03-26",
+    "soap_note": "SOAP funciona SEM VPN (Basic Auth em porta 8051). 9 DataServers confirmados via GetSchema+ReadView.",
+    "productionVolume": {
+      "funcionarios": 20748,
+      "holerites": 161842,
+      "batidasPonto": 198713,
+      "pessoasRH": 359086,
+      "coligadasAtivas": 31
+    }
+  },
+  "modules": [
+    { "name": "Educacional", "area": "Academico", "dataServers": 730 },
+    { "name": "Imobiliario", "area": "Patrimonial", "dataServers": 500 },
+    { "name": "RH", "area": "Recursos Humanos", "dataServers": 426 },
+    { "name": "Folha de Pagamento", "area": "Departamento Pessoal", "dataServers": 350 },
+    { "name": "Projetos", "area": "Gestao", "dataServers": 277 },
+    { "name": "Fiscal", "area": "Backoffice", "dataServers": 200 },
+    { "name": "Controle de Ponto", "area": "Departamento Pessoal", "dataServers": 167 },
+    { "name": "Financeiro", "area": "Backoffice", "dataServers": 161 },
+    { "name": "CRM", "area": "Comercial", "dataServers": 136 },
+    { "name": "Seg. e Med. do Trabalho", "area": "Departamento Pessoal", "dataServers": 121 },
+    { "name": "Movimento (Faturamento)", "area": "Comercial", "dataServers": 109 },
+    { "name": "Contabil", "area": "Backoffice", "dataServers": 91 },
+    { "name": "Manutencao", "area": "Operacional", "dataServers": 86 },
+    { "name": "Biblioteca", "area": "Academico", "dataServers": 86 },
+    { "name": "Estoque", "area": "Operacional", "dataServers": 84 },
+    { "name": "Globais", "area": "Infraestrutura", "dataServers": 78 },
+    { "name": "Patrimonial", "area": "Operacional", "dataServers": 74 },
+    { "name": "Conector", "area": "Integracao", "dataServers": 65 },
+    { "name": "Planej. Controle Producao", "area": "Operacional", "dataServers": 56 },
+    { "name": "Avaliacao e Pesquisa", "area": "Academico/RH", "dataServers": 32 },
+    { "name": "Compras", "area": "Operacional", "dataServers": 22 },
+    { "name": "Contrato", "area": "Backoffice", "dataServers": 15 }
+  ],
+  "knownDataServers": {
+    "_note": "DataServers referenciados no dicionario mas nao todos scraped. Para schemas detalhados, ver soap.dataServers.",
+    "folha": ["FopFuncData", "FopEnvelopeData", "FopEventoData", "FopFichaFinancData", "FopHstSalData", "FopHstSitData", "FopDependData", "FopRescisaoData", "FopAvisoPrevioData", "FopCCustoData", "FopSecaoData", "FopFuncaoData", "FopLancExternoData", "FopEsocialFilaEventosData", "FopConvenioData", "FopEnvelopeFeriasData"],
+    "ponto": ["PtoBatidaData", "PtoHorarioData", "PtoAbonoData", "PtoOcorrenciaCalculadaData", "PtoSaldoBancoHorData", "PtoEspelhoCartaoData", "PtoBatidasDoDiaData", "PtoDataMovimentoDiaDia", "PtoJustFunData"],
+    "rh": ["RhuPessoaData", "RhuCargoData", "RhuFuncaoData", "RhuBenefFuncData", "RhuReqDesligamentoData", "RhuSelecoesData", "RhuTreinamentosData", "RhuAvaliacoesData", "RhuGradeRemuneracaoData", "RhuPDIData"],
+    "educacional_extra": ["EduAlunoData", "EduAlunosTurmasProfData", "EduFrequenciaDiariaData", "EduBoletoData", "EduHabilitacaoFilialData"],
+    "financeiro": ["FinBoletoData", "FinAcordoData", "FinBancoData", "FinLancamentoData", "CtbContaData", "CtbLancamentoData", "CtbCCustoData", "CtbAccountingEntriesDataApi"],
+    "compras_estoque": ["CmpCotacaoData", "CmpOrdemCompraData", "CmpQualificacaoCfoData", "EstConsultaSaldoData", "EstGrdData", "EstMntInventarioData"],
+    "smt": ["SmtAtestadoData", "SmtExamesData", "SmtEpiData", "SmtEmprestimoEPIData", "SmtOcorrenciaData", "SmtPPRAData", "SmtCtrlVacinalData"]
+  },
+  "rest": {
+    "baseUrl": "https://<host>/api",
+    "auth": "Basic (username:password base64) ou JWT Bearer",
+    "endpoints": [
+      {
+        "endpoint": "educational/v1/StudentContexts",
+        "httpStatus": 200,
+        "responseFormat": "list",
+        "total": 0,
+        "hasNext": false,
+        "sampleKeys": [
+          "hasNext",
+          "total",
+          "items"
+        ]
+      },
+      {
+        "endpoint": "educational/v1/ProfessorContexts",
+        "httpStatus": 200,
+        "responseFormat": "list",
+        "total": 0,
+        "hasNext": false,
+        "sampleKeys": [
+          "hasNext",
+          "total",
+          "items"
+        ]
+      },
+      {
+        "endpoint": "educational/v1/Academics/terms",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Courses",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Qualifications",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/CurriculumMatrices",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/DisciplineClasses",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Disciplines",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Periods",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Buildings",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Blocks",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Rooms",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Shifts",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/OccurrenceGroups",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/StudentOccurrences",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Reports",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/SelectionProcesses",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/FinancialAgreements",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/LibrarySearchFields",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/LessonPlans",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/PublishedActivities",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/AreaOfInterestOffered",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Exams",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/ReportViews",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/Publications",
+        "httpStatus": 400,
+        "responseFormat": "error",
+        "error": "Bad Request"
+      },
+      {
+        "endpoint": "educational/v1/OfferedActivities",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/OfferedActivityEnrollments",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/StudentCalendar",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/CandidateFiles",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/CandidateResults",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/DisciplineGrids",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "educational/v1/AppliedMatrices",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "framework/v1/companies",
+        "httpStatus": 200,
+        "responseFormat": "list",
+        "hasNext": true,
+        "fieldNames": [
+          "id",
+          "code",
+          "nickname",
+          "federalId",
+          "name",
+          "phoneNumber",
+          "faxNumber",
+          "email",
+          "street",
+          "number",
+          "neighborhood",
+          "city",
+          "state",
+          "country",
+          "zipCode",
+          "active",
+          "isFluigIntegrated"
+        ],
+        "fieldCount": 17
+      },
+      {
+        "endpoint": "framework/v1/branches",
+        "httpStatus": 200,
+        "responseFormat": "list",
+        "hasNext": true,
+        "fieldNames": [
+          "BranchInternalId",
+          "CompanyCode",
+          "Code",
+          "Description",
+          "Title",
+          "CGC",
+          "StateRegistration",
+          "DDD",
+          "Phone",
+          "Street",
+          "Neighborhood",
+          "Country",
+          "State",
+          "City",
+          "ZipCode",
+          "CityCode",
+          "CNAECode",
+          "DTRE",
+          "Active"
+        ],
+        "fieldCount": 19
+      },
+      {
+        "endpoint": "rh/v1/employeeDataContent",
+        "httpStatus": 400,
+        "responseFormat": "error",
+        "error": "Bad Request"
+      },
+      {
+        "endpoint": "rh/v1/PayrollControl",
+        "httpStatus": 500,
+        "responseFormat": "error",
+        "error": "Internal Server Error"
+      },
+      {
+        "endpoint": "rh/v1/painel-auditoria/period",
+        "httpStatus": 403,
+        "responseFormat": "error",
+        "error": "Forbidden"
+      },
+      {
+        "endpoint": "rh/v1/painel-auditoria/big-numbers",
+        "httpStatus": 403,
+        "responseFormat": "error",
+        "error": "Forbidden"
+      },
+      {
+        "endpoint": "rh/v1/painel-auditoria/employees",
+        "httpStatus": 403,
+        "responseFormat": "error",
+        "error": "Forbidden"
+      },
+      {
+        "endpoint": "rh/v1/painel-auditoria/conformities",
+        "httpStatus": 403,
+        "responseFormat": "error",
+        "error": "Forbidden"
+      },
+      {
+        "endpoint": "rh/v1/painel-auditoria/branches",
+        "httpStatus": 403,
+        "responseFormat": "error",
+        "error": "Forbidden"
+      },
+      {
+        "endpoint": "rh/v1/painel-auditoria/last-update",
+        "httpStatus": 403,
+        "responseFormat": "error",
+        "error": "Forbidden"
+      },
+      {
+        "endpoint": "rh/v1/painel-auditoria/history",
+        "httpStatus": 403,
+        "responseFormat": "error",
+        "error": "Forbidden"
+      },
+      {
+        "endpoint": "rh/v1/employeehistorystatus",
+        "httpStatus": 200,
+        "responseFormat": "list",
+        "hasNext": true,
+        "fieldNames": [
+          "id",
+          "companyId",
+          "employeeId",
+          "dateOfChange",
+          "motiveCode",
+          "newStatusCode"
+        ],
+        "fieldCount": 6
+      },
+      {
+        "endpoint": "rh/v1/employeeHistorySection",
+        "httpStatus": 200,
+        "responseFormat": "list",
+        "hasNext": true,
+        "fieldNames": [
+          "id",
+          "sectionId",
+          "sectionDescription",
+          "motiveDescription",
+          "companyId",
+          "employeeId",
+          "dateOfChange",
+          "motiveCode"
+        ],
+        "fieldCount": 8
+      },
+      {
+        "endpoint": "rh/v1/employeehistoryroles",
+        "httpStatus": 500,
+        "responseFormat": "error",
+        "error": "Internal Server Error"
+      },
+      {
+        "endpoint": "rh/v1/employeehistorydependents",
+        "httpStatus": 500,
+        "responseFormat": "error",
+        "error": "Internal Server Error"
+      },
+      {
+        "endpoint": "rh/v1/employeeassociatedvalues",
+        "httpStatus": 500,
+        "responseFormat": "error",
+        "error": "Internal Server Error"
+      },
+      {
+        "endpoint": "rh/v1/calculatedWarnings",
+        "httpStatus": 200,
+        "responseFormat": "list",
+        "hasNext": true,
+        "fieldNames": [
+          "id",
+          "companyCode",
+          "employeeId",
+          "referenceDate",
+          "workingDayId",
+          "warningCode",
+          "description",
+          "validated",
+          "initialDate",
+          "endDate"
+        ],
+        "fieldCount": 10
+      },
+      {
+        "endpoint": "taf/v1/EsocialEvents",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "taf/v1/EsocialEstablishment",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "taf/v1/EsocialBranches",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "taf/v1/EsocialAudit/auditValues",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "taf/v1/EsocialAudit/status",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "taf/v1/FGTSPerWorkerInLaborProcess",
+        "httpStatus": 404,
+        "responseFormat": "error",
+        "error": "Not Found"
+      }
+    ]
+  },
+  "soap": {
+    "baseUrl": "https://<host>/wsDataServer/IwsDataServer",
+    "auth": "Basic + SQL Auth via header",
+    "note": "SOAP requer VPN ou whitelist de IP. JWT expira em 5min.",
+    "dataServers": [
+      {
+        "name": "GlbColigadaData",
+        "tables": [
+          "GColigada",
+          "GFilial"
+        ],
+        "tableCount": 2,
+        "fieldCount": 32
+      },
+      {
+        "name": "GlbUsuarioData",
+        "tables": [
+          "GUSUARIO",
+          "GPERMIS",
+          "GUSRPERFIL"
+        ],
+        "tableCount": 3,
+        "fieldCount": 63
+      },
+      {
+        "name": "EduCursoData",
+        "tables": [
+          "SCurso",
+          "SCURSOCOMPL"
+        ],
+        "tableCount": 2,
+        "fieldCount": 24
+      },
+      {
+        "name": "EduTurmaData",
+        "tables": [
+          "STurma",
+          "STURMACOMPL"
+        ],
+        "tableCount": 2,
+        "fieldCount": 61
+      },
+      {
+        "name": "EduHabilitacaoData",
+        "tables": [
+          "SHabilitacao",
+          "SHABILITACAOCOMPL"
+        ],
+        "tableCount": 2,
+        "fieldCount": 28
+      },
+      {
+        "name": "EduTurmaDiscData",
+        "tables": [
+          "STurmaDisc",
+          "STURMADISCCOMPL"
+        ],
+        "tableCount": 2,
+        "fieldCount": 70
+      },
+      {
+        "name": "EduMatriculaData",
+        "tables": [
+          "SMatricula",
+          "SMatriculaCompl",
+          "STurmaDisc",
+          "SHorarioTurma",
+          "SProfessorTurma"
+        ],
+        "tableCount": 5,
+        "fieldCount": 97
+      },
+      {
+        "name": "EduDisciplinaData",
+        "tables": [
+          "SDISCIPLINA"
+        ],
+        "tableCount": 1,
+        "fieldCount": 36
+      },
+      {
+        "name": "EduDiscGradeData",
+        "tables": [
+          "SDISCGRADE",
+          "SDISCGRADECOMPL"
+        ],
+        "tableCount": 2,
+        "fieldCount": 57
+      },
+      {
+        "name": "EduGradeData",
+        "tables": [
+          "SGrade",
+          "SDiscGrade",
+          "SOptativas",
+          "SGRADECOMPL"
+        ],
+        "tableCount": 4,
+        "fieldCount": 102
+      },
+      {
+        "name": "EduProfessorData",
+        "tables": [
+          "SProfessor",
+          "SProfessorCompl"
+        ],
+        "tableCount": 2,
+        "fieldCount": 177
+      },
+      {
+        "name": "EduHorarioTurmaData",
+        "tables": [
+          "SHorarioTurma"
+        ],
+        "tableCount": 1,
+        "fieldCount": 29
+      },
+      {
+        "name": "EduFrequenciaDiariaWSData",
+        "tables": [
+          "SFREQUENCIA",
+          "PARAMS",
+          "AlunosFreq",
+          "PlanoAulaFreq"
+        ],
+        "tableCount": 4,
+        "fieldCount": 22
+      },
+      {
+        "name": "EduNotasData",
+        "tables": [
+          "SNotas",
+          "SNotasComentario",
+          "NOTASVIEW"
+        ],
+        "tableCount": 3,
+        "fieldCount": 79
+      },
+      {
+        "name": "EduProfessorTurmaData",
+        "tables": [
+          "SPROFESSORTURMA",
+          "SPROFESSORTURMACOMPL"
+        ],
+        "tableCount": 2,
+        "fieldCount": 58
+      },
+      {
+        "name": "EduNotaEtapaData",
+        "tables": [
+          "SNotaEtapa",
+          "SNotaEtapaComentario"
+        ],
+        "tableCount": 2,
+        "fieldCount": 17
+      },
+      {
+        "name": "EduPlanoAulaData",
+        "tables": [
+          "SPlanoAula",
+          "SPlanoAulaArquivo"
+        ],
+        "tableCount": 2,
+        "fieldCount": 46
+      },
+      {
+        "name": "EduTipoMatriculaData",
+        "tables": [
+          "STipoMatricula"
+        ],
+        "tableCount": 1,
+        "fieldCount": 6
+      },
+      {
+        "name": "EduStatusData",
+        "tables": [
+          "SStatus",
+          "SStatusItinerarioFormativo"
+        ],
+        "tableCount": 2,
+        "fieldCount": 92
+      },
+      {
+        "name": "EduParcelaData",
+        "tables": [
+          "SParcela",
+          "SResponsavel"
+        ],
+        "tableCount": 2,
+        "fieldCount": 38
+      },
+      {
+        "name": "EduContratoData",
+        "tables": [
+          "SContrato",
+          "SResponsavelContrato",
+          "SBOLSARETROATIVACONTRATO",
+          "SCONTRATOACESSOS"
+        ],
+        "tableCount": 4,
+        "fieldCount": 94
+      },
+      {
+        "name": "EduBolsaData",
+        "tables": [
+          "SBolsa",
+          "SBOLSACOMPL"
+        ],
+        "tableCount": 2,
+        "fieldCount": 32
+      },
+      {
+        "name": "EduResponsavelData",
+        "tables": [
+          "SResponsavel"
+        ],
+        "tableCount": 1,
+        "fieldCount": 11
+      },
+      {
+        "name": "EduOcorrenciaAlunoData",
+        "tables": [
+          "SOcorrenciaAluno",
+          "SOCORRENCIAALUNOARQ",
+          "SOCORRENCIAALUNOCOMPL"
+        ],
+        "tableCount": 3,
+        "fieldCount": 35
+      },
+      {
+        "name": "FopFuncData",
+        "tables": [
+          "PFunc",
+          "PFCOMPL",
+          "VPCOMPL",
+          "PEstabilidadeProvisoria",
+          "PPendenciaDemissional",
+          "PFHSTHOR",
+          "PFHSTSEC",
+          "PFHSTUTILIZAPONTOAHGORA"
+        ],
+        "tableCount": 8,
+        "fieldCount": 612
+      },
+      {
+        "name": "EduSalaData",
+        "tables": [
+          "SSala",
+          "ILocal",
+          "SSALACOMPL"
+        ],
+        "tableCount": 3,
+        "fieldCount": 28
+      },
+      {
+        "name": "EduTurnoData",
+        "tables": [
+          "STurno"
+        ],
+        "tableCount": 1,
+        "fieldCount": 8
+      },
+      {
+        "name": "EduPredioData",
+        "tables": [
+          "SPredio",
+          "SPREDIOCOMPL"
+        ],
+        "tableCount": 2,
+        "fieldCount": 28
+      },
+      {
+        "name": "EduBlocoData",
+        "tables": [
+          "SBLOCO",
+          "SBLOCOCOMPL"
+        ],
+        "tableCount": 2,
+        "fieldCount": 10
+      }
+    ]
+  },
+  "soap_confirmed": [
+    {
+      "name": "EduBolsaData",
+      "table": "SBOLSA",
+      "confirmed": true,
+      "filter_prefix": "SBOLSA"
+    },
+    {
+      "name": "EduContratoData",
+      "table": "SCONTRATO",
+      "confirmed": true,
+      "filter_prefix": "SCONTRATO",
+      "gotcha": "STATUS é varchar, não int"
+    },
+    {
+      "name": "EduGradeData",
+      "table": "SGRADE",
+      "confirmed": true,
+      "filter_prefix": "SGRADE"
+    },
+    {
+      "name": "EduHabilitacaoFilialData",
+      "table": "SHABILITACAOFILIAL",
+      "confirmed": true,
+      "filter_prefix": "SHABILITACAOFILIAL"
+    },
+    {
+      "name": "EduMatriculaData",
+      "table": "SMATRICULA",
+      "confirmed": true,
+      "filter_prefix": "SMATRICULA",
+      "gotcha": "Usar SMATRICULA. (não SMATRICPL.) no filtro. 'CODCOLIGADA' sem prefixo dá ambiguous."
+    },
+    {
+      "name": "EduProfessorData",
+      "table": "SPROFESSOR",
+      "confirmed": true,
+      "filter_prefix": "SPROFESSOR"
+    },
+    {
+      "name": "EduTurmaData",
+      "table": "STURMA",
+      "confirmed": true,
+      "filter_prefix": "STURMA"
+    },
+    {
+      "name": "EduTurmaDiscData",
+      "table": "STURMADISC",
+      "confirmed": true,
+      "filter_prefix": "STURMADISC",
+      "gotcha": "NUMTEMPOS NÃO vem no ReadView — campo não populado"
+    },
+    {
+      "name": "GlbColigadaData",
+      "table": "GCOLIGADA",
+      "confirmed": true,
+      "filter_prefix": "GCOLIGADA"
+    }
+  ]
+}

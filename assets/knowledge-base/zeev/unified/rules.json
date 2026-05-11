@@ -1,0 +1,57 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26",
+    "sources": [
+      "DOC-1 (API Nativa)",
+      "DOC-4 (Limites)",
+      "raiz-platform services"
+    ]
+  },
+  "authentication": {
+    "impersonationFlow": [
+      "1. Service account envia POST /tokens/impersonate/{email}",
+      "2. Zeev retorna { current, impersonate: { id, name, temporaryToken } }",
+      "3. Cache temporaryToken por 8min (expira em ~10min)",
+      "4. Todas as chamadas subsequentes usam Bearer {temporaryToken}",
+      "5. Usuário só vê seus próprios dados (RLS enforced by Zeev)"
+    ],
+    "tokenTTL": "~10min (real), cache 8min (recomendado)",
+    "retryOn401": "2 tentativas — refresh token e retry",
+    "serviceTokenFormat": "URL-encoded (contém % chars)"
+  },
+  "limits": {
+    "requestTimeout": "10s hard wall-clock (zeev-proxy.service.ts)",
+    "globalToolTimeout": "12s (agent tool)",
+    "maxPaginationItems": 500,
+    "paginationIssue": "/assignments/report retorna max 500 items — incompleto para orgs grandes",
+    "concurrency": "Sem limite documentado (diferente de TOTVS SOAP)",
+    "retryPolicy": "2 tentativas em 401 (expired) + 5xx, backoff exponencial"
+  },
+  "gaps": {
+    "description": "Funcionalidades NÃO disponíveis via API (DOC-4)",
+    "items": [
+      "Flow modeling — sem acesso à definição BPMN",
+      "Form schema — sem template de formulário (só campos preenchidos)",
+      "Integration config — sem webhooks/API connectors",
+      "Business rules — sem condições de routing, automações",
+      "Permissions matrix — sem controle de acesso por fluxo",
+      "Full audit log — só reportLink (URL para Zeev)",
+      "Create instances — não pode iniciar solicitações via API",
+      "Attachments — não implementado",
+      "Comments — não implementado"
+    ]
+  },
+  "dataApi": {
+    "description": "API de Dados (financeiro) — separada da API Nativa",
+    "baseUrl": "metabases.raizeducacao.com.br/api-dados",
+    "auth": "X-API-Key header",
+    "pagination": "limit + offset",
+    "filters": [
+      "status",
+      "date_range",
+      "numero_solicitacao"
+    ],
+    "cache": "In-memory, 500 max entries, 5min TTL"
+  }
+}

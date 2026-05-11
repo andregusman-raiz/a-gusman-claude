@@ -1,0 +1,65 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-26"
+  },
+  "authentication": {
+    "oauth2": {
+      "flow": "Authorization Code",
+      "authorizeUrl": "https://app.hubspot.com/oauth/authorize",
+      "tokenUrl": "https://api.hubapi.com/oauth/v1/token",
+      "refreshUrl": "https://api.hubapi.com/oauth/v1/token",
+      "scopes": [
+        "crm.objects.contacts.read",
+        "crm.objects.contacts.write",
+        "crm.objects.companies.read",
+        "crm.objects.companies.write",
+        "crm.objects.deals.read",
+        "crm.objects.deals.write",
+        "crm.objects.owners.read",
+        "crm.lists.read",
+        "crm.schemas.contacts.read",
+        "crm.schemas.companies.read",
+        "crm.schemas.deals.read",
+        "tickets"
+      ]
+    },
+    "privateApp": {
+      "description": "Token fixo para integrações internas. Scopes definidos na criação.",
+      "header": "Authorization: Bearer {token}"
+    }
+  },
+  "rateLimits": {
+    "oauth": "100 requests / 10 seconds",
+    "privateApp": "500,000 requests / day",
+    "batch": "100 records per batch request",
+    "search": "5 requests / second, 200K results/day",
+    "response429": "Retry after header value (seconds)"
+  },
+  "pagination": {
+    "type": "Cursor-based",
+    "param": "after (from paging.next.after)",
+    "limit": "100 records per page (default)",
+    "maxLimit": "200 records per page (some endpoints)"
+  },
+  "webhooks": {
+    "events": [
+      "contact.creation",
+      "contact.propertyChange",
+      "deal.creation",
+      "deal.propertyChange",
+      "deal.deletion",
+      "ticket.creation"
+    ],
+    "verification": "X-HubSpot-Signature header (SHA-256 HMAC)",
+    "retry": "HubSpot retries failed webhooks up to 10 times",
+    "batchDelay": "Events are batched, delivered every ~5 seconds"
+  },
+  "bestPractices": [
+    "Use batch endpoints for bulk operations (100/batch)",
+    "Implement cursor pagination (never use offset for large datasets)",
+    "Cache owner/pipeline/property data (changes rarely)",
+    "Use webhook subscriptions instead of polling",
+    "Rate limit handling: exponential backoff on 429"
+  ]
+}
