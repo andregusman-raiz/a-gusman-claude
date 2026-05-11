@@ -105,7 +105,6 @@
       "Bash(mkdir -p /Users/andregusmandeoliveira/Claude/.claude/shared/meridian-kb/project-profiles)",
       "Bash(mkdir -p /Users/andregusmandeoliveira/Claude/.claude/shared/meridian-kb/convergence-history)",
       "Bash(mkdir -p /Users/andregusmandeoliveira/Claude/.claude/shared/templates/meridian)",
-      "Bash(nc -zv -w 5 REDACTED_IP 38000)",
       "Bash(bash /tmp/rename-agents.sh 2>&1)",
       "Bash(bash /tmp/rename-agents2.sh 2>&1)",
       "Bash(__NEW_LINE_bc5ae67c292b701f__ git:*)",
@@ -173,7 +172,6 @@
       "Bash(mkdir -p ~/.claude/mcp-servers)",
       "Bash(mv ~/Claude/mcp-computer-use ~/.claude/mcp-servers/computer-use)",
       "Read(//Users/andregusmandeoliveira/.claude/mcp-servers/**)",
-      "Bash(PGPASSWORD=${PGPASSWORD} psql *)",
       "Bash(mkdir -p ~/Claude/.claude/skills/pptx/templates)",
       "Read(//System/Library/Fonts/**)",
       "Bash(mkdir -p ~/Claude/docs/diagnosticos/2026-04-22-agx-diagnostic)",
@@ -326,8 +324,5 @@
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": false
-  },
-  "remote": {
-    "defaultEnvironmentId": "REDACTED_ENV_ID"
   }
 }
