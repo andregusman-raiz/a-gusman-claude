@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# claude agent worktrees and local config
+.claude/
+
+# node (caso venha a existir node_modules no root do monorepo)
+node_modules/
+
+# editor
+.vscode/
+.idea/
+*.swp
+
+# vercel (deploy config é per-project em catalog/.vercel)
+.vercel/
+
+# logs
+*.log

@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_wm0NV7FwuwOF2CytcYwdAb5AT3pQ",
+  "orgId": "team_R3Lq9XzXmQjmWdJH6ch2c9Y6",
+  "projectName": "catalog",
+  "settings": {
+    "createdAt": 1774697548245,
+    "framework": "nextjs",
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "24.x"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "description": "Dimensões fixas de layout (topbar, sidebar, container).",
+  "dimensions": [
+    { "label": "Topbar",             "value": "h-14",  "px": "56px" },
+    { "label": "Sidebar expandida",  "value": "w-60",  "px": "240px" },
+    { "label": "Sidebar colapsada",  "value": "w-16",  "px": "64px" },
+    { "label": "Container max",      "value": "max-w-[1440px]", "px": "1440px" }
+  ]
+}
