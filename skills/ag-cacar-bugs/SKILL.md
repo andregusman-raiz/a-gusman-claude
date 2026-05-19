@@ -66,6 +66,10 @@ problemas que existem no codigo mas que ainda nao se manifestaram em producao
 - Promises sem .catch() (unhandled rejection)
 - API routes sem error response padronizado
 - Falta de error boundary em componentes criticos
+- Error Boundary SEM retry (resetErrorBoundary nao implementado) — usuario fica preso em estado de erro
+- console.error sem feedback ao usuario (erro silencioso visual)
+- Async em useEffect sem cleanup de unmount (setState apos unmount)
+- Toast/Alert de erro sem texto acionavel ("Algo deu errado" sem proximo passo)
 
 ### 5. Data Integrity
 - Deletes sem cascade check (FK violations)
@@ -84,6 +88,18 @@ problemas que existem no codigo mas que ainda nao se manifestaram em producao
 - Map/filter/reduce encadeados em arrays grandes (O(n*m))
 - Falta de pagination em queries que crescem
 - Imports dinamicos sem Suspense boundary
+
+### 8. Hook Correctness (Rules of Hooks + deps)
+- Hook chamado dentro de if/else/ternary (BLOCKER)
+- Hook dentro de for/while/forEach/map (BLOCKER)
+- Hook depois de return condicional (BLOCKER)
+- useEffect/useMemo/useCallback com deps faltando (closure stale)
+- useEffect/useMemo/useCallback com deps redundantes (over-trigger)
+- Object/array literal inline em array de deps (re-render infinito disfarcado)
+- 4+ useState correlacionados (candidato a useReducer)
+- useEffect > 15 linhas com fetch/subscribe (candidato a custom hook)
+
+Para audit completo de Hooks: usar `/ag-auditar-react-hooks` (skill dedicada).
 
 ## Scoring
 

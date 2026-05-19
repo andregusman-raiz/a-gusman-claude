@@ -1,12 +1,12 @@
 ---
 name: ag-13-limpar-codigo
-description: "Maquina autonoma de limpeza de dead code (Knip + AST + bundle, confidence tiers, PRs atomicos). Use para tech debt, hand-off, reducao de bundle, cleanup pos-spike, auditoria de saude."
+description: "Maquina autonoma de limpeza de dead code (Knip + AST + bundle, confidence tiers, PRs atomicos). Use para tech debt, hand-off, reducao de bundle, cleanup pos-spike, auditoria de saude. Modo --target=harness audita dead skills/hooks/MCPs do proprio Claude Code."
 model: sonnet
 context: fork
-argument-hint: "[--triage-only | --apply-quick-wins | --full-pipeline | --create-issues | --resume | categoria:components|imports|state|comments]"
+argument-hint: "[--triage-only | --apply-quick-wins | --full-pipeline | --create-issues | --resume | --target=code|harness | categoria:components|imports|state|comments|duplicacao]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage, LSP
 metadata:
-  filePattern: "limpar-codigo-state.json,dead-code-findings.json,dead-code-*.md"
+  filePattern: "limpar-codigo-state.json,dead-code-findings.json,dead-code-*.md,harness-optimization-*.md"
   bashPattern:
     - "\\bknip\\b"
     - "\\bdead.code\\b"
@@ -19,17 +19,38 @@ metadata:
 ## Invocacao
 
 ```
-/ag-13-limpar-codigo                          # Diagnostico + plano (default report-only)
+/ag-13-limpar-codigo                          # Diagnostico + plano (default report-only) — target=code
 /ag-13-limpar-codigo --triage-only            # So lista, sem plano nem fix
 /ag-13-limpar-codigo --apply-quick-wins       # P0+P1 high-confidence auto-aplicados (PRs atomicos)
 /ag-13-limpar-codigo --full-pipeline          # Todos os Ps com gates entre PRs (max ciclos = 2)
 /ag-13-limpar-codigo --create-issues          # Cria GitHub issues por P do plano
 /ag-13-limpar-codigo --resume                 # Retoma de limpar-codigo-state.json
+/ag-13-limpar-codigo --target=harness         # Limpa dead skills/hooks/MCPs do proprio harness Claude Code
 /ag-13-limpar-codigo categoria:components     # So componentes nunca renderizados
 /ag-13-limpar-codigo categoria:imports        # So unused imports
 /ag-13-limpar-codigo categoria:state          # So useState/useReducer morto
 /ag-13-limpar-codigo categoria:comments       # So comentarios sem explicacao
+/ag-13-limpar-codigo categoria:duplicacao     # So duplicacao de codigo (jscpd)
 ```
+
+## Targets
+
+| Target | Escopo | Delega para |
+|---|---|---|
+| `code` (default) | Codigo da aplicacao no CWD | Pipeline 5-fases proprio |
+| `harness` | `~/Claude/.claude/skills/, hooks/, rules/`, MCPs instalados | `ag-otimizar-harness` |
+
+### --target=harness — comportamento
+
+1. Spawna `ag-otimizar-harness` (mesmo modo: triage / apply-quick-wins / full)
+2. Para `--apply-quick-wins` em harness:
+   - Aplica markers `cache_control: ephemeral` em skills elegiveis (delega `ag-otimizar-cache`)
+   - Marca `metadata.deprecated: true` em skills com 0 invocacoes em 90 dias
+   - Sinaliza MCPs com ratio < 0.05 para revisao manual (NAO desinstala automatico)
+3. Output: `~/Claude/docs/diagnosticos/harness-optimization-YYYY-MM-DD.md`
+4. PR atomico: `chore(harness): cleanup harness YYYY-MM-DD` se `--apply-quick-wins` ou `--full-pipeline`
+
+NUNCA delete automatico de skill (apenas marca). Decisao final via `ag-curador-skills` trimestral.
 
 ## O que faz
 
@@ -42,13 +63,14 @@ DISCOVERY -> MULTI-TOOL SCAN -> AST CUSTOM -> CONFIDENCE RANKING -> APPLY FIXES 
                                                                         (max 2 cycles)
 ```
 
-1. **DISCOVERY**: detecta stack (Next/Vite/Astro/Remix), entry points, monorepo, instala Knip se ausente, gera `knip.json` com ignores conservadores
-2. **MULTI-TOOL SCAN**: paralelo via Team — Knip + ts-prune + depcheck + ESLint --no-fix + Madge + bundle analyzer. Output JSON unificado
+1. **DISCOVERY**: detecta stack (Next/Vite/Astro/Remix), entry points, monorepo, instala Knip + jscpd se ausentes, gera `knip.json` + `.jscpd.json` com ignores conservadores
+2. **MULTI-TOOL SCAN**: paralelo via Team — Knip + ts-prune + depcheck + ESLint --no-fix + Madge + bundle analyzer + jscpd. Output JSON unificado
 3. **AST CUSTOM**: TS Compiler API para 4 categorias do pedido especifico:
    - Componentes nunca renderizados (JSX traversal a partir de entry points)
    - State morto (useState/useReducer com setter sem call ou value sem leitura)
    - Props nao usados (bonus DX)
    - Comentarios com codigo sem prefixo WHY/TODO/FIXME/HACK/NOTE/JSDoc/SPDX
+   - Blocos duplicados (jscpd cross-arquivo, threshold > 50 tokens)
 4. **CONFIDENCE RANKING**: combina sinais (tools que concordam + bundle confirmation + git churn + cobertura). HIGH (3+ tools) / MEDIUM (1-2) / LOW (suspeita, review humano)
 5. **APPLY FIXES**: aplica fixes em PRs atomicos por categoria, com quality gates entre batches (typecheck + lint + test + build + bundle delta). Se gate falha -> revert + alternativa
 
@@ -78,6 +100,7 @@ DISCOVERY -> MULTI-TOOL SCAN -> AST CUSTOM -> CONFIDENCE RANKING -> APPLY FIXES 
 | Arquivos orfaos | Knip + Madge | bundle | MEDIUM |
 | Types nunca usados | Knip | ts-prune | HIGH |
 | Branches de feature flag morta | grep `if (false)` + env vars antigas | manual | LOW |
+| Blocos duplicados (DRY) | jscpd (> 50 tokens, > 5 linhas) | AST diff + manual review | MEDIUM (refactor humano) |
 
 ## Confidence tiers (regras de auto-fix)
 
@@ -146,6 +169,7 @@ Spawnar `ag-escanear-morto-codigo` com `isolation: "worktree"`. Sub-tarefas para
 - `bunx madge --circular --json src > madge-circular.json`
 - `bunx madge --orphans --json src > madge-orphans.json`
 - `$PM run build && bunx @next/bundle-analyzer` ou `bunx rollup-plugin-visualizer`
+- `bunx jscpd --reporters json --min-tokens 50 --min-lines 5 --gitignore src/ app/ components/ > jscpd-output.json` (DRY/duplicacao)
 
 Unificar em `dead-code-findings-raw.json`.
 
@@ -243,6 +267,12 @@ Spawnar `ag-aplicar-fix-codigo` para cada P em sequencia (NUNCA paralelo entre P
 **P4 — Comentarios sem WHY** (review manual, LOW confidence)
 - PR consolidado: `chore(deadcode): remove dead code comments`
 
+**P4.5 — Duplicacao (DRY refactor)** (jscpd findings, MEDIUM confidence, user approval per cluster)
+- PR por cluster de duplicacao: `refactor(dry): extract <util> shared by N occurrences`
+- jscpd identifica blocos; humano decide a abstracao (util, hook, component)
+- NUNCA auto-aplica — apenas sugere fix proposto (snippet + suggested location)
+- Cross-check: garantir que abstracao nao quebra tests; quality gate completo
+
 **P5 — Hardening (preventivo)**
 - PR: adicionar Knip ao CI em modo warning
 - PR: `eslint-plugin-unused-imports` em pre-commit (lint-staged)
@@ -288,6 +318,7 @@ LIMPAR CODIGO COMPLETO
     Dead comments: [N]
     Orphan files: [N]
     Unused deps: [N]
+    Blocos duplicados: [N clusters / N% codebase]
   Diagnostico: docs/diagnosticos/dead-code-YYYY-MM-DD.md
   Plano: docs/plans/dead-code-refactor-plan-YYYY-MM-DD.md
   PRs aplicados: [N] (se modo apply)

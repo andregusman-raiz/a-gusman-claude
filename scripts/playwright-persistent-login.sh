@@ -55,6 +55,7 @@ Projetos disponiveis:
   hubspot                 https://app.hubspot.com
   github                  https://github.com         (sem SSO Google)
   sentry                  https://sentry.io
+  influency               https://app.influency.me/pt/#/auth  (email+senha, sem SSO)
 
 Workflow recomendado para Google SSO:
   1. bash playwright-persistent-login.sh --google
@@ -109,6 +110,7 @@ get_default_url() {
     hubspot)               echo "https://app.hubspot.com" ;;
     github)                echo "https://github.com" ;;
     sentry)                echo "https://sentry.io" ;;
+    influency)             echo "https://app.influency.me/pt/#/auth" ;;
     google-sso)            echo "https://accounts.google.com" ;;
     *)                     echo "" ;;
   esac
@@ -117,7 +119,7 @@ get_default_url() {
 # Apps SEM Google SSO (auth proprio)
 project_supports_sso() {
   case "$1" in
-    totvs-educacional|chamada-app|github)
+    totvs-educacional|chamada-app|github|influency)
       return 1  # nao suporta
       ;;
     *)
