@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raiz.local/schemas/machine-state.json",
+  "title": "Machine State (ag-0..ag-13)",
+  "description": "Schema unificado para state de uma invocacao de machine. Toda machine ag-N DEVE persistir state conforme este schema apos cada fase + ao terminar. Usado por baseline-machines.sh, ag-auditar-harness, ag-otimizar-harness.",
+  "type": "object",
+  "required": ["machine", "session_id", "started_at", "phases", "scores", "exit_code"],
+  "additionalProperties": false,
+  "properties": {
+    "machine": {
+      "type": "string",
+      "pattern": "^ag-(0|[1-9]|1[0-3])$",
+      "description": "Nome da machine: ag-0..ag-13"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "UUID ou id externo (Claude Code session id se disponivel)"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["interativo", "autonomo", "draft"],
+      "default": "interativo"
+    },
+    "args": {
+      "type": "string",
+      "description": "Argumentos crus passados a machine"
+    },
+    "phases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string"},
+          "status": {"type": "string", "enum": ["pending", "in_progress", "completed", "failed", "skipped"]},
+          "started_at": {"type": "string", "format": "date-time"},
+          "completed_at": {"type": ["string", "null"], "format": "date-time"},
+          "tokens_used": {"type": "integer", "minimum": 0, "default": 0},
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "scores": {
+      "type": "object",
+      "description": "Score numerico convergente. Toda machine que tem score (ag-7, ag-8, ag-9, etc) DEVE preencher.",
+      "additionalProperties": {
+        "oneOf": [
+          {"type": "number"},
+          {"type": "object", "required": ["value", "target"], "properties": {
+            "value": {"type": "number"},
+            "target": {"type": "number"},
+            "converged": {"type": "boolean"}
+          }}
+        ]
+      }
+    },
+    "skills_invoked": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": []
+    },
+    "agents_spawned": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {"type": "string"},
+          "isolation": {"type": "string", "enum": ["none", "worktree"]},
+          "model": {"type": "string"},
+          "duration_s": {"type": "number"}
+        }
+      },
+      "default": []
+    },
+    "hooks_fired": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "decision"],
+        "properties": {
+          "name": {"type": "string"},
+          "decision": {"type": "string", "enum": ["allow", "block", "warn"]},
+          "message": {"type": "string"}
+        }
+      },
+      "default": []
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "path"],
+        "properties": {
+          "kind": {"type": "string", "enum": ["spec", "plan", "pr", "report", "diagnostic", "doc", "adr", "other"]},
+          "path": {"type": "string"}
+        }
+      },
+      "default": []
+    },
+    "exit_code": {
+      "type": "integer",
+      "description": "0 = success, !=0 = falha. Se nao zero, gap_report deve estar preenchido."
+    },
+    "gap_report": {
+      "type": ["object", "null"],
+      "properties": {
+        "expected": {"type": "string"},
+        "actual": {"type": "string"},
+        "missing": {"type": "array", "items": {"type": "string"}},
+        "options": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

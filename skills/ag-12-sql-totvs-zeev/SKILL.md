@@ -1,6 +1,6 @@
 ---
 name: ag-12-sql-totvs-zeev
-description: "Maquina de otimizacao SQL e consulta de dados (TOTVS RM SQL Server + Neon PostgreSQL + Zeev BPM). Use para queries lentas, anti-patterns, relatorios, analise massiva, processos Zeev."
+description: "Maquina especialista em dados Raiz: data-engine API canonical (/v1/kpis/*, /reports/<panel>/data, Envelope v2, KPI Registry Ouro M01..A*) + SQL TOTVS RM + Neon PostgreSQL + Zeev BPM + PBI_DATASET. Use para: descobrir KPI Ouro, consumir painel canonical, escrever query nova (cascade painel>KPI>dinamica>raw), otimizar SQL lenta, anti-patterns, relatorios, processos Zeev. Tier 0: data-engine. Aplica ADR-041 (TOTVS via Neon Mirror enforced)."
 metadata:
   filePattern:
     - "**/*.sql"
@@ -10,14 +10,164 @@ metadata:
     - "**/relatorios/**"
     - "**/zeev*"
     - "**/bpm*"
+    - "**/raiz_data_engine/**"
+    - "**/dbt/models/**"
+    - "**/contracts/**"
   bashPattern:
     - "\\bSELECT\\b.*\\bFROM\\b"
     - "\\bsql\\b.*\\boptim"
     - "\\bzeev\\b"
+    - "\\bkpi_ouro_id\\b"
+    - "/v1/kpis"
+    - "/reports/.*/data"
+    - "value_raw|value_formatted"
   priority: 5
+  cache_policy:
+    enabled: true
+    marker_after: "## Inline KB — Quick Reference (Opus 4.7 ADR-0001 P1.2)"
+    estimated_tokens: 4800
 ---
 
-# SQL Optimization & Data Queries — TOTVS RM, Zeev BPM, PostgreSQL
+# Data Engine + SQL Optimization — TOTVS RM, Zeev BPM, PostgreSQL, PBI_DATASET
+
+## 🎯 TIER 0 — Data Engine API (PREFERIR sobre SQL direto)
+
+> data-engine-app é a **camada canonical** que já decodifica regras de negócio,
+> agrega Bronze→Prata→Ouro, aplica governança e expõe `value_raw + value_formatted`
+> consistente com BI Raiz. Se a resposta já existe na API canonical → consumi-la,
+> nunca reescrever SQL equivalente em outro projeto.
+
+### Arquitetura em 4 camadas (consultar ANTES de escolher fonte)
+
+```
+Bronze (mirrors raw)  →  Prata (dbt int/fact/dim)  →  Ouro (KPI Registry, 65+ IDs)  →  API
+                                                                                       │
+                                          ┌────────────────────────────────────────────┤
+                                          ▼                            ▼                ▼
+                                    DISCOVERY                    EXECUTION         GOVERNANCE
+                              /v1/kpis/catalog            /v1/kpis/{id}/value     X-API-Key
+                              /v1/kpis/search             /reports/<panel>/data    rate-tiers
+                              /<domain>/dictionary        /query/preflight + execute  PII mask
+                              /v1/manifest                                              audit
+                              /openapi.json (x-raiz-lineage)
+```
+
+| Camada | Conteúdo | Source of truth |
+|---|---|---|
+| **Bronze** | Scrapers, TOTVS REST/SOAP, BI Raiz | sistemas externos |
+| **Prata** | dbt `fact_*` + `dim_*` em `prata.*` | Neon mirror (PBI_DATASET + TOTVS RM) |
+| **Ouro** | KPI Registry (65 KPIs) | `raiz_data_engine/reports/core/kpi_registry/` |
+| **API** | Envelope v2 universal `{value_raw, value_formatted}` | `raiz_data_engine/api/` |
+
+### Cascade de Decisão (regra inegociável)
+
+Ordem de preferência ao buscar dado:
+
+1. `GET /reports/<panel>/data` — bundle multi-KPI cacheado (14 painéis ativos)
+2. `GET /v1/kpis/{id}/value?filters=...` — execução canônica do KPI Ouro
+3. `POST /query/preflight` → `POST /query/execute` — SQL dinâmico governado (audit + PII)
+4. SQL direto TOTVS RM / Neon / PBI_DATASET — **último recurso**, só se nada acima cobre
+
+**Se IA/plataforma já consome data-engine:** prefira Tier 0. SQL direto vira fallback documentado, não default.
+
+### IDs canônicos KPI Ouro (referência rápida — `kpi_id`)
+
+| Prefixo | Domínio | Faixa | Exemplos |
+|---|---|---|---|
+| **M** | Matrículas | M01–M15 | M01 Alunos Matriculados, M07 Taxa Ocupação |
+| **C** | Cobrança / Comercial | C01–C08 | C04 % Inadimplência Canonical |
+| **E** | Endividamento / Educacional | E01–E05 | E04 Saldo Devedor |
+| **R/F/S** | RH / Financeiro / Satisfação | extras Q9.C.0 | — |
+| **L/B/Z** | Layers / Benefícios / Zeev | extras | — |
+| **I/Q/N** | INEP / Quality / NPS | extras | — |
+| **D/A** | DRE / Avaliações | extras | A12 ENEM Redação |
+
+> Regra: persistir/logar/cachear sempre por `kpi_id` (estável). `label_pt` muda; ID não.
+
+### Endpoints canonical (memorizar)
+
+| Endpoint | Para que | Auth |
+|---|---|---|
+| `GET /v1/kpis/catalog` | catálogo completo (rich schema, fórmula SQL, known_gaps) | público |
+| `GET /v1/kpis/catalog?domain=<d>&status=canonical` | filtrado | público |
+| `GET /v1/kpis/search?q=...&prefix=M&limit=50` | full-text (key+label+description) | público |
+| `GET /v1/kpis/{id}` | lookup individual (atalho) | público |
+| `GET /v1/kpis/{id}/consumers` | painéis + APIs que usam | público |
+| `GET /v1/kpis/{id}/value?filters=...` | execução SQL canônica do KPI Ouro | público |
+| `GET /<domain>/dictionary` | dictionary (kpis + tables + conventions) | público |
+| `GET /reports/<panel>/data` | bundle de painel pronto | público |
+| `GET /v1/manifest` | catalog de manifests | público |
+| `GET /v1/schema/tables` | schema catalog | público |
+| `POST /query/preflight` | valida SQL antes de executar | X-API-Key |
+| `POST /query/execute` | SQL dinâmico governado | X-API-Key |
+| `GET /openapi.json` | OpenAPI + extensão `x-raiz-lineage` | público |
+| `GET /metrics/canonical` | Prometheus | público |
+
+Base prod: `https://app.example.com`
+
+### Envelope v2 universal
+
+Todo número da API canonical retorna:
+```json
+{ "value_raw": 1838.0, "value_formatted": "1.838" }
+```
+- `value_raw` → cálculo / agregação no cliente
+- `value_formatted` → display direto (parity com BI Raiz)
+- **NUNCA re-formatar `value_raw` no consumer** (mascaramento PII já server-side)
+
+### Rate Limit tiers (slowapi IP-level + 60 RPM/10K dia por key)
+
+| Path | Limite |
+|---|---|
+| `/health /metrics /readyz` | whitelist |
+| `auth/*` | 5/min |
+| `admin/*` | 30/min |
+| `api/*` (default) | 200/min |
+| outros | 100/min |
+
+Retry-on-429 com backoff exponencial + jitter. Batchar lookups (usar `search?prefix=M` em vez de N gets).
+
+### known_gaps — LER SEMPRE antes de prometer número
+
+Cada entry de `/v1/kpis/{id}` traz `known_gaps[]` com semantic drift declarado.
+Exemplo M01:
+- `matriculados_brutos: sem TAG_MATVALIDA — inclui contratos não confirmados`
+- `pre_matriculados: TAG_MATVALIDA=FALSE, contrato sem 1ª parcela paga`
+
+Resposta da IA sem citar known_gaps relevantes = "certo na conta, errado no negócio".
+
+### Lineage via `x-raiz-lineage` (OpenAPI extension)
+
+`/openapi.json` injeta mapping endpoint → tabela Bronze/Prata/Ouro. Usar para:
+- explicar resposta: "este número vem de `prata.int_alunos_qualificados` filtrado por…"
+- auditar prompt→data trail
+- debugar drift cross-source
+
+### Painéis ativos (14) — `/reports/<panel>/data`
+
+`matriculas`, `dre_dashboard`, `faturamento`, `inadimplencia`, `funnel`, `beneficios`,
+`pessoas_rh`, `quadro_docente`, `erros_operacionais`, `pesquisa_satisfacao`,
+`layers_comunidade`, `layers_payments`, `zeev`, `avaliacoes_inep`,
++ `painel_kpi_executivo_resumido`, `painel_resumo_operacional` (consolidados).
+
+### Pact contracts (consumer formal)
+
+Plataforma consumidora estável (não one-shot) → adicionar `contracts/consumer/<nome>.json`
+em `data-engine-app/contracts/consumer/`. Modelo: `example-platform.json`. Trava endpoints + schemas
+bidirecionalmente. Para agente IA: mesma lógica previne hallucination em prod.
+
+### Painel novo = registry declarativo (não custom code)
+
+Se a tarefa é **criar painel novo no data-engine**, único caminho aceito:
+```bash
+/ag-painel-novo-canonico criar painel <nome> com KPIs M01,M02,E03
+# OU
+python scripts/scaffold_panel.py --panel-id <slug> --kpi-ouro-ids "M01,M02" --all-from-registry
+```
+CI gate `painel-readiness-strict.yml` BLOQUEIA: queries.py presente, aggregator custom,
+MetricSpec sem `kpi_ouro_id`, score <9.0. Insistir em custom = PR reprovado.
+
+---
 
 ## Inline KB — Quick Reference (Opus 4.7 ADR-0001 P1.2)
 
@@ -93,6 +243,9 @@ while True:
 - `SELECT * FROM INFORMATION_SCHEMA.TABLES` para discovery
 - NULL-safe filter: `WHERE (col <> 'X' OR col IS NULL)` (SQL Server exclui NULL silencioso)
 - Tabelas `Tabela_*` já tem regras de negócio decoded (não replicar em SQL raw)
+
+<!-- cache_control: ephemeral -->
+
 ---
 
 ## Knowledge Base Unificada (OBRIGATÓRIO consultar)
@@ -137,18 +290,23 @@ Fontes brutas: `~/Claude/assets/knowledge-base/zeev/raw/`
 
 Executar TODOS os gates sequencialmente. Se qualquer gate falhar → PARAR e reportar.
 
-### GATE 1 — Source Selection
-Mapear o domínio de negócio para a fonte correta ANTES de tocar em SQL:
+### GATE 1 — Source Selection (Tier 0 prioritário)
 
-| Domínio | Fonte Primária | Tabelas Chave |
-|---------|---------------|---------------|
-| Matrículas, educacional, metas | **PBI_DATASET** (***REDACTED_DB***) | Tabela_Z_PAINELMATRICULA_BI, Tabela_f_matriculas |
-| Financeiro, cobrança, acordos | **PBI_DATASET** (***REDACTED_DB***) | Tabela_FICHAFINANCEIRA, Tabela_RPTCOBRANCA |
-| RH, folha, ponto, compras, contábil | **TOTVS RM** (Cloud) | PFUNC, PFFINANC, PFHSTAFT, PEVENTO |
-| HubSpot (deals, contacts, leads) | **Neon** (PostgreSQL) | hubspot_deal (335K), hubspot_contact (518K) |
-| Layers, Zeev, audit trail | **Neon** (PostgreSQL) | layers_*, zeev_*, hubspot_totvs_match (41K) |
+Mapear o domínio para a fonte correta ANTES de tocar em SQL. **Tier 0 (data-engine API) vence sempre que cobre.**
 
-Se domínio ambíguo → PARAR e perguntar ao usuário. NUNCA adivinhar fonte.
+| Tier | Fonte | Quando |
+|---|---|---|
+| **0** | **data-engine-app API canonical** | KPI existe no Registry Ouro **OU** painel `/reports/<panel>/data` cobre a pergunta |
+| 1 | PBI_DATASET (***REDACTED_DB***) | Matrículas/financeiro/educacional sem KPI Ouro canonical; tabelas `Tabela_*` |
+| 1 | TOTVS RM (Cloud) | RH, folha, ponto, compras, contábil (PFUNC, PFFINANC, PEVENTO, ...) — via Neon Mirror em runtime (ADR-041) |
+| 1 | Neon raw (PostgreSQL) | HubSpot deals/contacts/leads, Layers, Zeev, hubspot_totvs_match |
+| 2 | `/query/execute` (data-engine) | SQL dinâmico governado quando Tier 0 não cobre mas precisa de PII/audit |
+| 3 | SQL direto (psql / sqlcmd / pymssql) | Último recurso: backfill, admin, DDL, exploração ad-hoc |
+
+Regras:
+- Se Tier 0 cobre → usar Tier 0 e parar (cita `kpi_id` + `source.primary` + `known_gaps`).
+- Se domínio é ambíguo → PARAR e perguntar ao usuário.
+- NUNCA escrever SQL equivalente em projeto-cliente quando a API canonical já entrega.
 
 ### GATE 2 — Schema Validation (TOTVS RM only)
 1. Ler `~/Claude/assets/knowledge-base/totvs/unified/schema.json` para CADA tabela mencionada
@@ -173,22 +331,118 @@ Rejeitar e reescrever automaticamente:
 - `YEAR()`, `CONVERT(DATE, ...)` em filtro → reescrever como range sargable
 
 ### GATE 5 — PBI_DATASET Domain Check
-Se domínio é matrículas/financeiro/educacional:
+Se domínio é matrículas/financeiro/educacional E Tier 0 não cobre:
 1. Verificar se PBI_DATASET tem a tabela equivalente (ver guide pbi-app-bridge.md)
 2. Preferir PBI_DATASET — já tem regras de negócio decodificadas (evita reverse-engineering de DAX)
 3. SQL gotcha PBI_DATASET: NULL-safe filter obrigatório: `(col <> 'X' OR col IS NULL)`
 4. Discovery: `/api/pbi-app/tables`, `/api/pbi-app/columns/{table}`
 
+### GATE 6 — Data Engine Routing (Tier 0 enforcement)
+
+Antes de escrever **qualquer** SQL contra TOTVS/Neon/PBI_DATASET, executar a cascade:
+
+1. **Discovery KPI** — `GET /v1/kpis/search?q=<termo>&domain=<d>` (ou catalog se já souber `kpi_id`)
+2. **Painel pronto?** — listar `/reports/<panel>/data` ativos; se algum bundle responde a pergunta inteira → consumir bundle
+3. **KPI canônico?** — `GET /v1/kpis/{id}/value?filters=...` se for métrica isolada
+4. **Query dinâmica?** — `POST /query/preflight` antes de `POST /query/execute` (governance: PII mask + audit + rate limit)
+5. **Raw SQL?** — só se 1-4 falham, e documentar no PR/commit por que Tier 0 não cobriu (vira backlog de KPI Ouro)
+
+Cada chamada a data-engine deve **citar lineage** no output: `kpi_id`, `source.primary`, `known_gaps[]` relevantes.
+
+### GATE 7 — ADR-041 enforcement (TOTVS via Neon Mirror)
+
+`pymssql.connect()` direto em TOTVS RM é **PROIBIDO em runtime Railway** (ADR-041).
+Exceções permitidas:
+- Backfill inicial do mirror (rodando via GitHub Actions, **não** Railway)
+- Emergência P0 com aprovação explícita do usuário
+
+Substituir sempre por: `DATABASE_URL` Neon → tabelas `pbi_painel_matriculas`, `pbi_ficha_financeira`, `dre_lancamento` (mirror de PBI_DATASET + TOTVS RM). Issues #1433 e #1504 fechadas WONTFIX.
+
+### GATE 8 — `known_gaps` awareness antes de prometer número
+
+Toda resposta numérica vinda de KPI Ouro DEVE:
+1. Ler `known_gaps[]` do KPI (`GET /v1/kpis/{id}`)
+2. Anexar à resposta caso haja gap material (semantic drift declarado)
+3. Citar `kpi_id` + `version` + `status` (canonical/draft/deprecated)
+
+Exemplo: pergunta "quantos alunos matriculados em maio?" usando M01:
+- Resposta correta: "1.838 (kpi=M01 v1.0 canonical, source=`prata.int_alunos_qualificados`). Nota: 3 known_gaps em `matriculados_brutos`, `pre_matriculados`, `matriculados_inadimplentes` — confirmar com produto se inclui pré-matriculados."
+- Resposta incorreta: "1.838" sem contexto.
+
+### GATE 9 — Cache cliente alinhado ao TTL servidor
+
+| Endpoint | TTL recomendado cliente | Observação |
+|---|---|---|
+| `/v1/kpis/catalog` | 60–120s | servidor usa `KPI_CATALOG_CACHE_TTL=60s` |
+| `/v1/kpis/{id}` | 60s | metadata muda raramente |
+| `/v1/kpis/{id}/value` | <30s | dados Ouro rolam ao longo do dia |
+| `/reports/<panel>/data` | <5min | cron diário 03:00 UTC, dbt refresh |
+
+Usar `ETag`/`If-None-Match` quando disponível. NUNCA cache >1h em endpoint de valor (cron + dbt invalidam silencioso).
+
+### GATE 10 — Rate limit awareness
+
+5 tiers slowapi IP-level + 60 RPM/10K dia por API key. IA com tool-loop DEVE:
+- retry-on-429 com backoff exponencial + jitter
+- batchar lookups: `search?prefix=M&limit=200` em vez de N gets a `/v1/kpis/{id}`
+- usar painel bundle (`/reports/<panel>/data`) para evitar N requests de KPIs do mesmo painel
+
 ---
 
-## Workflow ao receber query para otimizar
+## Workflow A — "Quero um dado/relatório" (data consumer)
 
-1. **Executar Gates 1-5 acima** (obrigatório, não pular)
-2. Consultar schema.json → confirmar nomes reais de tabelas/campos
-3. Consultar glossary.json → entender significado de campos crípticos
-4. Consultar queries.json → verificar se já existe query similar catalogada
-5. Consultar rules.json → verificar regras de PII, risk scoring, multi-tenant
-6. Consultar gotchas.md → evitar armadilhas conhecidas
+Pipeline canônico para responder pergunta de negócio com data-engine:
+
+```
+1. Parse intent         → domain (matriculas|financeiro|...) + métrica + filtros + período
+2. Load context         → GET /<domain>/dictionary (conventions + tables + known_gaps)
+3. KPI resolution       → GET /v1/kpis/search?q=<termo>&domain=<d>
+                          escolher por (label, description, owner, prefix)
+4. Pre-flight           → GET /v1/kpis/{id}     (ler known_gaps, version, status)
+5. Execute              → preferir /reports/<panel>/data; fallback /v1/kpis/{id}/value
+                          último recurso: POST /query/preflight → POST /query/execute
+6. Format response      → usar value_formatted; citar kpi_id + source.primary + known_gaps
+7. Cite lineage         → x-raiz-lineage do OpenAPI para "fonte: prata.X → ouro.Y"
+8. Track consumption    → se virou produto: Pact contract + consumers.yaml
+```
+
+## Workflow B — "Quero otimizar SQL existente" (legacy / out-of-engine)
+
+1. **Executar Gates 1-10 acima** (obrigatório, não pular)
+2. **Tier 0 first** — checar se KPI Ouro equivalente já existe (`/v1/kpis/search`). Se sim → propor substituição para chamada API antes de otimizar.
+3. Consultar `schema.json` → confirmar nomes reais de tabelas/campos
+4. Consultar `glossary.json` → entender significado de campos crípticos
+5. Consultar `queries.json` → verificar se já existe query similar catalogada
+6. Consultar `rules.json` → verificar regras de PII, risk scoring, multi-tenant
+7. Consultar `gotchas.md` → evitar armadilhas conhecidas
+8. Aplicar patterns de otimização (seção abaixo) preservando semântica
+9. Se a query equivalente já existe como KPI Ouro: registrar a substituição como ADR/backlog em `docs/plans` do data-engine-app
+
+## Workflow C — "Quero criar painel novo no data-engine"
+
+Único caminho aceito (CI gate `painel-readiness-strict.yml` BLOQUEIA custom):
+
+```bash
+# 1. Workflow oficial via skill canonical
+/ag-painel-novo-canonico criar painel <nome> com KPIs M01,M02,E03
+
+# 2. OU direto via scaffold registry-aware
+python scripts/scaffold_panel.py \
+  --panel-id <slug> \
+  --kpi-ouro-ids "M01,M02,E03" \
+  --all-from-registry
+
+# 3. Validar gate strict S1-S4 antes do PR
+python scripts/ci/validate_painel_strict.py --panel-path raiz_data_engine/reports/<slug>
+```
+
+Checks que BLOQUEIAM merge:
+- S1: `queries.py` ausente (painel é declarativo)
+- S2: aggregator standard (sem custom)
+- S3: 100% MetricSpec com `kpi_ouro_id`
+- S4: score >=9.0
+
+Se algum KPI necessário **não existe** no registry → criar issue de expansão (Q11+) ANTES do painel.
 
 ---
 
@@ -247,15 +501,77 @@ Padrão: consultar TOTVS via SQL → enriquecer com dados Zeev via API.
 
 | Sistema | Host | Auth |
 |---------|------|------|
-| TOTVS RM (SQL) | REDACTED_IP:38000 | SQL Auth |
+| **data-engine-app (prod)** | `https://app.example.com` | X-API-Key (60 RPM, 10K dia) + tiers slowapi IP |
+| **data-engine-app (local)** | `http://localhost:8000` | sem auth em dev |
+| TOTVS RM (SQL) — backfill/admin only | ***REDACTED_IP***:38000 | SQL Auth (ADR-041: proibido em runtime Railway) |
+| TOTVS RM (em runtime) | Neon Mirror via `DATABASE_URL` | ADR-041 enforced |
 | Zeev Nativa | example.zeev.it/api/2/ | Bearer (impersonation) |
 | Zeev Dados | metabases.example.com/api-dados | X-API-Key |
 
 ---
 
+## Anti-patterns Data-Engine (evitar SEMPRE)
+
+| Anti-pattern | Por que dói | Substituir por |
+|---|---|---|
+| `SELECT * FROM pbi_painel_matriculas ...` em projeto-cliente | Bypassa registry, perde paridade BI, sem audit | `GET /v1/kpis/M01/value` ou `/reports/matriculas/data` |
+| Hardcode de `label_pt` ("Alunos Matriculados") em prompts/cache | label muda; ID não | persistir `kpi_id` (M01) |
+| Re-formatar `value_raw` (multiplicar por 100, mascarar PII) no cliente | quebra parity; PII server-side | usar `value_formatted` |
+| Loop sequencial `GET /v1/kpis/{id}` | rate-limit + latência | `search?prefix=M&limit=200` 1 hit |
+| `pymssql.connect()` em runtime Railway | ADR-041 enforced | Neon Mirror via `DATABASE_URL` |
+| Cachear `/reports/<panel>/data` > 1h | cron 03:00 UTC + dbt invalidam | TTL <5min ou ETag |
+| Criar painel novo com custom `queries.py` / aggregator | CI gate strict bloqueia | `scaffold_panel.py --all-from-registry` |
+| Responder número sem citar `known_gaps[]` | "certo na conta, errado no negócio" | sempre anexar gaps materiais |
+| Ignorar `consumers.yaml` ao adotar KPI | auto-introspection diz "0 consumers" | adicionar manifest com `kpi_ouro_id` |
+| Bypass `/query/preflight` em SQL dinâmico | sem governance (audit, PII, risk) | sempre preflight antes de execute |
+
+---
+
+## Tools de discovery para sessões IA
+
+Endpoints mais valiosos para expor como tools customizadas (MCP / function calling):
+
+| Tool | Endpoint | Quando IA chama |
+|---|---|---|
+| `kpi_search` | `/v1/kpis/search` | Resolver termo PT-BR → `kpi_id` |
+| `kpi_describe` | `/v1/kpis/{id}` + `/consumers` | "O que é M07?" / "onde aparece?" |
+| `domain_context` | `/<domain>/dictionary` | Carregar contexto de domínio antes de gerar SQL |
+| `kpi_value` | `/v1/kpis/{id}/value` | Resposta numérica canônica |
+| `panel_data` | `/reports/<panel>/data` | Bundle multi-KPI ready-to-render |
+| `dynamic_query` | `/query/preflight` + `/query/execute` | Última fronteira governada |
+| `schema_tables` | `/v1/schema/tables` | Schema-aware SQL synthesis |
+| `manifest` | `/v1/manifest` | Lista de painéis + filtros válidos |
+| `openapi_lineage` | `/openapi.json` (lê `x-raiz-lineage`) | Cita Bronze→Prata→Ouro na resposta |
+
+Padrão de payload retornado para a IA: sempre incluir `kpi_id` + `source.primary` + `known_gaps` + `version` para não precisar segunda chamada.
+
+---
+
 ## Referências
+
+### Data-engine canonical (PRIMARY)
+
+- `~/Claude/GitHub/data-engine-app/docs/canonical/PLATFORM_OVERVIEW.md` — 1-page onboarding
+- `~/Claude/GitHub/data-engine-app/docs/canonical/data-engine-bronze-prata-ouro-dictionary.md` — contrato 4 camadas
+- `~/Claude/GitHub/data-engine-app/docs/canonical/consumers.yaml` — autogerado (115 KPIs × 14 painéis)
+- `~/Claude/GitHub/data-engine-app/docs/canonical/v2-source-registry.yaml` — tier policy Prata/Ouro
+- `~/Claude/GitHub/data-engine-app/docs/api/v1-kpis-catalog.md` — catalog endpoint completo
+- `~/Claude/GitHub/data-engine-app/docs/api/domain-dictionaries.md` — 4 domain dictionaries
+- `~/Claude/GitHub/data-engine-app/contracts/consumer/example-platform.json` — modelo Pact
+- `~/Claude/GitHub/data-engine-app/raiz_data_engine/api/v1/` — 20+ módulos Python
+- `~/Claude/GitHub/data-engine-app/raiz_data_engine/reports/core/kpi_registry/kpis_ouro_fichas.yaml` — registry YAML
+- ADRs canonical: **Q9.B** (catalog), **INEV.F2.C** (search), **049** (registry), **041** (TOTVS via Neon)
+- CLAUDE.md do projeto: `~/Claude/GitHub/data-engine-app/CLAUDE.md` (Diretriz Mestra escalabilidade)
+
+### KB legada (FALLBACK quando Tier 0 não cobre)
 
 - KB TOTVS unificada: `~/Claude/assets/knowledge-base/totvs/unified/`
 - KB Zeev unificada: `~/Claude/assets/knowledge-base/zeev/unified/`
-- [AltimateAI/data-engineering-skills](https://github.com/AltimateAI/data-engineering-skills)
 - Scraper TOTVS: `~/Claude/totvs-scraper/`
+- [AltimateAI/data-engineering-skills](https://github.com/AltimateAI/data-engineering-skills)
+
+### Skills relacionadas
+
+- `/ag-painel-novo-canonico` — criar painel novo via scaffold (W4 Q10.H)
+- `/ag-arquiteto-raiz` — par técnico sênior para decisões arquiteturais
+- `/ag-referencia-stack-decisions` — stack canonical Raiz

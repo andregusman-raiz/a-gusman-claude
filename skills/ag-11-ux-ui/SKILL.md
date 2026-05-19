@@ -8,17 +8,19 @@ argument-hint: "[action] [element/project]"
 
 ## Canonical delegation (ADR-0001)
 
-**Esta machine delega para skills oficiais quando aplicável:**
+**Esta machine delega para SKILLS oficiais (invocar via `Skill({ skill: "..." })` ou slash command `/<nome>`, NUNCA via `Agent({ subagent_type: "..." })` — não existem agents com esses nomes):**
 
-| Caso | Canonical |
-|---|---|
-| URL Figma no prompt (Figma → código) | `figma:figma-implement-design` |
-| Criar design system no Figma | `figma:figma-generate-library` |
-| Escrever em Figma canvas | `figma:figma-use` (prerequisito obrigatório antes de `use_figma` tool) |
-| Code Connect (Figma ↔ código) | `figma:figma-code-connect` |
-| shadcn/ui setup + componentes | `vercel:shadcn` |
-| React best-practices review | `vercel:react-best-practices` |
-| UI criativa/distintiva | `frontend-design:frontend-design` |
+| Caso | Skill canonical | Como invocar |
+|---|---|---|
+| URL Figma no prompt (Figma → código) | `figma:figma-implement-design` | `Skill({ skill: "figma:figma-implement-design" })` |
+| Criar design system no Figma | `figma:figma-generate-library` | `Skill({ skill: "figma:figma-generate-library" })` |
+| Escrever em Figma canvas | `figma:figma-use` (prerequisito obrigatório antes de `use_figma` tool) | `Skill({ skill: "figma:figma-use" })` |
+| Code Connect (Figma ↔ código) | `figma:figma-code-connect` | `Skill({ skill: "figma:figma-code-connect" })` |
+| shadcn/ui setup + componentes | `vercel:shadcn` | `Skill({ skill: "vercel:shadcn" })` |
+| React best-practices review | `vercel:react-best-practices` | `Skill({ skill: "vercel:react-best-practices" })` |
+| UI criativa/distintiva | `frontend-design:frontend-design` | `Skill({ skill: "frontend-design:frontend-design" })` |
+
+**Se precisar contexto isolado** (paralelismo, escopo grande): spawnar `Agent({ subagent_type: "general-purpose", model: "sonnet", prompt: "Invoque a skill <nome> para ..." })` — o agent carrega a skill dentro do seu contexto isolado.
 
 Esta machine (ag-11-ux-ui) mantém valor como **orchestrator de design**: curadoria da Raiz Design Library, catálogo de 24 soluções, decisão entre estilos/paletas/fonts, integração com stack-decisions.
 

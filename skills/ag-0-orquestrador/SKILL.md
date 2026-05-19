@@ -360,6 +360,95 @@ SDD puro:     PRD → SPEC → Execução → Review
 
 ---
 
+## Modo --dag (DAG explícito)
+
+Para pipelines com fan-out, join, e conditions explícitas (alem do `--7fase` linear).
+
+### Quando usar
+- Multiplas builds paralelas com join (ex: FE + BE → QA → audit)
+- Quality gate condicional (ex: audit só se QA score >= 85)
+- Workflow que precisa retomar de falha mid-pipeline
+- Tarefa cross-repo onde nodes rodam em isolation: worktree
+
+### Schema
+
+DAG declarado em YAML conforme `~/Claude/.claude/shared/templates/dag-pipeline.schema.yaml`.
+
+Estrutura minima:
+```yaml
+pipeline:
+  name: feature-com-audit
+  on_failure: abort
+  max_parallel: 4
+  nodes:
+    - id: spec
+      machine: ag-1
+      args: "spec X"
+    - id: build_fe
+      machine: ag-1
+      args: "implementar X frontend"
+      depends_on: [spec]
+      isolation: worktree
+    - id: build_be
+      machine: ag-1
+      args: "implementar X backend"
+      depends_on: [spec]
+      isolation: worktree
+    - id: qa
+      machine: ag-7
+      depends_on: [build_fe, build_be]
+    - id: audit
+      machine: ag-9
+      depends_on: [qa]
+      condition: "{{ qa.MQS }} >= 85"
+      critical: false
+```
+
+### Invocacao
+
+```
+/ag-0-orquestrador --dag pipeline.yaml
+/ag-0-orquestrador --dag-resume docs/ai-state/dag-state-X.json
+```
+
+### Engine
+
+1. Valida YAML contra `dag-pipeline.schema.yaml`
+2. Resolve grafo topologicamente; detecta ciclos → abort
+3. Para camada paralela (sem `depends_on` entre si):
+   - Se algum node tem `isolation: worktree` → spawna via **`ag-team-safe`** (nunca worktree direto)
+   - Cap em `max_parallel` (default 4, max 6, ver R6 de agent-parallel-safety.md)
+4. Avalia `condition` apos completar dependencias usando outputs declarados (e.g., `{{ qa.MQS }}`)
+5. Persiste state em `docs/ai-state/dag-state-{name}-{timestamp}.json` apos cada node
+6. `on_failure: abort` → para cascata em primeiro node `critical: true` falho
+7. `--dag-resume` → carrega state, reprocessa nodes `pending`/`in_progress`/`failed-but-retryable`
+
+### Anti-overlap
+
+Engine BLOQUEIA pipeline se 2+ nodes paralelos modificam o mesmo arquivo (deduzido por args + machine target). User precisa serializar manualmente ou marcar `isolation: worktree`.
+
+### Rule aplicada
+- `agent-parallel-safety.md` (R6 max_parallel, R8 worktree para paralelismo de escrita)
+- `harness-coverage.md` (R8 DAG sempre passa via ag-team-safe)
+
+---
+
+## Modo --review-instincts (sugerir promocao de aprendizados)
+
+Pos-sessao, se `~/.claude/projects/<encoded>/memory/_instinct-candidates.md` existe e tem candidates pendentes:
+
+```
+ag-0 detecta: existe _instinct-candidates.md com N candidates >= 0.70
+ag-0 sugere ao usuario: "Detectei N aprendizados auto-extraidos da sessao.
+                          Rode /ag-retrospectiva --instincts para revisar."
+```
+
+NUNCA promove automatico. Sempre revisao humana via `ag-retrospectiva`.
+
+Trigger script: `~/Claude/.claude/scripts/session-retro-check.sh` (existente) — agora tambem checa presenca de `_instinct-candidates.md`.
+
+---
+
 ## Combos Beyond-Obvious (sugerir proativamente)
 
 Quando intent + contexto cruzarem os gatilhos abaixo, ag-0 PROPÕE o combo (não roda automaticamente — pergunta antes).

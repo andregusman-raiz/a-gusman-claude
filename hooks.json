@@ -58,6 +58,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/secret-scan.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/harness-drift-guard.sh 2>/dev/null || true"
           }
         ]
       }
@@ -72,6 +76,10 @@
           {
             "type": "command",
             "command": "bash ~/.claude/scripts/worktree-prune.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/instinct-extract.py 2>/dev/null || true"
           }
         ]
       }

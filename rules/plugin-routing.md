@@ -65,7 +65,7 @@ Usar o certo para cada situacao.
 ### Dead code / refactor: ag-13 vs simplify plugin
 - **Dead code elimination (orphan components, unused imports, dead state, dead comments)** → `/ag-13-limpar-codigo`
   - Pipeline 5-fases (Discovery → Multi-tool Scan → AST Custom → Confidence Ranking → Apply Fixes)
-  - Ensemble Knip + ts-prune + ESLint + AST custom + bundle analyzer
+  - Ensemble Knip + ts-prune + ESLint + AST custom + bundle analyzer + jscpd (DRY)
   - Confidence tiers (HIGH/MEDIUM/LOW), PRs atomicos por categoria, GitHub issues opt-in
 - **Simplificar logica de codigo recente (reuso, qualidade, eficiencia)** → `simplify` (plugin)
   - Foco em codigo recem-modificado, nao detecta dead code
@@ -73,3 +73,40 @@ Usar o certo para cada situacao.
 - **Tech debt geral (mix de issues)** → `/ag-2-corrigir debt [area]`
   - Quando o problema e heterogeneo e ag-13 / simplify nao se encaixam sozinhos
 - Em duvida: `/ag-13-limpar-codigo --triage-only` primeiro — se findings sao majoritariamente dead code, seguir com ag-13. Se sao logica complicada, usar simplify.
+
+### Benchmark prompts React/TS — 7 rotas canonicas
+
+Mapeamento dos prompts benchmark de analise de qualidade React/TS (validado 2026-05-12). Cada prompt tem 1 rota primaria + combinacao opcional para audit completo:
+
+| # | Prompt | Rota primaria | Combo audit completo |
+|---|---|---|---|
+| 1 | **Hooks React** (Rules of Hooks, deps, custom hook, useReducer) | `/ag-auditar-react-hooks --deep` | + `vercel:react-best-practices` apos editar TSX |
+| 2 | **TypeScript** (any, props sem tipo, interface vs type) | `/ag-2-corrigir --audit-any` | + `pr-review-toolkit:type-design-analyzer` em PR |
+| 3 | **Separacao responsabilidades** (UI com biz logic, fetch direto) | `/ag-avaliar-arquitetura` (dimensao PATTERNS) | + `ag-revisar-codigo` em PR |
+| 4 | **Error handling** (try/catch, async silencioso, Error Boundary + retry) | `pr-review-toolkit:silent-failure-hunter` | + `/ag-cacar-bugs --deep` (categoria 4) |
+| 5 | **Performance** (memo, useCallback, useMemo, virtualizacao, imagens) | `/ag-otimizar-codigo` (checklist React/Next) | + `chrome-devtools-mcp:debug-optimize-lcp` |
+| 6 | **DRY / duplicacao** | `/ag-13-limpar-codigo categoria:duplicacao` (jscpd) | + `simplify` para refactor pontual |
+| 7 | **Dead code** | `/ag-13-limpar-codigo --triage-only` ou `--apply-quick-wins` | (cobertura completa, sem combo) |
+
+**Audit dos 7 de uma vez em projeto:**
+```bash
+/ag-9-auditar [path]                  # FORTRESS: cobre #3 (ARCHITECT) + bullets de #4/#5/#7
+/ag-auditar-react-hooks [path] --deep # cobre #1
+/ag-2-corrigir --audit-any [path]     # cobre #2
+/ag-13-limpar-codigo [path]           # cobre #6 + #7
+```
+
+Cobertura validada: 7/7 prompts com rota canonical (2/7 excelente, 3/7 boa, 2/7 que eram criticos agora cobertos: #1 via skill nova, #6 via jscpd).
+
+### Harness audit (auditoria do proprio Claude Code)
+
+Auditar o proprio harness (skills, hooks, rules, MCPs) — equivalente local ao AgentShield do ECC:
+
+| Necessidade | Rota canonical |
+|---|---|
+| Audit completo do harness (HCS) | `/ag-9-auditar --include-harness` ou `/ag-auditar-harness` direto |
+| So otimizar (cache markers, dead skills, MCP roi) | `/ag-otimizar-harness` ou `/ag-13-limpar-codigo --target=harness` |
+| Revisar candidatos auto-extraidos da sessao | `/ag-retrospectiva --instincts` |
+| Revisar memories obsoletos | `/ag-retrospectiva --review-stale` (apos `memory-decay.py`) |
+
+Rules aplicaveis: `harness-coverage.md` (R1-R10).

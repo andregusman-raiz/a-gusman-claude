@@ -1,14 +1,26 @@
 {
-  "started_at": "2026-05-10T20:00:00Z",
-  "diagnostic_dir": "/Users/andregusmandeoliveira/Claude/GitHub/data-engine-app/docs/diagnosticos",
-  "max_concurrent_agents": 6,
-  "last_scan": "2026-05-10T22:10:00Z",
-  "scan_iterations": 5,
-  "memory_status": "38% free system-wide (healthy)",
-  "panels_total": 23,
-  "panels_done": 18,
-  "panels_in_flight": 5,
-  "panels_queued": 0,
-  "open_prs": [2636, 2637, 2638, 2639, 2640, 2641, 2642, 2643, 2644, 2645, 2646, 2647, 2648, 2649, 2650, 2651, 2652, 2653, 2654],
-  "in_flight_agents": ["fix-funnel (P12)", "fix-pesquisa-satisfacao (P20)", "fix-pessoas-rh (P21)", "fix-quadro-docente (P22)", "fix-zeev (P23)"]
+  "last_scan": "2026-05-11T00:13:00Z",
+  "scan_iterations": 11,
+  "memory_status": "47% free system-wide (healthy)",
+  "campaign_revalidation": {
+    "panels_total": 23,
+    "fix_completed": 20,
+    "fix_in_flight": 4,
+    "pending": 0,
+    "in_flight": ["fix-r18-painel-kpi-executivo-real-db", "fix-r21-pessoas-rh-real-db", "fix-r22-quadro-docente-real-db", "fix-r23-zeev-real-db"],
+    "open_prs_total": 21,
+    "real_db_validated_prs": [2666, 2668, 2669, 2670, 2671, 2672, 2673, 2674, 2675, 2676, 2677, 2678]
+  },
+  "cumulative_real_bugs_found": {
+    "R01": "cod_escola->cod_inep, matriculas_ef->efi/efii migration column drift",
+    "R04": "4: column_map codcoligada inexistente, aggregation_sql codconta/debito/credito, filter cols, stale dbt_model_missing",
+    "R10": "schema NARROW vs WIDE migration 144 fix",
+    "R11": "3: missing aggregation block, dict.split execute, fake column names",
+    "R13": "4: column drift schema, missing aggregation block (rmf orphan), SUM(E03) literal, hook _vencimentos_mi",
+    "R14": "per-user flags vs pre-aggregated view",
+    "R15": "7: wrong source community vs sale_pub, rmf alias crash, SUM(L04), dict.split, ADR-053 restored, gmv vs l04 lowercase, schema guard",
+    "R16": "4: source ref_lgpd inexistente, KPI ids G01-G10 vs V1 keys, missing aggregation, empty known_gaps",
+    "R17": "5: FROM base_data missing aggregation, db_error vs dbt_model_missing, wrong KPI keys, V1 legacy await missing, schema guard",
+    "R19": "expand=area causa z.area_nome SQL error sem JOIN z (cross-panel risk identified)"
+  }
 }

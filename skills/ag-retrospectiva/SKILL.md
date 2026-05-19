@@ -1,10 +1,10 @@
 ---
 name: ag-retrospectiva
-description: "Retrospectiva de sessao. Analisa tempo, falhas, decisoes. Compara com sessoes anteriores. Propoe melhorias para skills e memory."
+description: "Retrospectiva de sessao. Analisa tempo, falhas, decisoes. Compara com sessoes anteriores. Propoe melhorias para skills e memory. Modos: --instincts (revisa _instinct-candidates.md auto-extraidos), --review-stale (revisa memories obsoletos)."
 model: sonnet
 context: fork
-allowed-tools: Read, Glob, Grep, Bash, Write
-argument-hint: "[sessao ou projeto para retrospectiva]"
+allowed-tools: Read, Glob, Grep, Bash, Write, Edit
+argument-hint: "[sessao ou projeto] [--instincts | --review-stale | --auto-promote]"
 ---
 
 # ag-retrospectiva — Retrospectiva
@@ -73,3 +73,49 @@ After writing retrospective, update baselines:
 - Runs at end of long sessions (2h+) or on demand
 - ALWAYS reads previous retrospectives for comparison (step 0)
 - Writes retrospective doc AND updates baselines
+
+## Modo --instincts
+
+Quando invocado com `--instincts` (ou ag-0 sugere via orchestrator-feedback-loop):
+
+1. **Le** `~/.claude/projects/*/memory/_instinct-candidates.md` (auto-gerado pelo Stop hook `instinct-extract.py`).
+2. **Apresenta** cada candidato com:
+   - Confidence score (0.70-1.0)
+   - Sinais detectados (correction / confirmation / decision)
+   - User text + contexto do assistente
+3. **Pergunta**: promover (qual tipo: user/feedback/project/reference) ou descartar?
+4. **Promove** via `~/Claude/.claude/skills/ag-retrospectiva/promote-instinct.py` que:
+   - Cria `<tipo>_<slug>.md` em `memory/`
+   - Adiciona linha em `MEMORY.md` (secao `## Promoted instincts (auto)`)
+   - Remove candidato do `_instinct-candidates.md`
+
+Sub-flag `--auto-promote`: promove automaticamente candidatos com confidence >= 0.85.
+
+Pre-requisito: `instinct-extract.py` ja rodou (hook Stop). Sem `_instinct-candidates.md`, este modo nao tem o que apresentar.
+
+```bash
+# Exemplo
+python3 ~/Claude/.claude/skills/ag-retrospectiva/promote-instinct.py --auto-promote
+python3 ~/Claude/.claude/skills/ag-retrospectiva/promote-instinct.py  # interactive
+```
+
+## Modo --review-stale
+
+Quando invocado com `--review-stale`:
+
+1. **Le** `~/.claude/projects/*/memory/_stale-review.md` (gerado por `~/Claude/.claude/scripts/memory-decay.py`).
+2. **Apresenta** memories flag-ed como stale com razao.
+3. **Pergunta** para cada: refresh (re-validar conteudo), archive (mover para MEMORY-ARCHIVE.md), ou delete (com confirmacao).
+
+Pre-requisito: `memory-decay.py` ja rodou (mensal). Pode ser executado on-demand:
+
+```bash
+python3 ~/Claude/.claude/scripts/memory-decay.py
+```
+
+## Relacao com outras skills/hooks
+
+- **`instinct-extract.py`** (Stop hook) — gera candidatos. Nao-bloqueante.
+- **`memory-decay.py`** (script mensal) — flag memories obsoletos.
+- **`promote-instinct.py`** (helper) — bridge entre candidatos e memory tipado.
+- **`ag-0-orquestrador`** — sugere `/ag-retrospectiva --instincts` via `session-retro-check.sh`.
