@@ -97,13 +97,53 @@ Ordem de preferência ao buscar dado:
 | `GET /<domain>/dictionary` | dictionary (kpis + tables + conventions) | público |
 | `GET /reports/<panel>/data` | bundle de painel pronto | público |
 | `GET /v1/manifest` | catalog de manifests | público |
-| `GET /v1/schema/tables` | schema catalog | público |
+| `GET /schema/tables` | lista schema catalog cross-source | X-API-Key |
+| `GET /v1/schema/table/{table_name}` | lookup público individual de tabela | público |
 | `POST /query/preflight` | valida SQL antes de executar | X-API-Key |
-| `POST /query/execute` | SQL dinâmico governado | X-API-Key |
+| `POST /query/execute` | SQL dinâmico governado, usar `source=neon` | X-API-Key |
 | `GET /openapi.json` | OpenAPI + extensão `x-raiz-lineage` | público |
 | `GET /metrics/canonical` | Prometheus | público |
 
 Base prod: `https://raiz-data-engine-production.up.railway.app`
+
+### Política runtime TOTVS/RH para agentes
+
+- ADR-041: não usar SQL direto TOTVS RM em runtime Railway.
+- `/query/execute` é fallback governado Neon-only para agentes; enviar `source=neon`.
+- Se o usuário trouxer SQL RM bruto, converter manualmente para mirror Neon ou retornar gap acionável. Não selecionar fonte TOTVS RM direta no endpoint dinâmico.
+- Mirrors RH disponíveis:
+  - `PFFINANC` → `public.pffinanc_mirror`
+  - `PEVENTO` → `public.pevento_mirror`
+  - `PFUNC` → `public.pfunc_mirror`
+  - `PFUNCAO` → `public.pfuncao_mirror`
+  - `GFORMULA` → `public.gformula_mirror`
+- `GFORMULA` está disponível no Neon/schema registry para análise técnica de fórmulas RM. Usar `source=neon`; não usar `source=totvs_rm` em runtime. `FORMULACOMPILADA` binária não é espelhada; usar `texto`, `titulo` e metadados.
+
+### TOTVS GCONSSQL via wsDataServer
+
+Descoberta incorporada: cadastrar sentença SQL custom em `GCONSSQL` via `wsDataServer`/`GlbConsSqlData` desbloqueia fontes sem DataServer de negócio, como `MovMovimentoData`, desde que tratado como registry governado.
+
+Uso permitido:
+- sync/backfill controlado, nunca endpoint de SQL livre;
+- SQL versionado no `raiz-data-engine`;
+- sentença `COUNT` + sentença `PAGE`;
+- filtro obrigatório por `CODCOLIGADA`;
+- paginação determinística `OFFSET/FETCH`;
+- staging no Neon + count parity antes de publish;
+- PII somente com RBAC/LGPD formal.
+
+Uso proibido:
+- `SELECT *`;
+- `INSERT/UPDATE/DELETE/MERGE/DROP/ALTER/CREATE/EXEC`;
+- execução runtime direta contra TOTVS;
+- logar payload de linha, token, senha, CPF, RA, chapa ou nome.
+
+Fonte canônica no repo:
+- `scripts/ops/config/totvs_governed_sentence_registry.json`
+- `scripts/ops/sql/totvs_governed_sentence_registry/`
+- `docs/runbooks/totvs-governed-gconssql-registry.md`
+
+Piloto recomendado: `RDE.TOTVS.TMOV.COUNT/PAGE` e `RDE.TOTVS.TITMMOV.COUNT/PAGE` para alimentar `public.tmov_mirror` e `public.titmmov_mirror`.
 
 ### Envelope v2 universal
 
@@ -538,8 +578,9 @@ Endpoints mais valiosos para expor como tools customizadas (MCP / function calli
 | `domain_context` | `/<domain>/dictionary` | Carregar contexto de domínio antes de gerar SQL |
 | `kpi_value` | `/v1/kpis/{id}/value` | Resposta numérica canônica |
 | `panel_data` | `/reports/<panel>/data` | Bundle multi-KPI ready-to-render |
-| `dynamic_query` | `/query/preflight` + `/query/execute` | Última fronteira governada |
-| `schema_tables` | `/v1/schema/tables` | Schema-aware SQL synthesis |
+| `dynamic_query` | `/query/preflight` + `/query/execute` com `source=neon` | Última fronteira governada |
+| `schema_tables` | `/schema/tables` com `X-API-Key` | Schema-aware SQL synthesis |
+| `schema_table` | `/v1/schema/table/{table_name}` | Lookup público individual de tabela |
 | `manifest` | `/v1/manifest` | Lista de painéis + filtros válidos |
 | `openapi_lineage` | `/openapi.json` (lê `x-raiz-lineage`) | Cita Bronze→Prata→Ouro na resposta |
 
