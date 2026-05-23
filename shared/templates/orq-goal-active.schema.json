@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raiz/orq-goal-active.schema.json",
+  "title": "orq-goal-active",
+  "description": "Goal ativo do ag-0-orquestrador — guardrail Stop hook determinístico. Singleton em ~/Claude/docs/ai-state/orq-goal-active.json",
+  "type": "object",
+  "required": ["slug", "intent", "started_at", "expires_at", "checks"],
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Identificador kebab-case derivado das primeiras 4 palavras do intent"
+    },
+    "intent": {
+      "type": "string",
+      "minLength": 5,
+      "description": "Intent literal do usuário"
+    },
+    "machine_route": {
+      "type": "string",
+      "description": "Machine principal escolhida (ex: ag-1-construir, ag-7-qualidade)"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["single-pr", "full", "dag", "ad-hoc"]
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "TTL de segurança — após esta data, hook arquiva como .expired e libera Stop. Default 4h."
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "done", "expired", "abandoned"]
+    },
+    "bypass_allowed": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se true, usuário pode usar touch ~/Claude/docs/ai-state/orq-goal-bypass.flag para liberar Stop"
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "gh_pr_open",
+              "gh_pr_merged",
+              "file_exists",
+              "score_threshold",
+              "phase_done",
+              "deploy_url_active",
+              "command_success"
+            ]
+          },
+          "args": {
+            "type": "object"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "pass", "fail"],
+            "default": "pending"
+          },
+          "skip": {
+            "type": "boolean",
+            "default": false
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Por que este check faz parte do goal — para auditoria"
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "description": "Pointers para artifacts relacionados",
+      "properties": {
+        "phase_state_file": { "type": "string" },
+        "spec_path": { "type": "string" },
+        "execution_plan": { "type": "string" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "slug": "auth-multi-tenant-roles",
+      "intent": "implementar feature de auth multi-tenant com roles por escola",
+      "machine_route": "ag-1-construir",
+      "mode": "full",
+      "started_at": "2026-05-23T15:30:00Z",
+      "expires_at": "2026-05-23T19:30:00Z",
+      "status": "active",
+      "bypass_allowed": true,
+      "checks": [
+        {
+          "type": "phase_done",
+          "args": { "state_file": "orq-goal-auth-multi-tenant-roles.json", "phase_id": 7 },
+          "rationale": "Pipeline --full deve chegar até FINALIZE"
+        },
+        {
+          "type": "gh_pr_merged",
+          "args": { "head_branch": "feat/auth-multi-tenant" },
+          "rationale": "PR principal precisa ser merged antes de encerrar"
+        },
+        {
+          "type": "score_threshold",
+          "args": { "file": "meridian-state.json", "field": ".mqs", "min": 85 },
+          "rationale": "MERIDIAN quality threshold padrão"
+        }
+      ],
+      "links": {
+        "phase_state_file": "~/Claude/docs/ai-state/orq-goal-auth-multi-tenant-roles.json",
+        "spec_path": "docs/specs/auth-multi-tenant-spec.md"
+      }
+    }
+  ]
+}
