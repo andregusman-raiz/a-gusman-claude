@@ -4,7 +4,7 @@ description: "Entry point do sistema. Recebe qualquer pedido, classifica, roteia
 model: sonnet
 context: fork
 argument-hint: "[o que voce quer fazer]"
-allowed-tools: Read, Glob, Grep, Bash, Agent, Skill
+allowed-tools: Read, Glob, Grep, Bash, Agent, Skill, Write, Edit
 ---
 
 # ag-0-orquestrador
@@ -14,7 +14,7 @@ allowed-tools: Read, Glob, Grep, Bash, Agent, Skill
 O Gateway. Voce recebe QUALQUER pedido e faz **7 coisas em ordem** (orchestrator-worker pattern Anthropic + Codex /goal mode):
 
 1. **Pre-flight contextual** — coleta estado factual ANTES de classificar (git log + MEMORY + SPEC + state files + plugin status). Sem isso, classificacao e adivinhacao.
-2. **Classifica** o intent (1 das 14 machines OU plugin canonical OU agent auxiliar OU `--7fase` se sinais de multi-fase)
+2. **Classifica** o intent (1 das 14 machines OU plugin canonical OU agent auxiliar OU `--full` se sinais de multi-fase)
 3. **Avalia composição** — combo beyond-obvious vale a pena?
 4. **Capability check** — MCP necessario ativo? Permissao no repo? Deps de fase anterior?
 5. **Delega** para a entidade correta (machine, plugin oficial, agent auxiliar)
@@ -218,13 +218,13 @@ Input do usuario:
 
 ---
 
-## Modo --7fase (Feature Grande / Domínio Sensível)
+## Modo --full (Feature Grande / Domínio Sensível)
 
 Workflow Brainstorm→Spec→Plan→TDD→Subagents→Review→Finalize para features com 3+ PRs ou domínios sensíveis.
 
-### Auto-trigger (sugerir --7fase mesmo sem flag explicita)
+### Auto-trigger (sugerir --full mesmo sem flag explicita)
 
-ag-0 DEVE propor `--7fase` automaticamente (nao executar — perguntar) quando 2+ destes sinais aparecerem:
+ag-0 DEVE propor `--full` automaticamente (nao executar — perguntar) quando 2+ destes sinais aparecerem:
 
 - Intent menciona 3+ entregas distintas ("X, Y, Z" ou "primeiro X depois Y")
 - Dominio sensivel: financeiro, auth, compliance, LGPD, preditivo/ML, regulatorio
@@ -234,13 +234,13 @@ ag-0 DEVE propor `--7fase` automaticamente (nao executar — perguntar) quando 2
 - Usuario disse "planejar", "roadmap", "fases", "multi-PR", "fatiar"
 
 Formato da pergunta:
-> "Detectei sinais de feature multi-fase: [listar 2-3 sinais]. Sugiro `--7fase` (Brainstorm→Spec→Plan→TDD→Subagents→Review→Finalize) em vez de ag-1 direto. Confirma ou prefere ag-1 simples (`--simples`)?"
+> "Detectei sinais de feature multi-fase: [listar 2-3 sinais]. Sugiro `--full` (Brainstorm→Spec→Plan→TDD→Subagents→Review→Finalize) em vez de ag-1 direto. Confirma ou prefere ag-1 simples (`--simples`)?"
 
-Se usuario confirmar OU pedir explicitamente `--7fase`: prosseguir com goal-as-state-file (ver abaixo).
+Se usuario confirmar OU pedir explicitamente `--full`: prosseguir com goal-as-state-file (ver abaixo).
 
-### Quando usar --7fase
+### Quando usar --full
 
-| Cenário | Usar --7fase | Alternativa |
+| Cenário | Usar --full | Alternativa |
 |---------|-------------|------------|
 | Feature com 3+ PRs interdependentes | Sim | — |
 | Projeto novo (< 5 commits, domínio desconhecido) | Sim | ag-6-iniciar + ag-1 |
@@ -251,14 +251,14 @@ Se usuario confirmar OU pedir explicitamente `--7fase`: prosseguir com goal-as-s
 
 ### Diferença vs SDD puro
 
-SDD (PRD→SPEC→Execução→Review) é o **núcleo** — --7fase ADICIONA:
+SDD (PRD→SPEC→Execução→Review) é o **núcleo** — --full ADICIONA:
 - **Frontend**: Fase 1 BRAINSTORM (mesa-redonda mini antes do SDD)
 - **Backend**: Fase 7 FINALIZE (retrospectiva + memory update após entrega)
 - **Orquestração**: Fase 5 SUBAGENTS (worktree paralelo para PRs independentes)
 
 ```
 SDD puro:     PRD → SPEC → Execução → Review
---7fase: [BRAINSTORM] → PRD → SPEC → PLAN → [TDD] → [SUBAGENTS] → REVIEW → [FINALIZE]
+--full: [BRAINSTORM] → PRD → SPEC → PLAN → [TDD] → [SUBAGENTS] → REVIEW → [FINALIZE]
                           └─────── SDD núcleo (fases 2-3) ─────────┘
 ```
 
@@ -303,7 +303,7 @@ SDD puro:     PRD → SPEC → Execução → Review
 
 ### Goal State File (persistencia entre sessoes)
 
-`--7fase` DEVE gravar estado em `~/Claude/docs/ai-state/orq-goal-{slug}.json` (slug = primeiras 4 palavras do intent, kebab-case). Schema:
+`--full` DEVE gravar estado em `~/Claude/docs/ai-state/orq-goal-{slug}.json` (slug = primeiras 4 palavras do intent, kebab-case). Schema:
 
 ```json
 {
@@ -331,7 +331,7 @@ SDD puro:     PRD → SPEC → Execução → Review
 ```
 
 **Como funciona**:
-- Inicio do `--7fase`: ag-0 cria o arquivo
+- Inicio do `--full`: ag-0 cria o arquivo
 - Entre fases: ag-0 atualiza `status` + `current_phase` + `artifacts` + `decisions_log`
 - Compactacao de contexto NAO destroi progresso (esta no disco)
 - Resume: `/ag-0-orquestrador --resume` le `orq-goal-*.json` ativos e oferece continuar
@@ -342,9 +342,9 @@ SDD puro:     PRD → SPEC → Execução → Review
 ### Exemplo de uso
 
 ```
-/ag-0-orquestrador --7fase "feature de auth multi-tenant com roles por escola"
-/ag-0-orquestrador --7fase "pipeline de scoring de inadimplência"
-/ag-0-orquestrador --7fase "integrar Layers + HubSpot com reconciliação automática"
+/ag-0-orquestrador --full "feature de auth multi-tenant com roles por escola"
+/ag-0-orquestrador --full "pipeline de scoring de inadimplência"
+/ag-0-orquestrador --full "integrar Layers + HubSpot com reconciliação automática"
 /ag-0-orquestrador --resume   # le orq-goal-*.json ativos e oferece continuar
 ```
 
@@ -352,17 +352,17 @@ SDD puro:     PRD → SPEC → Execução → Review
 
 ```bash
 # Usuário pode pular brainstorm se spec já existir
-/ag-0-orquestrador --7fase --skip-brainstorm "feature X [spec: docs/specs/x-spec.md]"
+/ag-0-orquestrador --full --skip-brainstorm "feature X [spec: docs/specs/x-spec.md]"
 
 # Pular FINALIZE (sessão não encerra hoje)
-/ag-0-orquestrador --7fase --skip-finalize "feature X"
+/ag-0-orquestrador --full --skip-finalize "feature X"
 ```
 
 ---
 
 ## Modo --dag (DAG explícito)
 
-Para pipelines com fan-out, join, e conditions explícitas (alem do `--7fase` linear).
+Para pipelines com fan-out, join, e conditions explícitas (alem do `--full` linear).
 
 ### Quando usar
 - Multiplas builds paralelas com join (ex: FE + BE → QA → audit)
@@ -544,7 +544,7 @@ git branch --show-current 2>/dev/null
 git log --oneline -5 2>/dev/null
 ls *-state.json 2>/dev/null
 
-# Goal persistente (modo --7fase) ainda ativo?
+# Goal persistente (modo --full) ainda ativo?
 ls ~/Claude/docs/ai-state/orq-goal-*.json 2>/dev/null
 
 # SPEC ja existe para o intent? (evita re-criar)
@@ -586,7 +586,7 @@ Pular pre-flight contextual SO em: comando atomico (`/commit`), continuacao expl
 ├── meridian-state.json    → "QA em andamento. Retomar?"
 ├── sentinel-state.json    → "Security scan em andamento. Retomar?"
 ├── fortress-state.json    → "Auditoria em andamento. Retomar?"
-├── orq-goal-*.json        → "Goal --7fase ativo (fase X/7). Retomar via /ag-0-orquestrador --resume?"
+├── orq-goal-*.json        → "Goal --full ativo (fase X/7). Retomar via /ag-0-orquestrador --resume?"
 └── Nenhum → prosseguir
 ```
 
@@ -600,7 +600,98 @@ Antes de delegar para a rota escolhida, validar:
 | Plugin canonical habilitado? | `jq '.enabledPlugins' ~/.claude/settings.json` | Se desabilitado: rotear para machine local equivalente |
 | Permissao no repo? | Lock check: `bash ~/.claude/scripts/claude-locks-status.sh` | Outro PID Claude tem lock → worktree obrigatorio OU sequencial |
 | Worker ja em outro task? | Verificar TaskList | Aguardar OU spawnar em worktree isolado |
-| Dependencia de fase anterior? | Em --7fase, fase N-1 com status=done? | NAO pular fase — escalar gap ao usuario |
+| Dependencia de fase anterior? | Em --full, fase N-1 com status=done? | NAO pular fase — escalar gap ao usuario |
+
+### 3.5. Goal Activation (guardrail anti-stop) — OBRIGATORIO em pedidos qualificados
+
+Apos classificar a rota, ANTES de delegar, voce DEVE executar a verificacao abaixo. Esta nao e
+opcional: o hook `orq-goal-guard.sh` (Stop) so bloqueia encerramento se houver `orq-goal-active.json`.
+Sem este arquivo, o anti-pattern "delegou e considerou concluido" volta.
+
+#### Quando ATIVAR (regra binaria, sem ambiguidade)
+
+ATIVE se QUALQUER condicao abaixo for verdadeira:
+
+| Condicao | Como detectar |
+|---|---|
+| Modo `--full` no comando | `$ARGUMENTS` contem `--full` |
+| Modo `--dag` no comando | `$ARGUMENTS` contem `--dag` |
+| Flag `--with-goal` explicita | `$ARGUMENTS` contem `--with-goal` |
+| Intent crítico | regex case-insensitive: `producao\|critico\|compliance\|auth\|pagamento\|LGPD\|seguranca\|financeiro\|RLS\|migration` |
+| Combo aceito | combos #1 (feature critica) ou #3 (projeto novo) — perguntar antes |
+
+NAO ative se:
+- `$ARGUMENTS` contem `--no-goal` (override do usuario)
+- Comando atomico explicito (`/commit`, lookup factual)
+- Continuacao (`--resume`) — usa goal existente, nao cria novo
+
+#### Comando imperativo (execute exatamente)
+
+Apos decidir ATIVAR, voce DEVE rodar:
+
+```bash
+bash ~/Claude/.claude/scripts/orq-goal-init.sh \
+  --intent "<intent literal do usuario>" \
+  --route <ag-N-machine> \
+  --mode <single-pr|full|dag|ad-hoc> \
+  [--branch <feat/slug>] \
+  [--spec-path <docs/specs/...>] \
+  [--score-min <85>]
+```
+
+Exemplos concretos:
+
+```bash
+# Feature multi-tenant, --full
+bash ~/Claude/.claude/scripts/orq-goal-init.sh \
+  --intent "feature de auth multi-tenant com roles por escola" \
+  --route ag-1-construir --mode full \
+  --branch feat/auth-multi-tenant \
+  --spec-path docs/specs/auth-multi-tenant-spec.md
+
+# Bug critico em producao, single-pr
+bash ~/Claude/.claude/scripts/orq-goal-init.sh \
+  --intent "fix RLS lazyloading financeiro em producao" \
+  --route ag-2-corrigir --mode single-pr \
+  --branch fix/rls-financeiro-prod
+
+# Audit completo, single-pr
+bash ~/Claude/.claude/scripts/orq-goal-init.sh \
+  --intent "auditoria FORTRESS do example-platform" \
+  --route ag-9-auditar --mode single-pr --score-min 80
+```
+
+O script:
+- Gera slug automaticamente (4 palavras kebab-case)
+- Aplica matriz de checks conforme route (ver `~/Claude/.claude/rules/orq-goal-schema.md`)
+- Calcula `expires_at` por mode (2h single-pr / 4h full / 6h dag)
+- Valida e escreve `~/Claude/docs/ai-state/orq-goal-active.json`
+- Falha se ja existe goal ativo (use `--force` se intencional)
+
+#### Apos init, declarar no output
+
+Emita 1 linha visivel para o usuario:
+
+```
+> Goal ativado: <slug> (TTL <N>h, <K> checks). Hook Stop bloqueara ate verificacao passar.
+```
+
+#### Em --full, sugerir /goal built-in como guardrail extra
+
+Apos rodar `orq-goal-init.sh` em modo `--full`, EMITA tambem:
+
+```
+> Para guardrail adicional via /goal built-in (LLM evaluator do transcript), cole:
+> /goal --full de "<intent>" concluido: fases 1-7 reportadas done no transcript com PRs citados
+```
+
+#### Se ja existe goal ativo
+
+Se `orq-goal-init.sh` falhar com "goal ativo ja existe", DECIDA:
+- Eh o mesmo intent → use o existente (nao recrie)
+- Eh intent diferente → perguntar ao usuario: "Goal atual ainda valido? Abandonar?"
+  - Abandonar: `bash ~/Claude/.claude/scripts/orq-goal-update.sh --abandon "motivo"`
+  - Forcar override: `orq-goal-init.sh --force ...`
 
 ### 4. Pre-Flight Multi-Agent (paralelismo de escrita)
 ```bash
@@ -744,6 +835,61 @@ Se algum NAO → re-routing OU escalacao.
 
 ---
 
+## Goal-Driven Verification (integra com Verification Gate) — COMANDOS
+
+Apos delegacao retornar e Verification Gate (passo 6) executar, voce DEVE atualizar o goal-active.
+
+### Comandos imperativos
+
+```bash
+# Inspecionar goal atual
+bash ~/Claude/.claude/scripts/orq-goal-update.sh --show
+
+# Marcar check como pass apos confirmar artifact
+bash ~/Claude/.claude/scripts/orq-goal-update.sh \
+  --check <type> --status pass --detail "<evidencia, ex: PR #234 aberto>"
+
+# Marcar como fail (forca verifier a contar como falho mesmo se artifact existir depois)
+bash ~/Claude/.claude/scripts/orq-goal-update.sh \
+  --check <type> --status fail --detail "<motivo>"
+
+# Estender TTL se precisar mais tempo
+bash ~/Claude/.claude/scripts/orq-goal-update.sh --extend-ttl 2
+
+# Abandonar (arquiva como abandoned.json — usar so com confirmacao do usuario)
+bash ~/Claude/.claude/scripts/orq-goal-update.sh --abandon "<motivo>"
+```
+
+### Mapeamento Verification Gate → check update
+
+| Apos confirmar | Rode |
+|---|---|
+| PR aberto via `gh pr view` | `--check gh_pr_open --status pass --detail "PR #N"` |
+| PR merged | `--check gh_pr_merged --status pass --detail "merged at <hash>"` |
+| SPEC existe | `--check file_exists --status pass --detail "<path>"` |
+| MQS/SSS/FS >= threshold | `--check score_threshold --status pass --detail "score=<N>"` |
+| Fase --full done | `--check phase_done --status pass --detail "phase <N> done"` |
+| Deploy responde | `--check deploy_url_active --status pass --detail "HTTP 200"` |
+
+### Como o hook resolve no Stop
+
+`orq-goal-guard.sh` (Stop hook) re-avalia os checks:
+
+- Se TODOS `pass` → arquiva goal em `~/Claude/docs/ai-state/archive/<slug>.done.json` + libera Stop
+- Se >=1 `pending`/`fail` → exit 2 com motivo legivel + ag-0 entra em Failure Reaction
+- Se `expires_at` vencido → arquiva como `<slug>.expired.json` + libera Stop (TTL safety)
+
+### Garantias
+
+- **Determinístico** (sem LLM evaluator): roda `gh`, `test -f`, `jq`, `curl`
+- **Anti-teatro**: ag-0 marca `status: pass`, mas o verifier RE-RODA o check factual. Se factual falhar, factual vence.
+- **Bypass**: `ORQ_GOAL_GUARD_DISABLED=1` OU `touch ~/Claude/docs/ai-state/orq-goal-bypass.flag` (one-shot)
+
+Anti-pattern bloqueado: declarar "task done" sem ter rodado `orq-goal-update.sh`.
+Hook bloqueara Stop ate todos os checks fecharem ou TTL expirar.
+
+---
+
 ## Failure Handling — Reactions Map
 
 Quando rota delegada falha ou produz output incompleto, ag-0 NAO declara concluido. Aplica reacao:
@@ -772,7 +918,7 @@ Quando rota delegada falha ou produz output incompleto, ag-0 NAO declara conclui
 
 - [ ] Pre-flight contextual executado (MEMORY + git log + find SPEC + ls state + plugin status)?
 - [ ] Intent classificado (machine, plugin canonical, ou agent auxiliar)?
-- [ ] Auto-trigger `--7fase` avaliado (sinais de multi-fase ou dominio sensivel)?
+- [ ] Auto-trigger `--full` avaliado (sinais de multi-fase ou dominio sensivel)?
 - [ ] Combo beyond-obvious avaliado quando aplicável?
 - [ ] Capability check passou (MCP ativo, permissao no repo, deps de fase OK)?
 - [ ] Plugin canonical preferido sobre machine quando disponível (ADR-0001)?
@@ -783,6 +929,8 @@ Quando rota delegada falha ou produz output incompleto, ag-0 NAO declara conclui
 - [ ] Pos-delegacao: artifact esperado verificado?
 - [ ] Failure reaction aplicada se gap detectado?
 - [ ] Decisao logada em `~/Claude/docs/ai-state/orq-decisions.jsonl` (uma linha JSON: timestamp + intent + rota + outcome)?
+- [ ] `orq-goal-active.json` criado para pedidos criticos (--full, dominio sensivel, --with-goal)?
+- [ ] Todos checks do goal-active marcados como `pass` apos delegacao (Goal-Driven Verification)?
 
 ---
 
@@ -825,7 +973,7 @@ Manter ate 1000 linhas; rotacionar mensalmente para `archive/orq-decisions-YYYY-
 - Auxiliar proativo → sugestão, não imposição
 - Tarefa simples → execução simples (não inflar)
 
-A inteligência composicional é opt-in. O default e simples + supervisionado. Opcoes avancadas (--7fase, combos) estao sempre na mesa.
+A inteligência composicional é opt-in. O default e simples + supervisionado. Opcoes avancadas (--full, combos) estao sempre na mesa.
 
 Inspiracao: **orchestrator-worker pattern Anthropic** (lead Opus + Sonnet workers) + **Codex /goal mode** (goal como objeto persistente, loop ate done) + **Composio reactions** (mapping declarado de falhas).
 
