@@ -49,7 +49,8 @@ DEVE ter:
 
 Hooks atualmente conformes: `completion-gate.py`, `gap-acceptance-guard.py`,
 `branch-guard.sh`, `harness-drift-guard.sh`, `instinct-extract.py` (este
-ultimo nao-bloqueante, mas tem bypass mesmo assim).
+ultimo nao-bloqueante, mas tem bypass mesmo assim), `orq-goal-guard.sh`
+(bypass `ORQ_GOAL_GUARD_DISABLED=1` ou `orq-goal-bypass.flag` one-shot).
 
 ## R4 — Skills longas (>=300 linhas estaticas) tem cache_policy declarado
 
