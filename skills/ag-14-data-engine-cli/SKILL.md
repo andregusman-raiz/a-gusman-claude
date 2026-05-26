@@ -19,6 +19,7 @@ Use esta skill quando o usuario pedir para:
 - acessar dados ou APIs do Data Engine a partir de outra plataforma;
 - pedir permissao para KPIs, providers, endpoints, panels ou contracts;
 - criar um pedido autonomo para o Data Engine;
+- pedir acesso LLM governado pelo Data Engine, com politica explicita e aprovacao humana;
 - usar `data-engine` CLI no Codex ou Claude Code;
 - diagnosticar se o CLI existe ou se o checkout esta antigo;
 - explicar status, drift, descriptor ou approval de Access Broker.
@@ -35,6 +36,7 @@ A IA pode:
 - validar manifesto;
 - fazer preview;
 - abrir pedido;
+- solicitar LLM com `llm_allowed=true`, budget/politica explicitos e aprovacao obrigatoria;
 - acompanhar status;
 - explicar pendencias.
 
@@ -47,7 +49,8 @@ A IA nao pode:
 - pedir wildcard;
 - contornar o Access Broker;
 - usar raw SQL como primeira opcao;
-- pedir acesso LLM por este comando.
+
+LLM nao e proibido neste comando. LLM deve passar pelo mesmo Access Broker, mas exige declaracao explicita no manifesto e continua pendente de aprovacao no Control Plane. A IA nunca aprova o proprio acesso LLM.
 
 ## Fase -1: Resolver runtime do CLI
 
@@ -185,7 +188,7 @@ Nunca imprimir valores dessas variaveis.
 4. Identificar recursos, providers, KPIs, panels, endpoints e contracts relevantes.
 5. Preferir rotas canonicas do Data Engine.
 6. Buscar operacao no catalogo do Access Broker.
-7. Gerar manifesto de acesso.
+7. Gerar manifesto de acesso; se houver LLM, usar `llm_allowed=true` e politica explicita.
 8. Validar manifesto.
 9. Gerar preview/diff.
 10. Abrir pedido.
@@ -218,6 +221,23 @@ uv run data-engine access draft \
   --consumer example-platform \
   --environment production \
   --need "ler KPIs de matricula por coligada" \
+  --output data-engine.access.yaml
+```
+
+Gerar manifesto com LLM:
+
+```bash
+uv run data-engine access draft \
+  --consumer example-platform \
+  --environment production \
+  --need "usar LLM do Data Engine para assistente operacional" \
+  --operation "POST /v1/llm/chat=read:llm" \
+  --allow-llm \
+  --llm-provider data_engine_router \
+  --llm-model gpt-5.2 \
+  --llm-usage-profile assistant_readonly \
+  --llm-context-policy metadata_only \
+  --llm-budget-usd 25 \
   --output data-engine.access.yaml
 ```
 
@@ -290,6 +310,15 @@ scopes:
 
 Se o usuario pedir algo amplo, quebre em recursos especificos e declare a decisao.
 
+Para LLM:
+
+- usar `--allow-llm`;
+- preferir scopes especificos como `read:llm`;
+- declarar provider/modelo quando o usuario souber;
+- declarar budget sempre que houver uso produtivo;
+- manter logging sem prompt/output bruto;
+- manter aprovacao no Control Plane.
+
 ## Manifesto esperado
 
 Exemplo ilustrativo:
@@ -316,6 +345,29 @@ spec:
     raw_sql: false
     pii: false
     write_access: false
+```
+
+Exemplo de campos LLM no manifesto:
+
+```yaml
+access:
+  llm_allowed: true
+  llm:
+    provider: data_engine_router
+    models:
+      - gpt-5.2
+    usage_profile: assistant_readonly
+    context_policy: metadata_only
+    budget_usd: 25
+    logging:
+      log_prompts: false
+      log_outputs: false
+      audit_metadata_only: true
+  direct_api_access:
+    enabled: true
+    operations:
+      - operation_id: POST /v1/llm/chat
+        scope: read:llm
 ```
 
 ## Output final
