@@ -62,6 +62,14 @@ Usar o certo para cada situacao.
 ### Railway: canonical de infra não-Vercel (ADR-0001)
 - Railway projects/services/DBs/deploy → `railway:use-railway`
 
+### Data Engine: consumir dados vs pedir acesso
+- **Descobrir/consultar dado, KPI, painel, query** (Knowledge Gateway, KPI Ouro, SQL TOTVS/Neon/PBI) → `/ag-12-sql-totvs-zeev`
+- **Pedir acesso governado** (uma plataforma/app/agente precisa de credencial/grant para usar dados/APIs já existentes do Data Engine) → `/ag-14-data-engine-cli`
+  - Invocação explícita (`disable-model-invocation: true`) — não auto-roteada; o usuário/agente chama por `/ag-14`
+  - Fluxo: Knowledge Gateway → `data-engine catalog search` → `access draft` → `validate` → `preview` → `request` → aprovação no Control Plane (a IA nunca aprova, nunca revela segredo)
+  - NÃO confundir com "gerar/expor API no Data Engine" (provisioning) nem com consumir dado (ag-12)
+- Em dúvida ag-12 vs ag-14: a pergunta é "quero o dado" (ag-12) ou "quero permissão para acessar o dado de outra plataforma" (ag-14)?
+
 ### Dead code / refactor: ag-13 vs simplify plugin
 - **Dead code elimination (orphan components, unused imports, dead state, dead comments)** → `/ag-13-limpar-codigo`
   - Pipeline 5-fases (Discovery → Multi-tool Scan → AST Custom → Confidence Ranking → Apply Fixes)

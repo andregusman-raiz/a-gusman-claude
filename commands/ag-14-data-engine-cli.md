@@ -91,6 +91,16 @@ Raw SQL so como fallback, com `source="neon"`, quando rotas canonicas nao resolv
 9. Abra pedido com `uv run data-engine access request`.
 10. Informe request id, status e pendencia de aprovacao.
 
+## Contratos reais do CLI (nao inventar sintaxe)
+
+- `access draft` exige `--need` e `--expires`; operacoes via `--operation "<op_id>=<scope>"` (repetivel).
+- `access validate|preview|request|drift` usam `--file <path>` (NAO argumento posicional).
+- `access status|cancel|renew` usam `--request-id <id>` (alias `--id`); `renew` tambem `--expires-at <iso>`.
+- `access descriptor` usa `--connection-id <id>`.
+- `catalog search "<termo>"` e `catalog operation "<operation_id>"` recebem argumento posicional.
+- `access request` retorna `approval_required: true` + `approval_url`. Nunca aprovar.
+- Flags globais: `--json --quiet --no-color --timeout --base-url --api-key --repo-ref --git-sha`.
+
 ## Variaveis
 
 Use sem imprimir valores:
@@ -130,6 +140,7 @@ uv run data-engine access draft \
   --llm-provider data_engine_router \
   --llm-model gpt-5.2 \
   --llm-budget-usd 25 \
+  --expires 2026-12-31T23:59:59Z \
   --output data-engine.access.yaml
 ```
 

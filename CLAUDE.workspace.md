@@ -170,7 +170,7 @@ Detalhes: `.claude/rules/{naming-conventions,commit-conventions,branch-strategy,
 
 ---
 
-## Machines (Interface Principal — 13 commands)
+## Machines (Interface Principal — 14 commands)
 
 Padrao MERIDIAN: fases, convergencia, state, self-healing. Cada machine encapsula multiplos agents.
 
@@ -189,9 +189,11 @@ ag-10  BENCHMARK      Crawl SaaS, screenshot, AI analysis, SPEC
 ag-11  DESENHAR       UI/UX design, componentes, paletas, layouts, shadcn
 ag-12  SQL-TOTVS-ZEEV Otimizar SQL Server (TOTVS RM) + PostgreSQL + Zeev BPM
 ag-13  LIMPAR-CODIGO  Dead code (Knip + AST + bundle, confidence tiers, PRs atomicos)
+ag-14  DATA-ENGINE-CLI Pedir acesso governado a dados/APIs do Data Engine via Access Broker CLI (invocacao explicita /ag-14, nao auto-roteada)
 ```
 
 Na duvida: `/ag-0-orquestrador [pedido]` classifica e roteia.
+ag-14 e invocada explicitamente (`disable-model-invocation: true`): use `/ag-14-data-engine-cli` quando uma plataforma/agente precisar pedir acesso ao Data Engine.
 
 ### Activation modes
 
