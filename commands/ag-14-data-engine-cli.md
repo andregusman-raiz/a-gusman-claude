@@ -1,0 +1,130 @@
+# ag-14-data-engine-cli
+
+Use este comando quando uma plataforma, app, agente ou automacao precisar pedir acesso governado a dados/APIs do Data Engine.
+
+## Fase -1: Resolver CLI
+
+Antes de concluir que o CLI `data-engine` nao existe, verifique:
+
+```bash
+data-engine --help
+```
+
+Se nao estiver no PATH, use o repo local:
+
+```bash
+cd /Users/andregusmandeoliveira/Claude/GitHub/data-engine-app
+uv run data-engine --help
+```
+
+Se a branch local nao tiver `raiz_data_engine/cli/main.py`, verifique `origin/main`:
+
+```bash
+git fetch origin main --prune
+git show origin/main:pyproject.toml | rg "data-engine ="
+git ls-tree -r --name-only origin/main | rg "^raiz_data_engine/cli/main.py$"
+```
+
+Nunca diga "CLI nao existe" apenas porque o comando nao esta instalado globalmente. Diferencie:
+
+- CLI nao implementado no codigo;
+- CLI implementado, checkout antigo;
+- CLI implementado, nao instalado no PATH.
+
+## Fase 0: Knowledge Gateway obrigatorio
+
+Antes de responder, mapear, sugerir escopo ou abrir pedido, consulte:
+
+```text
+GET /v1/knowledge/llm-context
+GET /v1/knowledge/index
+GET /v1/agent/contract
+```
+
+Para detalhes:
+
+```text
+GET /v1/knowledge/resources/{resource_type}/{resource_id}
+```
+
+Tipos validos:
+
+```text
+kpi
+provider
+contract
+panel
+endpoint
+dbt_model
+agent_contract
+```
+
+A fonte canonica e o Knowledge Gateway, compilado de OpenAPI, manifests, registries, contracts, providers, dbt e Alembic.
+
+Trate:
+
+- `known_gaps` como gaps do discovery plane;
+- `known_limitations` como limitacoes declaradas dos recursos.
+
+## Ordem preferida
+
+1. `/v1/knowledge/llm-context`
+2. `/v1/knowledge/index`
+3. `/v1/agent/contract`
+4. `/v1/kpis/search` ou `/v1/kpis/catalog`
+5. `/v1/agg/canonical/{panel_id}/{metric_id}`
+6. `/openapi.json` apenas para confirmar contrato tecnico
+
+Raw SQL so como fallback, com `source="neon"`, quando rotas canonicas nao resolverem e o motivo estiver documentado.
+
+## Fluxo
+
+1. Entenda `$ARGUMENTS`.
+2. Resolva o runtime do CLI.
+3. Consulte Knowledge Gateway.
+4. Prefira rotas canonicas.
+5. Busque operacao com `uv run data-engine catalog search`.
+6. Gere manifesto com `uv run data-engine access draft`.
+7. Valide com `uv run data-engine access validate`.
+8. Faca preview com `uv run data-engine access preview`.
+9. Abra pedido com `uv run data-engine access request`.
+10. Informe request id, status e pendencia de aprovacao.
+
+## Variaveis
+
+Use sem imprimir valores:
+
+```bash
+DATA_ENGINE_BASE_URL
+DATA_ENGINE_ACCESS_BROKER_TOKEN
+DATA_ENGINE_CONSUMER_ID
+DATA_ENGINE_ENVIRONMENT
+RDE_BASE_URL
+RDE_ACCESS_BROKER_KEY
+DATA_ENGINE_API_KEY
+```
+
+## Proibicoes
+
+- Nao aprovar acesso.
+- Nao revelar segredo.
+- Nao imprimir token.
+- Nao criar wildcard.
+- Nao usar raw SQL como primeira opcao.
+- Nao pedir acesso LLM por este comando.
+- Nao contornar o Access Broker.
+
+## Output
+
+Retorne:
+
+- consumer;
+- environment;
+- recursos solicitados;
+- validacao;
+- preview;
+- request id;
+- status;
+- proximo passo no Control Plane.
+
+$ARGUMENTS
