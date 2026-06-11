@@ -9,6 +9,13 @@ argument-hint: "[projeto-path ou opcoes: --batch-size=N --max-retries=N --base-u
 
 # ag-testar-e2e-batch — E2E Tests with Infrastructure Validation
 
+> **ENGINE CANONICO (2026-06-11, piloto ADR-0002)**: o loop deterministico desta skill
+> (batching, retry bookkeeping, contadores, criterio de parada) vive em
+> `Workflow({name: "e2e-batch", args: {projectDir: "<path>"}})` —
+> script em `.claude/workflows/e2e-batch.js`. PREFERIR o Workflow: o loop nao "esquece"
+> fases e os fixes retornam schema validado. O texto abaixo permanece como referencia
+> de diagnostico por categoria de falha e fallback quando o Workflow tool nao esta disponivel.
+
 Executa suite E2E completa em batches com validacao de infraestrutura, auto-diagnose de falhas, e retry automatico ate convergencia (max 3 ciclos).
 
 ## Quando Usar
