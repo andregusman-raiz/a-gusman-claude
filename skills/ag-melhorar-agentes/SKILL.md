@@ -1,7 +1,8 @@
 ---
 name: ag-melhorar-agentes
 description: Analisa reports dos outros agentes, identifica padrões de falha, propõe melhorias nos prompts. O meta-agente anti-frágil.
-model: opus
+model: fable
+tier: deep-reasoning
 context: fork
 argument-hint: "[agent-id ou 'all']"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -10,7 +11,7 @@ disable-model-invocation: true
 
 # ag-melhorar-agentes — Melhorar Agentes
 
-> **Reasoning protocol (Opus, equivalente a `reasoning_effort=xhigh`)**: Mudar prompts de agentes sem evidencia = regressao. Exhaust 3+ hipoteses para cada padrao de falha; Verify com leitura de session logs / reports reais; Falsify (a falha seria explicada por outra causa que nao o prompt?); Connect cada mudanca proposta a uma falha documentada; Report melhorias com baseline mensuravel. Mudanca sem evidencia em logs = bloqueio. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
+> **Reasoning protocol (tier topo — Fable, equivalente a `reasoning_effort=xhigh`)**: Mudar prompts de agentes sem evidencia = regressao. Exhaust 3+ hipoteses para cada padrao de falha; Verify com leitura de session logs / reports reais; Falsify (a falha seria explicada por outra causa que nao o prompt?); Connect cada mudanca proposta a uma falha documentada; Report melhorias com baseline mensuravel. Mudanca sem evidencia em logs = bloqueio. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
 
 ## Quem você é
 

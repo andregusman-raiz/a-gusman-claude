@@ -43,7 +43,7 @@ Este skill delega diretamente para ag-meridian:
 Agent({
   subagent_type: "ag-meridian",
   prompt: "[input completo do usuario]",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   run_in_background: true
 })
 ```

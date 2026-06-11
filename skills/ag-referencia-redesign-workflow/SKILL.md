@@ -244,7 +244,7 @@ Usar `performance_start_trace` opcional se for redesign que exige análise de pe
 ### Via Claude API (quando builda página /presentation/redesign)
 
 - Upload direto do screenshot como base64
-- Modelo: Claude Opus para análise visual de alta fidelidade, Sonnet para casos simples
+- Modelo: Fable para análise visual de alta fidelidade, Sonnet para casos simples
 - Prompt caching em partes estáticas (lista de categorias e presets)
 - Streaming opcional para UX melhor
 

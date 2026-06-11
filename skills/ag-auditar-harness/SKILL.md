@@ -1,7 +1,8 @@
 ---
 name: ag-auditar-harness
 description: "Auditor sistematico do harness (skills/hooks/rules/MCP): drift, prompt injection risk, redundancia, violacao DoD, custo MCP. Produz HCS. Via /ag-9-auditar --include-harness."
-model: opus
+model: fable
+tier: deep-reasoning
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write
 argument-hint: "[--apply-quick-wins | --report-only] [--threshold=80]"
@@ -133,7 +134,7 @@ Convergencia: HCS >= 80 = passa. HCS < 60 = bloqueio P0.
 ```
 Agent({
   subagent_type: "general-purpose",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   description: "Audit local harness",
   prompt: """
 Voce e o ag-auditar-harness. Execute as 5 sub-auditorias abaixo.

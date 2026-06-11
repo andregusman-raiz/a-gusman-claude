@@ -1,20 +1,22 @@
 ---
-description: "Protocolo 5 passos para skills opus / diagnostico profundo"
+description: "Protocolo 5 passos para skills deep-reasoning (tier topo) / diagnostico profundo"
 paths:
   - ".claude/skills/**"
 ---
 
 # Deep Reasoning Directive
 
-> Equivalente ao `reasoning_effort=xhigh` do Codex. Carregada por skills `model: opus`
-> e tarefas que envolvem diagnostico profundo, arquitetura, ou planejamento multi-fase.
+> Equivalente ao `reasoning_effort=xhigh` do Codex. Carregada por skills com frontmatter
+> `tier: deep-reasoning` (model: fable por design; cadeia de fallback fable→opus→sonnet
+> via `model-fallback.sh`) e tarefas de diagnostico profundo, arquitetura ou planejamento multi-fase.
 
 ## Quando aplicar
 
 Sempre que: diagnostico de bug nao trivial, design de SPEC/arquitetura, planejamento
 de pipeline multi-PR, debate de trade-offs (mesa-redonda), escrita ou critica de skill,
-auditoria arquitetural. Ou seja: **toda invocacao das 7 skills Opus** + qualquer prompt
-que mencione "investigar profundo", "audit", "diagnostico".
+auditoria arquitetural. Ou seja: **toda invocacao das 9 skills `tier: deep-reasoning`**
+(lista dinamica: `grep -l '^tier: deep-reasoning' .claude/skills/*/SKILL.md`) + qualquer
+prompt que mencione "investigar profundo", "audit", "diagnostico".
 
 ## Protocolo de 5 passos (obrigatorio antes de propor solucao/diagnostico/plano)
 

@@ -38,7 +38,7 @@ Produz: Security Certificate, Load Report, Fix PR.
 Agent({
   subagent_type: "ag-sentinel",
   prompt: "[input completo do usuario]",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   run_in_background: true
 })
 ```

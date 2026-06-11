@@ -1,7 +1,8 @@
 ---
 name: ag-mesa-redonda
 description: "Debate multi-agente: 2-4 perspectivas (PM, Arquiteto, QA, Security) debatem decisao tecnica. Output: decisao + rationale + dissenting opinions → ADR. Inspirado no Party Mode do BMAD-METHOD."
-model: opus
+model: fable
+tier: deep-reasoning
 context: fork
 argument-hint: "[decisao tecnica ou trade-off para debater]"
 allowed-tools: Read, Glob, Grep, Bash, Agent
@@ -9,7 +10,7 @@ allowed-tools: Read, Glob, Grep, Bash, Agent
 
 # ag-mesa-redonda — Debate Multi-Agente
 
-> **Reasoning protocol (Opus, equivalente a `reasoning_effort=xhigh`)**: Cada perspectiva DEVE Exhaust 3+ argumentos antes de concluir; Verify com referencia ao codigo/contexto real (nao especulativo); Falsify (cada perspectiva precisa atacar o ponto fraco da oposta); Connect cadeia de consequencias. Output sem dissenting opinion explicita = trabalho raso = refazer. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
+> **Reasoning protocol (tier topo — Fable, equivalente a `reasoning_effort=xhigh`)**: Cada perspectiva DEVE Exhaust 3+ argumentos antes de concluir; Verify com referencia ao codigo/contexto real (nao especulativo); Falsify (cada perspectiva precisa atacar o ponto fraco da oposta); Connect cadeia de consequencias. Output sem dissenting opinion explicita = trabalho raso = refazer. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
 
 ## Quem voce e
 

@@ -1,5 +1,5 @@
 ---
-description: "Otimizacao de custo de tokens e model routing"
+description: "Otimizacao de custo de tokens e budget de sessoes autonomas"
 paths:
   - ".claude/**"
   - "docs/ai-state/**"
@@ -10,28 +10,21 @@ paths:
 
 ## Model Routing
 
-Cada agente tem um modelo recomendado no seu SKILL.md. Ao delegar:
+Casa unica: **CLAUDE.md global, secao "Model Routing (ENFORCEMENT) — era Fable 5"** (tabela de 4 tiers haiku/sonnet/opus/fable + cadeia de fallback `model-fallback.sh`). Esta rule NAO duplica a tabela.
 
-| Complexidade | Modelo | Agentes Tipicos |
-|-------------|--------|-----------------|
-| Scans rapidos, lookups | haiku | ag-explorar-codigo explore, ag-saude-sessao health |
-| Implementacao, debug, review | sonnet | ag-implementar-codigo build, ag-testar-codigo test, ag-revisar-codigo review |
-| Arquitetura, specs, analise profunda | opus | ag-0-orquestrador orq, ag-analisar-contexto analisar, ag-especificar-solucao spec, ag-planejar-execucao plan, ag-depurar-erro debug |
-
-## Default Model
-Para sessoes gerais, usar Sonnet como default (80% cost savings vs Opus).
-Mudar para Opus apenas para: arquitetura, specs complexas, analise profunda.
-Env var: `CLAUDE_CODE_MODEL=claude-sonnet-4-6`
+Resumo operacional: sessao principal = fable (nao fazer downgrade da main); subagents default `model: "sonnet"` explicito; subir tier exige 1 linha de justificativa.
 
 ## Budget Safety
-Para sessoes autonomas (ralph, headless, batch):
+
+Para sessoes autonomas (headless, batch, cron):
 ```bash
 claude -p "..." --max-budget-usd 10.00
 ```
 
 ## Reducao de Tokens
-- /clear entre tarefas nao-relacionadas
-- /compact proativo a 60% do context
-- Subagents para exploracao (context separado)
-- CLAUDE.md conciso (cada linha = tokens em toda sessao)
+
+Casa unica dos inegociaveis de I/O: CLAUDE.md global (secao Economia de Tokens) + `context-management.md` (/clear, /compact, sinais de context pressure). Itens exclusivos desta rule:
+
+- CLAUDE.md conciso (cada linha custa em TODA sessao — pointer > inline)
 - @reference em vez de inline para docs grandes
+- Subagents para exploracao (context separado de 200K)

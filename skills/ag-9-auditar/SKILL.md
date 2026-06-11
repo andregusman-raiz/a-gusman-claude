@@ -68,7 +68,7 @@ Convergencia: FS >= 80 = passa. FS < 60 = bloqueio P0.
 Agent({
   subagent_type: "ag-fortress",
   prompt: "[input completo do usuario]",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   run_in_background: true
 })
 
@@ -76,7 +76,7 @@ Agent({
 Agent({
   subagent_type: "ag-fortress",
   prompt: "[input do usuario] --include-harness",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   run_in_background: true
 })
 
