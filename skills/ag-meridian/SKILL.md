@@ -2,6 +2,8 @@
 name: ag-meridian
 description: "Maquina autonoma de qualidade. Descobre app, testa 5 dimensoes (ALIVE/REAL/WORKS/LOOKS/FEELS), corrige, re-testa ate convergencia. Quality Certificate + Fix PR + baselines."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 context: fork
 argument-hint: "[URL ou path do projeto] [--threshold N] [--audit-only] [--resume] [--scope rotas]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage

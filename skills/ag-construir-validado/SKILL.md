@@ -2,6 +2,8 @@
 name: ag-construir-validado
 description: "Spawna builder (ag-implementar-codigo) + validator (ag-revisar-codigo) em paralelo. Builder implementa, validator verifica em tempo real. Pattern de Boris Cherny."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 context: fork
 allowed-tools: Agent, Read, Glob, Grep, Bash
 argument-hint: "[projeto-path] [scope]"

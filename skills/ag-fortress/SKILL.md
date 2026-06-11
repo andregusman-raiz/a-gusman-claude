@@ -2,6 +2,8 @@
 name: ag-fortress
 description: "Orquestrador supremo. Roda MERIDIAN+SENTINEL+ARCHITECT+CONDUCTOR+LIGHTHOUSE em sequencia. Modo --include-harness adiciona dimensao HARNESS (HCS) auditando o proprio Claude Code. Fortress Score (FS) = laudo completo."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 context: fork
 argument-hint: "[URL ou path] [--skip machine] [--threshold N] [--include-harness | --harness-only]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage, Skill

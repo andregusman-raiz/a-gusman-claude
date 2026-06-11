@@ -2,6 +2,8 @@
 name: ag-preparar-ambiente
 description: "Gera e mantém infraestrutura de desenvolvimento e CI/CD: Dockerfile, docker-compose, pipeline, env vars. Dev novo roda em 10 min."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 argument-hint: "[projeto-path]"
 ---
 

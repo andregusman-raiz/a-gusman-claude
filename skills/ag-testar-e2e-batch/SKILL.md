@@ -2,6 +2,8 @@
 name: ag-testar-e2e-batch
 description: "Suite E2E completa com pre-flight de infra, batches de 10-20 testes, auto-fix de falhas (seletores/mocks/timing), retry ate 3 ciclos, progresso em /tmp/e2e-progress.md."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 argument-hint: "[projeto-path ou opcoes: --batch-size=N --max-retries=N --base-url=URL]"
 ---
 

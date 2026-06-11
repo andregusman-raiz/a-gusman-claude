@@ -2,6 +2,8 @@
 name: ag-sentinel
 description: "Maquina autonoma de seguranca, load testing e LGPD. 6 dimensoes, modo hybrid, convergencia SSS >= 80. Security Certificate + Load Report + Fix PR."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 context: fork
 argument-hint: "[URL ou path] [--threshold N] [--audit-only] [--resume] [--mode defensive|hybrid|offensive]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage
