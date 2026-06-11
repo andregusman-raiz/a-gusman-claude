@@ -7,7 +7,7 @@ argument-hint: "[modo] [path ou descricao] [--brand=raiz|inspira] [--skip-review
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage
 metadata:
   filePattern: "README.md,CHANGELOG.md,docs/**,*.xlsx,*.xlsm,*.csv,*.pdf,*.pptx,*.docx,*.md,openapi.*,swagger.*,**/specs/**,**/schema*"
-  bashPattern: "documentos|readme|changelog|xlsx|excel|pdf|pptx|docx|diagram|spec|api.doc|csv|data.dict|executive|executivo|board|diretoria|mckinsey|soap|motivacional|inspiracional|institucional|manifesto|cultura|town.?hall|all.?hands|kickoff|keynote|palestra"
+  bashPattern: "documentos|readme|changelog|xlsx|excel|pdf|pptx|docx|diagram|spec|api.doc|csv|data.dict|executive|executivo|board|diretoria|mckinsey|soap|motivacional|inspiracional|institucional|manifesto|cultura|town.?hall|all.?hands|kickoff|keynote|palestra|premium|infografico|infographic"
   priority: 85
 ---
 
@@ -123,8 +123,10 @@ Detalhes: `lib/pipeline.py::ExecutiveDeckPipeline`,
 | xlsx | skill: xlsx | Excel: formulas, formatacao, modelos financeiros, analise de dados, recalc via LibreOffice |
 | pdf | skill: pdf | PDF: criar, merge, split, extrair texto/tabelas, OCR, formularios, watermark, criptografia |
 | pptx | skill: pptx | PowerPoint standard: criar do zero (html2pptx), editar existente (OOXML), design padrao |
+| **pptx --premium** | **engine ppt-master** | **Deck PREMIUM visual: SVG autoral por pagina → PPTX DrawingML nativo editavel. Brand `raiz` pre-registrado. Para keynote/institucional rico onde design e o produto. Operacao: `Read ~/Claude/.claude/shared/patterns/ag5-engines-externos.md`** |
 | **executive** | **pipeline 7-fase** | **PPTX board-ready nivel McKinsey — DATA-DENSE: action titles, exhibits, charts, source lines. Tokens rAIz default. Entrega SEMPRE como v2 apos review.** |
 | **soap** | **template HTML** | **Apresentacao NARRATIVA de alto impacto — MINIMALISTA: 1 ideia por slide, tipografia gigante, marca. Para conteudo motivacional/institucional/cultural/manifesto. Entrega .html navegavel.** |
+| exhibit infographic | engine AntV Infographic | Exhibit conceitual (funil, timeline, processo, comparacao — ~200 templates) via DSL → SVG headless: `bun ~/Claude/scripts/infographic-render.mjs`. Usavel em QUALQUER modo. Detalhes no mesmo pattern acima |
 | docx | skill: docx | Word: criar (docx-js), editar (OOXML), tracked changes/redlining, comments |
 
 ### Projeto & Docs (4)
