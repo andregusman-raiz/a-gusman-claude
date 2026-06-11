@@ -9,6 +9,10 @@ metadata:
   filePattern: "construir-state.json"
   bashPattern: "construir"
   priority: 98
+  cache_policy:
+    enabled: true
+    marker_after: "## Output"
+    estimated_tokens: 4200
 ---
 
 # CONSTRUIR — Maquina Autonoma de Construcao
@@ -384,6 +388,8 @@ CONSTRUIR COMPLETO
   Testes: [N pass]
 ```
 
+<!-- cache_control: ephemeral -->
+
 ## Quando usar
 
 - "adicionar feature X" → /construir
@@ -394,3 +400,9 @@ CONSTRUIR COMPLETO
 - "integrar sistema W" → /construir integrar W
 - "logica de calculo financeiro / scoring / compliance" → /construir feature X --tdd
 - "refatorar calculo critico com risco de regressao" → /construir refatorar Y --tdd
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

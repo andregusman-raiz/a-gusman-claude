@@ -1,7 +1,10 @@
 ---
 description: "Convencoes de commit e versionamento"
 paths:
-  - "**/*"
+  - ".git/**"
+  - ".github/**"
+  - "docs/adr/**"
+  - "docs/plans/**"
 ---
 
 # Convencoes de Commit

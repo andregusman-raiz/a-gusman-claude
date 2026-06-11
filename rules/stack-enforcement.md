@@ -1,3 +1,10 @@
+---
+description: "Vercel + Supabase first — whitelist de stack"
+paths:
+  - "**/package.json"
+  - "**/pyproject.toml"
+---
+
 # Stack Enforcement — Vercel + Supabase First
 
 ## Regra

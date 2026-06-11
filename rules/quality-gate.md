@@ -1,7 +1,12 @@
 ---
 description: "Self-check antes de declarar qualquer trabalho como completo"
 paths:
-  - "**/*"
+  - "docs/specs/**"
+  - "docs/plans/**"
+  - "tests/**"
+  - "src/**"
+  - "app/**"
+  - "lib/**"
 ---
 
 # Protocolo Quality Gate

@@ -1,7 +1,9 @@
 ---
 description: "Guia de roteamento de deploy — qual caminho usar quando"
 paths:
-  - "**/*"
+  - "**/vercel.json"
+  - "**/railway.toml"
+  - "**/Dockerfile"
 ---
 
 # Deploy Routing

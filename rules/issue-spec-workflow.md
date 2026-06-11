@@ -1,3 +1,9 @@
+---
+description: "Issue -> SPEC -> Verify pipeline obrigatorio"
+paths:
+  - "docs/specs/**"
+---
+
 # Issue → SPEC → Verify Workflow (Obrigatorio)
 
 ## Regra Principal

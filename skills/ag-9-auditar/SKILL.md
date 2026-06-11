@@ -90,3 +90,9 @@ Skill({
 ## Rule referenciada
 
 - `harness-coverage.md` — R9 exige HCS >= 80 em PR que toca `.claude/`
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

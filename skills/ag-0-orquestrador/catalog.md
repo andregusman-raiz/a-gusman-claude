@@ -4,7 +4,7 @@
 
 | Machine | Comando | Modos | Agents internos |
 |---------|---------|-------|-----------------|
-| **ag-0-orquestrador** | `/ag-0-orquestrador` | (default) classifier, `--7fase` multi-fase, `--resume` retomar goal | self |
+| **ag-0-orquestrador** | `/ag-0-orquestrador` | (default) classifier, `--full` multi-fase, `--resume` retomar goal | self |
 | **ag-1-construir** | `/construir` | feature, issue, refactor, otimizar, ui, integrar, --validado, --tdd | ag-especificar-solucao, P-07, B-08, B-10, B-11, B-52, Q-12, Q-13, Q-14, D-18, I-32→35, M-51 |
 | **ag-2-corrigir** | `/corrigir` | bug, tipos, batch, debt, triage | ag-depurar-erro, B-23, B-53 |
 | **ag-3-entregar** | `/entregar` | preview, producao, rollback | ag-versionar-codigo, D-27, D-38, D-19, D-20 |

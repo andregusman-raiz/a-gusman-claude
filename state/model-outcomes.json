@@ -73,6 +73,36 @@
         "success": 0,
         "fail": 0
       }
+    },
+    "ag-12-sql-totvs-zeev:kpis-ouro": {
+      "sonnet": {
+        "success": 1,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-1-construir:data-engine": {
+      "sonnet": {
+        "success": 1,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-0-orquestrador:data-engine": {
+      "sonnet": {
+        "success": 1,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
     }
   },
   "_note": "Atualizar via: python3 ~/.claude/scripts/update-model-outcomes.py <categoria> <modelo> <success|fail>"

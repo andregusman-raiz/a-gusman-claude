@@ -1,7 +1,9 @@
 ---
 description: "Estrategia de merge — squash vs merge commit vs rebase"
 paths:
-  - "**/*"
+  - ".git/**"
+  - ".github/**"
+  - "docs/adr/**"
 ---
 
 # Merge Strategy

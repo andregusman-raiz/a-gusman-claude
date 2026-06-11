@@ -1,6 +1,6 @@
 ---
 name: ag-retrospectiva
-description: "Retrospectiva de sessao. Analisa tempo, falhas, decisoes. Compara com sessoes anteriores. Propoe melhorias para skills e memory. Modos: --instincts (revisa _instinct-candidates.md auto-extraidos), --review-stale (revisa memories obsoletos)."
+description: "Retrospectiva de sessao: tempo, falhas, decisoes, melhorias para skills/memory. Modos: --instincts (candidatos auto-extraidos), --review-stale (memories obsoletos)."
 model: sonnet
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write, Edit

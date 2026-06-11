@@ -1,3 +1,10 @@
+---
+description: "Data source router + guards TOTVS/Neon/PBI"
+paths:
+  - "**/*.sql"
+  - "**/migrations/**"
+---
+
 # SQL Multi-Database Governance
 
 ## Data Source Router (canônico — consultar ANTES de qualquer query)

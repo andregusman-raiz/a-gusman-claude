@@ -1,6 +1,6 @@
 ---
 name: xlsx
-description: "Criar, editar e analisar planilhas Excel (.xlsx, .xlsm, .csv, .tsv). Trigger quando usuario quer: abrir/ler/editar/corrigir arquivo Excel existente, criar planilha nova, converter entre formatos tabulares, limpar dados, ou gerar relatorios em Excel. Deliverable DEVE ser arquivo .xlsx."
+description: "Criar, editar e analisar Excel/CSV/TSV. Use para abrir/corrigir planilhas, converter formatos, limpar dados e gerar relatorios .xlsx."
 model: sonnet
 argument-hint: "[create|edit|analyze] [path ou descricao]"
 metadata:
@@ -336,3 +336,9 @@ for row in sheet.iter_rows(min_row=2, max_row=len(data)+1, max_col=len(headers))
 - SEMPRE recalcular com recalc.py apos adicionar formulas
 - Codigo Python conciso, sem prints desnecessarios
 - Comentarios em celulas com formulas complexas
+
+## Regra PDF -> Markdown (obrigatoria -- economia de tokens)
+
+Qualquer PDF consumido por esta skill/machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` -> Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

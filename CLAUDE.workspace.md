@@ -118,19 +118,13 @@ Detalhes: `.claude/rules/prompt-protocol.md`. Arvore de decisao expandida: `/ag-
 4. **Max 6 teammates simultaneos** (memory safety 36GB; monitorar `memory_pressure` em warn).
 5. **TeamDelete imediato** ao final — Teams vivos = memory leak + tmux orfao.
 6. **Plano multi-PR nunca em ag-1 direto.** Sempre via `/ag-0-orquestrador` ou `/ag-team-safe`.
-7. **Antes de spawnar team/agents paralelos:** rodar `bash ~/.claude/scripts/claude-locks-status.sh` + `bash ~/.claude/scripts/repo-health.sh <repo>`.
+7. **Checks automaticos de lock/repo-health desativados.** Nao rodar `claude-locks-status.sh` nem `repo-health.sh` como preflight automatico; usar worktree isolado ou execucao sequencial.
 
 ### Comandos utilitarios de diagnostico
 
 ```bash
-# Ver locks ativos (quem esta escrevendo no que)
-bash ~/.claude/scripts/claude-locks-status.sh
-
-# Limpar locks de PIDs mortos
-bash ~/.claude/scripts/claude-locks-status.sh --cleanup
-
-# Saude de um repo (stash, dirty, branches orfas, PIDs concorrentes)
-bash ~/.claude/scripts/repo-health.sh ~/Claude/GitHub/raiz-platform
+# Checks de lock/repo-health foram desativados por causarem loop em sessoes concorrentes.
+# Nao execute claude-locks-status.sh ou repo-health.sh automaticamente.
 
 # Limpar worktrees orfaos (roda automaticamente em Stop hook)
 bash ~/.claude/scripts/worktree-prune.sh
@@ -465,7 +459,7 @@ aviso. Regras:
 
 ### Multi-Agent: Isolamento Obrigatorio
 Ao rodar agents paralelos ou background tasks:
-1. **Health check primeiro**: `bash ~/.claude/scripts/repo-health.sh <repo-path>` — se stash >3 ou working tree dirty, PARAR e fazer triagem antes
+1. **Sem health check automatico**: nao rodar `repo-health.sh` como preflight; se houver risco de concorrencia, usar worktree isolado ou executar sequencialmente.
 2. **Cada agent DEVE trabalhar em diretorio/worktree separado** — NUNCA multiplos agents no mesmo working directory
 3. Usar `isolation: "worktree"` para agents que modificam codigo
 4. Se worktree nao for possivel, executar sequencialmente em vez de arriscar conflitos

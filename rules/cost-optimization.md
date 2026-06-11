@@ -1,7 +1,9 @@
 ---
 description: "Otimizacao de custo de tokens e model routing"
 paths:
-  - "**/*"
+  - ".claude/**"
+  - "docs/ai-state/**"
+  - "docs/plans/**"
 ---
 
 # Cost Optimization

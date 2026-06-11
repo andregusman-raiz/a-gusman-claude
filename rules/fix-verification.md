@@ -1,3 +1,13 @@
+---
+description: "Fix so e completo com verificacao interativa Playwright"
+paths:
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.jsx"
+  - "**/*.py"
+---
+
 # Fix Verification Protocol
 
 ## Regra Principal

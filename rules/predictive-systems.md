@@ -1,3 +1,13 @@
+---
+description: "Guard rails para sistemas preditivos/ML"
+paths:
+  - "**/*.ipynb"
+  - "**/models/**"
+  - "**/model/**"
+  - "**/train*.py"
+  - "**/*.pkl"
+---
+
 # Predictive Systems — Guard Rails
 
 > Quando projeto treina modelo, faz predicao, classifica, ou forecasting: invocar `/ag-referencia-anti-ciclo-preditivo`.

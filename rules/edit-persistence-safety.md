@@ -1,7 +1,10 @@
 ---
 description: "Prevenir perda de edicoes por context compaction ou interrupcao"
 paths:
-  - "**/*"
+  - ".claude/**"
+  - "docs/ai-state/**"
+  - "docs/plans/**"
+  - "docs/specs/**"
 ---
 
 # Edit Persistence Safety

@@ -1,7 +1,13 @@
 ---
 description: "Corrigir CAUSA RAIZ, nunca sintoma — protocolo de debugging"
 paths:
-  - "**/*"
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.jsx"
+  - "**/*.py"
+  - "tests/**"
+  - "logs/**"
 ---
 
 # Root Cause Debugging Protocol

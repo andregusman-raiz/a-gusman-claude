@@ -1,48 +1,62 @@
 #!/bin/bash
-# bash-guards.sh — PreToolUse(Bash): Block dangerous CLI patterns
-# BLOCKING (exit 2)
+# bash-guards.sh — PreToolUse(Bash): bloqueia padroes CLI perigosos + protecao de branch.
+# BLOCKING (exit 2). Le payload JSON do stdin (tool_input.command).
+# Consolidado 2026-06-11: absorve branch-guard.sh (protecao main/master/develop).
+# Bypass: BASH_GUARDS_DISABLED=1
+# Compat macOS: usa grep -E (BSD nao tem -P).
 
-INPUT="${CLAUDE_TOOL_INPUT:-}"
-[[ "$INPUT" == *"vercel --prod"* ]] && echo "BLOCKED: Use CI/CD pipeline instead of direct vercel --prod" && exit 2
-[[ "$INPUT" == *"--force"* ]] && [[ "$INPUT" == *"git push"* ]] && echo "BLOCKED: Force push is dangerous." && exit 2
-[[ "$INPUT" == *"--no-verify"* ]] && echo "BLOCKED: --no-verify bypasses safety hooks." && exit 2
+set -uo pipefail
+[ "${BASH_GUARDS_DISABLED:-0}" = "1" ] && exit 0
 
-# Auto-fix imports before commit (prevent lint-staged failures)
-if [[ "$INPUT" == *"git commit"* ]]; then
-  bash ~/Claude/.claude/scripts/pre-commit-autofix.sh 2>/dev/null
+INPUT="$(cat)"
+CMD="$(printf '%s' "$INPUT" | python3 -c 'import json,sys
+try:
+    d=json.load(sys.stdin); print(d.get("tool_input",{}).get("command",""))
+except Exception:
+    print("")' 2>/dev/null)"
+[ -z "$CMD" ] && exit 0
+
+block() { echo "BLOCKED: $1" >&2; exit 2; }
+
+# --- Operacoes destrutivas / bypass de pipeline ---
+case "$CMD" in
+  *"vercel --prod"*) block "Use CI/CD pipeline em vez de vercel --prod direto (rule deploy-routing)." ;;
+esac
+[[ "$CMD" == *"git push"* && ( "$CMD" == *"--force"* || "$CMD" == *" -f "* ) ]] && block "Force push e perigoso. Use --force-with-lease apenas com aprovacao explicita."
+[[ "$CMD" == *"--no-verify"* ]] && block "--no-verify pula hooks de seguranca."
+[[ "$CMD" == *"git rebase -i"* ]] && block "git rebase -i e interativo (nao suportado) e destrutivo. Use merge."
+[[ "$CMD" == *"git checkout -- ."* || "$CMD" == *'git checkout -- *'* ]] && block "git checkout -- . descarta TODAS as mudancas unstaged. Commit primeiro."
+[[ "$CMD" == *"git restore ."* ]] && block "git restore . descarta mudancas. Commit ou branch primeiro."
+[[ "$CMD" == *"git clean -f"* ]] && block "git clean -f apaga permanentemente arquivos untracked."
+
+# --- Protecao de branch (ex-branch-guard.sh) ---
+if [[ "$CMD" == *"git commit"* ]]; then
+  BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+  case "$BRANCH" in
+    main|master|develop)
+      # Excecao unica: commit inicial em repo sem historico (baseline)
+      if git rev-parse HEAD >/dev/null 2>&1; then
+        block "Commit em '$BRANCH' proibido. Crie feature branch: git checkout -b feat/nome"
+      fi ;;
+  esac
+fi
+# Push explicito para ref protegida (nao casa branches tipo feat/main-page)
+if printf '%s' "$CMD" | grep -qE 'git push.*(origin|upstream)[[:space:]]+(main|master|develop)([[:space:]]|$|:)'; then
+  block "Push direto em branch protegida. Use PR: gh pr create"
 fi
 
-# Block destructive git operations (not delegated to branch-guard.sh)
-if [[ "$INPUT" == *"git rebase -i"* ]]; then
-  echo "BLOCKED: git rebase -i is interactive and destructive. Use merge instead." && exit 2
+# --- SQL Safety (TOTVS RM multi-tenant) ---
+if printf '%s' "$CMD" | grep -qiE 'SELECT[[:space:]]+\*[[:space:]]+FROM[[:space:]]+(PFUNC|SMATRICULA|SMATRICPL|SHABILITACAOALUNO|PPESSOA|SPARCELA|FLAN)([^A-Z0-9_]|$)'; then
+  block "SELECT * em tabela TOTVS grande (PFUNC tem 680 cols). Especifique colunas; consulte schema.json."
 fi
-if [[ "$INPUT" == *"git checkout -- ."* ]] || [[ "$INPUT" == *"git checkout -- \*"* ]]; then
-  echo "BLOCKED: git checkout -- . discards all unstaged changes. Commit first." && exit 2
-fi
-if [[ "$INPUT" == *"git restore ."* ]]; then
-  echo "BLOCKED: git restore . discards changes. Commit or branch first." && exit 2
-fi
-if [[ "$INPUT" == *"git clean -f"* ]]; then
-  echo "BLOCKED: git clean -f permanently deletes untracked files." && exit 2
+if printf '%s' "$CMD" | grep -qiE 'FROM[[:space:]]+(PFUNC|SMATRICULA|SMATRICPL|SPARCELA|FLAN|SHABILITACAOALUNO|PFHSTAFT)([^A-Z0-9_]|$)' && \
+   ! printf '%s' "$CMD" | grep -qi 'CODCOLIGADA'; then
+  block "Query em tabela TOTVS multi-tenant sem filtro CODCOLIGADA. Adicione WHERE CODCOLIGADA = N."
 fi
 
-# SQL Safety Guards — Block dangerous query patterns against TOTVS RM
-# SELECT * on large TOTVS tables (PFUNC=680 cols, SMATRICPL=1M+ rows, SPARCELA=5M+)
-if echo "$INPUT" | grep -qiP 'SELECT\s+\*\s+FROM\s+(PFUNC|SMATRICULA|SMATRICPL|SHABILITACAOALUNO|PPESSOA|SPARCELA|FLAN)\b'; then
-  echo "BLOCKED: SELECT * on large TOTVS table. Specify column names (PFUNC has 680 cols). Consult schema.json." && exit 2
-fi
-# Multi-tenant queries without CODCOLIGADA filter
-if echo "$INPUT" | grep -qiP 'FROM\s+(PFUNC|SMATRICULA|SMATRICPL|SPARCELA|FLAN|SHABILITACAOALUNO|PFHSTAFT)\b' && \
-   ! echo "$INPUT" | grep -qi 'CODCOLIGADA'; then
-  echo "BLOCKED: Query on multi-tenant TOTVS table without CODCOLIGADA filter. Add WHERE CODCOLIGADA = N." && exit 2
-fi
-
-# Warn on git stash (non-blocking) — prefer WIP commits
-if [[ "$INPUT" == *"git stash"* ]] && \
-   [[ "$INPUT" != *"git stash list"* ]] && \
-   [[ "$INPUT" != *"git stash show"* ]] && \
-   [[ "$INPUT" != *"git stash pop"* ]]; then
-  echo "WARNING: git stash can lose work. Prefer WIP commits. Proceeding..." >&2
+# --- Warning nao-bloqueante ---
+if [[ "$CMD" == *"git stash"* && "$CMD" != *"git stash list"* && "$CMD" != *"git stash show"* && "$CMD" != *"git stash pop"* ]]; then
+  echo "WARNING: git stash pode perder trabalho. Prefira WIP commit." >&2
 fi
 
 exit 0

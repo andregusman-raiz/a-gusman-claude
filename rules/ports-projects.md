@@ -1,3 +1,10 @@
+---
+description: "Mapa porta->projeto (tabela inline no CLAUDE.md)"
+paths:
+  - "**/e2e/**"
+  - "**/playwright.config.*"
+---
+
 # Ports — Projeto por Porta
 
 | Porta | Projeto | Path | Dev |

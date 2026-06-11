@@ -31,7 +31,6 @@
       "Bash(tree:*)",
       "Bash(du:*)",
       "Bash(echo:*)",
-      "Bash(curl:*)",
       "Bash(chmod:*)",
       "Bash(pytest:*)",
       "Bash(docker:*)",
@@ -150,7 +149,6 @@
       "WebFetch(domain:normaseducacionaisrj.blogspot.com)",
       "WebFetch(domain:bwcontabilidade.com.br)",
       "WebFetch(domain:api.protesto24h.com.br)",
-      "Bash(osascript:*)",
       "Bash(screencapture -x /tmp/chrome-menu.png)",
       "Bash(screencapture -x /tmp/disp1.png /tmp/disp2.png)",
       "Bash(screencapture -x /tmp/chrome-front.png)",
@@ -166,16 +164,16 @@
       "Bash(PGPASSWORD=${PGPASSWORD} psql:*)",
       "Read(//Users/andregusmandeoliveira/Claude/GitHub/fgts-platform/certs/retorno-nis/**)",
       "mcp__plugin_playwright_playwright__browser_tabs",
-      "Bash(~/.claude/scripts/repo-lock.sh acquire:*)",
-      "Bash(~/.claude/scripts/repo-lock.sh validate:*)",
-      "Bash(~/.claude/scripts/repo-lock.sh release:*)",
       "Bash(mkdir -p ~/.claude/mcp-servers)",
       "Bash(mv ~/Claude/mcp-computer-use ~/.claude/mcp-servers/computer-use)",
       "Read(//Users/andregusmandeoliveira/.claude/mcp-servers/**)",
       "Bash(mkdir -p ~/Claude/.claude/skills/pptx/templates)",
       "Read(//System/Library/Fonts/**)",
       "Bash(mkdir -p ~/Claude/docs/diagnosticos/2026-04-22-agx-diagnostic)",
-      "Bash(mkdir -p ~/Claude/.claude/shared/adr)"
+      "Bash(mkdir -p ~/Claude/.claude/shared/adr)",
+      "Bash(rm -rf ~/Claude/projetos/uerj-resultado-por-aluno)",
+      "Bash(rm -f /Users/andregusmandeoliveira/.claude/projects/-Users-andregusmandeoliveira-Claude/memory/project_uerj_resultado_por_aluno.md)",
+      "Bash(rm -f /tmp/uerj_class2025.pdf /tmp/uerj_class2025.txt /tmp/uerj_class2026.pdf /tmp/uerj_eq2026_AB.pdf /tmp/uerj_aprovados_2025.csv /tmp/smoke_aprov.csv /tmp/smoke_match.csv /tmp/a.csv /tmp/a24.csv)"
     ],
     "deny": [
       "Read(.env)",
@@ -198,6 +196,9 @@
       "Bash(more .env*)"
     ]
   },
+  "disabledMcpjsonServers": [
+    "sentry"
+  ],
   "hooks": {
     "Notification": [
       {
@@ -237,11 +238,6 @@
             "type": "command",
             "command": "python3 ~/Claude/.claude/hooks/completion-gate.py",
             "statusMessage": "Completion gate (typecheck/lint/test)..."
-          },
-          {
-            "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/stop-consolidate.sh 2>/dev/null || true",
-            "statusMessage": "Auto-consolidating session learnings..."
           }
         ]
       }
@@ -253,28 +249,6 @@
           {
             "type": "command",
             "command": "bash -c 'echo \"PRESERVE: modified files, current task, test commands, errors found\" >&2'"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/secret-scan.sh 2>/dev/null || true",
-            "statusMessage": "Secret scan..."
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/parallel-agent-guard-cleanup.sh 2>/dev/null || true",
-            "statusMessage": "Release parallel agent lock..."
           }
         ]
       }
@@ -295,28 +269,28 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/bash-guards.sh",
-            "statusMessage": "Bash safety guards..."
-          },
-          {
-            "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/branch-guard.sh",
-            "statusMessage": "Branch protection guard..."
-          },
-          {
-            "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/parallel-agent-guard.sh",
-            "statusMessage": "Parallel agent lock check..."
+            "command": "bash ~/Claude/.claude/hooks/pre-bash-dispatch.sh",
+            "statusMessage": "Bash guards (destrutivos/branch/SQL/stack)..."
           }
         ]
       },
       {
-        "matcher": "Write",
+        "matcher": "Write|Edit|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/config-guard.sh",
-            "statusMessage": "Config protection guard..."
+            "command": "bash ~/Claude/.claude/hooks/pre-write-dispatch.sh",
+            "statusMessage": "Write guards (config/GHA)..."
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/pdf-read-guard.sh",
+            "statusMessage": "PDF markitdown guard..."
           }
         ]
       }

@@ -1,3 +1,10 @@
+---
+description: "Worktree isolation + limites de paralelismo (resumo inline no CLAUDE.md)"
+paths:
+  - ".claude/worktrees/**"
+  - ".claude/skills/ag-team-safe/**"
+---
+
 # Agent Parallel Safety — Unified Rules (ADR-0001)
 
 > **Unifica:** `agent-boundaries.md` + `multi-agent-isolation.md` em uma única rule canonical.

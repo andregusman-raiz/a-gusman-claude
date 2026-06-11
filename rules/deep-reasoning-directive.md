@@ -1,3 +1,9 @@
+---
+description: "Protocolo 5 passos para skills opus / diagnostico profundo"
+paths:
+  - ".claude/skills/**"
+---
+
 # Deep Reasoning Directive
 
 > Equivalente ao `reasoning_effort=xhigh` do Codex. Carregada por skills `model: opus`

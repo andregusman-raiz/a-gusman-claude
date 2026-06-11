@@ -1,6 +1,6 @@
 ---
 name: ag-12-sql-totvs-zeev
-description: "Maquina especialista em dados Raiz: data-engine API canonical (/v1/kpis/*, /reports/<panel>/data, Envelope v2, KPI Registry Ouro M01..A*) + SQL TOTVS RM + Neon PostgreSQL + Zeev BPM + PBI_RAIZ. Use para: descobrir KPI Ouro, consumir painel canonical, escrever query nova (cascade painel>KPI>dinamica>raw), otimizar SQL lenta, anti-patterns, relatorios, processos Zeev. Tier 0: data-engine. Aplica ADR-041 (TOTVS via Neon Mirror enforced)."
+description: "Dados Raiz: Knowledge Gateway/data-engine API, SQL TOTVS RM, Neon, Zeev BPM e PBI_RAIZ. Use para KPIs Ouro, paineis, queries e processos."
 metadata:
   filePattern:
     - "**/*.sql"
@@ -19,6 +19,7 @@ metadata:
     - "\\bzeev\\b"
     - "\\bkpi_ouro_id\\b"
     - "/v1/kpis"
+    - "/v1/knowledge"
     - "/reports/.*/data"
     - "value_raw|value_formatted"
   priority: 5
@@ -29,6 +30,46 @@ metadata:
 ---
 
 # Data Engine + SQL Optimization — TOTVS RM, Zeev BPM, PostgreSQL, PBI_RAIZ
+
+## 🛰️ TIER −1 — Knowledge Gateway (CONSULTAR PRIMEIRO, fonte canônica)
+
+> **Antes de responder qualquer coisa sobre o Data Engine, consulte o Knowledge Gateway.**
+> Ele é a fonte de verdade — compilado de OpenAPI, manifests, registries, contracts,
+> providers, dbt e Alembic. A documentação manual desta skill (KB inline, KBs em
+> `~/Claude/assets/`) é apoio/cache, **nunca** source of truth quando o Gateway responde.
+
+Base prod: `https://raiz-data-engine-production.up.railway.app`
+
+### Sequência obrigatória de consulta
+
+```
+1. GET /v1/knowledge/llm-context                                  ← contexto compilado p/ LLM (SEMPRE 1º)
+2. GET /v1/knowledge/index                                        ← índice de recursos disponíveis
+3. GET /v1/knowledge/resources/{resource_type}/{resource_id}      ← detalhe de recurso específico
+```
+
+### Ordem preferida ao buscar dado/resposta
+
+```
+1. GET  /v1/knowledge/llm-context        ← carregar contexto canônico primeiro
+2. GET  /v1/knowledge/index              ← descobrir recursos
+3. GET  /v1/agent/contract               ← contrato do agente (capacidades + limites)
+4. GET  /v1/kpis/search ou /v1/kpis/catalog   ← resolver KPI
+5. GET  /v1/agg/canonical/{panel_id}/{metric_id}   ← valor agregado canônico
+```
+
+### Regras
+
+- **Raw SQL NÃO é primeira opção.** Só fallback, com `source="neon"`, quando as rotas
+  canônicas (1–5 acima) não resolverem.
+- Não tratar a doc manual desta skill como verdade — ela pode estar defasada vs Gateway.
+  Em divergência, **o Gateway vence**.
+- Citar a proveniência na resposta: qual recurso do Gateway respondeu (`resource_type/resource_id`,
+  `kpi_id`, `panel_id/metric_id`) + `known_gaps` se houver.
+- Falha/timeout do Gateway → cair para TIER 0 (endpoints `/v1/kpis/*`, `/reports/<panel>/data`)
+  e, só então, para SQL governado/raw. Declarar explicitamente o fallback no output.
+
+---
 
 ## 🎯 TIER 0 — Data Engine API (PREFERIR sobre SQL direto)
 
@@ -88,6 +129,11 @@ Ordem de preferência ao buscar dado:
 
 | Endpoint | Para que | Auth |
 |---|---|---|
+| `GET /v1/knowledge/llm-context` | **contexto canônico compilado p/ LLM (1º sempre)** | público |
+| `GET /v1/knowledge/index` | índice de recursos do Gateway | público |
+| `GET /v1/knowledge/resources/{type}/{id}` | detalhe de recurso específico | público |
+| `GET /v1/agent/contract` | contrato do agente (capacidades + limites) | público |
+| `GET /v1/agg/canonical/{panel_id}/{metric_id}` | valor agregado canônico | público |
 | `GET /v1/kpis/catalog` | catálogo completo (rich schema, fórmula SQL, known_gaps) | público |
 | `GET /v1/kpis/catalog?domain=<d>&status=canonical` | filtrado | público |
 | `GET /v1/kpis/search?q=...&prefix=M&limit=50` | full-text (key+label+description) | público |
@@ -381,6 +427,7 @@ Se domínio é matrículas/financeiro/educacional E Tier 0 não cobre:
 
 Antes de escrever **qualquer** SQL contra TOTVS/Neon/PBI_RAIZ, executar a cascade:
 
+0. **Knowledge Gateway primeiro** — `GET /v1/knowledge/llm-context` → `GET /v1/knowledge/index` → (se preciso) `GET /v1/knowledge/resources/{resource_type}/{resource_id}`. Fonte canônica; doc manual não vence o Gateway.
 1. **Discovery KPI** — `GET /v1/kpis/search?q=<termo>&domain=<d>` (ou catalog se já souber `kpi_id`)
 2. **Painel pronto?** — listar `/reports/<panel>/data` ativos; se algum bundle responde a pergunta inteira → consumir bundle
 3. **KPI canônico?** — `GET /v1/kpis/{id}/value?filters=...` se for métrica isolada
@@ -434,6 +481,7 @@ Usar `ETag`/`If-None-Match` quando disponível. NUNCA cache >1h em endpoint de v
 Pipeline canônico para responder pergunta de negócio com data-engine:
 
 ```
+0. Knowledge Gateway    → GET /v1/knowledge/llm-context → /v1/knowledge/index (fonte canônica 1ª)
 1. Parse intent         → domain (matriculas|financeiro|...) + métrica + filtros + período
 2. Load context         → GET /<domain>/dictionary (conventions + tables + known_gaps)
 3. KPI resolution       → GET /v1/kpis/search?q=<termo>&domain=<d>
@@ -573,6 +621,11 @@ Endpoints mais valiosos para expor como tools customizadas (MCP / function calli
 
 | Tool | Endpoint | Quando IA chama |
 |---|---|---|
+| `knowledge_context` | `/v1/knowledge/llm-context` | **SEMPRE 1º** — carregar contexto canônico do Gateway |
+| `knowledge_index` | `/v1/knowledge/index` | Descobrir recursos disponíveis |
+| `knowledge_resource` | `/v1/knowledge/resources/{type}/{id}` | Detalhe de um recurso específico |
+| `agent_contract` | `/v1/agent/contract` | Capacidades + limites do agente |
+| `agg_canonical` | `/v1/agg/canonical/{panel_id}/{metric_id}` | Valor agregado canônico |
 | `kpi_search` | `/v1/kpis/search` | Resolver termo PT-BR → `kpi_id` |
 | `kpi_describe` | `/v1/kpis/{id}` + `/consumers` | "O que é M07?" / "onde aparece?" |
 | `domain_context` | `/<domain>/dictionary` | Carregar contexto de domínio antes de gerar SQL |
@@ -616,3 +669,9 @@ Padrão de payload retornado para a IA: sempre incluir `kpi_id` + `source.primar
 - `/ag-painel-novo-canonico` — criar painel novo via scaffold (W4 Q10.H)
 - `/ag-arquiteto-raiz` — par técnico sênior para decisões arquiteturais
 - `/ag-referencia-stack-decisions` — stack canonical Raiz
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

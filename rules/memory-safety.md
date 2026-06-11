@@ -1,7 +1,8 @@
 ---
 description: "Prevencao de memory leaks por processos orfaos"
 paths:
-  - "**/*"
+  - "**/*.ts"
+  - "**/*.tsx"
 ---
 
 # Memory Safety — Prevencao de Leaks

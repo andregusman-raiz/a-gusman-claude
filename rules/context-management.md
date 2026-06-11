@@ -1,7 +1,9 @@
 ---
 description: "Regras de gestao de contexto para eficiencia de sessao"
 paths:
-  - "**/*"
+  - ".claude/**"
+  - "docs/ai-state/**"
+  - "docs/plans/**"
 ---
 
 # Context Management

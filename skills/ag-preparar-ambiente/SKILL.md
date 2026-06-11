@@ -1,6 +1,6 @@
 ---
 name: ag-preparar-ambiente
-description: Gera e mantém infraestrutura de desenvolvimento e CI/CD: Dockerfile, docker-compose, pipeline, env vars. Dev novo roda em 10 min.
+description: "Gera e mantém infraestrutura de desenvolvimento e CI/CD: Dockerfile, docker-compose, pipeline, env vars. Dev novo roda em 10 min."
 model: sonnet
 argument-hint: "[projeto-path]"
 ---
@@ -91,4 +91,3 @@ ANTES de gerar QUALQUER workflow, ler `~/Claude/.claude/rules/gha-minimal.md`.
 - Dev novo roda em 10 minutos com README + scripts?
 
 Se algum falha → PARAR. Corrigir antes de prosseguir.
-

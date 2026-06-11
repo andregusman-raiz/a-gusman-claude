@@ -1,3 +1,9 @@
+---
+description: "Modos --interativo/--autonomo/--draft das machines"
+paths:
+  - ".claude/skills/**"
+---
+
 # Activation Modes — Padrao para Todas as Machines
 
 ## 3 Modos Base

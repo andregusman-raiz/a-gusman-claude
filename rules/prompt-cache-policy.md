@@ -1,7 +1,8 @@
 ---
 description: "Politica de prompt caching para reducao de custo em machines e skills grandes"
 paths:
-  - "**/*"
+  - ".claude/skills/**"
+  - ".claude/rules/**"
 ---
 
 # Prompt Cache Policy

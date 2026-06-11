@@ -1,7 +1,11 @@
 ---
 name: ag-referencia-anti-ciclo-preditivo
-description: "30+ regras anti-ciclo para sistemas preditivos (classificacao, regressao, forecasting, anomaly, scoring, recommendation). Derivadas de diagnostico ultra-hard de 13 ciclos falhos em projeto preditivo real. Reference skill carregada on-demand."
+description: "30+ regras anti-ciclo para sistemas preditivos (classificacao, regressao, forecast, anomaly, scoring, recommendation). Reference skill on-demand."
 context: fork
+cache_policy:
+  enabled: true
+  marker_after: "Apendice B — Enforcement roadmap"
+  estimated_tokens: 7800
 ---
 
 # Anti-Ciclo Preditivo — Regras Universais
@@ -665,6 +669,8 @@ Sintomas comuns em projetos preditivos e quais regras os teriam prevenido:
 - Pipeline stress test framework (M12) — 1 semana
 
 ---
+
+<!-- cache_control: ephemeral -->
 
 ## Apendice C — Aplicacao em projetos Raiz
 

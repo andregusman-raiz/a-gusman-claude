@@ -1,7 +1,10 @@
 ---
 description: "Estrategia de branching — quando e como criar branches"
 paths:
-  - "**/*"
+  - ".git/**"
+  - ".github/**"
+  - "docs/adr/**"
+  - "docs/plans/**"
 ---
 
 # Branch Strategy

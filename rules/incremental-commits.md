@@ -1,7 +1,10 @@
 ---
 description: "Protocolo de commits incrementais para proteger trabalho em andamento"
 paths:
-  - "**/*"
+  - ".git/**"
+  - ".github/**"
+  - "docs/plans/**"
+  - "docs/specs/**"
 ---
 
 # Protocolo de Commits Incrementais

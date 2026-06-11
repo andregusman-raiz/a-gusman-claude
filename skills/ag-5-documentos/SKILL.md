@@ -1,13 +1,13 @@
 ---
 name: ag-5-documentos
-description: "Maquina autonoma de documentacao. Office (PPTX, DOCX, XLSX, PDF), projeto (README, API), diagramas, specs, changelogs, data dictionaries, CSV transform — 16 modos, auto-detecta, produz docs completos. Modo `executive` entrega decks McKinsey-grade com tokens rAIz via pipeline 4-fase obrigatorio."
+description: "Documentacao: Office (PPTX/DOCX/XLSX/PDF), README, API, diagramas, specs, changelog, data dictionary e CSV; executive para decks."
 model: sonnet
 context: fork
 argument-hint: "[modo] [path ou descricao] [--brand=raiz|inspira] [--skip-review] [--draft]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage
 metadata:
   filePattern: "README.md,CHANGELOG.md,docs/**,*.xlsx,*.xlsm,*.csv,*.pdf,*.pptx,*.docx,*.md,openapi.*,swagger.*,**/specs/**,**/schema*"
-  bashPattern: "documentos|readme|changelog|xlsx|excel|pdf|pptx|docx|diagram|spec|api.doc|csv|data.dict|executive|executivo|board|diretoria|mckinsey"
+  bashPattern: "documentos|readme|changelog|xlsx|excel|pdf|pptx|docx|diagram|spec|api.doc|csv|data.dict|executive|executivo|board|diretoria|mckinsey|soap|motivacional|inspiracional|institucional|manifesto|cultura|town.?hall|all.?hands|kickoff|keynote|palestra"
   priority: 85
 ---
 
@@ -114,7 +114,7 @@ consecutiva.
 Detalhes: `lib/pipeline.py::ExecutiveDeckPipeline`,
 `lib/visualization.py` (P0.1), `lib/audit.py` (P0.2/P0.3/P0.5/P1.2/P1.3/P1.4).
 
-## Modos (15)
+## Modos (16)
 
 ### Office Suite (4 skills dedicados + 1 modo executivo)
 
@@ -123,7 +123,8 @@ Detalhes: `lib/pipeline.py::ExecutiveDeckPipeline`,
 | xlsx | skill: xlsx | Excel: formulas, formatacao, modelos financeiros, analise de dados, recalc via LibreOffice |
 | pdf | skill: pdf | PDF: criar, merge, split, extrair texto/tabelas, OCR, formularios, watermark, criptografia |
 | pptx | skill: pptx | PowerPoint standard: criar do zero (html2pptx), editar existente (OOXML), design padrao |
-| **executive** | **pipeline 4-fase** | **PPTX board-ready nivel McKinsey — tokens rAIz default, brand override (inspira), action titles, takeaway bars, auditor visual. Entrega SEMPRE como v2 apos review.** |
+| **executive** | **pipeline 7-fase** | **PPTX board-ready nivel McKinsey — DATA-DENSE: action titles, exhibits, charts, source lines. Tokens rAIz default. Entrega SEMPRE como v2 apos review.** |
+| **soap** | **template HTML** | **Apresentacao NARRATIVA de alto impacto — MINIMALISTA: 1 ideia por slide, tipografia gigante, marca. Para conteudo motivacional/institucional/cultural/manifesto. Entrega .html navegavel.** |
 | docx | skill: docx | Word: criar (docx-js), editar (OOXML), tracked changes/redlining, comments |
 
 ### Projeto & Docs (4)
@@ -394,13 +395,113 @@ for item in pipe.outline:
 - `--skip-review` — promove v1 -> v2 sem auditoria (mantem estrutura do pipeline)
 - `--draft` — rascunho rapido, sem quality gate
 
+## Modo `soap` — apresentacao narrativa de alto impacto (HTML)
+
+> Estilo "SOAP / Apple / Duarte": minimalista, emocional, 1 ideia grande por
+> slide. O apresentador fala; o slide ancora. Oposto do `executive` (data-dense).
+
+### Quando usar (auto-trigger)
+
+Palavras-chave que disparam: `soap`, `motivacional`, `inspiracional`,
+`institucional`, `cultura`, `manifesto`, `valores`, `visao`, `proposito`,
+`comunicado`, `kickoff`, `town hall`, `all-hands`, `palestra`, `keynote`,
+`celebracao`, `storytelling`.
+
+Tambem quando: conteudo e emocional/narrativo (nao data-dense), publico amplo
+(colaboradores, evento), objetivo e engajar/inspirar/alinhar (nao decidir com dados).
+
+### SOAP vs executive — qual escolher
+
+| Sinal | **soap** (HTML) | **executive** (PPTX) |
+|-------|-----------------|----------------------|
+| Objetivo | inspirar, alinhar cultura, narrar | decidir com dados, board |
+| Densidade | 1 ideia por slide, texto minimo | data-dense, action titles, exhibits |
+| Visual | tipografia gigante, cor de marca, respiro | charts, matrizes, KPIs, source lines |
+| Dados | narrativo — KPI NAO obrigatorio | numerico — source line obrigatoria |
+| Formato | `.html` standalone (full-screen, navegavel) | `.pptx` + `.pdf` |
+| Publico | colaboradores, evento, town hall | N1/CEO/investidor/board |
+
+Na duvida entre os dois: se o pedido tem **numeros/decisao/board** → `executive`.
+Se tem **cultura/pessoas/inspiracao/manifesto** → `soap`.
+
+### ⚠️ Regra anti-fabricacao (CRITICA — inegociavel)
+
+> Incidente 2026-05-26: deck "Modo Raiz" foi gerado como pitch institucional
+> generico com KPIs INVENTADOS (73% engajamento, 9K alunos, 94% score, 335K
+> leads, "5 novos mercados"). Conteudo, publico e dados errados. Corrigido
+> reescrevendo com o roteiro real do usuario, zero numeros fabricados.
+
+1. Usar o CONTEUDO FORNECIDO pelo usuario fielmente. Roteiro dado = seguir.
+2. **NUNCA inventar** KPIs, percentuais, metricas, nomes de produto ou marcos.
+   Deck de cultura nao precisa de numero.
+3. Se houver dado, vem do usuario ou de fonte real (data-engine) — jamais chutado.
+4. Faltou conteudo? **Perguntar** — nao preencher com pitch generico.
+
+### Principios SOAP
+
+- 1 mensagem por slide. A headline ocupa o slide.
+- Texto minimo. Sem paragrafos longos; bullets curtos quando preciso.
+- Contraste forte: fundos solidos (dark/navy/orange/teal), tipografia weight 900.
+- Ritmo: alternar slides de IMPACTO (`slide--section`, statement centrado) com
+  slides de CONTEUDO (lista/pills/transformacoes/passos).
+- Marca: tokens rAIz, logo oficial SVG embutido, laranja em pontos-chave (nao decorativo).
+- Maximo ~15 slides salvo pedido explicito.
+
+### Template canonical (NAO gerar do zero)
+
+`lib/templates/soap_deck.html` — copiar e preencher. Ja inclui:
+- Framework CSS: temas `slide--{dark,navy,orange,teal}` + `slide--section`
+- Componentes: `.statements`, `.list-clean`, `.list-no`, `.transforms`, `.steps`,
+  `.pill-grid`, `.quote`, `.highlight-box`, `.grid-2`/`.card`, `.accent-line`, `.kicker`
+- Logo oficial Raiz como `<symbol id="raiz-logo">` (de `assets/logos/raiz-educacao-logo.svg`)
+- Navegacao: teclado (←→, espaco, Home/End) + clique lateral + swipe + progress + counter automatico
+- `@media print` → export PDF com 1 slide por pagina
+
+O template tem cabecalho-comentario com a lista completa de componentes e o
+bloco de verificacao headless. Trocar de marca = trocar `<symbol>` + tokens `--raiz-*`.
+
+### Pipeline SOAP (4 passos)
+
+1. **CONTEUDO** — coletar/estruturar a narrativa do usuario. Nunca inventar (ver regra acima).
+2. **ESTRUTURA** — mapear em <=15 slides, alternando impacto x conteudo; tema por slide.
+3. **RENDER** — `cp lib/templates/soap_deck.html $PROJECT_ROOT/docs/reports/<slug>.html`,
+   substituir os `<div class="slide">` pelo conteudo real (manter `<style>`/`<symbol>`/`<script>`).
+4. **VERIFY** — renderizar 3-5 slides representativos via Chrome headless, Read multimodal,
+   conferir logo/contraste/overflow/ortografia. Loop ate limpo.
+
+### Verificacao headless (sem Playwright MCP)
+
+```bash
+CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+DECK="$PROJECT_ROOT/docs/reports/<slug>.html"
+
+# Screenshot do slide N (troca init goTo(1)->goTo(N) numa copia temp):
+perl -0pe 's/\n    goTo\(1\);\n  \}\)\(\);/\n    goTo(N);\n  })();/' "$DECK" > /tmp/s.html
+"$CHROME" --headless=new --force-device-scale-factor=2 --window-size=1600,900 \
+  --screenshot=/tmp/sN.png "file:///tmp/s.html"   # depois: Read /tmp/sN.png (multimodal)
+
+# Export PDF (1 slide por pagina, via @media print):
+"$CHROME" --headless=new --print-to-pdf="$PROJECT_ROOT/docs/reports/<slug>.pdf" \
+  --no-pdf-header-footer "file://$DECK"
+```
+
+### Output
+
+`$PROJECT_ROOT/docs/reports/<slug>.html` (ou `~/Claude/docs/workspace/<slug>.html`
+com `--workspace-doc` para conteudo cross-project como comunicados corporativos).
+
 ## Exemplos de Uso
 
 ```bash
-# Modo executive (pipeline 4-fase obrigatorio)
+# Modo executive (pipeline 7-fase obrigatorio — PPTX data-dense para board)
 /ag-5-documentos executive deck cybersec inspira 2025-2027 --brand=inspira
 /ag-5-documentos executive pitch deck investidores rAIz  # default = raiz tokens
 /ag-5-documentos executive --draft board pre-mortem      # bypass rapido
+
+# Modo soap (HTML narrativo de alto impacto — cultura/motivacional/institucional)
+/ag-5-documentos soap apresentacao "Modo Raiz" cultura de trabalho
+/ag-5-documentos soap manifesto institucional rAIz para town hall
+/ag-5-documentos soap kickoff 2026 --workspace-doc
 
 # Office Suite
 /ag-5-documentos xlsx relatorio financeiro Q1
@@ -778,3 +879,9 @@ child.on("close", (code) => {
 ```
 
 Implementacao da bridge: ver Phase 2b (raiz-platform).
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

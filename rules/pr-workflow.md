@@ -1,7 +1,10 @@
 ---
 description: "Workflow de Pull Requests — toda mudanca funcional via PR"
 paths:
-  - "**/*"
+  - ".git/**"
+  - ".github/**"
+  - "docs/adr/**"
+  - "docs/plans/**"
 ---
 
 # PR Workflow

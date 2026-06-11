@@ -1,6 +1,6 @@
 ---
 name: ag-auditar-harness
-description: "Auditor sistematico do proprio harness (skills, agents, hooks, rules, MCP). Detecta drift, prompt injection risk, redundancia semantica, violacao de DoD, cost MCP. Produz HCS (Harness Coverage Score). Invocado por /ag-9-auditar --include-harness."
+description: "Auditor sistematico do harness (skills/hooks/rules/MCP): drift, prompt injection risk, redundancia, violacao DoD, custo MCP. Produz HCS. Via /ag-9-auditar --include-harness."
 model: opus
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write

@@ -1,6 +1,6 @@
 ---
 name: ag-criar-projeto
-description: Scaffolding completo: estrutura de pastas, configs, .env.example, CI base, README. Projeto nasce agent-ready.
+description: "Scaffolding completo: estrutura de pastas, configs, .env.example, CI base, README. Projeto nasce agent-ready."
 model: sonnet
 argument-hint: "[nome-do-projeto] [stack]"
 ---
@@ -118,4 +118,3 @@ Ao criar o scaffolding, incluir automaticamente:
 - knowledge.db no .gitignore?
 
 Se algum falha → PARAR. Corrigir antes de prosseguir.
-

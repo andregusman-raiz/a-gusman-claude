@@ -1,6 +1,6 @@
 ---
 name: ag-testar-e2e
-description: QA automatizado com Playwright. Simula usuario real navegando na aplicacao - clica, preenche, navega, e captura tudo que quebra (erros de console, falhas de rede, UI inacessivel, fluxos interrompidos). Gera report visual com screenshots e logs. Use apos /construir e /validar para verificar que a aplicacao funciona de ponta a ponta.
+description: "QA Playwright automatizado: navega como usuario, captura console/rede/UI quebrada e gera relatorio para fluxos criticos e regressao."
 model: sonnet
 argument-hint: "[projeto-path ou URL]"
 disable-model-invocation: true
@@ -714,3 +714,8 @@ test('exportar como PDF → download completo', async ({ page }) => {
 - [ ] Cada falha tem screenshot + logs + sugestao de fix?
 - [ ] Smoke tests passam contra URL Vercel (se deploy)?
 
+## Regra PDF -> Markdown (obrigatoria -- economia de tokens)
+
+Qualquer PDF consumido por esta skill/machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` -> Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

@@ -173,3 +173,9 @@ docs/specs/{name}/
 - Tipos: `~/Claude/projetos/vibecoding-roadmap/src/lib/crawler/types.ts`
 - Engine (JS snippets, prompts): `~/Claude/projetos/vibecoding-roadmap/src/lib/crawler/engine.ts`
 - Configs: `~/Claude/projetos/vibecoding-roadmap/src/lib/crawler/configs/{name}.json`
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

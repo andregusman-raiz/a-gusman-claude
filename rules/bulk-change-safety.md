@@ -1,7 +1,13 @@
 ---
 description: "Protocolo de seguranca para operacoes bulk (5+ arquivos com mesmo pattern)"
 paths:
-  - "**/*"
+  - "src/**"
+  - "app/**"
+  - "lib/**"
+  - "packages/**"
+  - "tests/**"
+  - "scripts/**"
+  - ".claude/**"
 ---
 
 # Bulk Change Safety Protocol

@@ -33,3 +33,9 @@ metadata:
 | benchmark | ag-benchmark-qualidade + ag-criar-cenario-benchmark | Benchmark comparativo (dual-run, parity index) |
 | ciclo | ag-ciclo-testes | Test-fix-retest completo (max 3 ciclos) |
 | e2e | ag-testar-e2e-batch | E2E em batches com auto-fix |
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

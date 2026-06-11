@@ -83,10 +83,7 @@ DONE_PATTERNS = re.compile(
 USER_BYPASS_PAT = re.compile(
     r"\b(?:pode\s+(?:parar|encerrar|finalizar)"
     r"|tá\s+bom\s+assim"
-    r"|t[aá]\s+ok"
-    r"|encerre"
-    r"|finalize"
-    r"|fim"
+    r"|encerre\s+sem\s+(?:rodar|verificar|check)"
     r"|chega\s+por\s+aqui"
     r"|skip\s+check"
     r"|sem\s+(?:typecheck|lint|test)"

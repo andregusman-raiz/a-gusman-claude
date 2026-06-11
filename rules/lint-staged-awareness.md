@@ -1,3 +1,12 @@
+---
+description: "eslint --fix reverte silencioso em pre-commit"
+paths:
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.jsx"
+---
+
 # Lint-Staged Awareness
 
 ## Problema

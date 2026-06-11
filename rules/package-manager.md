@@ -1,7 +1,12 @@
 ---
 description: "Detectar e usar o package manager correto (bun ou npm)"
 paths:
-  - "**/*"
+  - "**/package.json"
+  - "**/bun.lock"
+  - "**/bun.lockb"
+  - "**/package-lock.json"
+  - "**/pnpm-lock.yaml"
+  - "**/yarn.lock"
 ---
 
 # Package Manager — Deteccao Automatica

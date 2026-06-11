@@ -41,8 +41,8 @@ for pattern in "${SCAFFOLDING_PATTERNS[@]}"; do
   fi
 done
 
-# Marker para evitar disparar duas vezes na mesma sessão
-MARKER="/tmp/.claude-newproj-warned-$$"
+# Marker por COMANDO ($$ mudava a cada invocacao e causava loop infinito de bloqueio — fix 2026-06-11)
+MARKER="/tmp/.claude-newproj-warned-$(printf '%s' "$COMMAND" | shasum | cut -c1-12)"
 
 if [[ $IS_SCAFFOLDING -eq 1 && ! -f "$MARKER" ]]; then
   touch "$MARKER"

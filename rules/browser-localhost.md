@@ -1,3 +1,12 @@
+---
+description: "Playwright MCP obrigatorio para localhost (resumo inline no CLAUDE.md)"
+paths:
+  - "**/e2e/**"
+  - "**/*.spec.ts"
+  - "**/playwright.config.*"
+  - "tests/**"
+---
+
 # Browser Localhost — Playwright MCP Obrigatorio
 
 ## Regra Principal
@@ -15,6 +24,10 @@ NUNCA abrir browser do sistema (Safari, Chrome) via `open`, `xdg-open`, ou simil
 | Memory leak / heap snapshot | **Chrome DevTools MCP** (`memory-leak-debugging`) | `take_memory_snapshot` |
 | Network inspection detalhada | **Chrome DevTools MCP** (`list_network_requests`) | Timing completo |
 | Console messages/errors | Qualquer (Playwright `browser_console_messages` OU Chrome `list_console_messages`) | Escolha conveniência |
+
+## Economia de tokens: snapshot > screenshot
+`browser_snapshot` (a11y tree, texto) e o DEFAULT para verificar estado da pagina.
+`browser_take_screenshot` custa ~1-2k tokens/imagem — usar SO quando pixel/layout importa (regressao visual, design review).
 
 ## Modo de Execucao
 - SEMPRE rodar em **headless** (minimizado, sem janela visivel)

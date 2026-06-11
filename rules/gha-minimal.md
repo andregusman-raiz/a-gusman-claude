@@ -1,3 +1,9 @@
+---
+description: "GitHub Actions uso minimo — whitelist W1-W4"
+paths:
+  - ".github/workflows/**"
+---
+
 # GitHub Actions — Uso Mínimo
 
 ## Princípio
