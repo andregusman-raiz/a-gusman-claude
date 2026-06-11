@@ -76,12 +76,16 @@ renderer: `~/Claude/scripts/infographic-render.mjs`. Smoke validado com palette 
        - "#5BB5A2"
        - "#1A1A1A"
    ```
-3. Render: `bun ~/Claude/scripts/infographic-render.mjs <input.txt> <output.svg>`
-4. Embed: em PPTX premium → colocar no `svg_output/` do projeto ppt-master (dimensionar
-   canvas 16:9); em executive/python-pptx → converter SVG→PNG (rsvg/LibreOffice) e inserir
-   como picture; em docx/pdf/html → embed direto.
-5. Fontes: o SVG referencia webfont AlibabaPuHuiTi via stylesheet — para uso offline/PPTX,
-   trocar por IBM Plex no SVG ou aceitar fallback na rasterizacao.
+3. Render: `bun ~/Claude/scripts/infographic-render.mjs <input.txt> <output.svg> [output.png]`
+4. **GOTCHA rasterizacao (descoberto no QA 2026-06-11)**: o engine emite TEXTO em
+   `<foreignObject>` — `rsvg-convert`/`resvg`/LibreOffice renderizam o SVG SEM NENHUM texto.
+   Raster SEMPRE via browser engine: o proprio script (3o argumento .png usa Playwright,
+   com override IBM Plex Sans). Validar o PNG com Read multimodal antes de embedar.
+5. Embed: em PPTX premium → o conversor svg_to_pptx do ppt-master tambem nao processa
+   foreignObject — usar o PNG no slide (ou <image> no SVG da pagina); em executive/python-pptx
+   → inserir o PNG como picture; em HTML/soap → embed do SVG direto (browser renderiza tudo).
+6. Quirk conhecido: gradientes com id contendo '#' geram `url(##...)` — browsers toleram,
+   validadores XML reclamam; inofensivo no fluxo PNG.
 
 ## Manutencao
 
