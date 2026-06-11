@@ -1,3 +1,9 @@
+---
+description: "Protocolo Rewrite + Routing (resumo inline no CLAUDE.md)"
+paths:
+  - ".claude/**"
+---
+
 # Protocolo Rewrite + Routing
 
 ## Principio
@@ -59,12 +65,12 @@ Exemplo:
 
 ## Referencias (onde esta a matriz completa)
 
-- **Matriz machine vs agent vs skill vs plugin** → `agent-decision-guide.md`
+- **Matriz machine vs agent vs skill vs plugin** → CLAUDE.md workspace (Matriz de Decisao)
 - **Skill vs Agent vs Teams vs Worktree** → `agent-invocation.md`
 - **Plugin vs agent** → `plugin-routing.md`
 - **Deploy routing** → `deploy-routing.md`
 - **Ativacao (autonomo/draft/interativo)** → `activation-modes.md`
-- **Paralelismo (worktree, overlap)** → `multi-agent-isolation.md` + `agent-boundaries.md`
+- **Paralelismo (worktree, overlap)** → `agent-parallel-safety.md`
 - **Arvore expandida + exemplos** → `/ag-referencia-roteamento`
 
 ## Regra de Ouro

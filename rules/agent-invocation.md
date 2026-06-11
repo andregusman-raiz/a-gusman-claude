@@ -1,13 +1,13 @@
 ---
 description: "Quando usar Skill vs Agent vs Agent Teams vs Worktree"
 paths:
-  - "**/*"
+  - ".claude/**"
 ---
 
 # Agent Invocation — When to Use What
 
 ## Skill (load context on-demand)
-- Pattern/reference skills: `/ag-referencia-nextjs-patterns-nextjs`, `/ag-referencia-supabase-patterns-supabase`, etc.
+- Pattern/reference skills: `/ag-referencia-playwright`, `/ag-referencia-sdd`, `/ag-referencia-stack-decisions`, etc. (lista real: `ls .claude/skills/ | grep ag-referencia`)
 - When you need domain expertise loaded into current context
 - context: fork — isolates from main conversation
 

@@ -1,3 +1,9 @@
+---
+description: "Plugin vs Agent routing — tabela completa de prioridade"
+paths:
+  - ".claude/**"
+---
+
 # Plugin vs Agent Routing
 
 ## Principio
@@ -6,11 +12,9 @@ Usar o certo para cada situacao.
 
 ## Regras de Preferencia
 
-### Git: ag-versionar-codigo sobre /commit
-- `/commit` e `/commit-push-pr` do plugin commit-commands NAO tem branch-guard nem lint-staged awareness
+### Git: ag-versionar-codigo ou skill local /commit-push-pr
+- Plugin commit-commands esta DESABILITADO — usar skill local `/commit-push-pr` ou ag-versionar-codigo
 - Para projetos com branch protection → SEMPRE usar ag-versionar-codigo
-- `/commit` plugin aceitavel apenas para: repos sem protecao, quick fixes em branch ja criada
-- `/clean_gone` do plugin e seguro — nao tem equivalente em agents
 
 ### Code Review: depende do tamanho
 - < 10 arquivos, review rapido → `/code-review` ou `/review-pr`
@@ -23,7 +27,7 @@ Usar o certo para cada situacao.
 - NUNCA plugin para producao sem CI verde
 
 ### Feature: depende da complexidade
-- Feature isolada, sem pipeline QA → `/feature-dev`
+- Feature isolada, sem pipeline QA → `/ag-1-construir --draft` (plugin feature-dev esta desabilitado)
 - Feature com spec + testes + review → ag-especificar-solucao → ag-planejar-execucao → ag-implementar-codigo (pipeline ag-0-orquestrador)
 
 ### Sentry: canonical de monitoring (ADR-0001)
@@ -34,7 +38,7 @@ Usar o certo para cada situacao.
 - ag-monitorar-producao continua como wrapper para multi-monitoring orchestration (Sentry + Web Vitals + auto-rollback)
 
 ### Figma: canonical (ADR-0001)
-- URL Figma → código React → `figma:figma-implement-design`
+- URL Figma → código React / código → Figma → `figma:figma-generate-design`
 - Criar design system no Figma → `figma:figma-generate-library`
 - Escrever no canvas Figma (obrigatório antes de `use_figma`) → `figma:figma-use`
 - Code Connect → `figma:figma-code-connect`
@@ -61,6 +65,14 @@ Usar o certo para cada situacao.
 
 ### Railway: canonical de infra não-Vercel (ADR-0001)
 - Railway projects/services/DBs/deploy → `railway:use-railway`
+
+### Data Engine: consumir dados vs pedir acesso
+- **Descobrir/consultar dado, KPI, painel, query** (Knowledge Gateway, KPI Ouro, SQL TOTVS/Neon/PBI) → `/ag-12-sql-totvs-zeev`
+- **Pedir acesso governado** (uma plataforma/app/agente precisa de credencial/grant para usar dados/APIs já existentes do Data Engine) → `/ag-14-data-engine-cli`
+  - Invocação explícita (`disable-model-invocation: true`) — não auto-roteada; o usuário/agente chama por `/ag-14`
+  - Fluxo: Knowledge Gateway → `data-engine catalog search` → `access draft` → `validate` → `preview` → `request` → aprovação no Control Plane (a IA nunca aprova, nunca revela segredo)
+  - NÃO confundir com "gerar/expor API no Data Engine" (provisioning) nem com consumir dado (ag-12)
+- Em dúvida ag-12 vs ag-14: a pergunta é "quero o dado" (ag-12) ou "quero permissão para acessar o dado de outra plataforma" (ag-14)?
 
 ### Dead code / refactor: ag-13 vs simplify plugin
 - **Dead code elimination (orphan components, unused imports, dead state, dead comments)** → `/ag-13-limpar-codigo`
