@@ -30,6 +30,11 @@ if [ "${GUSMAN_OS_ASK_CONTEXT:-0}" = "1" ]; then
   esac
   printf '%s' "$CMD" | grep -qE '(^|[^A-Za-z_])psql([^A-Za-z0-9_]|$)' && block "ask-context: psql direto proibido. Dados do DE so via proxy local http://127.0.0.1:4577/de/data/."
   printf '%s' "$CMD" | grep -q 'DATABASE_URL' && block "ask-context: DATABASE_URL proibido. Dados do DE so via proxy local /de/data."
+  # Escrita no Zeev SO pelo caminho deterministico (aprovar #X → confirma). O -p nunca toca a API do
+  # Zeev direto (impersonation = pode aprovar qualquer um). Bloqueia host/token/impersonate/PUT.
+  printf '%s' "$CMD" | grep -qiE 'zeev\.it|/api/2/(tokens/impersonate|assignments)|ZEEV_SERVICE_TOKEN' && block "ask-context: API do Zeev proibida aqui. Aprovacao so pelo comando 'aprovar #X' (maker-checker)."
+  # Leitura de segredos no sandbox (a chave/PEM do DE, .env): so o daemon usa; o -p nao precisa.
+  printf '%s' "$CMD" | grep -qiE 'secrets/|private-key|\.pem([^A-Za-z0-9]|$)' && block "ask-context: leitura de segredos proibida. Dados/escrita via proxy ou comando dedicado."
 fi
 
 # --- Operacoes destrutivas / bypass de pipeline ---
