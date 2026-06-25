@@ -18,6 +18,20 @@ except Exception:
 
 block() { echo "BLOCKED: $1" >&2; exit 2; }
 
+# --- gusman-os ask: NUNCA tocar o Data Engine direto (defense-in-depth) ---
+# So dispara quando GUSMAN_OS_ASK_CONTEXT=1 (setado SO no spawn do ask do WhatsApp pelo kernel).
+# O terminal normal do dono (sem o marcador) NAO e afetado — pode usar railway/psql no DE a vontade.
+# Razao: o ask roda em bypassPermissions com cwd=~/Claude, cujo corpus ENSINA o caminho proibido
+# (railway run psql $DATABASE_URL); o dado do DE deve vir SO do proxy local http://127.0.0.1:4577/de/data/.
+if [ "${GUSMAN_OS_ASK_CONTEXT:-0}" = "1" ]; then
+  case "$CMD" in
+    *raiz-data-engine*) block "ask-context: acesso direto ao repo do Data Engine proibido. Use o proxy local: curl http://127.0.0.1:4577/de/data/<path> (rule: nunca mexer no DE direto)." ;;
+    *"railway "*) block "ask-context: railway (run/ssh/connect) no DE proibido. Dados do DE so via proxy local /de/data." ;;
+  esac
+  printf '%s' "$CMD" | grep -qE '(^|[^A-Za-z_])psql([^A-Za-z0-9_]|$)' && block "ask-context: psql direto proibido. Dados do DE so via proxy local http://127.0.0.1:4577/de/data/."
+  printf '%s' "$CMD" | grep -q 'DATABASE_URL' && block "ask-context: DATABASE_URL proibido. Dados do DE so via proxy local /de/data."
+fi
+
 # --- Operacoes destrutivas / bypass de pipeline ---
 case "$CMD" in
   *"vercel --prod"*) block "Use CI/CD pipeline em vez de vercel --prod direto (rule deploy-routing)." ;;
@@ -31,7 +45,16 @@ esac
 
 # --- Protecao de branch (ex-branch-guard.sh) ---
 if [[ "$CMD" == *"git commit"* ]]; then
-  BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+  # Resolve o diretorio-alvo: se o comando comeca com `cd <dir> && ...`,
+  # a branch a checar e a do worktree/repo de destino, nao a do CWD do hook
+  # (que e o CWD da sessao — tipicamente ~/Claude em main). Sem isto, commit
+  # em worktree feature e bloqueado por falso-positivo de "main".
+  TARGET_DIR="."
+  if printf '%s' "$CMD" | grep -qE '^[[:space:]]*cd[[:space:]]'; then
+    TARGET_DIR=$(printf '%s' "$CMD" | sed -E 's/^[[:space:]]*cd[[:space:]]+//; s/[[:space:]]*(&&|;).*//' | tr -d "\"'")
+    [ -z "$TARGET_DIR" ] && TARGET_DIR="."
+  fi
+  BRANCH=$(git -C "$TARGET_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
   case "$BRANCH" in
     main|master|develop)
       # Excecao unica: commit inicial em repo sem historico (baseline)
