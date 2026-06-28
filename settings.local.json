@@ -238,6 +238,11 @@
             "type": "command",
             "command": "python3 ~/Claude/.claude/hooks/completion-gate.py",
             "statusMessage": "Completion gate (typecheck/lint/test)..."
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/autonomous-persist-guard.py",
+            "statusMessage": "Autonomous journey guard (Opus 4.8 + workflows)..."
           }
         ]
       }
