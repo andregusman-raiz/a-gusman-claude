@@ -299,6 +299,17 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "python3 ~/Claude/.claude/hooks/prefer-workflows-guard.py",
+            "type": "command",
+            "statusMessage": "Prefer agents/subagents/workflows (delegação)"
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {
