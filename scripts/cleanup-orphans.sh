@@ -16,10 +16,24 @@ SKIPPED=0
 kill_orphans() {
   local pattern="$1"
   local label="$2"
+  local min_age_s="${3:-0}"   # só matar processos mais velhos que isto (0 = qualquer idade)
   local pids
 
   pids=$(pgrep -f "$pattern" 2>/dev/null || true)
   [ -z "$pids" ] && return
+
+  # Filtro de idade: protege processos legítimos em andamento (ex.: smoke-prod
+  # com Playwright rodando <5min era morto pelo cron — 2026-07-05).
+  if [ "$min_age_s" -gt 0 ]; then
+    local old_pids=""
+    for pid in $pids; do
+      local etime_s
+      etime_s=$(ps -o etimes= -p "$pid" 2>/dev/null | tr -d ' ' || echo 0)
+      [ "${etime_s:-0}" -ge "$min_age_s" ] && old_pids="$old_pids $pid"
+    done
+    pids=$(echo "$old_pids" | tr ' ' '\n' | sed '/^$/d')
+    [ -z "$pids" ] && return
+  fi
 
   local count
   count=$(echo "$pids" | wc -l | tr -d ' ')
@@ -44,11 +58,12 @@ if [ "$TSC_COUNT" -gt 1 ]; then
   kill_orphans "tsc --noEmit" "tsc (excess: $TSC_COUNT)"
 fi
 
-# 3. Orphaned Playwright Chrome browsers (headless)
-kill_orphans "playwright_chromiumdev_profile" "Playwright Chrome"
+# 3. Orphaned Playwright Chrome browsers (headless) — só >10min (smokes
+#    legítimos rodam <5min e eram mortos no meio)
+kill_orphans "playwright_chromiumdev_profile" "Playwright Chrome" 600
 
 # 4. Orphaned Playwright daemon sessions
-kill_orphans "run-cli-server.*daemon-session" "Playwright daemon"
+kill_orphans "run-cli-server.*daemon-session" "Playwright daemon" 600
 
 # 5. Orphaned jest workers (from timed-out test runs)
 kill_orphans "jest-worker/build/processChild" "Jest worker"
