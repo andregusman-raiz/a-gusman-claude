@@ -75,6 +75,6 @@ Atalho canônico: `cbuild [--dry-run] [--no-worktree] <spec-path> [gates]` (`.cl
 
 ## Config
 
-- Profile build: `~/.codex/build.config.toml` (`gpt-5.5` + `model_reasoning_effort = "xhigh"`). Formato codex-cli ≥0.142: profile = arquivo separado, NÃO `[profiles.x]` no config.toml.
-- `gpt-5.5-codex` NÃO é suportado em conta ChatGPT (erro 400) — usar `gpt-5.5`.
+- Profile build: `~/.codex/build.config.toml` (`gpt-5.6-sol` + `model_reasoning_effort = "xhigh"`). Formato codex-cli ≥0.142: profile = arquivo separado, NÃO `[profiles.x]` no config.toml.
+- Variantes `-codex` (ex: `gpt-5.5-codex`) NÃO são suportadas em conta ChatGPT (erro 400) — usar o modelo base.
 - Default global (`~/.codex/config.toml`): `model_reasoning_effort = "medium"` — asks avulsos e gusman-os não queimam quota; `xhigh` SÓ no profile build (verificado 2026-07-18).
