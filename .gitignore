@@ -27,3 +27,6 @@ Thumbs.db
 # Node (if using npx installer)
 node_modules/
 package-lock.json
+
+# assets/ vive em ~/Claude/assets (repo do workspace) — ver rules/workspace-layout.md
+assets/
