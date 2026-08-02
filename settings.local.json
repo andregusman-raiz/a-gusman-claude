@@ -1,0 +1,318 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
+    "ENABLE_TOOL_SEARCH": "auto:5"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(supabase:*)",
+      "Bash(vercel:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(cat:*)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(sort:*)",
+      "Bash(tree:*)",
+      "Bash(du:*)",
+      "Bash(echo:*)",
+      "Bash(chmod:*)",
+      "Bash(pytest:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(brew:*)",
+      "Bash(tmux:*)",
+      "Bash(memory_pressure:*)",
+      "Bash(claude --version:*)",
+      "Bash(cd:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python3:*)",
+      "Bash(npm install:*)",
+      "Bash(rsync:*)",
+      "Bash(unzip:*)",
+      "Bash(diff:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(xargs:*)",
+      "Bash(open:*)",
+      "Bash(gws:*)",
+      "Bash(playwright-cli:*)",
+      "Bash(sentry-cli:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:nextjs.org)",
+      "WebFetch(domain:supabase.com)",
+      "WebFetch(domain:vercel.com)",
+      "WebFetch(domain:developer.mozilla.org)",
+      "WebFetch(domain:typescriptlang.org)",
+      "WebFetch(domain:tailwindcss.com)",
+      "WebFetch(domain:react.dev)",
+      "WebFetch(domain:playwright.dev)",
+      "WebFetch(domain:zod.dev)",
+      "WebFetch(domain:docs.python.org)",
+      "WebFetch(domain:raizeducacao.com.br)",
+      "WebFetch(domain:www.brandcolorcode.com)",
+      "WebFetch(domain:brandfetch.com)",
+      "WebFetch(domain:www.fundacaovale.org)",
+      "WebFetch(domain:midiasstoragesec.blob.core.windows.net)",
+      "Bash(ls /Users/andregusmandeoliveira/Claude/projetos/totvs-educacional-frontend/app/src/app/\\\\\\(app\\\\\\)/academico/)",
+      "Bash(ls /Users/andregusmandeoliveira/Claude/projetos/totvs-educacional-frontend/app/src/app/\\\\\\(app\\\\\\)/explorar/)",
+      "Bash(ls /Users/andregusmandeoliveira/Claude/projetos/totvs-educacional-frontend/app/src/app/\\\\\\(app\\\\\\)/relatorios/)",
+      "Bash(ls /Users/andregusmandeoliveira/Claude/projetos/totvs-educacional-frontend/app/src/app/\\\\\\(app\\\\\\)/comunicacao/)",
+      "Bash(ls /Users/andregusmandeoliveira/Claude/projetos/totvs-educacional-frontend/app/src/app/\\\\\\(app\\\\\\)/configuracoes/)",
+      "Bash(ls /Users/andregusmandeoliveira/Claude/projetos/totvs-educacional-frontend/app/src/app/\\\\\\(app\\\\\\)/secretaria/)",
+      "Bash(ls /Users/andregusmandeoliveira/Claude/projetos/totvs-educacional-frontend/app/src/app/\\\\\\(app\\\\\\)/pedagogico/)",
+      "Bash(/dev/null echo:*)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_playwright_playwright__browser_console_messages",
+      "mcp__plugin_playwright_playwright__browser_click",
+      "mcp__plugin_playwright_playwright__browser_close",
+      "Bash(pkill -f \"next-server\")",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(while read:*)",
+      "Bash(do echo:*)",
+      "Bash(done)",
+      "Bash(npx tsx -e \":*)",
+      "Bash(git add:*)",
+      "mcp__plugin_playwright_playwright__browser_fill_form",
+      "Bash(printf '%s' \"${CREDENTIAL}\")",
+      "Bash(xxd)",
+      "Bash(for route:*)",
+      "Bash(pkill -f \"chromium\\\\|chrome\")",
+      "Bash(bash ~/Claude/.claude/scripts/memory-guard.sh)",
+      "Bash(gtimeout 3 npx -y @executeautomation/database-server --sqlserver --server test --database test --user test --password test)",
+      "Bash(claude mcp:*)",
+      "Bash(mkdir -p /Users/andregusmandeoliveira/Claude/.claude/skills/ag-M-60-meridian)",
+      "Bash(mkdir -p /Users/andregusmandeoliveira/Claude/.claude/shared/meridian-kb/project-profiles)",
+      "Bash(mkdir -p /Users/andregusmandeoliveira/Claude/.claude/shared/meridian-kb/convergence-history)",
+      "Bash(mkdir -p /Users/andregusmandeoliveira/Claude/.claude/shared/templates/meridian)",
+      "Bash(bash /tmp/rename-agents.sh 2>&1)",
+      "Bash(bash /tmp/rename-agents2.sh 2>&1)",
+      "Bash(__NEW_LINE_bc5ae67c292b701f__ git:*)",
+      "mcp__plugin_github_github__get_file_contents",
+      "mcp__context7__resolve-library-id",
+      "mcp__plugin_playwright_playwright__browser_resize",
+      "Bash(rm -rf src/lib/stripe src/app/api/webhooks/stripe src/app/api/checkout)",
+      "Bash(rm -f supabase/migrations/20260326000001_stripe_columns.sql)",
+      "Bash(rm -rf \"src/app/plans\" \"src/app/enterprise\" \"src/app/api/users\")",
+      "Bash(rm -f \"src/app/\\(dashboard\\)/billing/page.tsx\")",
+      "Bash(rmdir \"src/app/\\(dashboard\\)/billing\")",
+      "WebFetch(domain:docket.com.br)",
+      "WebFetch(domain:blog.docket.com.br)",
+      "Bash(file ~/Claude/assets/logos/*)",
+      "WebFetch(domain:infosimples.com)",
+      "WebFetch(domain:valida.api.br)",
+      "WebFetch(domain:netrin.com.br)",
+      "WebFetch(domain:www.directd.com.br)",
+      "Bash(pkill -f \"create-next-app\")",
+      "Bash(mkdir -p raiz-docs)",
+      "Bash(cp /tmp/raiz-docs-pkg.json raiz-docs/package.json)",
+      "Bash(/Users/andregusmandeoliveira/Claude/projetos/raiz-docs/tsconfig.json:*)",
+      "Bash(screencapture -x /tmp/test-screen.png)",
+      "Read(//tmp/**)",
+      "Bash(printf 'INFOSIMPLES_TOKEN=${INFOSIMPLES_TOKEN}\\\\nINFOSIMPLES_TIMEOUT=60\\\\n')",
+      "Bash(tee .env.local)",
+      "mcp__plugin_github_github__create_repository",
+      "Bash(printf \"${INFOSIMPLES_TOKEN}\")",
+      "Bash(screencapture -x /tmp/qcertifica-screen.png)",
+      "Bash(screencapture -x /tmp/qcertifica-screen1.png /tmp/qcertifica-screen2.png /tmp/qcertifica-screen3.png)",
+      "Read(//private/tmp/**)",
+      "Bash(pkill -f \"node bot.js\")",
+      "Bash(osascript -e 'quit app \"\"Google Chrome\"\"')",
+      "Bash(screencapture -x /tmp/qcertifica-chrome-real.png)",
+      "Bash(screencapture -x /tmp/qc-disp1.png /tmp/qc-disp2.png)",
+      "Bash(osascript -e 'tell application \"\"Google Chrome\"\" to activate')",
+      "Bash(screencapture -x /tmp/qc-chrome-front1.png /tmp/qc-chrome-front2.png)",
+      "Bash(pkill -9 -f 'Google Chrome')",
+      "Bash(screencapture -x /tmp/tela1.png /tmp/tela2.png)",
+      "WebFetch(domain:www.inspecaoescolar.educacao.rj.gov.br)",
+      "WebFetch(domain:www.cee.rj.gov.br)",
+      "WebFetch(domain:www.normasbrasil.com.br)",
+      "WebFetch(domain:normaseducacionaisrj.blogspot.com)",
+      "WebFetch(domain:bwcontabilidade.com.br)",
+      "WebFetch(domain:api.protesto24h.com.br)",
+      "Bash(screencapture -x /tmp/chrome-menu.png)",
+      "Bash(screencapture -x /tmp/disp1.png /tmp/disp2.png)",
+      "Bash(screencapture -x /tmp/chrome-front.png)",
+      "Bash(pkill -f \"next dev.*3010\")",
+      "Bash(printf 'escola-legal-cron-2026')",
+      "Bash(for proj:*)",
+      "Bash(do)",
+      "Bash(__NEW_LINE_c06e28c0e8d909f3__ gh:*)",
+      "Bash(__NEW_LINE_c06e28c0e8d909f3__ done:*)",
+      "mcp__plugin_github_github__search_repositories",
+      "Skill(ag-1-construir)",
+      "mcp__plugin_github_github__search_code",
+      "Bash(PGPASSWORD=${PGPASSWORD} psql:*)",
+      "Read(//Users/andregusmandeoliveira/Claude/GitHub/fgts-platform/certs/retorno-nis/**)",
+      "mcp__plugin_playwright_playwright__browser_tabs",
+      "Bash(mkdir -p ~/.claude/mcp-servers)",
+      "Bash(mv ~/Claude/mcp-computer-use ~/.claude/mcp-servers/computer-use)",
+      "Read(//Users/andregusmandeoliveira/.claude/mcp-servers/**)",
+      "Bash(mkdir -p ~/Claude/.claude/skills/pptx/templates)",
+      "Read(//System/Library/Fonts/**)",
+      "Bash(mkdir -p ~/Claude/docs/diagnosticos/2026-04-22-agx-diagnostic)",
+      "Bash(mkdir -p ~/Claude/.claude/shared/adr)",
+      "Bash(rm -rf ~/Claude/projetos/uerj-resultado-por-aluno)",
+      "Bash(rm -f /Users/andregusmandeoliveira/.claude/projects/-Users-andregusmandeoliveira-Claude/memory/project_uerj_resultado_por_aluno.md)",
+      "Bash(rm -f /tmp/uerj_class2025.pdf /tmp/uerj_class2025.txt /tmp/uerj_class2026.pdf /tmp/uerj_eq2026_AB.pdf /tmp/uerj_aprovados_2025.csv /tmp/smoke_aprov.csv /tmp/smoke_match.csv /tmp/a.csv /tmp/a24.csv)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(~/.ssh/**)",
+      "Read(**/secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Bash(cat .env*)",
+      "Bash(cat **/.env*)",
+      "Bash(head .env*)",
+      "Bash(tail .env*)",
+      "Bash(less .env*)",
+      "Bash(more .env*)"
+    ]
+  },
+  "disabledMcpjsonServers": [
+    "sentry"
+  ],
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'pkill -f terminal-notifier 2>/dev/null; REPO=$(git rev-parse --show-toplevel 2>/dev/null | xargs basename 2>/dev/null || echo \"claude\"); BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"-\"); nohup terminal-notifier -title \"Claude Code\" -subtitle \"$REPO ($BRANCH)\" -message \"Needs your input\" -sender com.anthropic.claudefordesktop -sound Glass >/dev/null 2>&1 & disown; afplay /System/Library/Sounds/Glass.aiff 2>/dev/null &disown'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/scripts/cleanup-orphans.sh 2>/dev/null",
+            "statusMessage": "Cleaning orphaned processes..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/scripts/session-health.sh --quiet 2>/dev/null || true",
+            "statusMessage": "Session health check..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/gap-acceptance-guard.py",
+            "statusMessage": "Gap acceptance guard..."
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/completion-gate.py",
+            "statusMessage": "Completion gate (typecheck/lint/test)..."
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/autonomous-persist-guard.py",
+            "statusMessage": "Autonomous journey guard (Opus 4.8 + workflows)..."
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'echo \"PRESERVE: modified files, current task, test commands, errors found\" >&2'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "TeamCreate|TaskCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "OUT=$(bash ~/Claude/.claude/scripts/memory-guard.sh 2>&1); EXIT=$?; if [ $EXIT -ne 0 ]; then printf '%s\\n' \"$OUT\" >&2; fi; exit $EXIT",
+            "statusMessage": "Memory guard check..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/pre-bash-dispatch.sh",
+            "statusMessage": "Bash guards (destrutivos/branch/SQL/stack)..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/pre-write-dispatch.sh",
+            "statusMessage": "Write guards (config/GHA)..."
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/pdf-read-guard.sh",
+            "statusMessage": "PDF markitdown guard..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "python3 ~/Claude/.claude/hooks/prefer-workflows-guard.py",
+            "type": "command",
+            "statusMessage": "Prefer agents/subagents/workflows (delegação)"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "context7@claude-plugins-official": false
+  }
+}

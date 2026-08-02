@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-03-14T15:38:06.829891",
+  "skill": "ag-B-09-depurar-erro",
+  "project": "/Users/andregusmandeoliveira/Claude/GitHub/raiz-platform",
+  "evals_count": 11,
+  "analysis": {
+    "total_assertions": 30,
+    "passed": 25,
+    "failed": 5,
+    "pass_rate": 0.8333333333333334,
+    "failed_assertions": [
+      "[EVAL ERROR] 1: timeout",
+      "Identificou causa raiz: 1. Chat principal (agent.service.ts → providers) nao loga em ai_usage_logs (FORA DO ESCOPO - tratar em PR separado)",
+      "[EVAL ERROR] 6: timeout",
+      "Identificou causa raiz: `ConnectComputerCard.tsx:79-87` nao desembrulhava o envelope `{ success, data }` retornado por `apiSuccess()`. A API retorna `{ success: true, data: { code, expiresAt, commands } }` mas o componente acessava `data.code` diretamente (que era `undefined`) em vez de `data.data.code`.",
+      "Identificou causa raiz: Inconsistencia entre o check de permissao do frontend e do backend."
+    ],
+    "errored_evals": 2
+  },
+  "threshold": 0.8,
+  "action": "no-action"
+}

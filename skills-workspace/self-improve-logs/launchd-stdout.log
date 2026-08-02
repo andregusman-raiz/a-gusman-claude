@@ -1,0 +1,92 @@
+=== Skill Self-Improvement Run: 20260309-070003 ===
+Projects: 0 | Skills: 1 | Dry run: no
+
+=== Skill Self-Improvement Run: 20260310-232323 ===
+Projects: 2 | Skills: 1 | Dry run: no
+
+--- Project: raiz-platform ---
+  Skill: ag-09-depurar-erro
+=== Skill Self-Improvement: ag-09-depurar-erro ===
+Project: /Users/andregusmandeoliveira/Claude/GitHub/raiz-platform
+Threshold: 80%
+
+--- FASE 1: HARVEST ---
+Encontradas 11 entradas no errors-log.md
+
+Distribuicao por tipo:
+  unknown: 6
+  crash: 4
+  config: 1
+
+Gerados 11 eval cases de 11 entradas
+Salvo em: /Users/andregusmandeoliveira/Claude/.claude/skills-workspace/ag-09-depurar-erro/auto-evals/_tmp_errors-log.md
+
+Total: 11 evals unicos de 1 arquivos
+
+--- FASE 2: GRADE ---
+Traceback (most recent call last):
+  File "/Users/andregusmandeoliveira/Claude/.claude/skills/ag_skill-creator/scripts/self_improve.py", line 284, in <module>
+    main()
+    ~~~~^^
+  File "/Users/andregusmandeoliveira/Claude/.claude/skills/ag_skill-creator/scripts/self_improve.py", line 233, in main
+    grade_result = run_grade(args.skill, evals_path, iteration=1)
+  File "/Users/andregusmandeoliveira/Claude/.claude/skills/ag_skill-creator/scripts/self_improve.py", line 86, in run_grade
+    {skill_path.read_text()}
+     ~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 787, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/andregusmandeoliveira/Claude/.claude/skills/ag-09-depurar-erro/SKILL.md'
+  WARN: failed or no data
+
+--- Project: rAIz-AI-Prof ---
+  Skill: ag-09-depurar-erro
+=== Skill Self-Improvement: ag-09-depurar-erro ===
+Project: /Users/andregusmandeoliveira/Claude/GitHub/rAIz-AI-Prof
+Threshold: 80%
+
+--- FASE 1: HARVEST ---
+Encontradas 6 entradas no errors-log.md
+
+Distribuicao por tipo:
+  unknown: 4
+  crash: 1
+  silent-fail: 1
+
+Gerados 6 eval cases de 6 entradas
+Salvo em: /Users/andregusmandeoliveira/Claude/.claude/skills-workspace/ag-09-depurar-erro/auto-evals/_tmp_errors-log.md
+
+Encontradas 1 entradas no errors-log.md
+
+Distribuicao por tipo:
+  unknown: 1
+
+Gerados 1 eval cases de 1 entradas
+Salvo em: /Users/andregusmandeoliveira/Claude/.claude/skills-workspace/ag-09-depurar-erro/auto-evals/_tmp_errors-log.md
+
+Total: 7 evals unicos de 2 arquivos
+
+--- FASE 2: GRADE ---
+Traceback (most recent call last):
+  File "/Users/andregusmandeoliveira/Claude/.claude/skills/ag_skill-creator/scripts/self_improve.py", line 284, in <module>
+    main()
+    ~~~~^^
+  File "/Users/andregusmandeoliveira/Claude/.claude/skills/ag_skill-creator/scripts/self_improve.py", line 233, in main
+    grade_result = run_grade(args.skill, evals_path, iteration=1)
+  File "/Users/andregusmandeoliveira/Claude/.claude/skills/ag_skill-creator/scripts/self_improve.py", line 86, in run_grade
+    {skill_path.read_text()}
+     ~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 787, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/andregusmandeoliveira/Claude/.claude/skills/ag-09-depurar-erro/SKILL.md'
+  WARN: failed or no data
+
+=== Run complete: 20260310-232323 ===
+Log: /Users/andregusmandeoliveira/.claude/skills-workspace/self-improve-logs/run-20260310-232323.log

@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-03-25",
+  "strategies": [
+    {
+      "id": "SFIX-001",
+      "category": "MISSING_HEADERS",
+      "approach": "Add security headers to next.config",
+      "code_template": "headers() { return [{ source: '/(.*)', headers: [{ key: 'X-Content-Type-Options', value: 'nosniff' }, { key: 'X-Frame-Options', value: 'DENY' }, { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' }] }] }",
+      "success_rate": null,
+      "total_uses": 0
+    },
+    {
+      "id": "SFIX-002",
+      "category": "ENV_IN_GIT",
+      "approach": "Remove .env from git tracking and add to .gitignore",
+      "steps": ["git rm --cached .env", "echo '.env' >> .gitignore", "echo '.env.local' >> .gitignore", "echo '.env.production' >> .gitignore"],
+      "success_rate": null,
+      "total_uses": 0
+    },
+    {
+      "id": "SFIX-003",
+      "category": "SOURCE_MAPS",
+      "approach": "Disable source maps in production",
+      "code_template": "productionBrowserSourceMaps: false in next.config",
+      "success_rate": null,
+      "total_uses": 0
+    },
+    {
+      "id": "SFIX-004",
+      "category": "PII_MASKING",
+      "approach": "Add PII masking utility for logs and responses",
+      "steps": ["Create lib/utils/mask-pii.ts", "Mask CPF: replace middle digits with *", "Mask email: show first 2 chars + domain", "Mask phone: show last 4 digits", "Apply to logger and API responses"],
+      "success_rate": null,
+      "total_uses": 0
+    }
+  ]
+}

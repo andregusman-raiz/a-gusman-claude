@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-03-11T16:39:50.902256",
+  "skill": "ag-B-09-depurar-erro",
+  "project": "/Users/andregusmandeoliveira/Claude/GitHub/raiz-platform",
+  "evals_count": 11,
+  "analysis": {
+    "total_assertions": 34,
+    "passed": 25,
+    "failed": 9,
+    "pass_rate": 0.7352941176470589,
+    "failed_assertions": [
+      "Identificou causa raiz: O deploy de producao (`dpl_H4SEr1hKRPERYL6UM6pevsqeG6ip`) ainda contém o código antigo (PATCH) que foi corrigido no commit anterior. O fix no `useAccessControl.ts` (PATCH→PUT) não foi deployado. SWR retry amplifica os erros.",
+      "Identificou causa raiz: 1. Chat principal (agent.service.ts → providers) nao loga em ai_usage_logs (FORA DO ESCOPO - tratar em PR separado)",
+      "Identificou causa raiz: Duas causas independentes:",
+      "Identificou causa raiz: Tres problemas combinados:",
+      "Identificou causa raiz: `src/app/page.tsx:97-103` chamava `createNavItems()` sem passar `allowedModules`. Em `navigation.tsx:117`: `if (!allowedModules) return true` → mostra TUDO por backwards compatibility. Bug secundario: `usePermissions.ts` tinha lista hardcoded incompleta para `has_full_access` (faltavam 6 modulos).",
+      "Identificou causa raiz: Quatro problemas combinados:",
+      "Identificou causa raiz: Duas causas independentes:",
+      "Identificou causa raiz: Quatro problemas combinados:",
+      "Identificou causa raiz: Inconsistencia entre o check de permissao do frontend e do backend."
+    ]
+  },
+  "threshold": 0.8,
+  "action": "improved-validated"
+}

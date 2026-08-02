@@ -1,0 +1,82 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-03-25",
+  "strategies": [
+    {
+      "id": "FIX-001",
+      "bug_category": "MOCK_DATA",
+      "approach": "Replace placeholder text with data binding",
+      "steps": [
+        "1. Identify mock text in component (grep for indicators)",
+        "2. Trace data flow: component → props → parent → API call",
+        "3. If API exists: bind to real data field",
+        "4. If API missing: add proper empty state instead of mock",
+        "5. Verify: page shows real data or appropriate empty state"
+      ],
+      "success_rate": null,
+      "total_uses": 0,
+      "agent": "ag-B-23"
+    },
+    {
+      "id": "FIX-002",
+      "bug_category": "HARDCODED_VALUES",
+      "approach": "Extract to environment variables or config",
+      "steps": [
+        "1. Identify hardcoded value in source (grep for pattern)",
+        "2. Determine type: URL → env var, magic number → named constant, ID → env var",
+        "3. Add to .env.example with description",
+        "4. Add to process.env usage with fallback",
+        "5. Update any deployment configs that need the new var"
+      ],
+      "success_rate": null,
+      "total_uses": 0,
+      "agent": "ag-B-23"
+    },
+    {
+      "id": "FIX-003",
+      "bug_category": "DEAD_FILTERS",
+      "approach": "Fix filter-to-query propagation",
+      "steps": [
+        "1. Trace filter component → onChange handler → state update → API call",
+        "2. Check if query params are actually sent in API request",
+        "3. Check if server-side handles the filter param",
+        "4. Fix the broken link in the chain",
+        "5. Verify: changing filter visibly changes displayed data"
+      ],
+      "success_rate": null,
+      "total_uses": 0,
+      "agent": "ag-B-23"
+    },
+    {
+      "id": "FIX-004",
+      "bug_category": "BLANK_SCREEN",
+      "approach": "Fix data fetching and add error boundaries",
+      "steps": [
+        "1. Check browser console for errors",
+        "2. Check network tab for failed requests",
+        "3. If SSR error: check server component data fetching",
+        "4. If client error: add error boundary wrapping",
+        "5. Add loading state (Suspense or manual)",
+        "6. Verify: page shows content or meaningful error"
+      ],
+      "success_rate": null,
+      "total_uses": 0,
+      "agent": "ag-B-09"
+    },
+    {
+      "id": "FIX-005",
+      "bug_category": "MISSING_EMPTY_STATE",
+      "approach": "Add empty state component",
+      "steps": [
+        "1. Identify list/table/card component showing nothing",
+        "2. Add conditional: if data.length === 0 → render EmptyState",
+        "3. EmptyState includes: icon, title, description, CTA button",
+        "4. If using shadcn: use Card with centered content",
+        "5. Verify: empty data shows helpful message instead of blank"
+      ],
+      "success_rate": null,
+      "total_uses": 0,
+      "agent": "ag-B-23"
+    }
+  ]
+}

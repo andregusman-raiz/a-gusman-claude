@@ -1,0 +1,109 @@
+{
+  "_doc": "Model outcomes por categoria de task. Multi-armed bandit conservador para routing sugestions.",
+  "_version": "1.0",
+  "_created": "2026-05-10",
+  "_usage": "ag-0-orquestrador consulta antes de rotear se win_rate(sonnet) < 0.5 para a categoria. Nao substitui opus-mode.txt.",
+  "categories": {
+    "ag-2-corrigir:totvs": {
+      "sonnet": {
+        "success": 1,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-2-corrigir:tipos": {
+      "sonnet": {
+        "success": 0,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-2-corrigir:bug": {
+      "sonnet": {
+        "success": 0,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-1-construir:feature": {
+      "sonnet": {
+        "success": 0,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-1-construir:refactor": {
+      "sonnet": {
+        "success": 0,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-12-sql-totvs:query": {
+      "sonnet": {
+        "success": 0,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-7-qualidade:full": {
+      "sonnet": {
+        "success": 0,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-12-sql-totvs-zeev:kpis-ouro": {
+      "sonnet": {
+        "success": 1,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-1-construir:data-engine": {
+      "sonnet": {
+        "success": 1,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "ag-0-orquestrador:data-engine": {
+      "sonnet": {
+        "success": 1,
+        "fail": 0
+      },
+      "opus": {
+        "success": 0,
+        "fail": 0
+      }
+    }
+  },
+  "_note": "Atualizar via: python3 ~/.claude/scripts/update-model-outcomes.py <categoria> <modelo> <success|fail>"
+}
