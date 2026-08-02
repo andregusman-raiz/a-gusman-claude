@@ -56,7 +56,8 @@ O que ele detecta:
 | `curl \| sh` no start do servidor | P0 | download+exec a cada boot |
 | Transporte `http://` remoto sem TLS | P0 | tool call em claro |
 | `npx -y pkg@latest` sem pin de versao | P1 | codigo remoto novo a cada start, sem revisao |
-| Segredo literal em `env`/`headers` da config | P1 | vaza em backup, sync e transcript |
+| Segredo literal em `env`/`headers` **e config legivel por outros** | P1 | qualquer processo da maquina le — `chmod 600` |
+| Segredo literal em config **ja 0600** | P2 | aceito: mover para env var nao melhora (ver abaixo) |
 | Servidor novo desde o baseline | P1 | entrou sem passar por revisao |
 | Homoglifo CYRILLIC+LATIN no nome | P1 | typosquat de tool confiavel |
 
@@ -102,12 +103,28 @@ Nao usar `--dangerously-run-mcp-servers` neste workspace.
 4. `python3 $S --save-baseline` **depois** de decidir — o baseline registra o estado aprovado.
 5. Antes de instalar skills de terceiros: `python3 $S --scan-skills <clone>` e ler todo P0.
 
-## Estado atual (auditoria de 2026-08-02)
+## Por que segredo em config 0600 nao vira P1
 
-18 servidores MCP em 2 configs, baseline armado. P0=0. P1=7: 4 servidores em `npx -y`
-sem pin (`context7`, `docs-search`, `knowledge-graph`, `semantic-code-search`) e 3 com
-segredo literal em `~/.claude.json` (`configurador-escolas`, `configurador-remoto`,
-`gusman-os`). Nenhum tratado ainda — sao decisao do dono.
+Tentacao natural: trocar o valor literal por `${VAR}`. Mas o valor tem que morar em
+algum lugar — e um shell profile (`~/.zshrc`) costuma ser **0644**, ou seja, a "correcao"
+piora a exposicao. Com `~/.claude.json` em 0600 o segredo esta tao protegido quanto
+estaria num `.env` dedicado, e nao ha o risco de quebrar servidores em uso (a expansao
+de `${VAR}` em `~/.claude.json`, distinta do `.mcp.json` de projeto, nao esta
+documentada — nao mudar sem confirmar). O que importa e a **permissao**, e e isso que
+o script mede.
+
+## Estado atual (auditoria de 2026-08-02, remediada)
+
+18 servidores MCP em 2 configs, baseline armado. **P0=0, P1=0, P2=3.**
+
+Resolvido nesta rodada:
+- 4 servidores pinados: `@upstash/context7-mcp@3.2.5`, `@arabold/docs-mcp-server@2.4.5`,
+  `@modelcontextprotocol/server-memory@2026.7.4`, `@zilliz/claude-context-mcp@0.1.15`
+- `~/.claude.json` e seus backups estavam **0644** (legiveis por qualquer processo da
+  maquina) — corrigidos para 0600. Era esta a exposicao real dos 3 tokens.
+
+Os 3 P2 remanescentes (`configurador-escolas`, `configurador-remoto`, `gusman-os`) sao
+segredo literal em config ja 0600: aceito por decisao, pelo motivo da secao acima.
 
 ## Referencias
 

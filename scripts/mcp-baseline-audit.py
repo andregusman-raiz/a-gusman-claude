@@ -157,9 +157,24 @@ def normalize(spec: dict) -> str:
     return json.dumps(keep, sort_keys=True, ensure_ascii=False)
 
 
+def world_readable(path: str) -> bool:
+    """Config com segredo so e P1 se outro usuario/processo puder ler.
+    Com 0600 o segredo esta tao protegido quanto estaria num .env separado —
+    mover para env var nao melhora nada e pode piorar (shell profile costuma ser 0644)."""
+    try:
+        import stat as _stat
+        mode = Path(path).stat().st_mode
+        return bool(mode & (_stat.S_IRGRP | _stat.S_IROTH))
+    except OSError:
+        return True
+
+
 def audit_server(name: str, spec: dict, source: str) -> list[dict]:
     out = []
     where = f"mcp:{name}"
+    exposed = world_readable(source)
+    sev_secret = "P1" if exposed else "P2"
+    perm_note = "legivel por outros (chmod 600)" if exposed else "arquivo ja 0600"
     cmd = spec.get("command") or ""
     args = spec.get("args") or []
     argstr = " ".join(str(a) for a in args)
@@ -182,10 +197,12 @@ def audit_server(name: str, spec: dict, source: str) -> list[dict]:
     for k, v in (spec.get("env") or {}).items():
         if re.search(r"KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL", k, re.I) and isinstance(v, str):
             if v and not v.startswith("${") and len(v) > 12:
-                out.append(finding("P1", "segredo em claro", where, f"env {k} literal em {Path(source).name}"))
+                out.append(finding(sev_secret, "segredo em claro", where,
+                                   f"env {k} literal em {Path(source).name} — {perm_note}"))
     for k, v in (spec.get("headers") or {}).items():
         if re.search(r"authorization|api-?key|token", k, re.I) and isinstance(v, str) and not v.startswith("${"):
-            out.append(finding("P1", "segredo em claro", where, f"header {k} literal em {Path(source).name}"))
+            out.append(finding(sev_secret, "segredo em claro", where,
+                               f"header {k} literal em {Path(source).name} — {perm_note}"))
 
     out.extend(scan_text(f"{cmd} {argstr} {url}", where))
     return out
