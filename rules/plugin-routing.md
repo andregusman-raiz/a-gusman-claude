@@ -50,6 +50,7 @@ Usar o certo para cada situacao.
 - Otimizar LCP / Core Web Vitals → `chrome-devtools-mcp:debug-optimize-lcp`
 - A11y audit → `chrome-devtools-mcp:a11y-debugging`
 - Memory leaks → `chrome-devtools-mcp:memory-leak-debugging`
+- **Ativacao PROATIVA** (acionar sem o usuario nomear a ferramenta, por sintoma) → `.claude/rules/chrome-devtools-proativo.md` (path-scoped em arquivos frontend)
 
 ### Supabase: canonical (ADR-0001)
 - Qualquer operação Supabase (DB, Auth, Edge Functions, Realtime, Storage, RLS, migrations) → `supabase:supabase`
@@ -117,6 +118,7 @@ Auditar o proprio harness (skills, hooks, rules, MCPs) — equivalente local ao 
 | Necessidade | Rota canonical |
 |---|---|
 | Audit completo do harness (HCS) | `/ag-9-auditar --include-harness` ou `/ag-auditar-harness` direto |
+| Superficie MCP + skills de terceiros antes de instalar (tool poisoning, rug pull, dep nao pinada) | `/ag-auditar-mcp` |
 | So otimizar (cache markers, dead skills, MCP roi) | `/ag-otimizar-harness` ou `/ag-13-limpar-codigo --target=harness` |
 | Revisar candidatos auto-extraidos da sessao | `/ag-retrospectiva --instincts` |
 | Revisar memories obsoletos | `/ag-retrospectiva --review-stale` (apos `memory-decay.py`) |

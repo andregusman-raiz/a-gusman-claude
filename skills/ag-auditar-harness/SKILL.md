@@ -87,6 +87,11 @@ Convergencia: HCS >= 80 = passa. HCS < 60 = bloqueio P0.
 
 **Score:** 100 - 20*P0_count - 5*P1_count, floor 0.
 
+**Escopo:** este sub-auditor cobre CODIGO do harness (hook/script executando input).
+Injecao indireta via TEXTO que o modelo le como dado — descricao de tool MCP, `description:`
+de SKILL.md de terceiro, tool poisoning, rug pull — e coberta por `/ag-auditar-mcp`
+(`.claude/scripts/mcp-baseline-audit.py`). Nao duplicar aqui.
+
 ### 3. HCS.redundancy — Skills semanticamente sobrepostas
 
 **Detecta:** pares de skills com similaridade > 0.85 (candidatos a merge).
