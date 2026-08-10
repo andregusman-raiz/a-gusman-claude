@@ -46,6 +46,7 @@ Usar o certo para cada situacao.
 
 ### Chrome DevTools: canonical de browser debug (ADR-0001)
 - Navegação localhost / screenshots → **Playwright MCP** (canonical navegação)
+- Fetch/scrape/extração DOM/automação IA em massa (sem pixel) → **playwright-obscura** (Obscura via CDP — detalhes em `browser-localhost.md`)
 - Debug browser / performance / network → `chrome-devtools-mcp:chrome-devtools`
 - Otimizar LCP / Core Web Vitals → `chrome-devtools-mcp:debug-optimize-lcp`
 - A11y audit → `chrome-devtools-mcp:a11y-debugging`
