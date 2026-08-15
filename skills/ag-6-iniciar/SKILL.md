@@ -41,6 +41,10 @@ test -f bun.lock && PM=bun || PM=npm   # NUNCA pnpm sem ADR
 - [ ] Vitest + Playwright no plano
 - [ ] **NÃO gerar `.github/workflows/ci.yml`** — Vercel CI cobre. Gerar `.husky/pre-commit` + `vercel.json` com `buildCommand` (ver `gha-minimal.md`)
 - [ ] Workflow GHA SOMENTE se enquadra na whitelist W1-W4 de `gha-minimal.md` (com header `JUSTIFICATIVA-GHA:`)
+- [ ] `docs/DECISOES.md` criado a partir de `shared/templates/project-context/DECISOES.template.md` (ledger de decisoes de UX/escopo D-001..)
+- [ ] CLAUDE.md do projeto inclui a secao "Fluxos numerados (F-001..)" (copiar de `shared/templates/project-context/project-context.md`)
+
+> **Padrao de Qualidade Operacional** (CLAUDE.md raiz) se aplica a todo projeto novo: estados universais (`elements/14-states/`), `?estado=` para QAT sem backend, componentes operacionais canonicos (`elements/15-operacional/`), fluxos numerados + E2E 1:1, `docs/DECISOES.md`.
 
 **Se usuário pediu lib FORA whitelist:**
 1. PARAR e perguntar: "X não está na whitelist Raiz. Justificativa? Criamos ADR?"

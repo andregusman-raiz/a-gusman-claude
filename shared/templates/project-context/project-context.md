@@ -109,6 +109,20 @@ src/
 |------|---------|----------|
 | [data] | [o que mudou] | [por que] |
 
+## 9. Fluxos Numerados (F-001..)
+
+Listar aqui os 10-20 fluxos de negocio do projeto, numerados sequencialmente. Regras:
+- Todo fluxo tem 1 teste E2E nomeado 1:1 com ele (ex: `F-003` -> `e2e/f003-*.spec.ts`)
+- Todo PR que toca a logica de um fluxo cita o numero na descricao (ex: "resolve F-007")
+- Decisoes de UX/escopo (nao arquitetura) desses fluxos vao em `docs/DECISOES.md` (template `DECISOES.template.md`). ADR continua sendo o lugar para decisoes de ARQUITETURA.
+
+| Fluxo | Descricao | Teste E2E |
+|-------|-----------|-----------|
+| F-001 | [exemplo] Login com Supabase Auth (email/senha) | `e2e/f001-login.spec.ts` |
+| F-002 | [exemplo] Criar registro X e ver refletido na listagem | `e2e/f002-criar-listar-x.spec.ts` |
+| F-003 | [exemplo] Exportar relatorio Y em CSV | `e2e/f003-exportar-relatorio.spec.ts` |
+| F-004 | [preencher] | `e2e/f004-*.spec.ts` |
+
 ---
 
 > Este documento e carregado automaticamente por agents via `@reference`.

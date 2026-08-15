@@ -19,6 +19,14 @@ Qual acao principal o usuario deve realizar.
 - **1024px** (desktop): {{DESKTOP_ADAPTATIONS}}
 - **1440px** (wide): {{WIDE_ADAPTATIONS}}
 
+## Estados Universais (`?estado=`)
+
+Alem dos breakpoints, fotografar a rota tambem forcando os 3 estados universais via query param (hook `useEstadoDemo`, template `component/`, gate de ambiente) — toda tela prova loading/vazio/erro sem depender de backend:
+
+- `{{ROUTE}}?estado=loading`
+- `{{ROUTE}}?estado=vazio`
+- `{{ROUTE}}?estado=erro`
+
 ## Interacoes Criticas
 
 1. {{INTERACTION_1}} — {{WHY_CRITICAL}}

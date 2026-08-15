@@ -90,6 +90,8 @@ Para cada funcionalidade, seguir o framework User Story → QAT Scenario:
 6. Implementar 4 camadas: L1 Smoke → L2 Functional → L3 Quality → L4 Business
 7. Registrar cenario em `qat.config.ts` com `category`, `persona`, `userInput`
 
+> Tela com estados universais (loading/vazio/erro): fotografar cada rota tambem em `?estado=loading`, `?estado=vazio`, `?estado=erro` (hook `useEstadoDemo`, template `component/`) — toda tela prova seus estados universais sem backend.
+
 Ver pattern completo: `~/.claude/shared/patterns/qat-scenario-design.md`
 
 ### 6. Adicionar ao playwright.config.ts
