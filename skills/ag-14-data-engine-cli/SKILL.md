@@ -38,7 +38,10 @@ A IA pode:
 - abrir pedido;
 - solicitar LLM com `llm_allowed=true`, budget/politica explicitos e aprovacao obrigatoria;
 - acompanhar status;
-- explicar pendencias.
+- explicar pendencias;
+- gerar link temporario de aprovacao para pedido ja submetido;
+- entregar a `approval_url` exclusivamente ao usuario solicitante;
+- consultar o pedido apos a acao humana e validar provisionamento, delivery, scopes e auditoria.
 
 A IA nao pode:
 - aprovar acesso;
@@ -49,6 +52,12 @@ A IA nao pode:
 - pedir wildcard;
 - contornar o Access Broker;
 - usar raw SQL como primeira opcao;
+- abrir ou clicar no botao de aprovacao;
+- chamar diretamente a operacao humana de aprovacao (`/admin/access-approval/<token>`);
+- simular, automatizar ou contornar o Google SSO;
+- aprovar o proprio pedido;
+- compartilhar a `approval_url` em log, issue, PR, commit ou canal publico;
+- revelar ou persistir a credencial de maquina usada para gerar o link.
 
 LLM e permitido neste comando quando declarado explicitamente. O pedido continua governado pelo Access Broker, exige `llm_allowed=true`, politica/budget explicitos e aprovacao no Control Plane. A IA nunca aprova o proprio acesso LLM, nunca provisiona provider/modelo por fora e nunca revela segredo.
 
@@ -217,6 +226,63 @@ Nunca imprimir valores dessas variaveis.
 9. Gerar preview/diff.
 10. Abrir pedido.
 11. Informar request id, status e proximo passo de aprovacao no Control Plane.
+12. Consultar `access status --request-id <id> --json`.
+13. Gerar o link de aprovacao SOMENTE se o pedido estiver acionavel (pendente de aprovacao,
+    nao cancelado, nao expirado, sem drift).
+14. Entregar a URL ao humano solicitante e PARAR no limite humano.
+15. Apos a confirmacao explicita do usuario, consultar o status novamente e validar a entrega.
+
+### Handoff humano de aprovacao (SSO)
+
+A IA gera o handoff; a decisao permanece humana. Referencia detalhada de contrato, erros e
+limites: `references/access-approval-links.md`.
+
+Gerar o link (so depois de confirmar que o pedido esta acionavel):
+
+```bash
+uv run data-engine access approval-link \
+  --request-id REQ-XXXXXXXX \
+  --expires-in 15m \
+  --base-url https://raiz-data-engine-production.up.railway.app \
+  --json
+```
+
+- `--expires-in` aceita de `5m` a `30m` (default `15m`). Fora da faixa, o CLI recusa.
+- Entregue a `approval_url` ao humano solicitante, e so a ele.
+- Informe que ele deve autenticar via Google SSO e clicar em "Aprovar e liberar acesso".
+- PARE aqui. Aguarde a confirmacao do usuario de que aprovou. Nao tente abrir, seguir,
+  automatizar nem prever o resultado do link.
+
+Depois da confirmacao humana, consultar novamente:
+
+```bash
+uv run data-engine access status --request-id REQ-XXXXXXXX --json
+```
+
+Validar, item a item:
+- status final do pedido;
+- `connection_id` da conexao provisionada;
+- delivery (modo e destino);
+- operacoes e scopes efetivamente provisionados vs solicitados;
+- expiracao do grant;
+- eventos de auditoria (criacao, confirmacao, aprovacao, provisionamento, conclusao);
+- ausencia de segredo, token ou API key no output.
+
+Buscar o descriptor SOMENTE apos aprovacao confirmada:
+
+```bash
+uv run data-engine access descriptor --connection-id <connection_id> --json
+```
+
+### Regras de autorizacao do handoff
+
+- A credencial geradora e de maquina e possui SOMENTE `approval_link:create`.
+- Wildcard (`*`), `admin` e qualquer scope de aprovacao sao proibidos nessa credencial.
+- O aprovador humano precisa de `can_approve_access=true`.
+- Em producao, o aprovador deve ser um ator diferente do requester (four-eyes).
+- O link e temporario, de uso unico e protegido por SSO.
+- Reabrir um link ja concluido nao pode reprovisionar: mostra "Operacao ja concluida".
+- A IA gera o handoff; a decisao permanece humana.
 
 ## Comandos CLI
 
@@ -238,6 +304,7 @@ Flags globais aceitas em todo comando: `--json` (saida JSON estavel), `--quiet`,
 | Abrir pedido | `access request --file data-engine.access.yaml --json` | sim |
 | Drift manifesto vs grants | `access drift --file data-engine.access.yaml --json` | sim |
 | Status do pedido | `access status --request-id <id> --json` | sim |
+| Gerar handoff humano | `access approval-link --request-id <id> --expires-in 15m --json` | sim; exige scope exato `approval_link:create` |
 | Cancelar pedido | `access cancel --request-id <id> --json` | sim |
 | Renovar pedido | `access renew --request-id <id> --expires-at <iso> --json` | sim |
 | Descriptor (pos-aprovacao) | `access descriptor --connection-id <id> --json` | sim |
@@ -247,6 +314,8 @@ Contratos reais do CLI — nao inventar sintaxe:
 - `validate`, `preview`, `request`, `drift` recebem `--file <path>` (NAO argumento posicional).
 - `status`, `cancel`, `renew` recebem `--request-id <id>` (alias `--id`).
 - `descriptor` recebe `--connection-id <id>` (a conexao provisionada, nao um grant id solto).
+- `approval-link` recebe `--request-id <id>` (alias `--id`) e `--expires-in <N>m`. So aceita
+  minutos, entre `5m` e `30m` (default `15m`); o CLI converte para `expires_in_seconds`.
 - `catalog search` recebe o termo como argumento posicional; `catalog operation` recebe o
   `operation_id` como argumento posicional.
 - `access explain`, `access validate` e `access draft` (com `--operation` explicito) rodam
@@ -405,6 +474,22 @@ Recursos solicitados:
 Proximo passo: um aprovador (ator diferente do requester em producao) aprova no Control
 Plane. So entao o descriptor fica disponivel via `access descriptor --connection-id <id>`.
 O segredo NUNCA aparece aqui — vem por delivery seguro (vault_write/callback).
+```
+
+Apos `access approval-link`, reporte assim (sem nunca imprimir segredo/token/API key):
+
+```text
+Link de aprovacao gerado.
+
+Pedido: <request_number>
+Status: aguardando aprovacao humana
+Expira em: <expires_at>
+Aprovacao SSO: <approval_url>
+
+Abra o link, autentique com um usuario que possua
+can_approve_access=true e clique em "Aprovar e liberar acesso".
+
+Depois responda "aprovado" para validar provisionamento e auditoria.
 ```
 
 Se nao conseguir abrir pedido, informe:
