@@ -95,6 +95,10 @@ mkdir -p "$(dirname "$DEST")"
 - **Bypass de sessao** (emergencia): `export DOCS_GUARD_DISABLED=1`.
 - **Bypass legitimo**: salvar em `~/Claude/docs/workspace/...` (sem bloqueio).
 
+## Visualização local
+
+Projetos com `.markdown-viewer.json` podem abrir documentos publicados via `/markdown-viewer`. Gerar um `.md` não o publica automaticamente: diretórios já autorizados aparecem sem cópia; novas raízes exigem revisão explícita da allowlist. Caminhos sensíveis continuam bloqueados pela denylist do runtime.
+
 ## Migracao do legado
 
 Os 369 .md ja em `~/Claude/docs/{specs,diagnosticos,plans}/` foram acumulados por sessoes que rodaram com CWD = `~/Claude`. Migrar via:

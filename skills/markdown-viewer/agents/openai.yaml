@@ -1,0 +1,8 @@
+interface:
+  display_name: "Markdown Viewer"
+  short_description: "Visualiza Markdown local com allowlist segura"
+  brand_color: "#F7941D"
+  default_prompt: "Use $markdown-viewer para abrir os documentos publicados deste projeto no navegador."
+
+policy:
+  allow_implicit_invocation: true

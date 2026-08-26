@@ -160,6 +160,17 @@ for project in "${PROJECTS[@]}"; do
     sync_dir "$SHARED_DIR/templates/ux-qat/runtime" "$project/ux-qat/runtime" "UX-QAT runtime engine"
   fi
 
+  # 11. Markdown Viewer — validar manifesto existente, nunca criar/publicar implicitamente
+  harness_root="$(cd "$SHARED_DIR/.." && pwd -P)"
+  viewer_launcher="$harness_root/skills/markdown-viewer/scripts/markdown-viewer.sh"
+  if [ -f "$project/.markdown-viewer.json" ] && [ -x "$viewer_launcher" ]; then
+    if "$viewer_launcher" --project "$project" --check >/dev/null; then
+      log_ok "Markdown Viewer: manifesto valido"
+    else
+      log_warn "Markdown Viewer: manifesto invalido em $project/.markdown-viewer.json"
+    fi
+  fi
+
   log_ok "Projeto $project_name sincronizado."
 done
 

@@ -41,6 +41,16 @@ test -f bun.lock && PM=bun || PM=npm   # NUNCA pnpm sem ADR
 - [ ] Vitest + Playwright no plano
 - [ ] **NÃO gerar `.github/workflows/ci.yml`** — Vercel CI cobre. Gerar `.husky/pre-commit` + `vercel.json` com `buildCommand` (ver `gha-minimal.md`)
 - [ ] Workflow GHA SOMENTE se enquadra na whitelist W1-W4 de `gha-minimal.md` (com header `JUSTIFICATIVA-GHA:`)
+- [ ] Projeto que gera Markdown tem `.markdown-viewer.json` inicializado por `/markdown-viewer --init`, com allowlist revisada antes de servir
+
+Após criar `README.md` e `docs/` em projeto documental, executar:
+
+```bash
+bash ~/Claude/.claude/skills/markdown-viewer/scripts/markdown-viewer.sh --project "$PROJECT_ROOT" --init
+bash ~/Claude/.claude/skills/markdown-viewer/scripts/markdown-viewer.sh --project "$PROJECT_ROOT" --check
+```
+
+O init só cria manifesto ausente; nunca sobrescreve customização existente.
 
 **Se usuário pediu lib FORA whitelist:**
 1. PARAR e perguntar: "X não está na whitelist Raiz. Justificativa? Criamos ADR?"
