@@ -113,6 +113,13 @@ Input do usuario:
 │      ├─ módulo vertical/dashboard → consultar design-library/solutions/
 │      └─ recriar de screenshot/URL → /ag-referencia-redesign-workflow
 │
+├─ GERAR/EDITAR IMAGEM IA (bitmap/asset final)?
+│  "gerar imagem" "criar imagem" "ilustração" "logo" "ícone" "hero image"
+│  "foto sintética" "editar imagem" "variação de imagem" "asset gráfico"
+│  └─→ Skill("gerar-imagem", args: "[descrição + destino]")
+│      ├─ provider default: OpenAI gpt-image-1 (openai-image.sh); Nano Banana aguarda billing
+│      └─ fronteira ag-11: aqui sai PNG pronto; ag-11 desenha UI/componente/sistema de design
+│
 ├─ OTIMIZAR SQL / DADOS TOTVS / ZEEV?
 │  "sql" "query lenta" "otimizar query" "relatorio" "TOTVS RM" "PostgreSQL"
 │  "matricula" "turma" "aluno" "professor" "coligada" "frequencia"
@@ -290,6 +297,7 @@ SDD puro:     PRD → SPEC → Execução → Review
 - Se plano tem 2+ PRs independentes: invoca `/ag-team-safe` com worktree por PR
 - Se PRs são sequenciais: ag-1 serial (sem team)
 - Pre-flight obrigatório: `repo-health.sh` + `memory_pressure`
+- Antes de despachar builds que abrem PR, checar PRs em voo da mesma frente (`gh pr list --state open`); fila governada (raiz-data-engine) segue regra 8 QUEUE.md (teto 2 PRs vivos por frente, anexar por default — ver SHIP-0 do ag-1-construir)
 
 **Fase 6 — REVIEW** (qualidade + segurança)
 - `/ag-revisar-codigo` em todos os PRs do plano
@@ -736,7 +744,7 @@ Apos machine/skill retornar, ANTES de declarar tarefa concluida ao usuario:
 
 | Rota delegada | Artifact esperado | Como verificar |
 |---|---|---|
-| ag-1-construir | PR aberto, build verde | `gh pr view --json url,state,mergeable,statusCheckRollup` |
+| ag-1-construir | PR aberto (novo) OU commits landados em PR existente #X (appended-to, regra 8 QUEUE.md), build verde | `gh pr view --json url,state,mergeable,statusCheckRollup` OU `gh pr view <X> --json commits` / head SHA da branch contendo o commit novo |
 | ag-2-corrigir | PR aberto OU fix commitado, typecheck OK | `gh pr view` + `git log -1 --stat` + check do completion-gate |
 | ag-3-entregar | Deploy URL ativa, smoke OK | `vercel inspect <url>` ou checar Sentry release |
 | ag-4-teste-final | Score por dimensao, screenshots em `docs/qat/` | `ls docs/qat/*-score.json` |
@@ -794,6 +802,7 @@ bash ~/Claude/.claude/scripts/orq-goal-update.sh --abandon "<motivo>"
 | Apos confirmar | Rode |
 |---|---|
 | PR aberto via `gh pr view` | `--check gh_pr_open --status pass --detail "PR #N"` |
+| Commits landados em PR existente (appended-to, regra 8 QUEUE.md) | mesmo check `gh_pr_open --status pass --detail "appended-to PR #X, commit <sha>"` — alternativa valida ao PR novo, verificar via `gh pr view <X> --json commits` ou head SHA da branch |
 | PR merged | `--check gh_pr_merged --status pass --detail "merged at <hash>"` |
 | SPEC existe | `--check file_exists --status pass --detail "<path>"` |
 | MQS/SSS/FS >= threshold | `--check score_threshold --status pass --detail "score=<N>"` |
