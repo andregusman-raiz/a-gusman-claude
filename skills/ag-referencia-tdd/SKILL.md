@@ -291,7 +291,7 @@ it('debitar reduz saldo', async () => {
 ## Composicao com regras existentes
 
 - **`fix-verification.md`**: verificacao end-to-end via Playwright apos ciclo RED-GREEN-REFACTOR confirma que o comportamento funciona do ponto de vista do usuario, nao apenas unitariamente
-- **`quality-systems.md` M16 (Baseline Parity)**: escrever o teste para o baseline simples ANTES do modelo complexo — TDD aplicado a modelos preditivos
+- **`predictive-systems.md` M16 (Baseline Parity)**: escrever o teste para o baseline simples ANTES do modelo complexo — TDD aplicado a modelos preditivos
 - **`root-cause-debugging.md`**: quando bug e encontrado, escrever teste que reproduz o bug (RED) antes de corrigir (GREEN) — documenta o bug e garante nao-regressao
 - **`quality-gate.md`**: `bun run test` (ou equivalente) e gate de qualidade — TDD garante que esse gate tem cobertura real, nao cosmética
 - **`incremental-commits.md`**: cada ciclo RED-GREEN-REFACTOR = commits incrementais (max 3 commits por ciclo); nunca acumular multiplos ciclos sem commit
@@ -303,7 +303,7 @@ it('debitar reduz saldo', async () => {
 | Dominio | Motivo | Exemplo de comportamento a testar |
 |---------|--------|----------------------------------|
 | Calculos financeiros | Erros custam dinheiro real | Juros, parcelas, descontos, acordos |
-| Pipelines preditivos | M16 Baseline Parity (quality-systems.md) | Score de inadimplencia, threshold de churn |
+| Pipelines preditivos | M16 Baseline Parity (predictive-systems.md) | Score de inadimplencia, threshold de churn |
 | Dados regulatorios (LGPD, fiscal) | Compliance — falha gera passivo juridico | Anonimizacao, retencao, exportacao de dados |
 | Logica de autorizacao / permissoes | Falha = brecha de seguranca | RLS, roles, can-access predicates |
 | ETL critico com reconciliacao | Dado errado em batch = retrabalho massivo | Transformacoes, joins, validacoes de schema |
@@ -314,5 +314,5 @@ it('debitar reduz saldo', async () => {
 
 - Skill canonical: `/ag-referencia-tdd`
 - Modo na machine: `/ag-1-construir feature X --tdd`
-- Regras compostas: `fix-verification.md`, `quality-systems.md`, `root-cause-debugging.md`
+- Regras compostas: `fix-verification.md`, `predictive-systems.md`, `root-cause-debugging.md`
 - Templates de teste Raiz: `~/Claude/.claude/shared/templates/`

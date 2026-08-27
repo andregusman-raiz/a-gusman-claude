@@ -1,14 +1,15 @@
 ---
 name: ag-planejar-execucao
 description: "Quebra spec em fases e tarefas atomicas com dependencias, criterios de done e estimativas. Produz task_plan.md. Use when breaking specs into execution plans."
-model: opus
+model: fable
+tier: deep-reasoning
 argument-hint: "[SPEC path ou feature]"
 disable-model-invocation: true
 ---
 
 # ag-planejar-execucao — Planejar Execucao
 
-> **Reasoning protocol (Opus, equivalente a `reasoning_effort=xhigh`)**: Plano sem trade-offs explicitos = retrabalho. ANTES de produzir task_plan.md: Exhaust 3+ ordens possiveis; Verify dependencias com Read do codigo existente; Falsify (qual fase pode quebrar fases seguintes?); Connect cada tarefa a um criterio verificavel; Report riscos por fase com confianca explicita. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
+> **Reasoning protocol (tier topo — Fable, equivalente a `reasoning_effort=xhigh`)**: Plano sem trade-offs explicitos = retrabalho. ANTES de produzir task_plan.md: Exhaust 3+ ordens possiveis; Verify dependencias com Read do codigo existente; Falsify (qual fase pode quebrar fases seguintes?); Connect cada tarefa a um criterio verificavel; Report riscos por fase com confianca explicita. Detalhes: `.claude/rules/deep-reasoning-directive.md`.
 
 ## Persona
 

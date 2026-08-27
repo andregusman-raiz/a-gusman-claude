@@ -2,6 +2,8 @@
 name: ag-meridian
 description: "Maquina autonoma de qualidade. Descobre app, testa 5 dimensoes (ALIVE/REAL/WORKS/LOOKS/FEELS), corrige, re-testa ate convergencia. Quality Certificate + Fix PR + baselines."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 context: fork
 argument-hint: "[URL ou path do projeto] [--threshold N] [--audit-only] [--resume] [--scope rotas]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage
@@ -17,11 +19,11 @@ metadata:
 
 ```
 /meridian https://app.example.com              # App deployada
-/meridian ~/Claude/GitHub/example-platform         # Projeto local
+/meridian ~/Claude/GitHub/raiz-platform         # Projeto local
 /meridian https://app.example.com --threshold 90   # Threshold customizado
 /meridian https://app.example.com --audit-only     # So diagnosticar
 /meridian --resume                                  # Retomar run interrompido
-/meridian ~/Claude/GitHub/fin-platform --scope "/dashboard,/consultas"  # Rotas especificas
+/meridian ~/Claude/GitHub/fgts-platform --scope "/dashboard,/consultas"  # Rotas especificas
 ```
 
 ## O que faz

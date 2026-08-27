@@ -24,60 +24,11 @@ argument-hint: "[action] [element/project]"
 
 Esta machine (ag-11-ux-ui) mantém valor como **orchestrator de design**: curadoria da Raiz Design Library, catálogo de 24 soluções, decisão entre estilos/paletas/fonts, integração com stack-decisions.
 
-## Inline Design Tokens — rAIz (Opus 4.7 ADR-0001 P1.2)
+## Design Tokens rAIz — 4 primários
 
-> Tokens críticos inline para eliminar Read. Catálogo completo em `~/Claude/assets/design-library/catalog.md`.
+`--raiz-orange: #F7941D` | `--raiz-teal: #5BB5A2` | `--raiz-dark: #1A1A1A` | `--raiz-gray-50: #F8F9FA`
 
-### Cores Raiz (core palette)
-
-```css
---raiz-primary: #2E7D32;       /* verde raiz */
---raiz-primary-dark: #1B5E20;
---raiz-secondary: #FFA726;     /* amarelo complementar */
---raiz-success: #4CAF50;
---raiz-warning: #FB8C00;
---raiz-error: #E53935;
---raiz-info: #1E88E5;
---raiz-text: #212121;
---raiz-text-muted: #757575;
---raiz-bg: #FFFFFF;
---raiz-bg-alt: #F5F5F5;
---raiz-border: #E0E0E0;
-```
-
-### Tipografia
-
-```css
---font-sans: 'Inter', system-ui, sans-serif;
---font-mono: 'JetBrains Mono', ui-monospace, monospace;
-
-/* Scale */
---text-xs: 0.75rem;   /* 12px */
---text-sm: 0.875rem;  /* 14px */
---text-base: 1rem;    /* 16px */
---text-lg: 1.125rem;  /* 18px */
---text-xl: 1.25rem;   /* 20px */
---text-2xl: 1.5rem;   /* 24px */
---text-3xl: 1.875rem; /* 30px */
---text-4xl: 2.25rem;  /* 36px */
-```
-
-### Spacing (4px grid)
-
-```css
---space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
---space-4: 1rem;    --space-6: 1.5rem; --space-8: 2rem;
---space-12: 3rem;   --space-16: 4rem;
-```
-
-### Radius + shadow
-
-```css
---radius-sm: 0.375rem; --radius: 0.5rem; --radius-lg: 0.75rem; --radius-full: 9999px;
---shadow-sm: 0 1px 2px rgba(0,0,0,.05);
---shadow:    0 2px 4px rgba(0,0,0,.1);
---shadow-lg: 0 10px 15px rgba(0,0,0,.1);
-```
+> Tokens completos (tipografia IBM Plex, spacing 4px grid, radius, shadows, paleta expandida): Read `~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md` + `~/Claude/assets/design-library/tokens/colors.json`
 
 ### 24 Soluções catalogadas (quick index)
 
@@ -94,7 +45,16 @@ ANTES de gerar qualquer design system ou componente, consultar:
 1. **Design System Oficial**: `~/Claude/assets/design-library/UI_UX/raiz-educacao-design-system.md` — tokens, cores, tipografia, spacing (para projetos rAIz)
 2. **Catalogo de Solucoes**: `~/Claude/assets/design-library/catalog.md` — 24 solucoes curadas
 3. **Solution Specs**: `~/Claude/assets/design-library/solutions/NN-id/spec.md` — props, layout, CSS, deps
-4. **Componentes Base**: `~/Claude/assets/design-library/catalog/src/components/ui/` — 13 shadcn customizados
+4. **Componentes Base**: `~/Claude/assets/design-library/catalog/src/components/ui/` — 12 shadcn customizados
+5. **Motion Tokens**: `~/Claude/assets/design-library/tokens/motion.json` — easing/durações/springs canônicos
+6. **Componentes Operacionais Canônicos**: `~/Claude/assets/design-library/elements/15-operacional/` — StatusBadge, KpiCard, PrazoBadge, LogTimeline, ConfirmacaoReforcada, SlaRing
+
+**Regra operacional (obrigatória)**: componentes operacionais (badge de status, KPI, prazo, timeline, confirmação de risco, anel de SLA) SEMPRE dos elements canônicos acima — PROIBIDO reinventar por projeto. Status = ícone + rótulo (cor nunca sozinha). Delta de KPI = direção ≠ tom (nem toda alta é boa).
+
+**Reference skills irmãs (carregar conforme a tarefa):**
+- Landing page, auth, marketing, escolha de layout → `/ag-referencia-design-presentation` (taxonomia de 86 variantes com código em `elements/`)
+- Gerar UI via prompt (Claude/Cursor/v0/Lovable) → `/ag-referencia-prompt-guide` (template de 6 blocos)
+- Qualquer animação, micro-interação ou review de motion → `/ag-referencia-motion` (curvas, durações, gate de frequência, 13 receitas)
 
 Se o projeto e rAIz Educacao → usar tokens do design system oficial como base.
 Se existe solucao catalogada → adaptar em vez de criar do zero.
@@ -107,7 +67,7 @@ Se criou componente novo reutilizavel → propor adicao ao catalogo como nova so
 
 # UI/UX Pro Max - Design Intelligence
 
-Comprehensive design guide for web and mobile applications. Contains 67 styles, 96 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 13 technology stacks. Searchable database with priority-based recommendations.
+Comprehensive design guide for web and mobile applications. Contains 67 styles, 96 color palettes, 57 font pairings, 105 UX guidelines, and 25 chart types across 13 technology stacks. Searchable database with priority-based recommendations.
 
 ## When to Apply
 
@@ -172,9 +132,12 @@ Reference these guidelines when:
 
 ### 6. Animation (MEDIUM)
 
+- `frequency-gate` - Never animate keyboard/100+×day actions
 - `duration-timing` - Use 150-300ms for micro-interactions
-- `transform-performance` - Use transform/opacity, not width/height
+- `easing` - Strong ease-out `cubic-bezier(0.23, 1, 0.32, 1)`; never ease-in
+- `transform-performance` - Use transform/opacity, not width/height; never `transition: all`
 - `loading-states` - Skeleton screens or spinners
+- Referência completa: `/ag-referencia-motion`
 
 ### 7. Style Selection (MEDIUM)
 
@@ -304,7 +267,7 @@ Get implementation-specific best practices. If user doesn't specify a stack, **d
 python3 skills/ag-11-ux-ui/scripts/search.py "<keyword>" --stack html-tailwind
 ```
 
-Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
+Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `nuxtjs`, `nuxt-ui`, `svelte`, `astro`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
 
 ---
 
@@ -398,10 +361,13 @@ After generating the design system (Steps 2-4), apply these creative execution p
 - Use CSS variables for consistency
 - NEVER use cliched purple gradients on white backgrounds
 
-**Motion — orchestrated, not scattered:**
-- One well-orchestrated page load with staggered reveals (`animation-delay`) creates more delight than scattered micro-interactions
-- Prioritize CSS-only solutions for HTML; Motion library for React
-- Use scroll-triggering and hover states that surprise
+**Motion — orchestrated, not scattered** (referência completa: `/ag-referencia-motion`):
+- Gate de frequência ANTES de animar: ação 100+×/dia (teclado, command palette) = nunca animar; ocasional (modal/toast) = padrão; rara (onboarding/sucesso) = único lugar do delight budget
+- One well-orchestrated page load with staggered reveals (30-80ms delay entre itens) creates more delight than scattered micro-interactions
+- Easing canônico: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` para entrada/saída; NUNCA `ease-in` em UI; UI funcional sempre <300ms
+- Só animar `transform`/`opacity` (nunca `transition: all`, nunca width/height/top/left)
+- Prioritize CSS-only solutions for HTML; Motion library for React (só para spring/layout/exit/gesto)
+- Scroll reveal SÓ em marketing/landing — nunca em app funcional
 
 **Spatial Composition — break the grid intentionally:**
 - Asymmetry, overlap, diagonal flow, grid-breaking elements
@@ -561,6 +527,15 @@ Before delivering UI code, verify these items:
 - [ ] Hover states provide clear visual feedback
 - [ ] Transitions are smooth (150-300ms)
 - [ ] Focus states visible for keyboard navigation
+
+### Motion (ver `/ag-referencia-motion` — checklist Never Ship completo)
+- [ ] Zero `transition: all` — propriedades explícitas
+- [ ] Zero `ease-in` em transições de UI
+- [ ] Só `transform`/`opacity` animados (height apenas em accordion, 200ms máx)
+- [ ] Entrada nunca de `scale(0)` — mínimo `scale(0.9)` + opacity
+- [ ] Popover/dropdown com `transform-origin` no trigger (modal isento)
+- [ ] Ações de teclado/alta frequência SEM animação
+- [ ] Entrada de grupo com stagger (30-80ms), não tudo-de-uma-vez
 
 ### Light/Dark Mode
 - [ ] Light mode text has sufficient contrast (4.5:1 minimum)
@@ -731,3 +706,9 @@ Validacoes inegociaveis antes de scaffold:
 | `--headed` | Abre Chrome em modo visivel para acompanhar captura |
 | `--skip-spa-check` | Pula deteccao de SPA (force clone) |
 | `--port <N>` | Dev server na porta especificada (default: proxima porta livre) |
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

@@ -17,7 +17,7 @@ metadata:
 
 ```
 /auditar https://app.example.com               # FORTRESS classico (5D)
-/auditar ~/Claude/GitHub/example-platform          # FORTRESS classico
+/auditar ~/Claude/GitHub/raiz-platform          # FORTRESS classico
 /auditar --resume                                # Retoma de fortress-state.json
 /auditar --include-harness ~/Claude/...          # FORTRESS + HARNESS (6D, default mensal)
 /auditar --harness-only                          # So auditoria do harness local (sem app target)
@@ -68,7 +68,7 @@ Convergencia: FS >= 80 = passa. FS < 60 = bloqueio P0.
 Agent({
   subagent_type: "ag-fortress",
   prompt: "[input completo do usuario]",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   run_in_background: true
 })
 
@@ -76,7 +76,7 @@ Agent({
 Agent({
   subagent_type: "ag-fortress",
   prompt: "[input do usuario] --include-harness",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   run_in_background: true
 })
 
@@ -90,3 +90,9 @@ Skill({
 ## Rule referenciada
 
 - `harness-coverage.md` — R9 exige HCS >= 80 em PR que toca `.claude/`
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

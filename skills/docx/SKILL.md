@@ -298,3 +298,9 @@ pandoc input.html -o output.docx
 4. Tracked changes exigem IDs unicos e timestamps validos
 5. Testar abertura no Word/LibreOffice apos gerar
 6. Para docs complexos com TOC, avisar usuario que TOC atualiza ao abrir no Word
+
+## Regra PDF -> Markdown (obrigatoria -- economia de tokens)
+
+Qualquer PDF consumido por esta skill/machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` -> Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

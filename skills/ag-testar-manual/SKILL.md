@@ -1,6 +1,6 @@
 ---
 name: ag-testar-manual
-description: Teste exploratorio via Playwright CLI. Navega na aplicacao como usuario real usando browser controlado por IA. Captura screenshots, erros de console, problemas de acessibilidade. Gera relatorio estruturado. Use para QA exploratoria antes de merge ou apos deploy.
+description: "Teste exploratorio com Playwright: navega como usuario, captura screenshots, console e a11y. Use antes de merge/deploy ou bugs visuais."
 model: sonnet
 argument-hint: "[URL da aplicacao]"
 disable-model-invocation: true
@@ -213,3 +213,8 @@ Esta secao transforma QA exploratorio em input actionavel para o roadmap.
 - [ ] Gap Analysis gerado com fluxos sem cobertura?
 - [ ] Sugestoes de roadmap items incluidas?
 
+## Regra PDF -> Markdown (obrigatoria -- economia de tokens)
+
+Qualquer PDF consumido por esta skill/machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` -> Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

@@ -1,6 +1,6 @@
 ---
 name: markdown-report
-description: "Gerar relatorios estruturados em Markdown com TOC, tabelas, mermaid diagrams, badges, e formatacao profissional. Trigger quando usuario quer relatorio, analise, sumario, ou documento tecnico em .md."
+description: "Gerar arquivo .md formatado (TOC, tabelas, mermaid, badges). Trigger APENAS quando usuario pede explicitamente um relatorio/documento EM ARQUIVO .md formatado — analise em chat ou docs de projeto roteiam para ag-5-documentos."
 model: sonnet
 argument-hint: "[report|analysis|summary] [tema]"
 metadata:

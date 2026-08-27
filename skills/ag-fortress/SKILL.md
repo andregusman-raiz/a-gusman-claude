@@ -2,6 +2,8 @@
 name: ag-fortress
 description: "Orquestrador supremo. Roda MERIDIAN+SENTINEL+ARCHITECT+CONDUCTOR+LIGHTHOUSE em sequencia. Modo --include-harness adiciona dimensao HARNESS (HCS) auditando o proprio Claude Code. Fortress Score (FS) = laudo completo."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 context: fork
 argument-hint: "[URL ou path] [--skip machine] [--threshold N] [--include-harness | --harness-only]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage, Skill
@@ -14,10 +16,10 @@ metadata:
 # FORTRESS — Laudo Completo de Software
 
 ```
-/fortress ~/Claude/GitHub/example-platform              # Completo (5 maquinas)
+/fortress ~/Claude/GitHub/raiz-platform              # Completo (5 maquinas)
 /fortress https://app.example.com                     # Parcial (MERIDIAN + SENTINEL)
-/fortress ~/Claude/GitHub/payroll-app --skip sentinel  # Pular maquina
-/fortress ~/Claude/GitHub/example-platform --include-harness    # 6 maquinas (FS6)
+/fortress ~/Claude/GitHub/salarios-platform --skip sentinel  # Pular maquina
+/fortress ~/Claude/GitHub/raiz-platform --include-harness    # 6 maquinas (FS6)
 /fortress --harness-only                              # So auditoria do harness local
 ```
 

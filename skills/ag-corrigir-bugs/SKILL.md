@@ -1,6 +1,6 @@
 ---
 name: ag-corrigir-bugs
-description: "Bugfix unificado com auto-routing. Triage (classificar bugs), Fix (1 bug + 5 gates), Batch (2-5 bugs em sprints), Parallel (6+ bugs em Agent Teams). Substitui ag-corrigir-bugs/24/25/26."
+description: "Bugfix unificado com auto-routing. Triage (classificar bugs), Fix (1 bug + 5 gates), Batch (2-5 bugs em sprints), Parallel (6+ bugs em Agent Teams)."
 model: sonnet
 argument-hint: "[--triage|--fix|--batch|--parallel] [bugs ou path para diagnostico]"
 disable-model-invocation: true
@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 # ag-corrigir-bugs — Bugfix
 
-Spawn the `ag-23-bugfix` agent to handle any bugfix workflow — from triage to parallel execution.
+Spawn a `general-purpose` agent to handle any bugfix workflow — from triage to parallel execution.
 
 ## Auto-Routing
 
@@ -26,7 +26,7 @@ The agent auto-selects the best mode based on input:
 ## Invocation
 
 Use the **Agent tool** with:
-- `subagent_type`: `ag-23-bugfix`
+- `subagent_type`: `general-purpose`
 - `mode`: `bypassPermissions`
 - `run_in_background`: `true` (except `--fix` which runs foreground)
 - `prompt`: Compose from template below + $ARGUMENTS

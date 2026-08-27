@@ -41,6 +41,20 @@ test -f bun.lock && PM=bun || PM=npm   # NUNCA pnpm sem ADR
 - [ ] Vitest + Playwright no plano
 - [ ] **NÃO gerar `.github/workflows/ci.yml`** — Vercel CI cobre. Gerar `.husky/pre-commit` + `vercel.json` com `buildCommand` (ver `gha-minimal.md`)
 - [ ] Workflow GHA SOMENTE se enquadra na whitelist W1-W4 de `gha-minimal.md` (com header `JUSTIFICATIVA-GHA:`)
+- [ ] `docs/DECISOES.md` criado a partir de `shared/templates/project-context/DECISOES.template.md` (ledger de decisoes de UX/escopo D-001..)
+- [ ] CLAUDE.md do projeto inclui a secao "Fluxos numerados (F-001..)" (copiar de `shared/templates/project-context/project-context.md`)
+- [ ] Projeto que gera Markdown tem `.markdown-viewer.json` inicializado por `/markdown-viewer --init`, com allowlist revisada antes de servir
+
+> **Padrao de Qualidade Operacional** (CLAUDE.md raiz) se aplica a todo projeto novo: estados universais (`elements/14-states/`), `?estado=` para QAT sem backend, componentes operacionais canonicos (`elements/15-operacional/`), fluxos numerados + E2E 1:1, `docs/DECISOES.md`.
+
+Após criar `README.md` e `docs/` em projeto documental, executar:
+
+```bash
+bash ~/Claude/.claude/skills/markdown-viewer/scripts/markdown-viewer.sh --project "$PROJECT_ROOT" --init
+bash ~/Claude/.claude/skills/markdown-viewer/scripts/markdown-viewer.sh --project "$PROJECT_ROOT" --check
+```
+
+O init só cria manifesto ausente; nunca sobrescreve customização existente.
 
 **Se usuário pediu lib FORA whitelist:**
 1. PARAR e perguntar: "X não está na whitelist Raiz. Justificativa? Criamos ADR?"
@@ -51,7 +65,7 @@ test -f bun.lock && PM=bun || PM=npm   # NUNCA pnpm sem ADR
 
 ```
 /iniciar projeto SaaS com Next.js + Supabase + Clerk
-/iniciar ambiente ~/Claude/GitHub/example-platform
+/iniciar ambiente ~/Claude/GitHub/raiz-platform
 /iniciar explorar ~/Claude/GitHub/novo-repo
 /iniciar pesquisar alternativas de auth
 ```
@@ -95,7 +109,7 @@ ANTES de criar projeto novo ou pesquisar alternativas:
 - Template: Next.js 16 + Tailwind 4 + shadcn/ui + Zod + Supabase (Auth+DB+Storage)
 - NUNCA desviar do stack aprovado sem ADR + aprovação do usuário
 
-### 2. Design Library (`example-catalog.vercel.app`)
+### 2. Design Library (`catalogo-raiz.vercel.app`)
 - **Soluções** (24 patterns): dashboard, workflow, chat, etc.
 - **Elementos UI** (144): referências best-in-class
 - **Módulos funcionais** (32): auth, LLM router, TOTVS sync, export engine, etc.
@@ -111,3 +125,9 @@ ANTES de criar projeto novo ou pesquisar alternativas:
 | ambiente | ag-preparar-ambiente | Dev environment (deps, env vars, dev server) |
 | explorar | ag-explorar-codigo | Mapear codebase (project-profile, findings) |
 | pesquisar | ag-pesquisar-referencia | Benchmarks e alternativas com trade-offs |
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

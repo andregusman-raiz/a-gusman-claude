@@ -67,5 +67,5 @@ ACT:   Atualizar baselines, registrar failure patterns, adicionar learnings
 - Agent completo: `~/.claude/agents/ag-testar-qualidade-qat.md`
 - Pattern: `~/.claude/shared/patterns/quality-acceptance-testing.md`
 - Templates: `~/.claude/shared/templates/qat/`
-- SPEC original: `/tmp/example-platform-git/docs/specs/QAT-SPEC.md`
+- SPEC original: `/tmp/raiz-platform-git/docs/specs/QAT-SPEC.md`
 

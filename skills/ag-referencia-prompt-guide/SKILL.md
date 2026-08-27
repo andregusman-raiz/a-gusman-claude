@@ -64,6 +64,7 @@ Usuário final: <PERSONA>. Objetivo: <O QUE O USUÁRIO DEVE FAZER/SENTIR>.
 - Dark mode: <class strategy | data-attribute | nenhum>
 - Spacing: <8pt grid | 4pt grid | custom>
 - Shadows: <subtle | pronounced | nenhum>
+- Motion: <none | subtle — 150-250ms ease-out, sem transition:all, sem ease-in | ver /ag-referencia-motion>
 
 ## Referências
 - Design-library: <ID da variante — ex: 04b-split-text-image>
@@ -102,7 +103,7 @@ Cursor usa Claude por baixo, mas com contexto limitado. Versão condensada:
 ```
 Contexto: <produto> — <persona> — <objetivo em 1 frase>
 Layout: <estrutura em 1 frase, base na variante <ID do library>>
-Estilo: Raiz tokens (laranja #FF6D00, teal #006E6A, rounded-xl, Inter, dark mode via class)
+Estilo: Raiz tokens (laranja #F7941D, teal #5BB5A2, rounded-xl, IBM Plex Sans, dark mode via class)
 Stack: React 19 + Tailwind v4 + shadcn + lucide-react
 Entregável: 1 arquivo .tsx, PT-BR, mobile-first, a11y básica
 ```
@@ -156,10 +157,10 @@ Objetivo: autenticar via e-mail institucional sem senha.
 Card centralizado em viewport neutro. Logo rAIz no topo, form simples, mensagem de confirmação.
 
 ## Estilo
-- Primária: #FF6D00 (orange)
+- Primária: #F7941D (orange)
 - Radius: 0.75rem
 - Dark mode: class strategy
-- Typography: Inter
+- Typography: IBM Plex Sans
 
 ## Referências
 - Design-library: 01e-magic-link-only
@@ -243,7 +244,7 @@ Raiz default mais soft — sem orange aggressive, paleta neutra com 1 accent tea
 
 ❌ "É um SaaS de gestão educacional para diretores, captamos leads, preciso de landing"
 
-Sem bloco de estilo/tokens, AI inventa. Melhor: "É um SaaS de gestão educacional [contexto]... **Estilo: Raiz tokens #FF6D00 + #006E6A, rounded-xl, Inter, dark mode via class** [continua]".
+Sem bloco de estilo/tokens, AI inventa. Melhor: "É um SaaS de gestão educacional [contexto]... **Estilo: Raiz tokens #F7941D + #5BB5A2, rounded-xl, IBM Plex Sans, dark mode via class** [continua]".
 
 ### Prompt de estética sem contexto
 

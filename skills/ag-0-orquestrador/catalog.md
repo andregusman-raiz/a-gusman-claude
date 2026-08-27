@@ -1,6 +1,6 @@
 # ag-0-orquestrador — Machine & Agent Catalog
 
-## 14 Machines (User-Facing)
+## 16 Machines (User-Facing)
 
 | Machine | Comando | Modos | Agents internos |
 |---------|---------|-------|-----------------|
@@ -18,6 +18,8 @@
 | **ag-11-ux-ui** | `/ag-11-ux-ui` | design system, componentes, paletas, layouts, shadcn | ag-revisar-ux, ag-avaliar-ux-design-library |
 | **ag-12-sql-totvs-zeev** | `/ag-12-sql-totvs-zeev` | otimizar SQL Server (TOTVS RM) + PostgreSQL (Neon) + Zeev BPM | self |
 | **ag-13-limpar-codigo** | `/ag-13-limpar-codigo` | --triage-only, --apply-quick-wins, --full-pipeline, --create-issues | ag-escanear-morto-codigo, ag-aplicar-fix-codigo |
+| **ag-14-data-engine-cli** | `/ag-14-data-engine-cli` | descoberta, manifesto, preview, request/status (invocacao explicita) | self |
+| **ag-15-hubspot** | `/ag-15-hubspot` | HubSQL, funil captacao, campanhas, conversas, propriedades, escrita `--escrita` | self |
 
 ## Shortcuts (Machine-Based)
 

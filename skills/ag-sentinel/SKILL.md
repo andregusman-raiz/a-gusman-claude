@@ -2,6 +2,8 @@
 name: ag-sentinel
 description: "Maquina autonoma de seguranca, load testing e LGPD. 6 dimensoes, modo hybrid, convergencia SSS >= 80. Security Certificate + Load Report + Fix PR."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 context: fork
 argument-hint: "[URL ou path] [--threshold N] [--audit-only] [--resume] [--mode defensive|hybrid|offensive]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage
@@ -17,12 +19,12 @@ metadata:
 
 ```
 /sentinel https://app.example.com              # Producao (DEFENSIVE auto)
-/sentinel ~/Claude/GitHub/example-platform         # Local (OFFENSIVE auto)
+/sentinel ~/Claude/GitHub/raiz-platform         # Local (OFFENSIVE auto)
 /sentinel https://preview-xyz.vercel.app        # Staging (HYBRID auto)
-/sentinel ~/Claude/GitHub/fin-platform --threshold 90
+/sentinel ~/Claude/GitHub/fgts-platform --threshold 90
 /sentinel https://app.example.com --audit-only
 /sentinel --resume
-/sentinel ~/Claude/GitHub/example-platform --mode defensive  # Override modo
+/sentinel ~/Claude/GitHub/raiz-platform --mode defensive  # Override modo
 ```
 
 ## O que faz

@@ -2,6 +2,8 @@
 name: ag-escanear-morto-codigo
 description: "Sub-agent de scan multi-tool dead code (Knip + ts-prune + depcheck + ESLint + Madge + bundle + AST custom). Read-only. Output JSON para ag-13-limpar-codigo."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, LSP
 argument-hint: "[project-path] [--categoria components|imports|state|comments|all] [--quick | --deep]"

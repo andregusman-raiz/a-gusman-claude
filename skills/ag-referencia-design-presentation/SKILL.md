@@ -182,6 +182,18 @@ Estados vazios, erros, loading, cookies.
 - `14d-cookie-banner-gdpr` — Banner minimal bottom, Accept/Customize
 - `14e-error-boundary-card` — Card centralizado com retry + report
 
+> **Catálogo formal (canônico)**: além das 5 variantes de apresentação acima (VibeUI), `elements/14-states/` está sendo formalizado como catálogo canônico de **7 estados universais** de uso transversal obrigatório (loading, vazio, erro, sem-permissão, etc.) — ver "Padrão de Qualidade Operacional" no CLAUDE.md raiz. Toda tela do projeto DEVE demonstrar os estados aplicáveis usando esses componentes, nunca inventar estado ad-hoc.
+
+### 15 — Operacional (canônico, 6)
+Componentes operacionais de uso transversal — status, KPI, prazo, log, confirmação de risco. PROIBIDO reinventar por projeto.
+
+- `elements/15-operacional/status-badge` — StatusBadge: ícone + rótulo sempre juntos, cor nunca carrega significado sozinha
+- `elements/15-operacional/kpi-card` — KpiCard: indicador com delta (direção ≠ tom — nem toda alta é boa)
+- `elements/15-operacional/prazo-badge` — PrazoBadge: vencido / ≤30d / ok
+- `elements/15-operacional/log-timeline` — LogTimeline: histórico de eventos/auditoria em ordem cronológica
+- `elements/15-operacional/confirmacao-reforcada` — ConfirmacaoReforcada: ação de risco exige 2º clique + registro em log
+- `elements/15-operacional/sla-ring` — SlaRing: anel de progresso de prazo/SLA para apps com deadline
+
 ---
 
 ## Combos recomendados (templates)
@@ -201,7 +213,7 @@ Estados vazios, erros, loading, cookies.
 01a Split screen login ⇄ 01d Multi-step signup → Email verify → 11a Onboarding checklist → 14b Loading skeleton (app shell)
 ```
 
-### Internal Tool (example-platform, payroll-app estilo)
+### Internal Tool (raiz-platform, salarios-platform estilo)
 ```
 07c Sidebar fixed → 14c Empty state on first view → dashboard-kpi (solutions/#01) → table-filters-export (solutions/#02)
 ```

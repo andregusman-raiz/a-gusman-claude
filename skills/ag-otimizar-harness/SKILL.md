@@ -1,6 +1,6 @@
 ---
 name: ag-otimizar-harness
-description: "Otimizador de overhead do proprio harness. Identifica skills caras (tokens x frequencia), candidatas a cache_control, candidatas a depreciacao, MCPs com baixo ROI. Consumido por ag-9-auditar (dimensao HARNESS) e ag-13-limpar-codigo (--target=harness)."
+description: "Otimiza overhead do harness: skills caras, cache_control, depreciacao e MCPs de baixo ROI. Usado por ag-9 e ag-13 --target=harness."
 model: sonnet
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write

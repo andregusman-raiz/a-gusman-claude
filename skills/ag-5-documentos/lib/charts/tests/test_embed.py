@@ -50,7 +50,7 @@ def test_embed_chart_in_slide_adds_picture(empty_slide):
         region=region,
         action_title=spec.action_title,
         takeaway_bar="Margem caiu 4pp em 12 meses pressionando lucro",
-        source="PBI_DATASET, Abr-2026",
+        source="PBI_RAIZ, Abr-2026",
     )
     n_shapes_after = len(empty_slide.shapes)
     # action_title (1) + takeaway bar rect (1) + takeaway text (1) + picture (1) + source line (1)
@@ -81,7 +81,7 @@ def test_builder_build_returns_png_for_valid_spec():
             {"label": "2023", "value": 100},
             {"label": "2024", "value": 125},
         ],
-        source="PBI_DATASET, Abr-2026",
+        source="PBI_RAIZ, Abr-2026",
     )
     result = ChartBuilder().build(spec)
     assert result.png_bytes[:8] == b"\x89PNG\r\n\x1a\n"
@@ -138,7 +138,7 @@ def test_builder_build_and_embed_integrates_with_slide(empty_slide):
         action_title="Receita cresceu 25% pressionando margem",
         data=[{"label": "A", "value": 1}, {"label": "B", "value": 2}],
         takeaway_bar="Crescimento sustentado pelo segmento premium",
-        source="PBI_DATASET, Abr-2026",
+        source="PBI_RAIZ, Abr-2026",
     )
     region = default_chart_region()
     n_before = len(empty_slide.shapes)

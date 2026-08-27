@@ -14,7 +14,7 @@ allowed-tools: Read, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, 
 `TeamCreate` por padrao NAO impoe `isolation:"worktree"` nos teammates. Se
 voce spawna 3 teammates que editam o mesmo repo, os 3 escrevem no mesmo
 working tree → corrupcao garantida (stash overflow, edits perdidos, branch
-drift). Incidente referencia: `docs/diagnosticos/2026-04-07-data-engine-app-wip-triage.md`.
+drift). Incidente referencia: `docs/diagnosticos/2026-04-07-raiz-data-engine-wip-triage.md`.
 
 ## O que faz
 
@@ -33,8 +33,8 @@ drift). Incidente referencia: `docs/diagnosticos/2026-04-07-data-engine-app-wip-
 ## Invocacao
 
 ```
-/ag-team-safe adicionar autenticacao Clerk no example-platform --teammates 3
-/ag-team-safe refatorar modulo auth em 3 frentes --teammates 3 --repo ~/Claude/GitHub/example-platform
+/ag-team-safe adicionar autenticacao Clerk no raiz-platform --teammates 3
+/ag-team-safe refatorar modulo auth em 3 frentes --teammates 3 --repo ~/Claude/GitHub/raiz-platform
 ```
 
 ## Regras inegociaveis

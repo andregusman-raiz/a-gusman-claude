@@ -2,6 +2,8 @@
 name: ag-aplicar-fix-codigo
 description: "Sub-agent applier de fixes dead code. Recebe findings de ag-escanear-morto-codigo, aplica em PRs atomicos com quality gates. Confidence-aware. Invocado por ag-13-limpar-codigo."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 context: fork
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, LSP
 argument-hint: "[findings-json-path] [P0|P1|P2|P3|P4|P5|all]"

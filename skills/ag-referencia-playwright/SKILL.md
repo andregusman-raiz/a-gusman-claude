@@ -9,7 +9,7 @@ user-invocable: true
 
 Referencia oficial para uso de Playwright em testes E2E, QAT, e automacao
 browser. Baseado em `playwright.dev/docs/best-practices` + observacoes de
-producao em example-platform, example-prof, jusraiz.
+producao em raiz-platform, profdigital, jusraiz.
 
 ## Quando ativar
 

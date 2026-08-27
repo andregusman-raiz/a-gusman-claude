@@ -53,7 +53,7 @@ EMIT_CHART_INSIGHT_TOOL = {
             },
             "source": {
                 "type": "string",
-                "description": "Ex: 'PBI_DATASET / TOTVS RM, Abr-2026'.",
+                "description": "Ex: 'PBI_RAIZ / TOTVS RM, Abr-2026'.",
             },
         },
         "required": ["action_title", "takeaway_bar"],

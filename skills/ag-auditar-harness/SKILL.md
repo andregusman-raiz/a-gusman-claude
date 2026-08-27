@@ -1,7 +1,8 @@
 ---
 name: ag-auditar-harness
-description: "Auditor sistematico do proprio harness (skills, agents, hooks, rules, MCP). Detecta drift, prompt injection risk, redundancia semantica, violacao de DoD, cost MCP. Produz HCS (Harness Coverage Score). Invocado por /ag-9-auditar --include-harness."
-model: opus
+description: "Auditor sistematico do harness (skills/hooks/rules/MCP): drift, prompt injection risk, redundancia, violacao DoD, custo MCP. Produz HCS. Via /ag-9-auditar --include-harness."
+model: fable
+tier: deep-reasoning
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write
 argument-hint: "[--apply-quick-wins | --report-only] [--threshold=80]"
@@ -86,6 +87,11 @@ Convergencia: HCS >= 80 = passa. HCS < 60 = bloqueio P0.
 
 **Score:** 100 - 20*P0_count - 5*P1_count, floor 0.
 
+**Escopo:** este sub-auditor cobre CODIGO do harness (hook/script executando input).
+Injecao indireta via TEXTO que o modelo le como dado — descricao de tool MCP, `description:`
+de SKILL.md de terceiro, tool poisoning, rug pull — e coberta por `/ag-auditar-mcp`
+(`.claude/scripts/mcp-baseline-audit.py`). Nao duplicar aqui.
+
 ### 3. HCS.redundancy — Skills semanticamente sobrepostas
 
 **Detecta:** pares de skills com similaridade > 0.85 (candidatos a merge).
@@ -133,7 +139,7 @@ Convergencia: HCS >= 80 = passa. HCS < 60 = bloqueio P0.
 ```
 Agent({
   subagent_type: "general-purpose",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   description: "Audit local harness",
   prompt: """
 Voce e o ag-auditar-harness. Execute as 5 sub-auditorias abaixo.

@@ -244,7 +244,7 @@ Usar `performance_start_trace` opcional se for redesign que exige análise de pe
 ### Via Claude API (quando builda página /presentation/redesign)
 
 - Upload direto do screenshot como base64
-- Modelo: Claude Opus para análise visual de alta fidelidade, Sonnet para casos simples
+- Modelo: Fable para análise visual de alta fidelidade, Sonnet para casos simples
 - Prompt caching em partes estáticas (lista de categorias e presets)
 - Streaming opcional para UX melhor
 
@@ -262,3 +262,9 @@ Usar `performance_start_trace` opcional se for redesign que exige análise de pe
 - Sites com heavy animações só capturam um frame estático
 - PDFs/PowerPoints: pedir conversão manual para PNG primeiro
 - Figma: preferir `figma-implement-design` skill antes, só usar este workflow como fallback
+
+## Regra PDF -> Markdown (obrigatoria -- economia de tokens)
+
+Qualquer PDF consumido por esta skill/machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` -> Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

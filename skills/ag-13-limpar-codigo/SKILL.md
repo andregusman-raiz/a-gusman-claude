@@ -1,6 +1,6 @@
 ---
 name: ag-13-limpar-codigo
-description: "Maquina autonoma de limpeza de dead code (Knip + AST + bundle, confidence tiers, PRs atomicos). Use para tech debt, hand-off, reducao de bundle, cleanup pos-spike, auditoria de saude. Modo --target=harness audita dead skills/hooks/MCPs do proprio Claude Code."
+description: "Limpeza de dead code com Knip+AST+bundle, confidence tiers e PRs atomicos. Use para tech debt, cleanup, bundle e --target=harness."
 model: sonnet
 context: fork
 argument-hint: "[--triage-only | --apply-quick-wins | --full-pipeline | --create-issues | --resume | --target=code|harness | categoria:components|imports|state|comments|duplicacao]"
@@ -372,3 +372,9 @@ LIMPAR CODIGO COMPLETO
 - "Working Effectively with Legacy Code" (Michael Feathers) — characterization tests
 - ESLint plugin unused-imports: https://github.com/sweepline/eslint-plugin-unused-imports
 - Mikado Method: https://mikadomethod.info/
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

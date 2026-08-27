@@ -1,13 +1,13 @@
 ---
 name: ag-5-documentos
-description: "Maquina autonoma de documentacao. Office (PPTX, DOCX, XLSX, PDF), projeto (README, API), diagramas, specs, changelogs, data dictionaries, CSV transform — 16 modos, auto-detecta, produz docs completos. Modo `executive` entrega decks McKinsey-grade com tokens rAIz via pipeline 4-fase obrigatorio."
+description: "Documentacao: Office (PPTX/DOCX/XLSX/PDF), README, API, diagramas, specs, changelog, data dictionary e CSV; executive para decks."
 model: sonnet
 context: fork
 argument-hint: "[modo] [path ou descricao] [--brand=raiz|inspira] [--skip-review] [--draft]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, TaskCreate, TaskUpdate, TaskList, TeamCreate, TeamDelete, SendMessage
 metadata:
   filePattern: "README.md,CHANGELOG.md,docs/**,*.xlsx,*.xlsm,*.csv,*.pdf,*.pptx,*.docx,*.md,openapi.*,swagger.*,**/specs/**,**/schema*"
-  bashPattern: "documentos|readme|changelog|xlsx|excel|pdf|pptx|docx|diagram|spec|api.doc|csv|data.dict|executive|executivo|board|diretoria|mckinsey"
+  bashPattern: "documentos|readme|changelog|xlsx|excel|pdf|pptx|docx|diagram|spec|api.doc|csv|data.dict|executive|executivo|board|diretoria|mckinsey|soap|motivacional|inspiracional|institucional|manifesto|cultura|town.?hall|all.?hands|kickoff|keynote|palestra|premium|infografico|infographic"
   priority: 85
 ---
 
@@ -97,7 +97,7 @@ Ambos rodam dentro de `audit_slide()` e sao reportados em `audit["blocked_for_de
 `ExecutiveDeckPipeline(audience="external")` ativa auto-mask de nomes
 proprios internos detectados via regex (CamelCase sem prefix Raiz).
 Exemplos: `JusRaiz` → `plataforma interna`. Brand allowlist preserva
-`Raiz`/`ExampleOrg`/`rAIz`. Warnings emitidos para revisao manual.
+`Raiz`/`RaizEducacao`/`rAIz`. Warnings emitidos para revisao manual.
 
 Audiences validas: `internal` (no-op), `external`, `board_external`,
 `investor`, `press`.
@@ -114,7 +114,7 @@ consecutiva.
 Detalhes: `lib/pipeline.py::ExecutiveDeckPipeline`,
 `lib/visualization.py` (P0.1), `lib/audit.py` (P0.2/P0.3/P0.5/P1.2/P1.3/P1.4).
 
-## Modos (15)
+## Modos (16)
 
 ### Office Suite (4 skills dedicados + 1 modo executivo)
 
@@ -123,7 +123,10 @@ Detalhes: `lib/pipeline.py::ExecutiveDeckPipeline`,
 | xlsx | skill: xlsx | Excel: formulas, formatacao, modelos financeiros, analise de dados, recalc via LibreOffice |
 | pdf | skill: pdf | PDF: criar, merge, split, extrair texto/tabelas, OCR, formularios, watermark, criptografia |
 | pptx | skill: pptx | PowerPoint standard: criar do zero (html2pptx), editar existente (OOXML), design padrao |
-| **executive** | **pipeline 4-fase** | **PPTX board-ready nivel McKinsey — tokens rAIz default, brand override (inspira), action titles, takeaway bars, auditor visual. Entrega SEMPRE como v2 apos review.** |
+| **pptx --premium** | **engine ppt-master** | **Deck PREMIUM visual: SVG autoral por pagina → PPTX DrawingML nativo editavel. Brand `raiz` pre-registrado. Para keynote/institucional rico onde design e o produto. Operacao: `Read ~/Claude/.claude/shared/patterns/ag5-engines-externos.md`** |
+| **executive** | **pipeline 7-fase** | **PPTX board-ready nivel McKinsey — DATA-DENSE: action titles, exhibits, charts, source lines. Tokens rAIz default. Entrega SEMPRE como v2 apos review.** |
+| **soap** | **template HTML** | **Apresentacao NARRATIVA de alto impacto — MINIMALISTA: 1 ideia por slide, tipografia gigante, marca. Para conteudo motivacional/institucional/cultural/manifesto. Entrega .html navegavel.** |
+| exhibit infographic | engine AntV Infographic | Exhibit conceitual (funil, timeline, processo, comparacao — ~200 templates) via DSL → SVG headless: `bun ~/Claude/scripts/infographic-render.mjs`. Usavel em QUALQUER modo. Detalhes no mesmo pattern acima |
 | docx | skill: docx | Word: criar (docx-js), editar (OOXML), tracked changes/redlining, comments |
 
 ### Projeto & Docs (4)
@@ -182,36 +185,11 @@ Todas as cores e fontes sao carregadas de
 `cd ~/Claude/assets/design-library/catalog && npm run dev -- -p 3011`
 → `http://localhost:3011/tokens` (Playwright MCP).
 
-### Tipografia canonical (guia mestre 16.2-16.3, migrado 2026-04-25)
+### Tipografia canonical
 
-Escala em pontos para uso em PPTX. Valores em `lib/raiz_tokens.FONT_SIZE`.
+Escala Montserrat: kicker/caption=9pt, body=14pt, h1=28pt, hero=40pt, hero_xl=56pt. Valores em `lib/raiz_tokens.FONT_SIZE`. Escape hatch legacy: `FONT_SIZE_LEGACY["body"]` = 11pt.
 
-| Token | Tamanho (pt) | Uso |
-|-------|--------------|-----|
-| `kicker` | 9 | Section kicker (cabecalho do chrome) |
-| `caption` | 9 | Captions, source lines, footer |
-| `body_sm` | 12 | Body compact (cards densos) |
-| `body` | **14** | Body padrao em slides (guia 14-16) |
-| `subtitle` | **16** | Subtitulo abaixo do action title (guia 14-18) |
-| `takeaway` | **14** | Takeaway bar |
-| `label` | **14** | Labels destacados em cards |
-| `h3` | **16** | Titulos de cards/quadrantes |
-| `h2` | **20** | Titulos secundarios |
-| `h1` | **28** | Action title (guia 26-30) |
-| `section` | **36** | Titulo de secao em divisor (guia 32-44) — NOVO |
-| `hero` | **40** | KPIs medios (guia 32-56) |
-| `hero_xl` | **56** | KPIs grandes em capa |
-| `table` | **11** | Texto em tabela (guia 9-12) — NOVO |
-
-**Bumps em negrito** vieram da migracao Montserrat. Para reverter um layout
-especifico ao tamanho legacy (pre-2026-04-25), importar `FONT_SIZE_LEGACY` em
-vez de `FONT_SIZE`:
-
-```python
-from lib.raiz_tokens import FONT_SIZE, FONT_SIZE_LEGACY
-size_now = FONT_SIZE["body"]            # 14 (Montserrat era)
-size_old = FONT_SIZE_LEGACY["body"]     # 11 (IBM Plex Sans era — escape hatch)
-```
+> Tabela completa: Read `~/Claude/.claude/shared/patterns/ag5-exhibits.md` (Seção D)
 
 ### Fallback de fonte (Helvetica)
 
@@ -315,76 +293,11 @@ Apos PDF gerado (FASE 6), Claude orquestrador DEVE:
 ### Charts (`lib/timeline_charts.py`)
 `timeline_horizontal()`, `line_chart_simple()`, `bar_chart_horizontal()`.
 
-### Biblioteca de exhibits (`lib/exhibits/`) — P1.1 + P1.6 refactors
+### Biblioteca de exhibits e Brand semantics
 
-11 builders canonicos, cada um com `render(slide, spec, brand)`:
+11 builders em `lib/exhibits/` (hero_number, matrix_2x2, timeline_horizontal, bar_chart_comparison, stack_hierarchy, before_after_arrow, risk_heatmap, quote_slide, decision_slide, process_flow, section_divider) + 3 tiers de paleta (accent_strong #F7941D, accent_moderate #5BB5A2, accent_neutral #1E2433).
 
-| Kind | Quando usar |
-|---|---|
-| `hero_number` | Numero gigante + caption HARD LIMIT 12 palavras (P1.6d) |
-| `matrix_2x2` | Classificacao 2 dimensoes (4 quadrantes) |
-| `timeline_horizontal` | Marcos sequenciais |
-| `bar_chart_comparison` | Comparacao 2-5 segmentos |
-| `stack_hierarchy` | N camadas + emphasis_index opcional (P1.6e) |
-| `before_after_arrow` | 2 estados com seta dominante |
-| `risk_heatmap` | Risco x impacto (5x5 ou 3x3) |
-| `quote_slide` | Citacao editorial |
-| `decision_slide` | Pergunta + 2-3 opcoes com trade-offs |
-| `process_flow` | Etapas com setas |
-| `section_divider` | Divisor entre blocos com variant `with_preview` (P1.6a) |
-
-**Refactors P1.6 (2026-04-25):**
-
-| Refactor | Detalhe |
-|----------|---------|
-| P1.6a `section_divider` | Variante `with_preview` — 3-4 mini-cards prévia do conteudo |
-| P1.6b `closing_slide` | 1 frase + 1 visual. Rejeita >2 frases via `_validate_text_budget()` |
-| P1.6c `cover_slide` | `logo_path` OBRIGATORIO. Rejeita sem logo via `_validate_logo()` |
-| P1.6d `hero_number` | Caption HARD LIMIT 12 palavras + 1 frase. Excess vai para `_overflow_to_takeaway` |
-| P1.6e `stack_hierarchy` | Param `emphasis_index` — destaca camada arbitraria (resolve "Generativa > Agentica") |
-
-### Brand semantics (P1.7) — `palette_overrides/raiz.py`
-
-Tres tiers para uso disciplinado da paleta (evitar laranja-decorativo):
-
-| Tier | Token raiz | Uso recomendado |
-|------|-----------|-----------------|
-| `accent_strong` | `#F7941D` (RAIZ_ORANGE) | Capa, hero side-bars, divisores criticos |
-| `accent_moderate` | `#5BB5A2` (RAIZ_TEAL) | Takeaway bars, dividers, accents secundarios |
-| `accent_neutral` | `#1E2433` (SIDEBAR) | Body backgrounds, navy escuro |
-
-Uso:
-```python
-from lib.palette_overrides.raiz import (
-    ACCENT_STRONG, ACCENT_MODERATE, ACCENT_NEUTRAL,
-    tier_color, tier_for_exhibit,
-)
-
-# Brand carregado tem os tiers como atributos:
-brand = get_brand("raiz")
-brand.accent_strong    # "#F7941D"
-brand.accent_moderate  # "#5BB5A2"
-brand.accent_neutral   # "#1E2433"
-
-# Helper para mapeamento canonical exhibit → tier
-tier_for_exhibit("takeaway_bar")    # "moderate"
-tier_for_exhibit("cover_slide")      # "strong"
-tier_color("strong")                  # "#F7941D"
-```
-
-Resultado: deck preserva identidade Raiz (laranja em pontos-chave) sem
-virar laranja-decorativo (anti-pattern McKinsey).
-
-Uso:
-```python
-from lib.exhibits import RENDER_REGISTRY, EXAMPLE_INPUTS
-
-# Em loop de render
-for item in pipe.outline:
-    viz = item['viz']
-    render_fn = RENDER_REGISTRY[viz.kind]
-    render_fn(slide, item.get('viz_data', EXAMPLE_INPUTS[viz.kind]), brand=brand)
-```
+> Detalhe completo + code: Read `~/Claude/.claude/shared/patterns/ag5-exhibits.md` (Seções A e B)
 
 ### Templates prontos (`lib/templates/`)
 - `briefing.md` — template canonical de briefing
@@ -394,13 +307,113 @@ for item in pipe.outline:
 - `--skip-review` — promove v1 -> v2 sem auditoria (mantem estrutura do pipeline)
 - `--draft` — rascunho rapido, sem quality gate
 
+## Modo `soap` — apresentacao narrativa de alto impacto (HTML)
+
+> Estilo "SOAP / Apple / Duarte": minimalista, emocional, 1 ideia grande por
+> slide. O apresentador fala; o slide ancora. Oposto do `executive` (data-dense).
+
+### Quando usar (auto-trigger)
+
+Palavras-chave que disparam: `soap`, `motivacional`, `inspiracional`,
+`institucional`, `cultura`, `manifesto`, `valores`, `visao`, `proposito`,
+`comunicado`, `kickoff`, `town hall`, `all-hands`, `palestra`, `keynote`,
+`celebracao`, `storytelling`.
+
+Tambem quando: conteudo e emocional/narrativo (nao data-dense), publico amplo
+(colaboradores, evento), objetivo e engajar/inspirar/alinhar (nao decidir com dados).
+
+### SOAP vs executive — qual escolher
+
+| Sinal | **soap** (HTML) | **executive** (PPTX) |
+|-------|-----------------|----------------------|
+| Objetivo | inspirar, alinhar cultura, narrar | decidir com dados, board |
+| Densidade | 1 ideia por slide, texto minimo | data-dense, action titles, exhibits |
+| Visual | tipografia gigante, cor de marca, respiro | charts, matrizes, KPIs, source lines |
+| Dados | narrativo — KPI NAO obrigatorio | numerico — source line obrigatoria |
+| Formato | `.html` standalone (full-screen, navegavel) | `.pptx` + `.pdf` |
+| Publico | colaboradores, evento, town hall | N1/CEO/investidor/board |
+
+Na duvida entre os dois: se o pedido tem **numeros/decisao/board** → `executive`.
+Se tem **cultura/pessoas/inspiracao/manifesto** → `soap`.
+
+### ⚠️ Regra anti-fabricacao (CRITICA — inegociavel)
+
+> Incidente 2026-05-26: deck "Modo Raiz" foi gerado como pitch institucional
+> generico com KPIs INVENTADOS (73% engajamento, 9K alunos, 94% score, 335K
+> leads, "5 novos mercados"). Conteudo, publico e dados errados. Corrigido
+> reescrevendo com o roteiro real do usuario, zero numeros fabricados.
+
+1. Usar o CONTEUDO FORNECIDO pelo usuario fielmente. Roteiro dado = seguir.
+2. **NUNCA inventar** KPIs, percentuais, metricas, nomes de produto ou marcos.
+   Deck de cultura nao precisa de numero.
+3. Se houver dado, vem do usuario ou de fonte real (data-engine) — jamais chutado.
+4. Faltou conteudo? **Perguntar** — nao preencher com pitch generico.
+
+### Principios SOAP
+
+- 1 mensagem por slide. A headline ocupa o slide.
+- Texto minimo. Sem paragrafos longos; bullets curtos quando preciso.
+- Contraste forte: fundos solidos (dark/navy/orange/teal), tipografia weight 900.
+- Ritmo: alternar slides de IMPACTO (`slide--section`, statement centrado) com
+  slides de CONTEUDO (lista/pills/transformacoes/passos).
+- Marca: tokens rAIz, logo oficial SVG embutido, laranja em pontos-chave (nao decorativo).
+- Maximo ~15 slides salvo pedido explicito.
+
+### Template canonical (NAO gerar do zero)
+
+`lib/templates/soap_deck.html` — copiar e preencher. Ja inclui:
+- Framework CSS: temas `slide--{dark,navy,orange,teal}` + `slide--section`
+- Componentes: `.statements`, `.list-clean`, `.list-no`, `.transforms`, `.steps`,
+  `.pill-grid`, `.quote`, `.highlight-box`, `.grid-2`/`.card`, `.accent-line`, `.kicker`
+- Logo oficial Raiz como `<symbol id="raiz-logo">` (de `assets/logos/raiz-educacao-logo.svg`)
+- Navegacao: teclado (←→, espaco, Home/End) + clique lateral + swipe + progress + counter automatico
+- `@media print` → export PDF com 1 slide por pagina
+
+O template tem cabecalho-comentario com a lista completa de componentes e o
+bloco de verificacao headless. Trocar de marca = trocar `<symbol>` + tokens `--raiz-*`.
+
+### Pipeline SOAP (4 passos)
+
+1. **CONTEUDO** — coletar/estruturar a narrativa do usuario. Nunca inventar (ver regra acima).
+2. **ESTRUTURA** — mapear em <=15 slides, alternando impacto x conteudo; tema por slide.
+3. **RENDER** — `cp lib/templates/soap_deck.html $PROJECT_ROOT/docs/reports/<slug>.html`,
+   substituir os `<div class="slide">` pelo conteudo real (manter `<style>`/`<symbol>`/`<script>`).
+4. **VERIFY** — renderizar 3-5 slides representativos via Chrome headless, Read multimodal,
+   conferir logo/contraste/overflow/ortografia. Loop ate limpo.
+
+### Verificacao headless (sem Playwright MCP)
+
+```bash
+CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+DECK="$PROJECT_ROOT/docs/reports/<slug>.html"
+
+# Screenshot do slide N (troca init goTo(1)->goTo(N) numa copia temp):
+perl -0pe 's/\n    goTo\(1\);\n  \}\)\(\);/\n    goTo(N);\n  })();/' "$DECK" > /tmp/s.html
+"$CHROME" --headless=new --force-device-scale-factor=2 --window-size=1600,900 \
+  --screenshot=/tmp/sN.png "file:///tmp/s.html"   # depois: Read /tmp/sN.png (multimodal)
+
+# Export PDF (1 slide por pagina, via @media print):
+"$CHROME" --headless=new --print-to-pdf="$PROJECT_ROOT/docs/reports/<slug>.pdf" \
+  --no-pdf-header-footer "file://$DECK"
+```
+
+### Output
+
+`$PROJECT_ROOT/docs/reports/<slug>.html` (ou `~/Claude/docs/workspace/<slug>.html`
+com `--workspace-doc` para conteudo cross-project como comunicados corporativos).
+
 ## Exemplos de Uso
 
 ```bash
-# Modo executive (pipeline 4-fase obrigatorio)
+# Modo executive (pipeline 7-fase obrigatorio — PPTX data-dense para board)
 /ag-5-documentos executive deck cybersec inspira 2025-2027 --brand=inspira
 /ag-5-documentos executive pitch deck investidores rAIz  # default = raiz tokens
 /ag-5-documentos executive --draft board pre-mortem      # bypass rapido
+
+# Modo soap (HTML narrativo de alto impacto — cultura/motivacional/institucional)
+/ag-5-documentos soap apresentacao "Modo Raiz" cultura de trabalho
+/ag-5-documentos soap manifesto institucional rAIz para town hall
+/ag-5-documentos soap kickoff 2026 --workspace-doc
 
 # Office Suite
 /ag-5-documentos xlsx relatorio financeiro Q1
@@ -409,14 +422,14 @@ for item in pipe.outline:
 /ag-5-documentos docx contrato com tracked changes
 
 # Projeto & Docs
-/ag-5-documentos projeto ~/Claude/GitHub/example-platform
-/ag-5-documentos api-docs ~/Claude/GitHub/fin-platform/src/app/api
+/ag-5-documentos projeto ~/Claude/GitHub/raiz-platform
+/ag-5-documentos api-docs ~/Claude/GitHub/fgts-platform/src/app/api
 /ag-5-documentos changelog v1.0.0 v2.0.0
 /ag-5-documentos spec feature autenticacao OAuth
 
 # Diagramas & Dados
 /ag-5-documentos diagram er-diagram do schema de alunos
-/ag-5-documentos data-dict ~/Claude/GitHub/payroll-app/src/db/schema
+/ag-5-documentos data-dict ~/Claude/GitHub/salarios-platform/src/db/schema
 /ag-5-documentos csv limpar ~/data/export-totvs.csv
 
 # Relatorios & Qualidade
@@ -446,22 +459,13 @@ Se modo nao especificado, detectar pelo contexto:
 > caixas porque `python-pptx` nao mede largura renderizada. Paleta dark era default — falta
 > de contraste agravava problemas de leitura.
 
-### Regras R1-R8 (detalhe completo em `skills/pptx/SKILL.md`)
+### Regras R1-R8
 
-1. **R1** — Toda caixa de texto passa por `add_text_safe()` ou `add_paragraphs_safe()` do helper `pptx_utils.py` (mede via Pillow + fonte do sistema, auto-shrink)
-2. **R2** — `LIGHT_THEME` como padrao (fundo off-white, texto near-black). Dark so quando pedido
-3. **R3** — Fonte com TTF instalado (`Helvetica`/`Arial`). Fontes web-only quebram medicao
-4. **R4** — Larguras em Emu calculadas; padding interno min 2pt; altura reserva `lines * size * 1.3`
-5. **R5** — Numeros grandes (metrics) em caixa dedicada com `fit_text_size`. Label em caixa separada
-6. **R6** — Bullet text: max 12 palavras / 75 chars, 1 linha preferencial (encurtar, nao reduzir fonte)
-7. **R7** — Pos-geracao obrigatorio: `verify_deck(path)` + `render_deck_to_pngs(path)` para QA visual
-8. **R8** — Usar `DeckBuilder` (quando disponivel) ou helper direto — nunca `add_textbox` cru
-
-### Caminho preferido
-
+Detalhe completo em `skills/pptx/SKILL.md` (seção "REGRAS OBRIGATORIAS Anti-Overflow"). Caminho do helper:
 ```python
 import sys
-sys.path.insert(0, "/Users/andregusmandeoliveira/Claude/.claude/skills/pptx/templates")
+from pathlib import Path
+sys.path.insert(0, str(Path.home() / "Claude" / ".claude" / "skills" / "pptx" / "templates"))
 from pptx_utils import LIGHT_THEME, add_text_safe, verify_deck, render_deck_to_pngs
 ```
 
@@ -469,201 +473,15 @@ from pptx_utils import LIGHT_THEME, add_text_safe, verify_deck, render_deck_to_p
 
 ## PDF — REGRAS OBRIGATORIAS (Anti-Overflow)
 
-> Incidentes 2026-04-11 (Cubo Tech):
-> - **v1**: badges/tabelas com overflow (causa: `drawString` + strings cruas sem wrap)
-> - **v2**: tentei usar U+2011 (non-breaking hyphen) para resolver v1 — resultado foi PIOR: Helvetica built-in nao tem glyph, todos viraram quadrado preto `■`, e Paragraph ignora U+2011 para break control
-> - **v3 (correto)**: hifen ASCII `-` para tudo + `splitLongWords=0` no ParagraphStyle das celulas/KPIs
->
-> **Essas regras sao obrigatorias em todo PDF gerado. Ver detalhes completos em `skills/pdf/SKILL.md`.**
+Detalhe completo em `skills/pdf/SKILL.md`. Resumo: R1 `Paragraph()` em toda célula (nunca `drawString`), R2 `splitLongWords=0` + hífen ASCII (nunca `\u2011`), R3 KPI badges via `Table`, R4 larguras proporcionais, R5 verificação pós-geração via `pdftotext`, R6 usar template `professional_report.py`.
 
-### Regras R1-R6
-
-1. **R1**  Toda celula de tabela DEVE ser `Paragraph(texto, style)`, NUNCA string crua
-2. **R2**  Use `splitLongWords=0` no ParagraphStyle de celulas curtas e KPIs. Hifen ASCII `-` para tudo: ranges numericos (`280-360`, `R$ 5,5-10,6M`) E palavras compostas (`escola-instituto`, `capacidade-alvo`, `semi-integral`). **NUNCA usar `\u2011`** — vira quadrado preto em Helvetica built-in
-3. **R3**  KPI badges como `Table` de `Paragraph`, NUNCA `canvas.drawString` em caixa de largura fixa
-4. **R4**  Larguras de coluna proporcionais a `CONTENT_W` com pesos explicitos que somam 1.0
-5. **R5**  Verificacao obrigatoria pos-geracao via `pdftotext -layout` + grep de padroes de overflow + checagem de U+25A0 (quadrado preto)
-6. **R6**  Usar o template `skills/pdf/templates/professional_report.py` como ponto de partida
-
-### Caminho preferido para PDFs de relatorio profissional
-
-```python
-import sys
-sys.path.insert(0, "/Users/andregusmandeoliveira/Claude/.claude/skills/pdf/templates")
-from professional_report import ReportBuilder, nbh
-
-rb = ReportBuilder(
-    "saida.pdf",
-    title="Titulo",
-    subtitle="Subtitulo",
-    tagline="TAGLINE DA CAPA",
-    brand="Nome Marca",
-    version="v1.0  Abril 2026",
-    confidential=True,
-    theme={  # opcional, override de cores
-        "primary": HexColor("#0A1628"),
-        "accent":  HexColor("#00C3FF"),
-    }
-)
-
-# Capa com badges (numeros passam por nbh() automaticamente)
-rb.cover(kpis=[
-    ("280-360", "alunos"),
-    ("R$ 5,5-10,6M", "orcamento"),
-    ("6 labs", "core"),
-    ("90%", "meta"),
-])
-
-# Conteudo
-rb.section(1, "Sumario Executivo")
-rb.paragraph("Texto do paragrafo...")
-rb.bullets(["ponto 1", "ponto 2"])
-rb.quote("Frase importante")
-rb.table(
-    header=["Col A", "Col B", "Col C"],
-    rows=[["v1", "v2", "v3"]],
-    weights=[0.40, 0.40, 0.20],  # soma = 1.0
-)
-rb.kpi_row([("100%", "meta"), ("92%", "atual")])
-rb.page_break()
-
-# Build + verificacao automatica (R5)
-path, ok, warnings = rb.build_and_verify()
-```
-
-### Quando NAO usar o template
-
-- PDFs meramente tecnicos sem capa/tabelas/KPIs (usar reportlab diretamente, sem design)
-- Watermark, merge, split, OCR, form fill (usar pypdf/pdfplumber diretamente)
-- PDFs que precisam de layout radicalmente diferente (HTML-to-PDF via playwright, por ex.)
-
-Mesmo fora do template, **R1-R5 continuam obrigatorias**.
+Template Python completo (ReportBuilder): Read `~/Claude/.claude/shared/patterns/ag5-exhibits.md` (Seção E). Quando NAO usar o template: PDFs técnicos sem design, watermark/merge/split, HTML-to-PDF. Mesmo fora do template, **R1-R5 continuam obrigatorias**.
 
 ## Padrao Executive — referencia canonical (PR 5.3)
 
-Esta secao documenta os artefatos canonicos da skill em modo executive,
-finalizados em PR 5.3 (fechamento do plano de 18 PRs).
+Artefatos canonicos finalizados em PR 5.3: prompt McKinsey-grade, 17 validators (5 bloqueantes: pyramid, action title, anatomia 4 elementos, WCAG, label wrap, overlap), 19 exhibit types, 18 chart types, 6 storylines, 7 testes final_acceptance (bloqueio se <6/7), 3 configs YAML.
 
-### Prompt base canonical (modo executive — secao 34 do guia)
-
-Ao receber pedido de deck executivo, o agente deve aplicar o seguinte prompt
-master internamente antes de gerar:
-
-> **Voce e consultor McKinsey-grade.** Receba o briefing e produza um deck
-> que seja: (1) Pyramid-coerente top-down, (2) MECE entre secoes,
-> (3) com action title quantificado em 100% dos slides,
-> (4) viz nao-textual em >= 50% dos slides,
-> (5) source line em todo slide com dado,
-> (6) anatomia 4 elementos canonical em todos os slides de conteudo,
-> (7) cores 70/20/10 disciplinadas, tipografia Montserrat 14-16pt body,
-> (8) cover + executive summary auto-gerado + closing com CTA explicito.
-> Bloquear entrega se final_acceptance < 6/7 testes passando.
-
-### Tabela de validators
-
-| Validator | Modulo | Severidade | Bloqueante |
-|-----------|--------|------------|------------|
-| Pyramid Principle | `pyramid_validator.validate_pyramid_coherence` | high | sim |
-| MECE entre secoes | `mece_validator` | medium | warning |
-| Action title formula | `audit.validate_action_title` | high | sim |
-| Anatomia 4 elementos | `anatomy_validator` | high | sim |
-| One message per slide | `one_message_validator.detect_multi_message` | medium | warning |
-| Bullet quality | `bullet_validator` | medium | warning |
-| Lang executiva | `lang_validator.detect_weak_language` | medium | warning |
-| Spacing/margens | `spacing_audit` | medium | warning |
-| Cores 70/20/10 | `color_proportion_validator.audit_slide_color_proportion` | medium | warning |
-| Strategic bold <30% | `color_proportion_validator.audit_strategic_bold` | low | warning |
-| WCAG AA contrast | `audit.check_text_contrast` | high | sim |
-| Source line categorical | `audit.check_source_line_for_categorical` | medium | warning |
-| Layout repetition | `audit.detect_layout_repetition_from_kinds` | medium | warning |
-| Arbitrary label wrap | `audit.detect_arbitrary_label_wrap` | high | sim |
-| Intra-slide overlap | `audit.detect_intra_slide_overlap` | high | sim |
-| Chart V01-V13 | `chart_validator.ChartSpecValidator` | varia | parcial |
-| Chart anti-patterns AP01-AP08 | `chart_validator.ChartAntiPatternDetector` | varia | warning |
-| Final acceptance (7 testes) | `final_acceptance.run_final_acceptance` | high | sim (>=6/7) |
-
-### Tabela de exhibits canonical (19 tipos)
-
-`matrix_2x2`, `matrix_3x3`, `timeline_horizontal`, `timeline_vertical`,
-`process_flow`, `quadrant`, `waterfall`, `pyramid`, `stack_bar`, `bullet_list`,
-`kpi_row`, `table`, `callout`, `one_pager`, `histogram`, `funnel`,
-`driver_tree`, `raci_matrix`, `exec_summary`.
-
-Ver detalhes em `lib/configs/slide_template.yaml`.
-
-### Tabela de chart types canonical (18 tipos)
-
-`bar_horizontal`, `bar_vertical`, `bar_stacked`, `bar_grouped`, `line`,
-`line_multi`, `area`, `area_stacked`, `pie`, `donut`, `waterfall`, `bullet`,
-`heatmap`, `scatter`, `bubble`, `histogram`, `sparkline`, `combo`.
-
-Modulo `lib/charts/` IMPLEMENTADO (SPEC chart-CEO PR-A...PR-F mergeado em
-2026-04-26). 18 chart types em `CHART_REGISTRY` (paralelo a `RENDER_REGISTRY`):
-bar/grouped_bar, line/area, donut/pie, waterfall, bullet, infographic,
-stacked_bar/stacked100_bar, combo, scatter, heatmap, treemap, driver_tree,
-slope. Implementacao: matplotlib Agg + python-pptx via `embed_chart_in_slide`.
-Validacao: V01-V13 (`ChartSpecValidator`) + AP01-AP08 (`ChartAntiPatternDetector`)
-integrados ao `audit_deck(chart_specs=...)`. Pipeline integration:
-`viz_spec_to_chart_spec()` + `compute_chart_region()`. Insight LLM auto via
-`ChartInsightGenerator` com cache TTL 7d e fallback regex.
-
-### Tabela de storylines canonical (6 templates)
-
-| ID | Nome | Blocos |
-|----|------|--------|
-| scqa | SCQA McKinsey | situation -> complication -> question -> answer |
-| problem_solution | Problema -> Solucao | problem -> root_cause -> solution -> impact |
-| recommendation_first | Pyramid: recomendacao primeiro | recommendation -> evidencia 1/2/3 |
-| before_after | Antes vs Depois | before -> gap -> intervention -> after |
-| chronological | Cronologico | past -> present -> future -> decision |
-| comparative | Comparativo | option_a -> option_b -> criteria -> recommendation |
-
-Detalhes em `lib/storyline_templates.py` + `lib/configs/slide_template.yaml`.
-
-### Padrao de resposta YAML
-
-Os modos `criar` e `revisar` emitem resposta YAML estruturada via
-`lib/response_schema.py`:
-
-- `emit_criar(payload)` -> YAML com deck_metadata, storyline_aplicado, outline,
-  chart_specs, validators_aplicados, final_acceptance_score, audit_warnings
-- `emit_revisar(payload)` -> YAML com deck_path, num_slides, issues_blocking,
-  issues_warning, chart_audit, sugestoes_correcao, score_geral
-
-Schemas Pydantic v2 garantem validacao + conformidade com SPEC chart-CEO.
-
-### Anti-patterns detectados (32 anti-padroes em 26 detectors)
-
-Cobertura unificada via:
-
-- `audit.detect_anti_patterns()` — detectors slide-level (AP-09 titulo
-  generico, AP-10 bullet >2 linhas, AP-11 paralelismo, AP-18 capitalization,
-  AP-20 titulo >14 palavras, bullet >18 palavras legacy)
-- `chart_validator.ChartAntiPatternDetector` — chart-specific (AP01-AP08)
-- `audit.audit_deck_full()` — output unificado para o modo `revisar`
-  (slide_checklist + deck_checklist + anti_patterns + score_geral)
-
-### Final acceptance (7 testes obrigatorios)
-
-`lib/final_acceptance.py::run_final_acceptance` executa 7 testes da secao 36
-do guia mestre. Bloqueio formal se `tests_passed < 6/7`. Componentes:
-
-1. Decision clarity (existe recomendacao explicita)
-2. Audience match (tom alinhado com audience)
-3. Storyline coherence (5-9 blocos sem buracos)
-4. Pyramid principle deck-level
-5. Briefing match (deck cobre todos os topicos do briefing)
-6. Visual ratio >= 30%
-7. Source presence em slides com dado
-
-### Configs canonicals YAML (PR 5.3)
-
-| Arquivo | Conteudo |
-|---------|----------|
-| `lib/configs/visual_style.yaml` | Tipografia, cores 70/20/10, spacing, paletas chart |
-| `lib/configs/slide_template.yaml` | 6 canonical slides + 19 exhibits + 18 charts + 6 storylines |
-| `lib/configs/principles.yaml` | 22 regras canonical + hierarchy_4_levels (decisao/storyline/slide/design) |
-
+> Tabelas completas (validators, exhibits, charts, storylines, configs, anti-patterns): Read `~/Claude/.claude/shared/patterns/ag5-exhibits.md` (Seção C)
 ## Dependencias por Skill
 
 | Skill | Python | Node.js | Sistema |
@@ -684,7 +502,7 @@ do guia mestre. Bloqueio formal se `tests_passed < 6/7`. Componentes:
 
 A skill expoe `cli.py` para invocacao programatica externa (Node subprocess,
 HTTP service, n8n, scripts). Util quando consumidores fora do Claude Code
-precisam gerar/auditar decks (ex: example-platform `presentation-bridge.service.ts`
+precisam gerar/auditar decks (ex: raiz-platform `presentation-bridge.service.ts`
 em Phase 2b).
 
 ### Comandos
@@ -777,4 +595,10 @@ child.on("close", (code) => {
 });
 ```
 
-Implementacao da bridge: ver Phase 2b (example-platform).
+Implementacao da bridge: ver Phase 2b (raiz-platform).
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

@@ -51,13 +51,13 @@ def test_viz_to_chart_spec_returns_chart_spec_for_bar_kind():
     item = {
         "title": "Receita cresceu 25% pressionando margem",
         "message": "x",
-        "source": "PBI_DATASET",
+        "source": "PBI_RAIZ",
     }
     out = viz_spec_to_chart_spec(viz, item)
     assert out is not None
     assert out.type == "bar"
     assert out.action_title == "Receita cresceu 25% pressionando margem"
-    assert out.source == "PBI_DATASET"
+    assert out.source == "PBI_RAIZ"
     assert len(out.data) == 2
 
 

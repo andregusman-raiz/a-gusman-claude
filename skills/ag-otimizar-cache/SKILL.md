@@ -91,7 +91,7 @@ Wrappers:
 
 Reference skills:
   ag-referencia-stack-decisions, ag-referencia-sdd
-  ag-referencia-anti-cycle, ag-referencia-roteamento
+  ag-referencia-anti-ciclo-preditivo, ag-referencia-roteamento
   ag-referencia-seguranca-rules, ag-referencia-design-presentation
 ```
 

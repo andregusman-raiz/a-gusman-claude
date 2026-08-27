@@ -231,13 +231,13 @@ This API uses **Bearer Token** authentication.
 ```bash
 curl -X POST https://api.example.com/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "secret"}'
+  -d '{"email": "user@example.com", "password": "<example-password>"}'
 ```
 
 Response:
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "token": "<example-token>",
   "expiresIn": 3600
 }
 ```
@@ -247,7 +247,7 @@ Response:
 Include in all subsequent requests:
 ```bash
 curl https://api.example.com/v1/users \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+  -H "Authorization: Bearer ${API_TOKEN}"
 ```
 
 ### Token Refresh
