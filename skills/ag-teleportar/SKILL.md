@@ -63,13 +63,13 @@ done
 Incluir portas conhecidas da tabela do CLAUDE.md:
 | Porta | Projeto |
 |-------|---------|
-| 3000 | example-platform |
-| 3001 | example-prof |
-| 3002 | example-automata |
-| 3003 | edu-frontend |
-| 3004 | edu-portal |
-| 3005 | fin-platform |
-| 4200 | agent-dashboard |
+| 3000 | raiz-platform |
+| 3001 | profdigital |
+| 3002 | automata |
+| 3003 | totvs-educacional-frontend |
+| 3004 | sophia-educacional-frontend |
+| 3005 | fgts-platform |
+| 4200 | raiz-agent-dashboard |
 
 ## Para nome-do-projeto ou path
 
@@ -153,4 +153,4 @@ CLAUDE.md: [sim (N linhas) | nao]
 - Run in FOREGROUND — user needs the context output immediately
 - Uses haiku model (fast, just data collection)
 - Does NOT modify anything — pure context loading
-- Fuzzy matching: "raiz" matches "example-platform", "fgts" matches "fin-platform"
+- Fuzzy matching: "raiz" matches "raiz-platform", "fgts" matches "fgts-platform"

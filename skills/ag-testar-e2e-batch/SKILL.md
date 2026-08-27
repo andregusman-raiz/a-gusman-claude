@@ -1,11 +1,20 @@
 ---
 name: ag-testar-e2e-batch
-description: "Roda suite E2E completa com validacao de infraestrutura. Pre-flight (dev server, env vars, smoke), execucao em batches de 10-20 testes, auto-fix de falhas (seletores, mocks, timing), retry ate 3 ciclos, log de progresso em /tmp/e2e-progress.md."
+description: "Suite E2E completa com pre-flight de infra, batches de 10-20 testes, auto-fix de falhas (seletores/mocks/timing), retry ate 3 ciclos, progresso em /tmp/e2e-progress.md."
 model: sonnet
+disable-model-invocation: true
+visibility: internal
 argument-hint: "[projeto-path ou opcoes: --batch-size=N --max-retries=N --base-url=URL]"
 ---
 
 # ag-testar-e2e-batch — E2E Tests with Infrastructure Validation
+
+> **ENGINE CANONICO (2026-06-11, piloto ADR-0002)**: o loop deterministico desta skill
+> (batching, retry bookkeeping, contadores, criterio de parada) vive em
+> `Workflow({name: "e2e-batch", args: {projectDir: "<path>"}})` —
+> script em `.claude/workflows/e2e-batch.js`. PREFERIR o Workflow: o loop nao "esquece"
+> fases e os fixes retornam schema validado. O texto abaixo permanece como referencia
+> de diagnostico por categoria de falha e fallback quando o Workflow tool nao esta disponivel.
 
 Executa suite E2E completa em batches com validacao de infraestrutura, auto-diagnose de falhas, e retry automatico ate convergencia (max 3 ciclos).
 
@@ -363,3 +372,8 @@ E2E Batch Complete:
 - Mais de 3 ciclos de retry (loop infinito)
 - Alterar codigo de producao para fazer testes passar
 
+## Regra PDF -> Markdown (obrigatoria -- economia de tokens)
+
+Qualquer PDF consumido por esta skill/machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` -> Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

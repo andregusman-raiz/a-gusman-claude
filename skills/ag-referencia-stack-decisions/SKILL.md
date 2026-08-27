@@ -58,7 +58,7 @@ Só adicionar dependência quando Vercel+Supabase genuinamente não resolvem.
 | **Icons** | Lucide React | Consistência cross-projetos |
 | **Fonts** | IBM Plex Sans / Mono | Design system rAIz |
 | **Analytics** | Vercel Web Analytics + Speed Insights | Sentry só se precisa stack completa |
-| **Observability** | Vercel Logs + Drains | OTel só para example-platform |
+| **Observability** | Vercel Logs + Drains | OTel só para raiz-platform |
 
 ---
 

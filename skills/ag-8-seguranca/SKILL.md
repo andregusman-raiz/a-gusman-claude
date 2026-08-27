@@ -17,8 +17,8 @@ metadata:
 
 ```
 /seguranca https://app.example.com
-/seguranca ~/Claude/GitHub/example-platform
-/seguranca --audit-only ~/Claude/GitHub/example-platform
+/seguranca ~/Claude/GitHub/raiz-platform
+/seguranca --audit-only ~/Claude/GitHub/raiz-platform
 /seguranca --resume
 ```
 
@@ -38,7 +38,13 @@ Produz: Security Certificate, Load Report, Fix PR.
 Agent({
   subagent_type: "ag-sentinel",
   prompt: "[input completo do usuario]",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   run_in_background: true
 })
 ```
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

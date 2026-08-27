@@ -32,11 +32,11 @@ Ao receber este comando, execute o seguinte processo EXATAMENTE:
 2. Defaults: `maxPages=50`, `depth=3`
 3. Criar diretorio de output:
    ```
-   ~/Claude/projetos/sample-saas-roadmap/docs/specs/{name}/
-   ~/Claude/projetos/sample-saas-roadmap/docs/specs/{name}/screenshots/
-   ~/Claude/projetos/sample-saas-roadmap/docs/specs/{name}/screens/
+   ~/Claude/projetos/vibecoding-roadmap/docs/specs/{name}/
+   ~/Claude/projetos/vibecoding-roadmap/docs/specs/{name}/screenshots/
+   ~/Claude/projetos/vibecoding-roadmap/docs/specs/{name}/screens/
    ```
-4. Ler config se existir: `~/Claude/projetos/sample-saas-roadmap/src/lib/crawler/configs/{name}.json`
+4. Ler config se existir: `~/Claude/projetos/vibecoding-roadmap/src/lib/crawler/configs/{name}.json`
 5. Inicializar contadores: `visited=0`, `queue=[]`, `pages=[]`
 
 ### FASE 1: Login
@@ -170,6 +170,12 @@ docs/specs/{name}/
 
 ## Referencia Tecnica
 
-- Tipos: `~/Claude/projetos/sample-saas-roadmap/src/lib/crawler/types.ts`
-- Engine (JS snippets, prompts): `~/Claude/projetos/sample-saas-roadmap/src/lib/crawler/engine.ts`
-- Configs: `~/Claude/projetos/sample-saas-roadmap/src/lib/crawler/configs/{name}.json`
+- Tipos: `~/Claude/projetos/vibecoding-roadmap/src/lib/crawler/types.ts`
+- Engine (JS snippets, prompts): `~/Claude/projetos/vibecoding-roadmap/src/lib/crawler/engine.ts`
+- Configs: `~/Claude/projetos/vibecoding-roadmap/src/lib/crawler/configs/{name}.json`
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

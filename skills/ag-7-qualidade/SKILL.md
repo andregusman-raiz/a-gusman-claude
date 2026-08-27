@@ -17,7 +17,7 @@ metadata:
 
 ```
 /qualidade https://app.example.com
-/qualidade ~/Claude/GitHub/example-platform
+/qualidade ~/Claude/GitHub/raiz-platform
 /qualidade https://app.example.com --threshold 90
 /qualidade --audit-only https://app.example.com
 /qualidade --resume
@@ -43,7 +43,7 @@ Este skill delega diretamente para ag-meridian:
 Agent({
   subagent_type: "ag-meridian",
   prompt: "[input completo do usuario]",
-  model: "opus",
+  model: "fable", // model-fallback:managed
   run_in_background: true
 })
 ```
@@ -59,3 +59,9 @@ O MERIDIAN DEVE seguir estas regras aprendidas de falhas reais:
 3. **API 200 != E2E funcional** — tracar dados: API → adapter → state → DOM
 4. **Snapshot estatico != Teste** — se nao houve click/select/type, feature NAO foi testada
 5. **Testar interacoes adjacentes** — mudar filtro, trocar tab, selecionar outro item apos fix
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

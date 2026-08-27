@@ -271,11 +271,18 @@ class ReportBuilder:
         c.rect(0, PAGE_H - 17*mm, PAGE_W, 1*mm, stroke=0, fill=1)
         c.setFillColor(T["white"])
         c.setFont("Helvetica-Bold", 11)
-        c.drawString(MARGIN_L, PAGE_H - 9*mm, self.title.upper()[:40])
+        _hdr_title = self.title.upper()[:40]
+        c.drawString(MARGIN_L, PAGE_H - 9*mm, _hdr_title)
         c.setFont("Helvetica", 9)
         c.setFillColor(colors.HexColor("#94A3B8"))
         if self.subtitle:
-            c.drawString(MARGIN_L + 28*mm, PAGE_H - 9*mm, self.subtitle)
+            # offset dinamico: titulos largos empurram o subtitulo (28mm fixo sobrepunha)
+            _off = max(28*mm, c.stringWidth(_hdr_title, "Helvetica-Bold", 11) + 6*mm)
+            _max_sub_w = PAGE_W - MARGIN_R - 22*mm - (MARGIN_L + _off)
+            _sub = self.subtitle
+            while _sub and c.stringWidth(_sub, "Helvetica", 9) > _max_sub_w:
+                _sub = _sub[:-1]
+            c.drawString(MARGIN_L + _off, PAGE_H - 9*mm, _sub)
         c.setFillColor(T["accent"])
         c.setFont("Helvetica-Bold", 10)
         c.drawRightString(PAGE_W - MARGIN_R, PAGE_H - 9*mm, f"Pag. {doc.page}")

@@ -9,6 +9,10 @@ metadata:
   filePattern: "construir-state.json"
   bashPattern: "construir"
   priority: 98
+  cache_policy:
+    enabled: true
+    marker_after: "## Output"
+    estimated_tokens: 4200
 ---
 
 # CONSTRUIR — Maquina Autonoma de Construcao
@@ -201,7 +205,7 @@ ASSESS → PRD → SPEC → [ADVERSARIO] → ADR → PLAN → [TDD-LOOP] → VER
 | Dominio | Razao |
 |---------|-------|
 | Calculos financeiros (juros, parcelas, acordos, descontos) | Erro custa dinheiro real |
-| Pipelines preditivos e scoring | M16 Baseline Parity (quality-systems.md) exige |
+| Pipelines preditivos e scoring | M16 Baseline Parity (predictive-systems.md) exige |
 | Dados regulatorios (LGPD, fiscal, compliance) | Falha gera passivo juridico |
 | Logica de autorizacao / permissoes / RLS | Falha = brecha de seguranca |
 | Refactors de logica critica com comportamento ja documentado | Garantir nao-regressao |
@@ -247,6 +251,8 @@ Se detectado multi-PR:
 
 Exececao: `--force-single-pr` flag (so para rodar a PRIMEIRA fase do plano como PR isolado).
 
+O fatiamento em N PRs deve respeitar o teto de PRs vivos por frente (regra 8 QUEUE.md — 1 frente = 1 PR-trem vivo, teto 2): fatias da mesma frente entram SEQUENCIALMENTE no mesmo PR-trem (mergeia uma, abre a proxima), nunca N PRs simultaneos.
+
 ## O que faz
 
 Executa construcao completa AUTONOMA em 9 fases:
@@ -270,6 +276,7 @@ travadas:
 [BUILD →] implementando 3 arquivos...
 [VERIFY ✓] typecheck=0 lint=0 tests=12/12 ciclos=1
 [SHIP ✓] branch=feat/X PR=#42 url=https://github.com/.../pull/42
+[SHIP ✓] appended-to PR=#37 url=https://github.com/.../pull/37   (PR existente da mesma frente — ver SHIP-0)
 ```
 
 Formato: `[FASE STATUS]` onde STATUS = `→` (em progresso) ou `✓` (concluido) ou `✗` (falhou).
@@ -284,7 +291,7 @@ Emitir SEMPRE — nao e opcional, e o mecanismo de observabilidade da machine.
 6. **BUILD**: Implementa (ag-implementar-codigo/B-10/B-11/B-52/I-35 conforme modo). **Antes de `npm install` qualquer dep nova → verificar stack-enforcement rule.**
 7. **VERIFY**: Verifica completude vs SPEC + testes (ag-validar-execucao + ag-testar-codigo). Loop convergente. **OBRIGATORIO**: rodar `bun run typecheck && bun run lint && bun run test` (ou equivalente) ANTES de declarar fase concluida — Definition of Done do CLAUDE.md. Se vermelho → BUILD novamente (max 3 ciclos). Apos 3 ciclos red, parar e reportar status real ao usuario.
 8. **REVIEW**: Code review (ag-revisar-codigo, +ag-verificar-seguranca se 10+ arquivos, +ag-avaliar-ux-design-library se UI com app rodando)
-9. **SHIP**: Branch + PR com referencia a PRD, SPEC e ADRs
+9. **SHIP**: **SHIP-0 (obrigatorio, primeiro passo, ANTES de criar branch/PR)**: `gh pr list --state open --limit 100 --json number,title,headRefName` no repo alvo e comparar com tema/arquivos do trabalho atual (em repo com fila governada — raiz-data-engine — consultar tambem a `frente` do claim em `~/Claude/docs/ai-state/de-pr-queue/claims.json`). Se existe PR aberto da MESMA frente/tema ou com overlap de arquivos: DEFAULT e ANEXAR — checkout da branch existente (ou worktree dela), commits em cima, push, `gh pr edit`/comentario resumindo o que foi anexado, re-request review (tag `[SHIP ✓] appended-to PR=#X`). Abrir PR novo nesse cenario e EXCECAO: exige justificativa de 1 linha no output + autorizacao do coordenador quando o repo e raiz-data-engine (regra 8 QUEUE.md). Sem overlap/frente nova: fluxo normal — Branch + PR com referencia a PRD, SPEC e ADRs.
 
 ### Fases por Size
 
@@ -384,6 +391,8 @@ CONSTRUIR COMPLETO
   Testes: [N pass]
 ```
 
+<!-- cache_control: ephemeral -->
+
 ## Quando usar
 
 - "adicionar feature X" → /construir
@@ -394,3 +403,9 @@ CONSTRUIR COMPLETO
 - "integrar sistema W" → /construir integrar W
 - "logica de calculo financeiro / scoring / compliance" → /construir feature X --tdd
 - "refatorar calculo critico com risco de regressao" → /construir refatorar Y --tdd
+
+## Regra PDF → Markdown (obrigatoria — economia de tokens)
+
+Qualquer PDF consumido por esta machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` → Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

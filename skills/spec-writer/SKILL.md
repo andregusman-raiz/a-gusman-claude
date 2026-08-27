@@ -1,6 +1,6 @@
 ---
 name: spec-writer
-description: "Criar SPECs tecnicas padronizadas para features e issues. Template com objetivo, escopo, requisitos, edge cases, criterios de aceite. Trigger quando usuario quer spec, especificacao, ou documento tecnico para feature/issue."
+description: "Criar SPEC rapida via template (objetivo, escopo, requisitos, edge cases, criterios de aceite). Para SPEC complexa multi-sistema com deep reasoning usar /ag-especificar-solucao. Trigger: spec simples/rapida de feature ou issue."
 model: sonnet
 argument-hint: "[feature|issue|refactor] [descricao ou #issue]"
 metadata:

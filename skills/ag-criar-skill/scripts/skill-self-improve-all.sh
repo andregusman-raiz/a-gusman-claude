@@ -36,7 +36,7 @@ fi
 
 # Projects to scan
 PROJECTS=(
-  "$HOME/Claude/GitHub/example-platform"
+  "$HOME/Claude/GitHub/raiz-platform"
   "$HOME/Claude/GitHub/rAIz-AI-Prof"
 )
 

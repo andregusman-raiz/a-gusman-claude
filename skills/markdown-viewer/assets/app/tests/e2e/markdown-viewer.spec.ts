@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 
-const allowed_document = "/documento/docs/analises/CENARIOS-FINANCEIROS.md";
+const allowed_document = "/documento/docs/guides/overview.md";
 
 test("F-001 — raiz redireciona ao primeiro documento publicado", async ({ page }) => {
   await page.goto("/");
@@ -14,26 +14,26 @@ test("F-001 — raiz redireciona ao primeiro documento publicado", async ({ page
 test("F-002 — seleção no menu renderiza outro Markdown", async ({ page }) => {
   await page.goto(allowed_document);
   await page
-    .getByRole("link", { name: "Saúde Corporativa SulAmérica — Raiz Educação", exact: true })
+    .getByRole("link", { name: "Example Documentation", exact: true })
     .click();
 
   await expect(page).toHaveURL(/\/documento\/README\.md$/);
-  await expect(page.locator("main h1").first()).toHaveText(/Saúde Corporativa SulAmérica/);
+  await expect(page.locator("main h1").first()).toHaveText(/Example Documentation/);
 });
 
 test("F-003 — URL direta abre documento permitido", async ({ page }) => {
   await page.goto(allowed_document);
 
   await expect(page).toHaveURL(new RegExp(`${allowed_document}$`));
-  await expect(page.locator("main h1").first()).toContainText("Cenários financeiros");
+  await expect(page.locator("main h1").first()).toContainText("Overview");
 });
 
 test("F-004 — busca filtra por título", async ({ page }) => {
   await page.goto(allowed_document);
-  await page.getByRole("searchbox", { name: "Filtrar documentos" }).fill("matriz contratual");
+  await page.getByRole("searchbox", { name: "Filtrar documentos" }).fill("architecture");
 
-  await expect(page.getByRole("link", { name: "Matriz Contratual" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Cenários Financeiros" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Architecture Guide" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Overview" })).toHaveCount(0);
 });
 
 test("F-005 — limpar busca restaura o índice", async ({ page }) => {
@@ -41,8 +41,8 @@ test("F-005 — limpar busca restaura o índice", async ({ page }) => {
   await page.getByRole("searchbox", { name: "Filtrar documentos" }).fill("sem resultado");
   await page.getByRole("button", { name: "Limpar busca" }).click();
 
-  await expect(page.getByRole("link", { name: "Matriz Contratual" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Cenários Financeiros" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Architecture Guide" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Overview" })).toBeVisible();
 });
 
 test("F-006 — busca sem resultado mostra estado vazio", async ({ page }) => {
@@ -76,7 +76,7 @@ test("F-009 — menu móvel permite trocar documento", async ({ page }) => {
   const sidebar = page.locator("#document-sidebar");
   await expect(sidebar).toHaveClass(/sidebar-open/);
   await page
-    .getByRole("link", { name: "Saúde Corporativa SulAmérica — Raiz Educação", exact: true })
+    .getByRole("link", { name: "Example Documentation", exact: true })
     .click();
   await expect(page).toHaveURL(/\/documento\/README\.md$/);
 });

@@ -14,9 +14,11 @@ metadata:
 # LIGHTHOUSE — Observabilidade
 
 ```
-/lighthouse ~/Claude/GitHub/example-platform
+/lighthouse ~/Claude/GitHub/raiz-platform
 /lighthouse https://raiz.app
 ```
 
 5 dimensoes: ERRORS (Sentry), LOGS (structured), METRICS (Web Vitals), ALERTS (health+uptime), TRACES (OTEL).
 Local + URL. Produz Observability Certificate + Lighthouse Scores + Fix PR.
+
+**METRICS (Web Vitals) — fonte canonica = `chrome-devtools-mcp`** (nao estimar): rodar `chrome-devtools-mcp:debug-optimize-lcp` na URL viva para LCP/CLS/INP reais + long tasks; `chrome-devtools-mcp:memory-leak-debugging` quando a suspeita for crescimento de heap. So cair em `bunx lighthouse` se nao houver browser MCP disponivel. Gatilhos e fronteira vs Playwright: `.claude/rules/chrome-devtools-proativo.md`.

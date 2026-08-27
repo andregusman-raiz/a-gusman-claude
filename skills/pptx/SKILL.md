@@ -263,7 +263,8 @@ Para casos simples de 1-2 slides, uso direto de `add_text_safe()` e suficiente.
 
 ```python
 import sys
-sys.path.insert(0, "/Users/andregusmandeoliveira/Claude/.claude/skills/pptx/templates")
+from pathlib import Path
+sys.path.insert(0, str(Path.home() / "Claude" / ".claude" / "skills" / "pptx" / "templates"))
 
 from pptx_utils import (
     LIGHT_THEME, add_text_safe, add_paragraphs_safe,
@@ -298,3 +299,9 @@ pngs, _ = render_deck_to_pngs(OUT)   # QA visual
 | Takeaway bar | 200 | 30 |
 
 Se o conteudo natural excede → reescrever, nunca reduzir font-size abaixo de 8pt.
+
+## Regra PDF -> Markdown (obrigatoria -- economia de tokens)
+
+Qualquer PDF consumido por esta skill/machine DEVE ser convertido ANTES via markitdown:
+`bash ~/Claude/.claude/scripts/pdf2md.sh <arquivo.pdf>` -> Read/Grep no `.md` gerado (cache automatico).
+NUNCA Read direto de `.pdf` para extrair texto. Excecao visual (layout/slides): converter primeiro, Read multimodal depois. Enforcement: hook `pdf-read-guard.sh`. Detalhes: `.claude/rules/pdf-markitdown.md`.

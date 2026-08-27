@@ -1,14 +1,15 @@
 ---
 name: ag-depurar-erro
 description: "Diagnostica e corrige bugs. Le errors-log.md antes de comecar para nao repetir tentativas que ja falharam. Use quando algo nao funciona, da erro, quebrou, trava, build falha, ou qualquer comportamento inesperado."
-model: opus
+model: fable
+tier: deep-reasoning
 argument-hint: "[erro ou descricao do problema]"
 disable-model-invocation: true
 ---
 
 # ag-depurar-erro — Depurar Erro
 
-> **Reasoning protocol (Opus-only, equivalente a `reasoning_effort=xhigh` do Codex)**: ANTES de propor diagnostico, Exhaust 3+ hipoteses concorrentes → Verify cada uma com Read/Bash/grep → Falsify (o que refutaria?) → Connect cadeia causal sintoma→causa→fix → Report com confianca explicita (alta/media/baixa). Detalhes: `.claude/rules/deep-reasoning-directive.md`. NUNCA aceitar primeira hipotese plausivel sem listar concorrentes.
+> **Reasoning protocol (tier topo — Fable, equivalente a `reasoning_effort=xhigh` do Codex)**: ANTES de propor diagnostico, Exhaust 3+ hipoteses concorrentes → Verify cada uma com Read/Bash/grep → Falsify (o que refutaria?) → Connect cadeia causal sintoma→causa→fix → Report com confianca explicita (alta/media/baixa). Detalhes: `.claude/rules/deep-reasoning-directive.md`. NUNCA aceitar primeira hipotese plausivel sem listar concorrentes.
 
 Spawn the `ag-depurar-erro` agent to diagnose and fix bugs using root cause analysis.
 

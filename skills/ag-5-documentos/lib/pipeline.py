@@ -90,7 +90,7 @@ _AUDIENCES_INTERNAL = frozenset({"internal", "team", "tech"})
 _AUDIENCES_EXTERNAL = frozenset({"external", "board_external", "investor", "press"})
 
 # Termos sempre permitidos (brand canonical)
-_BRAND_ALLOWLIST = frozenset({"Raiz", "ExampleOrg", "RAIZ", "rAIz"})
+_BRAND_ALLOWLIST = frozenset({"Raiz", "RaizEducacao", "RAIZ", "rAIz"})
 
 # Pattern para detectar nomes proprios internos provaveis:
 # - CamelCase ou Pascal com 2+ sequencias (ex: JusRaiz, AutomataRaiz, AppRaiz)

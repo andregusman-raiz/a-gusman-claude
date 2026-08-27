@@ -26,6 +26,7 @@ metadata:
 - Criar mock data com **seed determinístico** (reproduzível, 100-500 registros)
 - Criar mock store mutável (Map in-memory para write-back)
 - Criar schemas Zod para cada server action
+- **Volumetria real declarada**: 2 camadas desacopladas — número real publicado (constante `VOLUMETRIA_REAL` documentada, com fonte) vs amostra gerada para popular a UI (teto ~5k registros; acima do teto, usar amostra % com racional explícito de por que representa o todo). KPI/contador na UI mostra **sempre** o número real publicado — **nunca** `dataset.length` do mock.
 
 ### Fase 2 — UI Completa com Mock
 - Construir todas as páginas consumindo mocks diretamente
@@ -35,6 +36,7 @@ metadata:
 
 ### Fase 3 — Auditoria UX
 - Capturar screenshots de **todas as rotas** via Playwright CLI
+- **Estados universais**: cada rota também capturada em `?estado=loading`, `?estado=vazio`, `?estado=erro` (hook `useEstadoDemo`, gate de ambiente) — mecanismo padrão para provar estados sem backend
 - Análise visual por critério (hierarquia, densidade, consistência, cores, empty states)
 - Classificar problemas (P0 dados, P1 visual, P2 feature, P3 polish)
 - Corrigir em sprints por prioridade

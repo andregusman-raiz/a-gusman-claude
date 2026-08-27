@@ -14,8 +14,8 @@ metadata:
 # CONDUCTOR — Developer Experience
 
 ```
-/conductor ~/Claude/GitHub/example-platform
-/conductor ~/Claude/GitHub/payroll-app --threshold 85
+/conductor ~/Claude/GitHub/raiz-platform
+/conductor ~/Claude/GitHub/salarios-platform --threshold 85
 ```
 
 5 dimensoes: SETUP (onboarding time), DOCS (README/CLAUDE.md), TYPES (TS strict), TESTS (passam, rapidos), CI (pipeline).

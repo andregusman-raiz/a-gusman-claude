@@ -212,7 +212,7 @@ So quando tier 1 e 2 falham. Pixel-base, frágil — coordenadas mudam com resol
 ### Registro em `~/Claude/.mcp.json`
 Os 3 MCPs devem estar registrados. Verificar com:
 ```bash
-python3 -c "import json; print([k for k in json.load(open('/Users/andregusmandeoliveira/Claude/.mcp.json'))['mcpServers']])"
+python3 -c "import json; from pathlib import Path; print([k for k in json.load((Path.home() / 'Claude' / '.mcp.json').open())['mcpServers']])"
 ```
 Esperado conter: `computer-use`, `macos-automator`, `macos-use`.
 
