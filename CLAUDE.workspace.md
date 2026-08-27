@@ -97,7 +97,7 @@ Statusline mostra 🔒 quando outro processo Claude tem lock no repo atual.
 
 ## Portas Localhost + Browser
 
-Portas: 3000 example-platform, 3001 example-prof, 3002 example-automata, 3003 edu-frontend, 3004 sophia, 3005 fgts, 3006 markdown-viewer, 4200 agent-dashboard. Detalhes em `.claude/rules/ports-projects.md`. Porta 3000 NUNCA para 2 ao mesmo tempo.
+Portas: 3000 example-platform, 3001 example-prof, 3002 example-automata, 3003 edu-frontend, 3004 sophia, 3005 fgts, 4200 agent-dashboard. Detalhes em `.claude/rules/ports-projects.md`. Porta 3000 NUNCA para 2 ao mesmo tempo.
 
 Browser localhost SEMPRE via Playwright MCP (`browser_navigate`). NUNCA `open`. Detalhes: `.claude/rules/browser-localhost.md` + `/ag-referencia-playwright`. Login persistente + Google SSO: skill `/ag-login-persistente`.
 
@@ -133,17 +133,6 @@ Sync: `bash ~/.claude/shared/sync.sh [projeto-path]`.
 ## Docs Location — projeto, nao workspace
 
 Toda doc gerada (SPEC, PRD, ADR, diagnostico, relatorio, plano) salvar em `<PROJECT_ROOT>/docs/{specs|adr|diagnosticos|plans|reports}/`. Hook `docs-location-guard.sh` (PreToolUse Write) bloqueia salvar em `~/Claude/docs/{specs,...}/`. Excecao cross-project: `~/Claude/docs/workspace/`. Bypass emergencia: `DOCS_GUARD_DISABLED=1`. Pattern: `.claude/shared/patterns/docs-location.md`.
-
----
-
-## Markdown → navegador via Streamdown
-
-Todo projeto que produza Markdown pode usar `/markdown-viewer`. A fonte canônica fica em `.claude/skills/markdown-viewer/` e também é descoberta pelo Codex via `.agents/skills`; NUNCA duplicar o runtime.
-
-- Publicação exige `.markdown-viewer.json` explícito; ausência do manifesto não libera arquivos por fallback.
-- Projetos novos com `README.md` e `docs/` inicializam o manifesto via `/markdown-viewer --init` e revisam a allowlist antes do uso.
-- Servir somente em `127.0.0.1:3006` por padrão. `CLAUDE.md`, `AGENTS.md`, `docs/ai-state/**`, `entrada/**` e `Downloads/**` permanecem bloqueados.
-- Alterar a allowlist é decisão de escopo documental; preservar configurações existentes e validar com `/markdown-viewer --check`.
 
 ---
 
@@ -241,3 +230,4 @@ Opus 4.7 1M context: prompts longos OK, subagents menos necessarios para <300K t
 data-engine-app status: Q9 DONE + Q10 PARTIAL, score 94/100. Detalhes em `CLAUDE.md` do projeto.
 
 <!-- cache_control: ephemeral -->
+
