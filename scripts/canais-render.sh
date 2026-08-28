@@ -55,6 +55,7 @@ run_one "alertas-render.sh"
 run_one "roadmap-render.sh"
 run_one "conduta-check.sh"
 run_one "bloqueios-notificar.sh"
+run_one "ghost-agents-check.sh"
 
 # "nunca falhe": o wrapper sempre sai 0 — sub-scripts ausentes são tolerados
 # por design, e uma falha isolada de um gerador não deve derrubar o ciclo

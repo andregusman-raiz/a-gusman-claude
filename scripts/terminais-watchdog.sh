@@ -145,6 +145,28 @@ for papel, entry in abertos.items():
     # "aguardando_ciclo" e vivo por desenho (cadencia declarada) — nunca nudge.
     if live_info.get("work_state") == "aguardando_ciclo":
         log(f"{papel} tier={tier} work_state=aguardando_ciclo acao=nenhuma")
+    # CICLO PARADO != SILENCIO. A idade de silencio e min(jsonl, heartbeat) — e o jsonl
+    # fresco (subagente respondendo, agente lendo arquivo) MASCARA um heartbeat velho.
+    # Medido 28/08: COMANDO com jsonl de 4min e heartbeat de 293min (loop morto ha 5h)
+    # nunca foi nudgado, e o work_state "aguardando_ciclo" ainda dava acao=nenhuma.
+    # Para papel que DECLARA heartbeat no registry, o heartbeat mede o CICLO e vale sozinho.
+    CICLO_MAX_MIN = int(os.environ.get("CICLO_MAX_MIN", "60"))
+    if entry.get("heartbeat") and isinstance(hb_age, (int, float)):
+        hb_min = hb_age / 60.0
+        if hb_min > CICLO_MAX_MIN and tier in (0, 1):
+            prev = last_stagnant.get(f"{papel}:ciclo", 0)
+            if (time.time() - prev) / 60.0 >= STAGNANT_COOLDOWN_MIN:
+                msg = (f"[watchdog] seu CICLO esta parado ha {int(hb_min)}min (heartbeat), "
+                       f"mesmo com atividade recente na sessao. Rode um tick agora: leia a inbox, "
+                       f"o boot do papel e produza progresso — ou registre o bloqueio.")
+                subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg, "--force"])
+                last_stagnant[f"{papel}:ciclo"] = time.time()
+                state_dirty = True
+                nudged_now = True
+                log(f"{papel} tier={tier} heartbeat={int(hb_min)}min acao=nudge-ciclo-parado")
+            else:
+                log(f"{papel} tier={tier} heartbeat={int(hb_min)}min acao=cooldown-ciclo")
+
     if live_info.get("work_state") == "stagnant":
         if tier in (0, 1):
             prev = last_stagnant.get(papel, 0)
