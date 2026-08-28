@@ -55,17 +55,17 @@ def main():
     print(
         f"BLOQUEADO pelo agent-ghost-guard: Agent com name='{nome}'.\n"
         f"\n"
-        f"Medido em 28/08: spawn nomeado devolveu ack de sucesso para 0 de 7 agentes\n"
-        f"que NUNCA nasceram (inbox vazia, zero transcript, um 'rodando' 11h sem\n"
-        f"nenhum evento). Task/subagent nativo, sem name: 16/16 concluiram.\n"
-        f"Varredura de 48h: 29 ghosts em 5 sessoes.\n"
+        f"Medido em 28/08: no papel COMANDO, 7 spawns nomeados receberam ack de sucesso\n"
+        f"e nunca produziram nada (um 'rodando' 11h sem um evento), enquanto Task\n"
+        f"nativo fez 16/16. O nomeado NEM SEMPRE falha — nesta sessao 3 entregaram —\n"
+        f"mas o ack nao distingue os dois casos, e nao ha sinal confiavel que separe\n"
+        f"depois (testados: transcript, 'finished', agent_id — todos presentes nos dois).\n"
         f"\n"
         f"Se o agente so precisa ENTREGAR: remova o campo `name`.\n"
         f"Se precisa conversar depois (SendMessage), rode assim e PROVE o nascimento:\n"
         f"  AGENT_NAME_OK=1  (e em ~60s: transcript novo em ~/.claude/projects/<cwd>/\n"
         f"                    ou `stat -f %SB` num arquivo da propriedade dele)\n"
-        f"Agente com zero evento e ghost, nao lento: some com o tempo em vez de aparecer.\n"
-        f"Checar ghosts existentes: ~/.claude/scripts/ghost-agents-check.sh",
+        f"Se em ~60s nao houver transcript nem arquivo dele, nao espere: respawne sem name.",
         file=sys.stderr,
     )
     return 2

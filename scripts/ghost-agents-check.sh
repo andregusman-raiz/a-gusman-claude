@@ -1,4 +1,15 @@
 #!/usr/bin/env bash
+#
+# ⛔ CRITERIO NAO CONFIAVEL (28/08 19:20) — NAO USAR PARA APAGAR NADA.
+# O criterio abaixo ("inbox com 0 itens + ausente do config.json") descreve
+# qualquer agente nomeado que TERMINOU, nao so o que nunca nasceu:
+# `build-canais` e `build-decisoes`, que entregaram scripts reais, apareciam
+# como ghost. Sinais testados que tambem NAO separam os casos: mencao em
+# transcript, transcript proprio, "finished", agent_id citado — presentes nos
+# dois grupos. Ate haver sinal que distinga `build-canais` (nasceu) de
+# `spec-funil` (nao nasceu), este script serve so como INVENTARIO, nunca como
+# base para exclusao. Desligado do canais-render.sh.
+#
 # ghost-agents-check.sh — detecta agentes que receberam ack de spawn mas NUNCA nasceram.
 #
 # Medido 2026-08-28: `Agent` com campo `name` (Team/mailbox) devolveu "Spawned successfully...

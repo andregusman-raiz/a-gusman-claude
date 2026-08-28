@@ -55,7 +55,16 @@ run_one "alertas-render.sh"
 run_one "roadmap-render.sh"
 run_one "conduta-check.sh"
 run_one "bloqueios-notificar.sh"
-run_one "ghost-agents-check.sh"
+# ghost-agents-check DESLIGADO em 28/08 19:20 — criterio nao confiavel.
+# "inbox 0 itens + fora do config.json" descreve QUALQUER agente nomeado que
+# terminou, nao so o que nunca nasceu: build-canais e build-decisoes (que
+# ENTREGARAM canal-append.sh e decisoes-render.sh) apareciam como ghost. Sinais
+# testados e que NAO distinguem: mencao em transcript, transcript proprio,
+# "finished", agent_id citado — todos presentes tanto em quem nasceu quanto em
+# quem nao nasceu. Rodando assim, gritava 47 falsos positivos a cada 10 min, e
+# alarme que erra ensina a ignorar alarme. Religar so com sinal que separe os
+# casos conhecidos: build-canais (nasceu) x spec-funil (nao nasceu).
+# run_one "ghost-agents-check.sh"
 
 # "nunca falhe": o wrapper sempre sai 0 — sub-scripts ausentes são tolerados
 # por design, e uma falha isolada de um gerador não deve derrubar o ciclo
