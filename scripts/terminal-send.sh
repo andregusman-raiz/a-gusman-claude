@@ -146,6 +146,27 @@ fi
 "$CMUX_BIN" send --workspace "$UUID" "$MSG"
 "$CMUX_BIN" send-key --workspace "$UUID" enter
 
+# CONFIRMACAO DE ENTREGA — o script confirma, o chamador nao improvisa.
+# Sem isto cada terminal inventava a propria verificacao com `read-screen`, e em
+# 28/08 um deles: (a) endereçou por `workspace:1` (indice posicional — se alguem
+# reordena as janelas, le a tela de OUTRO terminal e conclui "entregue"),
+# (b) leu "Press up to edit queued messages" como prova de recebimento (essa linha
+# diz que ha algo na fila de input, nao que a SUA mensagem esta la), e
+# (c) afirmou "sem menu aberto, nada foi respondido por engano" tendo olhado 6
+# linhas do fim da tela. Tres inferencias frageis empilhadas para declarar sucesso.
+sleep 2
+CONFIRMA=""
+TELA_POS=$("$CMUX_BIN" read-screen --workspace "$UUID" --lines 25 2>/dev/null || true)
+# procura uma fatia distintiva da mensagem (as primeiras palavras significativas)
+AMOSTRA=$(printf '%s' "$MSG" | tr -s ' ' | cut -c1-40)
+if [[ -n "$AMOSTRA" ]] && printf '%s' "$TELA_POS" | grep -qF -- "$AMOSTRA"; then
+  CONFIRMA="confirmado: texto visivel na tela do destino"
+elif printf '%s' "$TELA_POS" | grep -qiE "queued messages|esc to interrupt|working|thinking"; then
+  CONFIRMA="ENFILEIRADO: destino ocupado; texto nao visivel ainda (nao e prova de leitura)"
+else
+  CONFIRMA="NAO CONFIRMADO: texto nao apareceu na tela em 2s — verifique antes de assumir entrega"
+fi
+
 # Quem MANDOU, nao so quem recebeu. Sem isso o log responde "o papel X foi
 # avisado?" mas nao "quem pediu o que a quem, e quanto tempo esperou" — as
 # perguntas que faltavam na auditoria de 27/08. $CMUX_WORKSPACE_ID e injetado
@@ -174,3 +195,4 @@ mkdir -p "$T"
 printf '%s %s from=%s to=%s uuid=%s :: %s\n' \
   "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$MSG_ID" "$ORIGEM" "$PAPEL" "$UUID" "$MSG" >> "$LOG"
 echo "OK: mensagem enviada para $PAPEL ($UUID) [msg_id=$MSG_ID]"
+echo "     $CONFIRMA"

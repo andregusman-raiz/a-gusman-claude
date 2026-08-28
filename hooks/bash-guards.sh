@@ -74,6 +74,7 @@ FORCE_PUSH_HIT="$(printf '%s' "$GINFO" | sed -n '2p')"
 PKILL_HIT="$(printf '%s' "$GINFO" | sed -n '3p')"
 RAILWAY_KV_HIT="$(printf '%s' "$GINFO" | sed -n '4p')"
 CMUX_SEND_HIT="$(printf '%s' "$GINFO" | sed -n '5p')"
+WS_IDX_HIT="$(printf '%s' "$GINFO" | sed -n '13p')"
 CMUX_NEWWS_HIT="$(printf '%s' "$GINFO" | sed -n '6p')"
 VERCEL_PROD_HIT="$(printf '%s' "$GINFO" | sed -n '7p')"
 NO_VERIFY_HIT="$(printf '%s' "$GINFO" | sed -n '8p')"
@@ -87,6 +88,7 @@ NORM="$(printf '%s' "$NORM_B64" | base64 -d 2>/dev/null)"
 [ "$PKILL_HIT" = "1" ] || PKILL_HIT="0"
 [ "$RAILWAY_KV_HIT" = "1" ] || RAILWAY_KV_HIT="0"
 [ "$CMUX_SEND_HIT" = "1" ] || CMUX_SEND_HIT="0"
+[ "$WS_IDX_HIT" = "1" ] || WS_IDX_HIT="0"
 [ "$CMUX_NEWWS_HIT" = "1" ] || CMUX_NEWWS_HIT="0"
 [ "$VERCEL_PROD_HIT" = "1" ] || VERCEL_PROD_HIT="0"
 [ "$NO_VERIFY_HIT" = "1" ] || NO_VERIFY_HIT="0"
@@ -168,7 +170,22 @@ fi
 # --- cmux send/new-workspace cru: 15 sends crus em 48h bypassando marcador de
 # destino + log de terminal-send.sh (auditoria 2026-08-28, achado 2). Bypass: CMUX_RAW_ALLOWED=1
 if [ "${CMUX_RAW_ALLOWED:-0}" != "1" ]; then
-  if [ "$CMUX_SEND_HIT" = "1" ]; then
+  if [ "$WS_IDX_HIT" = "1" ] && [ "${CMUX_RAW_ALLOWED:-0}" != "1" ]; then
+  cat >&2 <<'EOF'
+BLOQUEADO: --workspace com INDICE posicional (workspace:N ou N).
+Identidade de terminal e por UUID, sempre. Indice muda a cada reordenacao —
+em 28/08 um terminal usou `--workspace workspace:1` para CONFIRMAR entrega de
+mensagem ao COMANDO: acertou por coincidencia, mas a mesma linha amanha le a
+tela de OUTRO terminal e conclui "entregue". E o incidente do destino errado
+na versao verificacao, que e pior: da falso positivo em vez de erro visivel.
+Use:  ~/.claude/scripts/terminal-resolve.sh <PAPEL>   (imprime o UUID)
+      ~/.claude/scripts/terminal-send.sh <PAPEL> "<msg>"  (ja confirma a entrega)
+Bypass consciente: CMUX_RAW_ALLOWED=1
+EOF
+  exit 2
+fi
+
+if [ "$CMUX_SEND_HIT" = "1" ]; then
     log_guard_block "cmux-send-cru"
     block "use ~/Claude/.claude/scripts/terminal-send.sh <PAPEL> \"<msg>\" em vez de 'cmux send' cru — o script checa marcador de destino/input pendente e loga em send.log (auditoria: 15 sends crus em 48h, 8 do proprio DE-COORD). Bypass consciente: CMUX_RAW_ALLOWED=1"
   fi

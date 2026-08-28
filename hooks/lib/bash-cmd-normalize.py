@@ -84,7 +84,7 @@ CLI (stdin = comando cru, texto puro OU JSON {"tool_input":{"command":...},
   normalize             -> stdout: comando normalizado (heredoc+comentario fora)
   check <rule-name>     -> stdout: "1" (bate a regra, TOP-LEVEL ou em script
                             referenciado — usa cwd do JSON se presente) ou "0"
-  guards-info           -> stdout 12 linhas: NORM em base64 | "1"/"0"
+  guards-info           -> stdout 13 linhas: NORM em base64 | "1"/"0"
                             (git-push-force) | "1"/"0" (pkill) | "1"/"0"
                             (railway-kv) | "1"/"0" (cmux-send, NAO recursivo
                             por desenho) | "1"/"0" (cmux-new-workspace, idem)
@@ -474,6 +474,17 @@ RULES = {
         "words": [("cmux",)],
         "flag": re.compile(r"(?:^|\s)send(?:-key)?\b"),
     },
+    # --- 28/08: endereçamento POSICIONAL. Um terminal usou
+    # `cmux read-screen --workspace workspace:1` para CONFIRMAR entrega de uma
+    # mensagem ao COMANDO: acertou por coincidencia (workspace:1 era o COMANDO
+    # naquele instante), mas indice muda a cada reordenacao — a mesma linha
+    # amanha le a tela de OUTRO terminal e conclui "entregue". E o incidente D2
+    # (ordem no destino errado) na versao verificacao, que e pior: da falso
+    # positivo em vez de erro visivel. Identidade e por UUID, sempre.
+    "cmux-workspace-indice": {
+        "words": [("cmux",)],
+        "flag": re.compile(r"--workspace\s+(?:workspace:)?\d+\b"),
+    },
     "cmux-new-workspace": {
         "words": [("cmux",)],
         "flag": re.compile(r"\bnew-workspace\b"),
@@ -722,6 +733,7 @@ def main(argv: list[str]) -> int:
         # NAO recursivo (ver comentario em RULES): so top-level.
         cmux_send = rule_matches(cmd, "cmux-send")
         cmux_new_ws = rule_matches(cmd, "cmux-new-workspace")
+        cmux_ws_idx = rule_matches(cmd, "cmux-workspace-indice")
         # fix 2026-08-28 (A1): as 6 regras migradas de substring cru em
         # bash-guards.sh — recursivas (mesmo fechamento de indirecao das 3
         # primeiras: `bash /tmp/x.sh` escondendo o comando nao escapa mais).
@@ -743,6 +755,7 @@ def main(argv: list[str]) -> int:
         print("1" if git_checkout_dot else "0")
         print("1" if git_restore_dot else "0")
         print("1" if git_clean_f else "0")
+        print("1" if cmux_ws_idx else "0")
         return 0
 
     sys.stderr.write("unknown mode: %s\n" % mode)
