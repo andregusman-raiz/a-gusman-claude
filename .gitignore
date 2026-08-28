@@ -30,3 +30,10 @@ package-lock.json
 
 # assets/ vive em ~/Claude/assets (repo do workspace) — ver rules/workspace-layout.md
 assets/
+
+# Harness scripts (unificados do ~/.claude/scripts em 2026-08-28)
+scripts/**/__pycache__/
+scripts/*.bak
+scripts/*.bak-*
+scripts/playwright/*-profile/
+scripts/playwright/.auth/
