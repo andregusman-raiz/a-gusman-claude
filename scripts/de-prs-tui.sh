@@ -77,7 +77,7 @@ render_once() {
     ''|*[!0-9]*) width=80 ;;
   esac
 
-  COLUMNS="$width" DE_PRS_TUI_Q="$Q" DE_PRS_TUI_NO_ROADMAP="$NO_ROADMAP" python3 <<'PYEOF'
+  COLUMNS="$width" DE_PRS_TUI_Q="$Q" DE_PRS_TUI_NO_ROADMAP="$NO_ROADMAP" MAX_FRENTES="${DE_PRS_TUI_MAX_FRENTES:-6}" python3 <<'PYEOF'
 import json, os, re, sys, time, textwrap
 from datetime import datetime, timezone
 
@@ -98,6 +98,7 @@ TERMINAL_STATUSES = {"merged", "closed", "cancelado-dedup", "closed-nao-remendar
 CACHE_TTL_MIN = 10
 ROADMAP_STALE_MIN = 60
 COMPACT_THRESHOLD = 70
+MAX_FRENTES = int(os.environ.get("MAX_FRENTES", "6"))
 MAX_ITEMS = 3
 PR_W, STATUS_W, AGE_W = 6, 18, 4
 
@@ -302,6 +303,30 @@ def extract_imediato(text):
     return m.group(0).strip("\n") if m else None
 
 
+def extract_frentes(text):
+    """Secao '## Frentes' do ROADMAP.md: frente -> itens.
+
+    Ja e calculada pelo roadmap-render.sh (claims nao-merged por frente, com
+    'bloqueado por' vindo do cache do gh) e nunca era exibida. E a metade do
+    roadmap que responde ONDE cada frente esta; o '## Imediato' so responde o hoje.
+    """
+    m = re.search(r"(?ms)^## Frentes\s*\n(.*?)(?=\n## |\Z)", text or "")
+    if not m:
+        return []
+    frentes, atual = [], None
+    for ln in m.group(1).split("\n"):
+        t = ln.strip()
+        if not t:
+            continue
+        mf = re.match(r"^\*\*(.+?)\*\*$", t)
+        if mf:
+            atual = {"nome": mf.group(1).strip(), "itens": []}
+            frentes.append(atual)
+        elif t.startswith("-") and atual is not None:
+            atual["itens"].append(t.lstrip("- ").strip())
+    return frentes
+
+
 def extract_resumo(block):
     if not block:
         return None
@@ -341,6 +366,7 @@ if not NO_ROADMAP:
         avisos.append(f"{roadmap_source} com {age_label(roadmap_age_min)} (> {ROADMAP_STALE_MIN}min) — pode estar desatualizado")
 
 imediato_block = extract_imediato(roadmap_text) if roadmap_text else None
+frentes = extract_frentes(roadmap_text) if roadmap_text else []
 resumo = extract_resumo(imediato_block)
 itens = numbered_items(imediato_block)
 
@@ -388,6 +414,28 @@ if not NO_ROADMAP:
                 out.append(truncate(f"  {prefix}{wline}{suffix}", WIDTH))
         if len(itens) > MAX_ITEMS:
             out.append(f"  (+{len(itens) - MAX_ITEMS} item(ns) — ver {roadmap_source or 'ROADMAP.md'})")
+
+
+    if frentes:
+        out.append(bar)
+        bloq = sum(1 for f in frentes for it in f["itens"] if "bloqueado por" in it.lower())
+        sem_pr = sum(1 for f in frentes for it in f["itens"] if it.startswith("(sem PR)"))
+        out.append(truncate(f"ROADMAP · frentes ({len(frentes)}) — {bloq} bloqueado(s), {sem_pr} sem PR", WIDTH))
+        for f in frentes[:MAX_FRENTES]:
+            itens_f = f["itens"]
+            marca = " BLOQ" if any("bloqueado por" in it.lower() for it in itens_f) else ""
+            out.append(truncate(f"  {f['nome']}{marca}", WIDTH))
+            for it in itens_f[:2]:
+                txt = clean_md(it)
+                mb = re.search(r"bloqueado por:\s*(.+)$", txt, re.I)
+                if mb:
+                    pr = re.match(r"(#\d+)", txt)
+                    txt = ((pr.group(1) + " ") if pr else "") + "bloqueado: " + mb.group(1).strip()
+                out.append(truncate(f"    - {txt}", WIDTH))
+            if len(itens_f) > 2:
+                out.append(f"    - (+{len(itens_f) - 2})")
+        if len(frentes) > MAX_FRENTES:
+            out.append(truncate(f"  (+{len(frentes) - MAX_FRENTES} frente(s) — ver ROADMAP.md)", WIDTH))
 
 if avisos:
     out.append(bar)
