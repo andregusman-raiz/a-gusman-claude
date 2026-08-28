@@ -106,12 +106,23 @@ def mutate(path, fn, timeout=DEFAULT_TIMEOUT):
     `fn(reg)` altera o dict in-place ou devolve um dict novo. A leitura
     acontece DENTRO do lock — nunca reaproveite um registry lido antes.
     Devolve o registry gravado.
+
+    No-op guard (achado 1d, revisor adversarial 2026-08-28): se `fn` roda mas
+    nao muda o conteudo semantico do JSON (comparado pelo dump canonico), o
+    arquivo NAO e regravado — sem isso, um chamador periodico (ex.: render a
+    cada 10 min via launchd) cujo `fn` nao tem nada a fazer neste ciclo ainda
+    assim trocava mtime/inode e fazia I/O identico pra sempre. O valor
+    retornado continua sendo o registry atualizado (identico ao lido, nesse
+    caso) — chamadores que so usam o retorno nao percebem diferenca.
     """
     with _locked(path, fcntl.LOCK_EX, timeout):
         with open(path) as f:
-            reg = json.load(f)
+            original_text = f.read()
+        reg = json.loads(original_text)
         result = fn(reg)
         if result is not None:
             reg = result
-        _atomic_write(path, reg)
+        new_text = json.dumps(reg, ensure_ascii=False, indent=2) + "\n"
+        if new_text != original_text:
+            _atomic_write(path, reg)
         return reg

@@ -15,6 +15,12 @@ estado=aberto no registry, calcula idade de silencio
   tier 1: >60min -> nudge
   tier 2/3: so log
 
+Independente disso (2026-08-28): tier 0/1 com work_state busy/progressing
+(ou seja, NAO silencioso) mas handoff_age_h > 8h -> nudge de "handoff de
+marco vencido", cooldown 4h (HANDOFF_NUDGE_COOLDOWN_MIN, default 240min).
+Cura achado 4 da auditoria de terminais 48h: papel ativo que so escreveu o
+handoff de abertura.
+
 NUNCA mata processo algum. Loga em docs/ai-state/terminais/watchdog.log
 (uma linha por papel so quando age>45min ou quando agiu). Se nenhum
 papel estiver com estado=aberto no registry, loga "nenhum tier0 aberto"
@@ -26,7 +32,11 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CMUX_BIN="${CMUX_BIN:-/Applications/cmux.app/Contents/Resources/bin/cmux}"
 export CMUX_QUIET=1
-T="$HOME/Claude/docs/ai-state/terminais"
+# T overridable (PAPEL_TERMINAIS_DIR) so para teste isolado com registry/
+# liveness sinteticos — default inalterado em producao. SCRIPT_DIR tambem
+# resolve terminais-liveness.sh/terminal-send.sh/terminal-open.sh: uma copia
+# de teste deste script num dir com stubs desses 3 nomes fica 100% isolada.
+T="${PAPEL_TERMINAIS_DIR:-$HOME/Claude/docs/ai-state/terminais}"
 REGISTRY="$T/registry.json"
 LOG="$T/watchdog.log"
 mkdir -p "$T"
@@ -115,6 +125,7 @@ try:
 except Exception:
     wstate = {}
 last_stagnant = wstate.get("last_stagnant_nudge", {})
+last_handoff_nudge = wstate.get("last_handoff_nudge", {})
 mutate_falhas = wstate.get("mutate_falhas", {})
 falhou_neste_tick = set()
 ALERT_APOS = int(os.environ.get("MUTATE_ALERT_APOS", "3"))
@@ -153,6 +164,34 @@ for papel, entry in abertos.items():
                 log(f"{papel} tier={tier} work_state=stagnant acao=cooldown({int(mins)}/{STAGNANT_COOLDOWN_MIN}min)")
         else:
             log(f"{papel} tier={tier} work_state=stagnant acao=log-only")
+
+    # Handoff de marco vencido (achado 4 da auditoria 48h, 2026-08-28): papel
+    # tier 0/1 ATIVO (busy/progressing — nao silencioso, nao estagnado) mas o
+    # handoff mais recente tem >8h. Diferente do nudge de silencio/estagnacao
+    # acima: este mede um documento (handoff) desatualizado, nao ausencia de
+    # sinal — por isso e independente e nao entra na supressao de "ja nudgado".
+    HANDOFF_NUDGE_COOLDOWN_MIN = int(os.environ.get("HANDOFF_NUDGE_COOLDOWN_MIN", "240"))
+    handoff_age_h = live_info.get("handoff_age_h")
+    if (
+        tier in (0, 1)
+        and isinstance(handoff_age_h, (int, float))
+        and handoff_age_h > 8
+        and live_info.get("work_state") in ("busy", "progressing")
+    ):
+        prev_h = last_handoff_nudge.get(papel, 0)
+        mins_h = (time.time() - prev_h) / 60.0
+        if mins_h >= HANDOFF_NUDGE_COOLDOWN_MIN:
+            hoje = time.strftime("%Y-%m-%d", time.localtime())
+            msg_h = (f"[watchdog] handoff de marco vencido ({handoff_age_h:.1f}h) — escreva "
+                     f"docs/ai-state/terminais/handoffs/{papel}/{hoje}.md agora (mesmo "
+                     f"que curto: estado exato + proximos passos). Template: "
+                     f"docs/ai-state/terminais/handoffs/TEMPLATE.md.")
+            subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg_h, "--force"])
+            last_handoff_nudge[papel] = time.time()
+            state_dirty = True
+            log(f"{papel} tier={tier} handoff_age_h={handoff_age_h:.1f} acao=nudge-handoff")
+        else:
+            log(f"{papel} tier={tier} handoff_age_h={handoff_age_h:.1f} acao=cooldown-handoff({int(mins_h)}/{HANDOFF_NUDGE_COOLDOWN_MIN}min)")
 
     ages = [a for a in (jsonl_age, hb_age) if isinstance(a, (int, float))]
     if not ages:
@@ -242,6 +281,7 @@ if podado != mutate_falhas:
 
 if state_dirty:
     wstate["last_stagnant_nudge"] = last_stagnant
+    wstate["last_handoff_nudge"] = last_handoff_nudge
     wstate["mutate_falhas"] = mutate_falhas
     tmp = STATE_PATH + ".tmp"
     with open(tmp, "w") as f:

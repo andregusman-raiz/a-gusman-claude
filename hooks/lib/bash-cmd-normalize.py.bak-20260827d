@@ -1,0 +1,365 @@
+#!/usr/bin/env python3
+"""bash-cmd-normalize — normalizacao segura de comando Bash para hooks PreToolUse.
+
+Origem do bug (2026-08-27, reportado por DE-COORD): guards que fazem match
+TEXTUAL cru (`[[ "$CMD" == *"git push --force"* ]]`, grep de `pkill`, etc.)
+tratam qualquer MENCAO ao padrao como se fosse execucao — ex.: escrever
+documentacao via heredoc (`cat > doc.md <<'EOF' ... git push --force ... EOF`)
+e bloqueado como se o comando estivesse sendo executado. 2o falso-positivo do
+dia (ALERTAS.md 22:40Z).
+
+Cura ja usada em ~/.claude/hooks/de-pr-queue-guard.py (generalizada aqui):
+  1. Remover corpos de heredoc ANTES de casar (o conteudo entre `<<EOF`/`<<'EOF'`
+     e o terminator nunca e "comando", e' dado literal).
+  2. Exigir POSICAO DE COMANDO (inicio de comando / apos ; && || | $( — nao
+     apos "echo ", nao dentro de uma string sendo passada como argumento a
+     OUTRO comando) para padroes do tipo "<comando> <flag>" (git push --force,
+     pkill/killall). Substring cru confunde `echo 'git push --force'` (documentacao)
+     com o comando real.
+
+Decisao de design: NAO apagamos o CONTEUDO de strings entre aspas (simples ou
+duplas). Apagar o conteudo apagaria um --force passado citado (`git push
+'--force'` FUNCIONA em bash — aspas nao mudam o valor do argumento) e
+transformaria uma catch real em falso-negativo, que e' pior que o
+falso-positivo que estamos corrigindo. Em vez disso, o parser abaixo e'
+quote-aware: sabe que `;`, `&&`, `||`, `|`, `#` e quebras de linha DENTRO de
+aspas nao sao separadores/comentarios reais, entao no faz a segmentacao/
+remocao de comentario errada, mas preserva o texto integralmente (inclusive
+aspas) para os checks de substring/flag ainda funcionarem.
+
+API python:
+  strip_heredocs(cmd)      -> remove corpos de heredoc (<<EOF / <<'EOF' / <<-EOF)
+  strip_comments(text)     -> remove de '#' (fora de aspas, em posicao de
+                               comentario) ate fim de linha; preserva aspas
+  normalize(cmd)           -> strip_comments(strip_heredocs(cmd)) — texto piano
+                               "efetivo" para checks simples de substring/grep
+  command_segments(text)   -> divide (fora de aspas) em "comandos simples" por
+                               ; && || | e quebra de linha — para checks que
+                               exigem posicao de comando
+  rule_matches(cmd, name)  -> True/False para uma regra registrada em RULES
+                               (hoje: "git-push-force", "pkill")
+
+CLI (stdin = comando cru, texto puro OU JSON {"tool_input":{"command":...}}):
+  normalize            -> stdout: comando normalizado (heredoc+comentario fora)
+  check <rule-name>     -> stdout: "1" (bate a regra) ou "0"
+  guards-info           -> stdout 3 linhas: NORM em base64 | "1"/"0" (git-push-force) | "1"/"0" (pkill)
+"""
+from __future__ import annotations
+
+import base64
+import json
+import re
+import sys
+
+_HEREDOC_RE = re.compile(r"<<(-?)\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2")
+
+
+def strip_heredocs(cmd: str) -> str:
+    """Remove corpos de heredoc (<<EOF / <<'EOF' / <<-EOF), incluindo a linha
+    do terminator. Best-effort (nao e' um parser de shell completo) — mesma
+    logica de ~/.claude/hooks/de-pr-queue-guard.py, generalizada para tambem
+    tratar `<<-` (strip de tabs) corretamente."""
+    lines = cmd.split("\n")
+    kept: list[str] = []
+    terminator: str | None = None
+    strip_leading_tabs = False
+    for line in lines:
+        if terminator is not None:
+            check = line.lstrip("\t") if strip_leading_tabs else line
+            if check.strip() == terminator:
+                terminator = None
+            continue
+        m = _HEREDOC_RE.search(line)
+        if m:
+            terminator = m.group(3)
+            strip_leading_tabs = m.group(1) == "-"
+        kept.append(line)
+    return "\n".join(kept)
+
+
+def strip_comments(text: str) -> str:
+    """Remove de `#` (fora de aspas, precedido por espaco/inicio-de-linha) ate
+    o fim da linha. Quote-aware: '#' dentro de aspas simples/duplas NAO inicia
+    comentario em bash. Preserva quebras de linha e o restante do texto
+    (inclusive aspas) intacto."""
+    out: list[str] = []
+    i, n = 0, len(text)
+    in_single = in_double = False
+    at_boundary = True
+    while i < n:
+        c = text[i]
+        if in_single:
+            out.append(c)
+            if c == "'":
+                in_single = False
+            i += 1
+            continue
+        if in_double:
+            if c == "\\" and i + 1 < n:
+                out.append(c)
+                out.append(text[i + 1])
+                i += 2
+                continue
+            out.append(c)
+            if c == '"':
+                in_double = False
+            i += 1
+            continue
+        if c == "'":
+            in_single = True
+            out.append(c)
+            i += 1
+            at_boundary = False
+            continue
+        if c == '"':
+            in_double = True
+            out.append(c)
+            i += 1
+            at_boundary = False
+            continue
+        if c == "\\" and i + 1 < n:
+            out.append(c)
+            out.append(text[i + 1])
+            i += 2
+            at_boundary = False
+            continue
+        if c == "#" and at_boundary:
+            nl = text.find("\n", i)
+            if nl == -1:
+                break
+            i = nl  # deixa o '\n' ser processado na proxima iteracao
+            continue
+        if c.isspace():
+            at_boundary = True
+            out.append(c)
+            i += 1
+            continue
+        at_boundary = False
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
+def normalize(cmd: str) -> str:
+    """Texto 'efetivo' do comando: sem corpos de heredoc, sem comentarios fora
+    de aspas. Aspas e conteudo citado permanecem intactos (ver docstring do
+    modulo — nao apagamos strings para nao mascarar flag real citada)."""
+    return strip_comments(strip_heredocs(cmd))
+
+
+def command_segments(text: str) -> list[str]:
+    """Divide `text` (ja normalizado — sem heredoc/comentario) em 'comandos
+    simples' por `;`, `&&`, `||`, `|` e quebra de linha, respeitando aspas
+    (um separador DENTRO de aspas nao quebra segmento — evita o falso-positivo
+    classico de `echo 'ok; rm -rf /'` virar 2 segmentos)."""
+    segments: list[str] = []
+    buf: list[str] = []
+    i, n = 0, len(text)
+    in_single = in_double = False
+    while i < n:
+        c = text[i]
+        if in_single:
+            buf.append(c)
+            if c == "'":
+                in_single = False
+            i += 1
+            continue
+        if in_double:
+            if c == "\\" and i + 1 < n:
+                buf.append(c)
+                buf.append(text[i + 1])
+                i += 2
+                continue
+            buf.append(c)
+            if c == '"':
+                in_double = False
+            i += 1
+            continue
+        if c == "'":
+            in_single = True
+            buf.append(c)
+            i += 1
+            continue
+        if c == '"':
+            in_double = True
+            buf.append(c)
+            i += 1
+            continue
+        if c == "\\" and i + 1 < n:
+            buf.append(c)
+            buf.append(text[i + 1])
+            i += 2
+            continue
+        if text[i : i + 2] in ("&&", "||"):
+            segments.append("".join(buf))
+            buf = []
+            i += 2
+            continue
+        if c in ";\n|":
+            segments.append("".join(buf))
+            buf = []
+            i += 1
+            continue
+        buf.append(c)
+        i += 1
+    segments.append("".join(buf))
+    return [s.strip() for s in segments if s.strip()]
+
+
+def _unquote(tok: str) -> str:
+    if len(tok) >= 2 and tok[0] == tok[-1] and tok[0] in ("'", '"'):
+        return tok[1:-1]
+    return tok
+
+
+def _tokenize_prefix(segment: str, max_tokens: int) -> list[str]:
+    """Tokeniza os primeiros `max_tokens` tokens de um segmento, respeitando
+    aspas (nao quebra token no meio de uma string citada). Tokens sao
+    'des-aspados' antes de retornar (valor efetivo do argumento)."""
+    tokens: list[str] = []
+    buf: list[str] = []
+    i, n = 0, len(segment)
+    in_single = in_double = False
+    while i < n and len(tokens) < max_tokens:
+        c = segment[i]
+        if in_single:
+            buf.append(c)
+            if c == "'":
+                in_single = False
+            i += 1
+            continue
+        if in_double:
+            if c == "\\" and i + 1 < n:
+                buf.append(c)
+                buf.append(segment[i + 1])
+                i += 2
+                continue
+            buf.append(c)
+            if c == '"':
+                in_double = False
+            i += 1
+            continue
+        if c.isspace():
+            if buf:
+                tokens.append("".join(buf))
+                buf = []
+            i += 1
+            continue
+        if c == "'":
+            in_single = True
+            buf.append(c)
+            i += 1
+            continue
+        if c == '"':
+            in_double = True
+            buf.append(c)
+            i += 1
+            continue
+        buf.append(c)
+        i += 1
+    if buf and len(tokens) < max_tokens:
+        tokens.append("".join(buf))
+    return [_unquote(t) for t in tokens]
+
+
+_WRAPPERS = {"sudo", "nice", "time"}
+
+
+def _effective_first_words(segment: str, max_words: int) -> list[str]:
+    """Primeiras `max_words` palavras 'reais' do segmento: ignora agrupadores
+    iniciais `(`/`$(`, keywords de shell (then/do/else/elif/if/while/until) e
+    wrappers simples (env VAR=val..., sudo, nice, time) antes de tokenizar."""
+    s = segment.strip()
+    s = re.sub(r"^(?:\(|\$\()+\s*", "", s)
+    s = re.sub(r"^(?:then|do|else|elif|if|while|until)\b\s*", "", s)
+    toks = _tokenize_prefix(s, max_tokens=max_words + 8)
+    idx = 0
+    while idx < len(toks):
+        t = toks[idx]
+        if t == "env":
+            idx += 1
+            while idx < len(toks) and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", toks[idx]):
+                idx += 1
+            continue
+        if t in _WRAPPERS:
+            idx += 1
+            continue
+        break
+    return toks[idx : idx + max_words]
+
+
+RULES = {
+    # git push --force / --force-with-lease / -f — so conta se "git push" e' o
+    # PROPRIO comando do segmento (nao um argumento citado a echo/printf/etc.)
+    "git-push-force": {
+        "words": [("git", "push")],
+        "flag": re.compile(r"--force\b|(?:^|\s)-f(?:\s|$)"),
+    },
+    # pkill/killall como comando do segmento (nao texto passado a outro comando)
+    "pkill": {
+        "words": [("pkill",), ("killall",)],
+        "flag": None,
+    },
+}
+
+
+def rule_matches(cmd: str, rule_name: str) -> bool:
+    rule = RULES[rule_name]
+    max_words = max(len(w) for w in rule["words"])
+    segments = command_segments(normalize(cmd))
+    for seg in segments:
+        words = tuple(_effective_first_words(seg, max_words))
+        for want in rule["words"]:
+            if words[: len(want)] == want:
+                if rule["flag"] is None or rule["flag"].search(seg):
+                    return True
+    return False
+
+
+def _read_stdin_command() -> str:
+    raw = sys.stdin.read()
+    try:
+        data = json.loads(raw)
+    except Exception:
+        return raw
+    if isinstance(data, dict):
+        cmd = (data.get("tool_input") or {}).get("command")
+        if cmd is None:
+            cmd = data.get("command")
+        return cmd or ""
+    return raw
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) < 2:
+        sys.stderr.write("usage: bash-cmd-normalize.py {normalize|check <rule>|guards-info}\n")
+        return 2
+    mode = argv[1]
+    cmd = _read_stdin_command()
+
+    if mode == "normalize":
+        sys.stdout.write(normalize(cmd))
+        return 0
+
+    if mode == "check":
+        if len(argv) < 3 or argv[2] not in RULES:
+            sys.stderr.write("usage: check <rule-name> (rules: %s)\n" % ", ".join(RULES))
+            return 2
+        print("1" if rule_matches(cmd, argv[2]) else "0")
+        return 0
+
+    if mode == "guards-info":
+        norm = normalize(cmd)
+        force = rule_matches(cmd, "git-push-force")
+        pkill = rule_matches(cmd, "pkill")
+        print(base64.b64encode(norm.encode()).decode())
+        print("1" if force else "0")
+        print("1" if pkill else "0")
+        return 0
+
+    sys.stderr.write("unknown mode: %s\n" % mode)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

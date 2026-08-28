@@ -85,6 +85,7 @@
       "mcp__plugin_playwright_playwright__browser_console_messages",
       "mcp__plugin_playwright_playwright__browser_click",
       "mcp__plugin_playwright_playwright__browser_close",
+      "mcp__playwright-obscura",
       "Bash(pkill -f \"next-server\")",
       "Bash(pkill -f \"next dev\")",
       "Bash(while read:*)",
@@ -173,7 +174,9 @@
       "Bash(mkdir -p ~/Claude/.claude/shared/adr)",
       "Bash(rm -rf ~/Claude/projetos/uerj-resultado-por-aluno)",
       "Bash(rm -f /Users/andregusmandeoliveira/.claude/projects/-Users-andregusmandeoliveira-Claude/memory/project_uerj_resultado_por_aluno.md)",
-      "Bash(rm -f /tmp/uerj_class2025.pdf /tmp/uerj_class2025.txt /tmp/uerj_class2026.pdf /tmp/uerj_eq2026_AB.pdf /tmp/uerj_aprovados_2025.csv /tmp/smoke_aprov.csv /tmp/smoke_match.csv /tmp/a.csv /tmp/a24.csv)"
+      "Bash(rm -f /tmp/uerj_class2025.pdf /tmp/uerj_class2025.txt /tmp/uerj_class2026.pdf /tmp/uerj_eq2026_AB.pdf /tmp/uerj_aprovados_2025.csv /tmp/smoke_aprov.csv /tmp/smoke_match.csv /tmp/a.csv /tmp/a24.csv)",
+      "Bash(python3 *)",
+      "Bash(cd *)"
     ],
     "deny": [
       "Read(.env)",
@@ -222,6 +225,11 @@
             "type": "command",
             "command": "bash ~/Claude/.claude/scripts/session-health.sh --quiet 2>/dev/null || true",
             "statusMessage": "Session health check..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/papel-session-start.sh 2>/dev/null || true",
+            "statusMessage": "Cockpit: assumindo papel (contrato + ONLINE)..."
           }
         ]
       }
@@ -243,6 +251,22 @@
             "type": "command",
             "command": "python3 ~/Claude/.claude/hooks/autonomous-persist-guard.py",
             "statusMessage": "Autonomous journey guard (Opus 4.8 + workflows)..."
+          },
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/papel-stop.sh",
+            "statusMessage": "Cockpit: handoff do dia + reporte ao COMANDO..."
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PAPEL_STOP_SESSIONEND=1 bash ~/Claude/.claude/hooks/papel-stop.sh 2>/dev/null || true",
+            "statusMessage": "Cockpit: reporte final ao COMANDO (SessionEnd)..."
           }
         ]
       }
@@ -260,7 +284,17 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "TeamCreate|TaskCreate",
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/agent-trust-cwd.py",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "TeamCreate|TaskCreate|Agent|Task|Workflow",
         "hooks": [
           {
             "type": "command",
@@ -298,15 +332,43 @@
             "statusMessage": "PDF markitdown guard..."
           }
         ]
+      },
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/decisao-em-chat-guard.py",
+            "statusMessage": "Cockpit: registrando decisão em chat (D-nnn)..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/decisao-em-chat-post.py",
+            "statusMessage": "Cockpit: fechando decisão em chat com a resposta..."
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
       {
         "hooks": [
           {
-            "command": "python3 ~/Claude/.claude/hooks/prefer-workflows-guard.py",
             "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/prefer-workflows-guard.py",
             "statusMessage": "Prefer agents/subagents/workflows (delegação)"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/agent-parallelism-reminder.sh",
+            "timeout": 10,
+            "statusMessage": "Parallelism check (fan-out ate 5)"
           }
         ]
       }

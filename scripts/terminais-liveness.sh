@@ -12,6 +12,10 @@ feed.list) + daemons HTTP + launchd, e escreve
 docs/ai-state/terminais/liveness.json (escrita atomica via tmp+mv).
 Cada coleta individual falha isolada (nunca derruba o script inteiro);
 itens que falharem aparecem como null/"down"/[] no JSON de saida.
+
+Campo novo por papel (2026-08-28): handoff_age_h — idade em horas do
+handoff mais recente em handoffs/<PAPEL>/*.md (null = nenhum handoff ainda).
+Consumido por terminais-watchdog.sh para cobrar handoff de marco vencido.
 EOF
   exit 0
 fi
@@ -271,6 +275,30 @@ for papel, entry in terminais_reg.items():
             if os.path.exists(hb_path):
                 heartbeat_age_s = int(now - os.path.getmtime(hb_path))
 
+        # handoff_age_h: idade (horas) do handoff MAIS RECENTE do papel, no
+        # diretorio handoffs/<PAPEL>/ inteiro — nao so o path fixo do registry
+        # (que aponta pro dia de ABERTURA e fica stale). Cura achado 4 da
+        # auditoria 48h (2026-08-28): 10/13 papeis so tinham o handoff de
+        # abertura; sem medir a idade real, o watchdog nao sabe cobrar.
+        # None = sem NENHUM handoff ainda (diretorio vazio/ausente) — nunca
+        # inferir saudavel a partir de ausencia (mesmo principio do work_state).
+        handoff_age_h = None
+        handoff_dir = os.path.join(HOME, "Claude", "docs", "ai-state", "terminais", "handoffs", papel)
+        if os.path.isdir(handoff_dir):
+            newest = None
+            for fname in os.listdir(handoff_dir):
+                if not fname.endswith(".md"):
+                    continue
+                fpath = os.path.join(handoff_dir, fname)
+                try:
+                    mt = os.path.getmtime(fpath)
+                except Exception:
+                    continue
+                if newest is None or mt > newest:
+                    newest = mt
+            if newest is not None:
+                handoff_age_h = round((now - newest) / 3600.0, 1)
+
         codex_pids = []
         codex_rollouts = []
         if entry.get("agent") == "codex" and cwd:
@@ -294,6 +322,7 @@ for papel, entry in terminais_reg.items():
             ),
             "codex_pids": codex_pids,
             "codex_rollouts": codex_rollouts,
+            "handoff_age_h": handoff_age_h,
         }
     terminais_out[papel] = safe(build, {
         "estado_registry": entry.get("estado"),
@@ -304,6 +333,7 @@ for papel, entry in terminais_reg.items():
         "heartbeat_age_s": None,
         "work_state": "unknown",
         "codex_pids": [],
+        "handoff_age_h": None,
         "codex_rollouts": [],
         "erro_coleta": True,
     })

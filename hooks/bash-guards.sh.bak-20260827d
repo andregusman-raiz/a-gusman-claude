@@ -1,0 +1,122 @@
+#!/bin/bash
+# bash-guards.sh — PreToolUse(Bash): bloqueia padroes CLI perigosos + protecao de branch.
+# BLOCKING (exit 2). Le payload JSON do stdin (tool_input.command).
+# Consolidado 2026-06-11: absorve branch-guard.sh (protecao main/master/develop).
+# Bypass: BASH_GUARDS_DISABLED=1
+# Compat macOS: usa grep -E (BSD nao tem -P).
+#
+# Anti-falso-positivo (fix 2026-08-27, gotcha reportado por DE-COORD): os checks
+# textuais abaixo rodam sobre $NORM (comando sem corpos de heredoc e sem
+# comentarios `# ...` fora de aspas — ver lib/bash-cmd-normalize.py), nao sobre
+# o $CMD cru. Sem isso, escrever documentacao via heredoc que MENCIONA um
+# padrao perigoso (`cat > doc.md <<'EOF' ... git push --force ... EOF`) era
+# bloqueado como se fosse execucao. git-push-force e pkill/killall, alem disso,
+# exigem POSICAO DE COMANDO (via bash-cmd-normalize.py check) — nao basta a
+# substring aparecer em qualquer lugar (`echo 'git push --force'` documentando
+# o comando, por exemplo, nao deve bloquear).
+
+set -uo pipefail
+[ "${BASH_GUARDS_DISABLED:-0}" = "1" ] && exit 0
+
+SDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB="$SDIR/lib/bash-cmd-normalize.py"
+
+INPUT="$(cat)"
+CMD="$(printf '%s' "$INPUT" | python3 -c 'import json,sys
+try:
+    d=json.load(sys.stdin); print(d.get("tool_input",{}).get("command",""))
+except Exception:
+    print("")' 2>/dev/null)"
+[ -z "$CMD" ] && exit 0
+
+# guards-info: 1 unico spawn python3 devolve (linha1) NORM em base64,
+# (linha2) 1/0 se "git push --force*" esta em posicao de comando, (linha3)
+# idem para pkill/killall. Falha do python (crash/ausencia) -> fail-open:
+# NORM cai para o CMD cru (comportamento pre-fix) e os dois flags ficam 0.
+GINFO="$(printf '%s' "$CMD" | python3 "$LIB" guards-info 2>/dev/null)"
+NORM_B64="$(printf '%s' "$GINFO" | sed -n '1p')"
+FORCE_PUSH_HIT="$(printf '%s' "$GINFO" | sed -n '2p')"
+PKILL_HIT="$(printf '%s' "$GINFO" | sed -n '3p')"
+NORM="$(printf '%s' "$NORM_B64" | base64 -d 2>/dev/null)"
+[ -z "$NORM" ] && NORM="$CMD"
+[ "$FORCE_PUSH_HIT" = "1" ] || FORCE_PUSH_HIT="0"
+[ "$PKILL_HIT" = "1" ] || PKILL_HIT="0"
+
+block() { echo "BLOCKED: $1" >&2; exit 2; }
+
+# --- gusman-os ask: NUNCA tocar o Data Engine direto (defense-in-depth) ---
+# So dispara quando GUSMAN_OS_ASK_CONTEXT=1 (setado SO no spawn do ask do WhatsApp pelo kernel).
+# O terminal normal do dono (sem o marcador) NAO e afetado — pode usar railway/psql no DE a vontade.
+# Razao: o ask roda em bypassPermissions com cwd=~/Claude, cujo corpus ENSINA o caminho proibido
+# (railway run psql $DATABASE_URL); o dado do DE deve vir SO do proxy local http://127.0.0.1:4577/de/data/.
+if [ "${GUSMAN_OS_ASK_CONTEXT:-0}" = "1" ]; then
+  case "$NORM" in
+    *raiz-data-engine*) block "ask-context: acesso direto ao repo do Data Engine proibido. Use o proxy local: curl http://127.0.0.1:4577/de/data/<path> (rule: nunca mexer no DE direto)." ;;
+    *"railway "*) block "ask-context: railway (run/ssh/connect) no DE proibido. Dados do DE so via proxy local /de/data." ;;
+  esac
+  printf '%s' "$NORM" | grep -qE '(^|[^A-Za-z_])psql([^A-Za-z0-9_]|$)' && block "ask-context: psql direto proibido. Dados do DE so via proxy local http://127.0.0.1:4577/de/data/."
+  printf '%s' "$NORM" | grep -q 'DATABASE_URL' && block "ask-context: DATABASE_URL proibido. Dados do DE so via proxy local /de/data."
+  # Escrita no Zeev SO pelo caminho deterministico (aprovar #X → confirma). O -p nunca toca a API do
+  # Zeev direto (impersonation = pode aprovar qualquer um). Bloqueia host/token/impersonate/PUT.
+  printf '%s' "$NORM" | grep -qiE 'zeev\.it|/api/2/(tokens/impersonate|assignments)|ZEEV_SERVICE_TOKEN' && block "ask-context: API do Zeev proibida aqui. Aprovacao so pelo comando 'aprovar #X' (maker-checker)."
+  # Leitura de segredos no sandbox (a chave/PEM do DE, .env): so o daemon usa; o -p nao precisa.
+  printf '%s' "$NORM" | grep -qiE 'secrets/|private-key|\.pem([^A-Za-z0-9]|$)' && block "ask-context: leitura de segredos proibida. Dados/escrita via proxy ou comando dedicado."
+fi
+
+# --- Operacoes destrutivas / bypass de pipeline ---
+case "$NORM" in
+  *"vercel --prod"*) block "Use CI/CD pipeline em vez de vercel --prod direto (rule deploy-routing)." ;;
+esac
+[ "$FORCE_PUSH_HIT" = "1" ] && block "Force push e perigoso. Use --force-with-lease apenas com aprovacao explicita."
+[[ "$NORM" == *"--no-verify"* ]] && block "--no-verify pula hooks de seguranca."
+[[ "$NORM" == *"git rebase -i"* ]] && block "git rebase -i e interativo (nao suportado) e destrutivo. Use merge."
+[[ "$NORM" == *"git checkout -- ."* || "$NORM" == *'git checkout -- *'* ]] && block "git checkout -- . descarta TODAS as mudancas unstaged. Commit primeiro."
+[[ "$NORM" == *"git restore ."* ]] && block "git restore . descarta mudancas. Commit ou branch primeiro."
+[[ "$NORM" == *"git clean -f"* ]] && block "git clean -f apaga permanentemente arquivos untracked."
+
+# --- pkill/killall: 4 incidentes de agents matando processo alheio (daemon de producao 2x, pytest de reviewer) ---
+# Matar processo: SEMPRE por PID explicito capturado no proprio spawn ($!). Bypass: PKILL_GUARD_DISABLED=1
+if [ "${PKILL_GUARD_DISABLED:-0}" != "1" ]; then
+  [ "$PKILL_HIT" = "1" ] && block "pkill/killall proibido (4 incidentes: matou daemon de producao/processo de outra sessao). Mate SO por PID explicito capturado no proprio spawn (kill \$PID). Bypass pontual: PKILL_GUARD_DISABLED=1."
+fi
+
+# --- Protecao de branch (ex-branch-guard.sh) ---
+if [[ "$NORM" == *"git commit"* ]]; then
+  # Resolve o diretorio-alvo: se o comando comeca com `cd <dir> && ...`,
+  # a branch a checar e a do worktree/repo de destino, nao a do CWD do hook
+  # (que e o CWD da sessao — tipicamente ~/Claude em main). Sem isto, commit
+  # em worktree feature e bloqueado por falso-positivo de "main".
+  TARGET_DIR="."
+  if printf '%s' "$NORM" | grep -qE '^[[:space:]]*cd[[:space:]]'; then
+    TARGET_DIR=$(printf '%s' "$NORM" | sed -E 's/^[[:space:]]*cd[[:space:]]+//; s/[[:space:]]*(&&|;).*//' | tr -d "\"'")
+    [ -z "$TARGET_DIR" ] && TARGET_DIR="."
+  fi
+  BRANCH=$(git -C "$TARGET_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+  case "$BRANCH" in
+    main|master|develop)
+      # Excecao unica: commit inicial em repo sem historico (baseline)
+      if git rev-parse HEAD >/dev/null 2>&1; then
+        block "Commit em '$BRANCH' proibido. Crie feature branch: git checkout -b feat/nome"
+      fi ;;
+  esac
+fi
+# Push explicito para ref protegida (nao casa branches tipo feat/main-page)
+if printf '%s' "$NORM" | grep -qE 'git push.*(origin|upstream)[[:space:]]+(main|master|develop)([[:space:]]|$|:)'; then
+  block "Push direto em branch protegida. Use PR: gh pr create"
+fi
+
+# --- SQL Safety (TOTVS RM multi-tenant) ---
+if printf '%s' "$NORM" | grep -qiE 'SELECT[[:space:]]+\*[[:space:]]+FROM[[:space:]]+(PFUNC|SMATRICULA|SMATRICPL|SHABILITACAOALUNO|PPESSOA|SPARCELA|FLAN)([^A-Z0-9_]|$)'; then
+  block "SELECT * em tabela TOTVS grande (PFUNC tem 680 cols). Especifique colunas; consulte schema.json."
+fi
+if printf '%s' "$NORM" | grep -qiE 'FROM[[:space:]]+(PFUNC|SMATRICULA|SMATRICPL|SPARCELA|FLAN|SHABILITACAOALUNO|PFHSTAFT)([^A-Z0-9_]|$)' && \
+   ! printf '%s' "$NORM" | grep -qi 'CODCOLIGADA'; then
+  block "Query em tabela TOTVS multi-tenant sem filtro CODCOLIGADA. Adicione WHERE CODCOLIGADA = N."
+fi
+
+# --- Warning nao-bloqueante ---
+if [[ "$NORM" == *"git stash"* && "$NORM" != *"git stash list"* && "$NORM" != *"git stash show"* && "$NORM" != *"git stash pop"* ]]; then
+  echo "WARNING: git stash pode perder trabalho. Prefira WIP commit." >&2
+fi
+
+exit 0

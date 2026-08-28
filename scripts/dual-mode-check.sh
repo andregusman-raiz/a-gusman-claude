@@ -62,10 +62,12 @@ check_count_equal() {
 }
 
 check_symlink_target "$CODEX_ALIAS" "$WORKSPACE"
+check_symlink_target "$WORKSPACE/AGENTS.md" "CLAUDE.md"
 
 check_symlink_target "$LOCAL_CODEX/rules" "../.claude/rules"
 check_symlink_target "$LOCAL_CODEX/shared" "../.claude/shared"
 check_symlink_target "$LOCAL_CODEX/skills" "../.agents/skills"
+check_symlink_target "$WORKSPACE/.agents/skills" "../.claude/skills"
 check_symlink_target "$LOCAL_CODEX/Playbooks" "../.claude/Playbooks"
 check_symlink_target "$LOCAL_CODEX/mcp" "../.claude/mcp"
 
@@ -80,8 +82,6 @@ check_exists "$GLOBAL_CODEX/scripts/repo-health.sh"
 check_exists "$GLOBAL_CODEX/scripts/Codex-locks-status.sh"
 check_exists "$GLOBAL_CODEX/skills/ag-1-construir/SKILL.md"
 check_exists "$GLOBAL_CODEX/skills/xlsx/scripts/recalc.py"
-
-check_count_equal "$WORKSPACE/.claude/skills" "$WORKSPACE/.agents/skills" "SKILL.md"
 
 if [ "$failures" -gt 0 ]; then
   printf 'Dual-mode bridge check failed: %s issue(s).\n' "$failures" >&2

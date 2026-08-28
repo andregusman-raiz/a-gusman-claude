@@ -83,6 +83,18 @@ if [[ "$FORCE" -eq 0 ]]; then
   fi
 fi
 
+# GUARD (28/08, incidente D-064): se a tela do destino mostra um MENU DE PERGUNTA
+# (AskUserQuestion / permissao / seletor), um Enter aqui RESPONDE PELO DONO. Vale
+# mesmo com --force. Nesse caso a mensagem vai para a inbox do papel e NAO e enviada.
+MENU_RE='Esc to cancel|Enter to (select|confirm|submit)|to select|↑/↓|\(Recommended\)|\(Recomendado\)|❯ *[0-9]+\.|Do you want to|Yes, and don|No, and tell'
+if echo "$SCREEN" | grep -qE "$MENU_RE"; then
+  INBOX="$HOME/Claude/docs/ai-state/terminais/inbox-${PAPEL}"
+  mkdir -p "$INBOX"
+  F="$INBOX/$(date -u +%Y%m%dT%H%M%SZ)-from-${FROM:-desconhecido}.md"
+  printf '%s\n' "# adiado $(date -u +%Y-%m-%dT%H:%MZ) — menu de decisao aberto em $PAPEL" "from: ${FROM:-desconhecido}" "" "$MSG" > "$F"
+  echo "ADIADO: $PAPEL esta com MENU DE DECISAO aberto na tela (um Enter responderia pelo dono). Mensagem gravada em $F — o papel le a inbox no proximo ciclo; reenvie depois se for urgente." >&2
+  exit 5
+fi
 "$CMUX_BIN" send --workspace "$UUID" "$MSG"
 "$CMUX_BIN" send-key --workspace "$UUID" enter
 

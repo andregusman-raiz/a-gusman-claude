@@ -5,6 +5,7 @@
 #
 # Permitido:
 #   - paths em ~/Claude/docs/workspace/...  (cross-project legitimo)
+#   - paths em ~/Claude/docs/ai-state/...  (infra do cockpit: registry/canais/handoffs/papeis)
 #   - DOCS_GUARD_DISABLED=1                 (bypass de sessao)
 #   - paths fora de ~/Claude/docs/          (qualquer projeto)
 #
@@ -72,6 +73,10 @@ esac
 # Path esta em workspace/ (excecao legitima)
 case "$FILE_PATH" in
   "$WORKSPACE_DOCS"/workspace/*) exit 0 ;;
+  # docs/ai-state/** e INFRAESTRUTURA do cockpit (registry, canais, handoffs, papeis,
+  # decisoes), nao doc de projeto. Bloquear aqui produzia o pior resultado: cada terminal
+  # contornava por Bash (bypass silencioso) — DE-COORD 27/08 21:35Z e builders 28/08.
+  "$WORKSPACE_DOCS"/ai-state/*) exit 0 ;;
 esac
 
 # Path nao e .md? (assets, scripts, screenshots etc) deixa passar

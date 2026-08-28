@@ -26,25 +26,6 @@
 # fail-open se o arquivo nao existir/nao puder ser lido. `eval "$VAR"`
 # (variavel, nao literal) e `bash -c "<literal>"` continuam FORA do alcance
 # de um guard textual — ver docstring do lib compartilhado.
-#
-# cmux send/new-workspace cru (fix 2026-08-28, auditoria terminais 48h — achado
-# 2: 15 `cmux send` crus bypassando terminal-send.sh, 8 do proprio DE-COORD):
-# bloqueia SO comando top-level (nao recursivo — os scripts da factory chamam
-# `$CMUX_BIN send` internamente, que nao e o literal "cmux" e nao casaria de
-# qualquer forma). Bypass: CMUX_RAW_ALLOWED=1.
-#
-# A1 — achado CRITICO pre-existente (auditoria adversarial 2026-08-28, fora da
-# reforma de pendencias): 6 regras ("vercel --prod", "--no-verify", "git rebase
-# -i", "git checkout -- .", "git restore .", "git clean -f") ainda eram
-# `[[ "$NORM" == *"..."* ]]` — substring cru, sem posicao-de-comando. Qualquer
-# MENCAO textual bloqueava como execucao (`echo 'nunca rodar vercel --prod
-# direto'`, `git commit -m "explica que git checkout -- . e perigoso"`,
-# `echo 'proibido: git rebase -i'`) — a promessa do header (linha 14-16) nao
-# valia pra essas 6. Migradas para RULES/rule_matches_recursive em
-# lib/bash-cmd-normalize.py (mesmo mecanismo do git-push-force/pkill/
-# railway-kv acima — ver comentario "vercel-prod"/"no-verify"/etc no RULES
-# dict la). Os 6 blocks abaixo agora leem VERCEL_PROD_HIT..GIT_CLEAN_F_HIT
-# (linhas 7-12 de guards-info) em vez de `case "$NORM" in *"..."* )`.
 
 set -uo pipefail
 [ "${BASH_GUARDS_DISABLED:-0}" = "1" ] && exit 0
@@ -73,59 +54,13 @@ NORM_B64="$(printf '%s' "$GINFO" | sed -n '1p')"
 FORCE_PUSH_HIT="$(printf '%s' "$GINFO" | sed -n '2p')"
 PKILL_HIT="$(printf '%s' "$GINFO" | sed -n '3p')"
 RAILWAY_KV_HIT="$(printf '%s' "$GINFO" | sed -n '4p')"
-CMUX_SEND_HIT="$(printf '%s' "$GINFO" | sed -n '5p')"
-CMUX_NEWWS_HIT="$(printf '%s' "$GINFO" | sed -n '6p')"
-VERCEL_PROD_HIT="$(printf '%s' "$GINFO" | sed -n '7p')"
-NO_VERIFY_HIT="$(printf '%s' "$GINFO" | sed -n '8p')"
-GIT_REBASE_I_HIT="$(printf '%s' "$GINFO" | sed -n '9p')"
-GIT_CHECKOUT_DOT_HIT="$(printf '%s' "$GINFO" | sed -n '10p')"
-GIT_RESTORE_DOT_HIT="$(printf '%s' "$GINFO" | sed -n '11p')"
-GIT_CLEAN_F_HIT="$(printf '%s' "$GINFO" | sed -n '12p')"
 NORM="$(printf '%s' "$NORM_B64" | base64 -d 2>/dev/null)"
 [ -z "$NORM" ] && NORM="$CMD"
 [ "$FORCE_PUSH_HIT" = "1" ] || FORCE_PUSH_HIT="0"
 [ "$PKILL_HIT" = "1" ] || PKILL_HIT="0"
 [ "$RAILWAY_KV_HIT" = "1" ] || RAILWAY_KV_HIT="0"
-[ "$CMUX_SEND_HIT" = "1" ] || CMUX_SEND_HIT="0"
-[ "$CMUX_NEWWS_HIT" = "1" ] || CMUX_NEWWS_HIT="0"
-[ "$VERCEL_PROD_HIT" = "1" ] || VERCEL_PROD_HIT="0"
-[ "$NO_VERIFY_HIT" = "1" ] || NO_VERIFY_HIT="0"
-[ "$GIT_REBASE_I_HIT" = "1" ] || GIT_REBASE_I_HIT="0"
-[ "$GIT_CHECKOUT_DOT_HIT" = "1" ] || GIT_CHECKOUT_DOT_HIT="0"
-[ "$GIT_RESTORE_DOT_HIT" = "1" ] || GIT_RESTORE_DOT_HIT="0"
-[ "$GIT_CLEAN_F_HIT" = "1" ] || GIT_CLEAN_F_HIT="0"
 
 block() { echo "BLOCKED: $1" >&2; exit 2; }
-
-# Resolve o PAPEL do chamador ($CMUX_WORKSPACE_ID -> registry.json) so quando
-# necessario (bloqueio de cmux cru) — usado so para o log de auditoria do
-# conduta-check.sh (M7), nunca para decidir se bloqueia. Falha/ausencia ->
-# "desconhecido", nunca aborta o guard.
-GUARD_BLOCK_LOG="$HOME/Claude/docs/ai-state/terminais/guard-blocks.log"
-log_guard_block() {
-  local regra="$1"
-  local papel="desconhecido"
-  local registry="$HOME/Claude/docs/ai-state/terminais/registry.json"
-  if [ -n "${CMUX_WORKSPACE_ID:-}" ] && [ -f "$registry" ]; then
-    papel="$(REGISTRY_LIB_DIR="$SDIR/../scripts" REGISTRY="$registry" WS="$CMUX_WORKSPACE_ID" python3 -c '
-import os, sys
-sys.path.insert(0, os.environ["REGISTRY_LIB_DIR"])
-try:
-    from registry_lib import load
-    reg = load(os.environ["REGISTRY"])
-except Exception:
-    print("desconhecido"); raise SystemExit(0)
-ws = os.environ["WS"]
-for p, e in (reg.get("terminais") or {}).items():
-    if e.get("workspace_uuid") == ws:
-        print(p); raise SystemExit(0)
-print("desconhecido")
-' 2>/dev/null)"
-    [ -z "$papel" ] && papel="desconhecido"
-  fi
-  mkdir -p "$(dirname "$GUARD_BLOCK_LOG")" 2>/dev/null
-  printf '%s %s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$papel" "$regra" >> "$GUARD_BLOCK_LOG" 2>/dev/null || true
-}
 
 # --- gusman-os ask: NUNCA tocar o Data Engine direto (defense-in-depth) ---
 # So dispara quando GUSMAN_OS_ASK_CONTEXT=1 (setado SO no spawn do ask do WhatsApp pelo kernel).
@@ -147,35 +82,21 @@ if [ "${GUSMAN_OS_ASK_CONTEXT:-0}" = "1" ]; then
 fi
 
 # --- Operacoes destrutivas / bypass de pipeline ---
-# fix 2026-08-28 (A1): os 6 checks abaixo eram substring cru sobre $NORM
-# (`[[ "$NORM" == *"..."* ]]`) — migrados para as flags calculadas em
-# guards-info (posicao-de-comando, via RULES em lib/bash-cmd-normalize.py).
-[ "$VERCEL_PROD_HIT" = "1" ] && block "Use CI/CD pipeline em vez de vercel --prod direto (rule deploy-routing)."
+case "$NORM" in
+  *"vercel --prod"*) block "Use CI/CD pipeline em vez de vercel --prod direto (rule deploy-routing)." ;;
+esac
 [ "$FORCE_PUSH_HIT" = "1" ] && block "Force push e perigoso. Use --force-with-lease apenas com aprovacao explicita."
 [ "$RAILWAY_KV_HIT" = "1" ] && block "railway variables --kv vaza secrets em texto puro no output/transcript. Use 'railway variables --json | jq keys' se precisar so dos nomes."
-[ "$NO_VERIFY_HIT" = "1" ] && block "--no-verify pula hooks de seguranca."
-[ "$GIT_REBASE_I_HIT" = "1" ] && block "git rebase -i e interativo (nao suportado) e destrutivo. Use merge."
-[ "$GIT_CHECKOUT_DOT_HIT" = "1" ] && block "git checkout -- . descarta TODAS as mudancas unstaged. Commit primeiro."
-[ "$GIT_RESTORE_DOT_HIT" = "1" ] && block "git restore . descarta mudancas. Commit ou branch primeiro."
-[ "$GIT_CLEAN_F_HIT" = "1" ] && block "git clean -f apaga permanentemente arquivos untracked."
+[[ "$NORM" == *"--no-verify"* ]] && block "--no-verify pula hooks de seguranca."
+[[ "$NORM" == *"git rebase -i"* ]] && block "git rebase -i e interativo (nao suportado) e destrutivo. Use merge."
+[[ "$NORM" == *"git checkout -- ."* || "$NORM" == *'git checkout -- *'* ]] && block "git checkout -- . descarta TODAS as mudancas unstaged. Commit primeiro."
+[[ "$NORM" == *"git restore ."* ]] && block "git restore . descarta mudancas. Commit ou branch primeiro."
+[[ "$NORM" == *"git clean -f"* ]] && block "git clean -f apaga permanentemente arquivos untracked."
 
 # --- pkill/killall: 4 incidentes de agents matando processo alheio (daemon de producao 2x, pytest de reviewer) ---
 # Matar processo: SEMPRE por PID explicito capturado no proprio spawn ($!). Bypass: PKILL_GUARD_DISABLED=1
 if [ "${PKILL_GUARD_DISABLED:-0}" != "1" ]; then
   [ "$PKILL_HIT" = "1" ] && block "pkill/killall proibido (4 incidentes: matou daemon de producao/processo de outra sessao). Mate SO por PID explicito capturado no proprio spawn (kill \$PID). Bypass pontual: PKILL_GUARD_DISABLED=1."
-fi
-
-# --- cmux send/new-workspace cru: 15 sends crus em 48h bypassando marcador de
-# destino + log de terminal-send.sh (auditoria 2026-08-28, achado 2). Bypass: CMUX_RAW_ALLOWED=1
-if [ "${CMUX_RAW_ALLOWED:-0}" != "1" ]; then
-  if [ "$CMUX_SEND_HIT" = "1" ]; then
-    log_guard_block "cmux-send-cru"
-    block "use ~/Claude/.claude/scripts/terminal-send.sh <PAPEL> \"<msg>\" em vez de 'cmux send' cru — o script checa marcador de destino/input pendente e loga em send.log (auditoria: 15 sends crus em 48h, 8 do proprio DE-COORD). Bypass consciente: CMUX_RAW_ALLOWED=1"
-  fi
-  if [ "$CMUX_NEWWS_HIT" = "1" ]; then
-    log_guard_block "cmux-new-workspace-cru"
-    block "use ~/Claude/.claude/scripts/terminal-open.sh <PAPEL> em vez de 'cmux new-workspace' cru — respeita o teto de 15 sessoes e o registry (sem isso o papel abre sem entrar no registry.json). Bypass consciente: CMUX_RAW_ALLOWED=1"
-  fi
 fi
 
 # --- Protecao de branch (ex-branch-guard.sh) ---
@@ -215,12 +136,6 @@ fi
 # --- Warning nao-bloqueante ---
 if [[ "$NORM" == *"git stash"* && "$NORM" != *"git stash list"* && "$NORM" != *"git stash show"* && "$NORM" != *"git stash pop"* ]]; then
   echo "WARNING: git stash pode perder trabalho. Prefira WIP commit." >&2
-fi
-
-# pbcopy/pbpaste entre terminais: nao ha como o cmux/hook verificar QUEM le o
-# clipboard do lado de la (nao e canal auditavel) — so aviso, nunca bloqueio.
-if printf '%s' "$NORM" | grep -qE '(^|[;&|[:space:]])pb(copy|paste)([[:space:]]|$)'; then
-  echo "WARNING: pbcopy/pbpaste nao e canal auditavel entre terminais do cockpit — texto entre papeis vai por terminal-send.sh (curto) ou arquivo (ALERTAS/PEDIDOS/ORDENS/handoff, longo)." >&2
 fi
 
 exit 0

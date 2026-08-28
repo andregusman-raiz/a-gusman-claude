@@ -43,6 +43,14 @@ if ! command -v jq >/dev/null 2>&1; then
   echo "[orq-goal-guard] jq não encontrado; pulando guard" >&2
   exit 0
 fi
+
+# Escopo por sessão: goal com session_id só bloqueia a sessão dona.
+# Sem session_id no arquivo (goal legado/antigo) → comportamento anterior (bloqueia todas).
+GOAL_SESSION_ID=$(jq -r '.session_id // empty' "$GOAL_FILE" 2>/dev/null)
+if [ -n "$GOAL_SESSION_ID" ] && [ -n "${CLAUDE_CODE_SESSION_ID:-}" ] && [ "$GOAL_SESSION_ID" != "$CLAUDE_CODE_SESSION_ID" ]; then
+  exit 0
+fi
+
 if ! command -v python3 >/dev/null 2>&1; then
   echo "[orq-goal-guard] python3 não encontrado; pulando guard" >&2
   exit 0

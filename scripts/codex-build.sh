@@ -99,9 +99,21 @@ if [ "$NOWT" = "0" ]; then
 fi
 
 # ── build ────────────────────────────────────────────────────────────────────
+# `--` obrigatório (codex-cli >=0.145): sem ele o exec ignora o prompt posicional,
+# lê stdin vazio e sai 0 sem fazer NADA — "success vazio" (gotcha 2026-07-23).
 echo "▶ codex --profile build exec (em $WORKDIR)"
 CODEX_EXIT=0
-( cd "$WORKDIR" && codex --profile build exec "$PROMPT" ) || CODEX_EXIT=$?
+( cd "$WORKDIR" && codex --profile build exec -- "$PROMPT" ) || CODEX_EXIT=$?
+
+# Guard anti-success-vazio: exec "ok" sem NENHUMA mudança no worktree = falha.
+if [ "$CODEX_EXIT" = "0" ] && [ "$NOWT" != "1" ]; then
+  CHANGED=$(git -C "$WORKDIR" status --porcelain | grep -cv "^?? docs/specs/" || true)
+  AHEAD=$(git -C "$WORKDIR" rev-list --count "@{u}..HEAD" 2>/dev/null || git -C "$WORKDIR" rev-list --count "$(git -C "$REPO_ROOT" rev-parse HEAD)..HEAD" 2>/dev/null || echo 0)
+  if [ "${CHANGED:-0}" = "0" ] && [ "${AHEAD:-0}" = "0" ]; then
+    echo "❌ codex exec saiu 0 mas NÃO produziu nenhuma mudança (success vazio) — abortando." >&2
+    CODEX_EXIT=97
+  fi
+fi
 
 # ── re-verificação local dos gates (regra 3: não confiar no 'passou') ────────
 GATES_EXIT=0

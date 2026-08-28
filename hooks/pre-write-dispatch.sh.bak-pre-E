@@ -1,7 +1,7 @@
 #!/bin/bash
 # pre-write-dispatch.sh — PreToolUse(Write|Edit|MultiEdit): payload lido UMA vez, guards em cadeia.
 # config-guard.sh so se aplica a Write (forca Edit em configs); gha-guard.sh a todos.
-# Bypass individual: CONFIG_GUARD_DISABLED=1 | GHA_GUARD_DISABLED=1 | TERMINAL_FENCING_DISABLED=1 | DECISOES_VIEW_EDIT=1
+# Bypass individual: CONFIG_GUARD_DISABLED=1 | GHA_GUARD_DISABLED=1 | TERMINAL_FENCING_DISABLED=1
 
 set -uo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,9 +20,6 @@ if [ "$TOOL" = "Write" ]; then
 fi
 
 printf '%s' "$PAYLOAD" | python3 "$DIR/terminal-fencing-guard.py"
-rc=$?; [ $rc -ne 0 ] && exit $rc
-
-printf '%s' "$PAYLOAD" | bash "$DIR/decisoes-view-guard.sh"
 rc=$?; [ $rc -ne 0 ] && exit $rc
 
 printf '%s' "$PAYLOAD" | bash "$HOME/.claude/scripts/gha-guard.sh"
