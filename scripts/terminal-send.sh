@@ -63,6 +63,46 @@ SCREEN2=$("$CMUX_BIN" read-screen --workspace "$UUID" --lines 15 2>/dev/null || 
 SCREEN="$SCREEN2"
 [[ -z "$SCREEN" ]] && SCREEN="$SCREEN1"
 
+# --- GUARDA DE MENU ABERTO: NAO e pulavel por --force ---
+# Incidente 2026-08-28 (2x): mensagem enviada a um terminal que tinha AskUserQuestion
+# aberto virou RESPOSTA a pergunta do dono (D-064 respondida "SSO Google" por engano,
+# depois anulada). As checagens de marcador/input parcial sao pulaveis por --force; esta
+# NAO pode ser, porque o dano nao e "mensagem no lugar errado" — e decisao do dono
+# falsificada. Fonte: feed do cmux (estruturado), casando workstream_id -> session_id do papel.
+MENU_ABERTO=$(CMUX_BIN="$CMUX_BIN" SESSION_ID="$(echo "$RESOLVE_JSON" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("session_id") or "")')" python3 <<'PYEOF' 2>/dev/null
+import json, os, subprocess
+sid = os.environ.get("SESSION_ID") or ""
+if not sid:
+    raise SystemExit(0)
+try:
+    out = subprocess.run([os.environ["CMUX_BIN"], "rpc", "feed.list", "{}"],
+                         capture_output=True, text=True, timeout=8).stdout
+    d = json.loads(out)
+except Exception:
+    raise SystemExit(0)   # feed indisponivel: nao inventa bloqueio
+items = d.get("items", d if isinstance(d, list) else [])
+for i in items:
+    if i.get("kind") not in ("question", "permission", "exit_plan"):
+        continue
+    if i.get("resolved_at") or i.get("status") in ("expired", "resolved", "answered"):
+        continue
+    ws = str(i.get("workstream_id") or i.get("request_id") or "")
+    if sid and sid in ws:
+        print(f'{i.get("kind")}|{str(i.get("title") or "")[:40]}')
+        break
+PYEOF
+)
+if [[ -n "$MENU_ABERTO" ]]; then
+  echo "RECUSADO: $PAPEL tem ${MENU_ABERTO%%|*} ABERTA esperando o dono (${MENU_ABERTO#*|})." >&2
+  echo "Enviar agora faria seu texto virar a RESPOSTA dessa pergunta — ja aconteceu 2x em 28/08" >&2
+  echo "(D-064 foi respondida por engano e precisou ser anulada)." >&2
+  echo "Esta guarda NAO e pulavel por --force. Escreva no canal de arquivo e espere o dono responder:" >&2
+  echo "  ~/.claude/scripts/canal-append.sh ALERTAS \"<texto>\" --papel <SEU_PAPEL>" >&2
+  echo "Bypass consciente (so se souber que a pergunta nao e do dono): TERMINAL_SEND_MENU_OK=1" >&2
+  [[ "${TERMINAL_SEND_MENU_OK:-0}" != "1" ]] && exit 6
+  echo "AVISO: TERMINAL_SEND_MENU_OK=1 — prosseguindo por bypass explicito." >&2
+fi
+
 if [[ "$FORCE" -eq 0 ]]; then
   BASENAME=$(basename "$CWD")
   MARK_OK=0
@@ -92,6 +132,14 @@ if echo "$SCREEN" | grep -qE "$MENU_RE"; then
   mkdir -p "$INBOX"
   F="$INBOX/$(date -u +%Y%m%dT%H%M%SZ)-from-${FROM:-desconhecido}.md"
   printf '%s\n' "# adiado $(date -u +%Y-%m-%dT%H:%MZ) — menu de decisao aberto em $PAPEL" "from: ${FROM:-desconhecido}" "" "$MSG" > "$F"
+  # SINAL: gravar na inbox nao acorda ninguem — o COMANDO roda em ciclo de 25min e
+  # mensagens ficaram ate 1h paradas (medido 28/08). O arquivo continua sendo o canal
+  # de verdade; o sinal so encurta a espera. set-status aparece na sidebar sem roubar
+  # foco nem digitar nada no pane (send/send-key aqui responderiam o menu — proibido).
+  "$CMUX_BIN" set-status inbox "📥 ${FROM:-peer}: mensagem adiada (menu aberto)" \
+      --workspace "$UUID" --priority 80 >/dev/null 2>&1 || true
+  "$CMUX_BIN" notify --title "Mensagem adiada — $PAPEL" \
+      --body "de ${FROM:-desconhecido}: menu aberto; ver inbox-$PAPEL" >/dev/null 2>&1 || true
   echo "ADIADO: $PAPEL esta com MENU DE DECISAO aberto na tela (um Enter responderia pelo dono). Mensagem gravada em $F — o papel le a inbox no proximo ciclo; reenvie depois se for urgente." >&2
   exit 5
 fi

@@ -134,7 +134,9 @@ reg = json.load(open('$REGISTRY'))
 n = sum(1 for v in reg.get('terminais', {}).values() if v.get('agent') == '$AGENT' and v.get('estado') == 'aberto')
 print(n)
 ")
-if [[ "$ABERTOS" -ge "$CAP" ]]; then
+# TERMINAL_OPEN_SKIP_CAP=1: usado pela RESTAURACAO. Cap impede a frota CRESCER sem
+# intencao; restaurar nao e crescer, e voltar ao estado anterior. Memoria nunca e pulada.
+if [[ "$ABERTOS" -ge "$CAP" && "${TERMINAL_OPEN_SKIP_CAP:-0}" != "1" ]]; then
   echo "RECUSADO: cap de $AGENT estourado ($ABERTOS/$CAP abertos)" >&2
   exit 4
 fi
@@ -149,7 +151,7 @@ import json,sys
 print(json.load(open(sys.argv[1])).get("cap",{}).get("total",15))
 PYX
 )
-if [[ "$TOTAL_ABERTOS" -ge "$TOTAL_CAP" ]]; then
+if [[ "$TOTAL_ABERTOS" -ge "$TOTAL_CAP" && "${TERMINAL_OPEN_SKIP_CAP:-0}" != "1" ]]; then
   echo "RECUSADO: cap total estourado ($TOTAL_ABERTOS/$TOTAL_CAP sessoes abertas no registry)" >&2
   exit 4
 fi
@@ -189,10 +191,35 @@ if [[ "$AGENT" == "claude" ]]; then
     CMD="claude --dangerously-skip-permissions --resume $SESSION_ID"
   fi
 elif [[ "$AGENT" == "codex" ]]; then
-  if [[ "$FRESH" -eq 1 ]]; then
-    CMD="codex --add-dir "$HOME/Claude/docs/ai-state" --add-dir "$HOME/Claude/.claude/worktrees" --add-dir "$HOME/Claude/GitHub/raiz-data-engine/.claude/worktrees" -c mcp_servers.raiz-data-engine.enabled=false"
+  # TRUST DO DIRETORIO: o codex pergunta "Do you trust this directory?" e ESPERA resposta
+  # — num restore automatico isso trava o terminal (medido 28/08 no HEMATO). A resposta
+  # persiste em ~/.codex/config.toml. Worktree novo nunca esta na lista (DE-CODEX, FUNIL-WP4).
+  if [[ -f "$HOME/.codex/config.toml" ]]; then
+    CODEX_CFG="$HOME/.codex/config.toml" TRUST_DIR="${WORKTREE:-$CWD}" python3 <<'PYEOF' || true
+import os, shutil, tempfile
+cfg, d = os.environ["CODEX_CFG"], os.environ.get("TRUST_DIR") or ""
+if not d:
+    raise SystemExit(0)
+raw = open(cfg, encoding="utf-8").read()
+if f'[projects."{d}"]' in raw:
+    raise SystemExit(0)
+shutil.copy2(cfg, cfg + ".bak-trust")
+fd, tmp = tempfile.mkstemp(dir=os.path.dirname(cfg), prefix=".config.", suffix=".toml")
+with os.fdopen(fd, "w", encoding="utf-8") as f:
+    f.write(raw.rstrip("\n") + '\n\n[projects."' + d + '"]\ntrust_level = "trusted"\n')
+os.replace(tmp, cfg)
+print("[terminal-open] trust concedido: " + d)
+PYEOF
+  fi
+  # Regra do dono (28/08): Codex sobe com --dangerously-bypass-approvals-and-sandbox.
+  # `--add-dir` foi REMOVIDO: ele amplia o sandbox, e com o sandbox desligado o codex
+  # responde "Error adding directories: Ignoring --add-dir" e NAO sobe — o restore
+  # reportava "restaurado" com o agente morto (sucesso aparente, medido em 28/08 17:39).
+  CODEX_BASE="codex --dangerously-bypass-approvals-and-sandbox -c mcp_servers.raiz-data-engine.enabled=false"
+  if [[ "$FRESH" -eq 1 || -z "$SESSION_ID" ]]; then
+    CMD="$CODEX_BASE"
   else
-    CMD="codex resume --add-dir "$HOME/Claude/docs/ai-state" --add-dir "$HOME/Claude/.claude/worktrees" --add-dir "$HOME/Claude/GitHub/raiz-data-engine/.claude/worktrees" -c mcp_servers.raiz-data-engine.enabled=false"
+    CMD="$CODEX_BASE resume $SESSION_ID"
   fi
 else
   echo "ERRO: agent desconhecido: $AGENT" >&2

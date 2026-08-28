@@ -11,6 +11,7 @@ ROTA_STATE="$T/.roteamento-state.json"
 ROTA_LOG="$T/roteamento.log"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TERMINAL_SEND_BIN="${TERMINAL_SEND_BIN:-$SCRIPT_DIR/terminal-send.sh}"
+CMUX_BIN="${CMUX_BIN:-/Applications/cmux.app/Contents/Resources/bin/cmux}"
 
 usage() {
   cat <<'EOF'
@@ -431,7 +432,29 @@ PYEOF
         if [[ $SEND_RC -ne 0 ]]; then
           printf '[%s] ROTEAMENTO FALHOU dest=%s canal=%s rc=%s :: %s\n' \
             "$TS" "$DEST" "$CANAL" "$SEND_RC" "$(echo "$SEND_OUT" | tr '\n' ' ' | cut -c1-300)" >> "$ROTA_LOG"
-          echo "AVISO: roteamento lateral para $DEST falhou (rc=$SEND_RC) — ver $ROTA_LOG" >&2
+          # FALLBACK DE INBOX: nudge que falha vira silencio — foram 12 falhas em
+          # 28/08 (tela do destino sem marcador, rc=4) e nenhum destinatario soube.
+          # O terminal-send ja usa inbox quando adia por menu; aqui a recusa (qualquer
+          # motivo) cai no MESMO lugar, com sinal na sidebar. NAO se usa --force: a
+          # checagem de marcador existe justamente porque endereco errado ja causou
+          # incidente (D2); o certo e entregar por outro caminho, nao atropelar o guard.
+          INBOX_D="$HOME/Claude/docs/ai-state/terminais/inbox-${DEST}"
+          mkdir -p "$INBOX_D" 2>/dev/null
+          INBOX_F="$INBOX_D/$(date -u +%Y%m%dT%H%M%SZ)-rota-${PAPEL:-desconhecido}.md"
+          {
+            printf '# nudge nao entregue %s — roteamento lateral\n' "$(date -u +%Y-%m-%dT%H:%MZ)"
+            printf 'de: %s · canal: %s · motivo: rc=%s\n\n' "${PAPEL:-desconhecido}" "$CANAL" "$SEND_RC"
+            printf '%s\n' "$MSG"
+          } > "$INBOX_F" 2>/dev/null
+          DEST_UUID=$("${TERMINAL_RESOLVE_BIN:-$SCRIPT_DIR/terminal-resolve.sh}" "$DEST" 2>/dev/null | python3 -c 'import json,sys
+try: print(json.load(sys.stdin).get("workspace_uuid_live") or "")
+except Exception: print("")' 2>/dev/null)
+          if [[ -n "$DEST_UUID" ]]; then
+            "$CMUX_BIN" set-status inbox "📥 ${PAPEL:-peer}: nudge na inbox" \
+                --workspace "$DEST_UUID" --priority 75 >/dev/null 2>&1 || true
+          fi
+          printf '[%s] ROTEAMENTO->INBOX dest=%s arquivo=%s\n' "$TS" "$DEST" "$INBOX_F" >> "$ROTA_LOG"
+          echo "AVISO: nudge para $DEST nao entregue (rc=$SEND_RC) — gravado em $INBOX_F e sinalizado na sidebar" >&2
         fi
         ;;
       ROTA_SKIP_BROADCAST)

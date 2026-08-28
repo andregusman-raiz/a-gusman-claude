@@ -300,6 +300,44 @@ lines.append("> Formula: Score 0-100 = ONLINE hoje (20) + handoff <=8h (20) + se
               "handoff, zero cmux/chat/msgs) aparece 'sem dados' — nunca com nota (ausencia de "
               "violacao != presenca de efeito; nao entra na media nem na lista 'abaixo de 50').")
 lines.append("")
+# --- Frescor das FONTES: uma fonte que morre em silencio e o modo de falha mais
+# caro deste cockpit (o cmux-sessions.jsonl do gusman-os passou 25 DIAS sem um
+# evento e ninguem viu; o codigo de restauracao seguia "pronto" o tempo todo).
+# Aqui a idade de cada fonte critica vira numero publicado.
+import time as _t
+# T nao e exportado para este bloco; deriva do SEND_LOG (que e $T/send.log)
+_TDIR = os.path.dirname(os.environ.get("SEND_LOG", "")) or os.path.dirname(os.environ.get("OUT", ""))
+def _idade_min(path):
+    try:
+        return int((_t.time() - os.path.getmtime(os.path.expanduser(path))) / 60)
+    except Exception:
+        return None
+FONTES = [
+    ("cmux session (restauracao)", "~/Library/Application Support/cmux/session-com.cmuxterm.app.json", 60),
+    ("liveness.json", os.path.join(_TDIR, "liveness.json"), 30),
+    ("registry.json", os.path.join(_TDIR, "registry.json"), 1440),
+    ("decisoes.json", os.path.join(_TDIR, "decisoes.json"), 1440),
+]
+lines.append("")
+lines.append("## Frescor das fontes")
+lines.append("")
+lines.append("| Fonte | Idade | Limite | Estado |")
+lines.append("|---|---|---|---|")
+_stale = []
+for nome, caminho, limite in FONTES:
+    idade = _idade_min(caminho) if caminho else None
+    if idade is None:
+        lines.append(f"| {nome} | — | {limite}min | **AUSENTE** |")
+        _stale.append(f"{nome}: ausente")
+    elif idade > limite:
+        lines.append(f"| {nome} | {idade}min | {limite}min | **PARADA** |")
+        _stale.append(f"{nome}: {idade}min")
+    else:
+        lines.append(f"| {nome} | {idade}min | {limite}min | ok |")
+if _stale:
+    lines.append("")
+    lines.append("**Fonte parada e restauracao que nao restaura.** Pendencias: " + "; ".join(_stale))
+lines.append("")
 lines.append("## Topologia (24h)")
 lines.append("")
 lines.append(f"Total de mensagens: {total_msgs}. Verticais (-> COMANDO/RESUMO/DE-COORD): "
