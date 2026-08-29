@@ -136,7 +136,19 @@ fila = f"fila: {n_open} abertos · {n_cr} CR por responder · {n_ok} prontos p/ 
 
 plan = []
 # --- papel de cada PR (worktree do DE > token WS-n da Entrega > #PR citado na Entrega) ---
+# fonte canônica PR->terminal: claims.json (branch -> terminal). NUNCA por autor (a frota inteira e um login: andregusman-raiz).
+claims_by_branch, claims_by_pr = {}, {}
+try:
+    _cl = json.load(open(os.path.join(os.path.dirname(snap_p), "claims.json"))).get("claims", {})
+    for br, c in (_cl.items() if isinstance(_cl, dict) else []):
+        if not isinstance(c, dict): continue
+        term = c.get("terminal")
+        if term in reg: claims_by_branch[br] = term
+        if term in reg and str(c.get("pr") or "").isdigit(): claims_by_pr[int(c["pr"])] = term
+except Exception: pass
 def papel_do_pr(p):
+    pap = claims_by_pr.get(p["number"]) or claims_by_branch.get(p["headRefName"])
+    if pap: return pap
     path = wt_branch_to_path.get(p["headRefName"]); pap = papel_of_path(path) if path else None
     if pap: return pap
     for papel, t in reg.items():
