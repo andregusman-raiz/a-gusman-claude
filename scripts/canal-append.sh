@@ -145,6 +145,14 @@ esac
 
 HOJE="$(date -u +%Y-%m-%d)"
 LOG_DIA="$Q/log/${HOJE}.md"
+# TS precisa existir ANTES da bifurcacao de canal: route_lateral() (chamada
+# incondicional no fim do script, para LOG e para PEDIDOS) usa $TS. Definido
+# so dentro do ramo PEDIDOS (bug real, achado em uso: canal-append.sh LOG
+# com texto citando um papel/#PR disparava o roteamento lateral, que batia
+# "TS: variavel nao associada" sob set -u -- a escrita ja tinha acontecido,
+# mas o script saia com rc!=0, e um `|| true` no chamador engolia isso em
+# silencio). Carimbado 1x aqui, reutilizado pelos dois ramos.
+TS="$(date -u +'%Y-%m-%d %H:%M')"
 
 case "$CANAL" in
   PEDIDOS) FILE="$Q/PEDIDOS.md" ;;
@@ -251,8 +259,6 @@ else
   if [[ "$TEXTO" == *$'\n'* || ${#TEXTO} -gt 300 ]]; then
     TEXTO_OVERFLOW=1
   fi
-
-  TS="$(date -u +'%Y-%m-%d %H:%M')"
 
   if [[ "$TEXTO_OVERFLOW" -eq 1 ]]; then
     # A prosa INTEIRA vai pro log ANTES de qualquer outra coisa -- se isto
