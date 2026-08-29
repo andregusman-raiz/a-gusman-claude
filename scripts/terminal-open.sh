@@ -98,6 +98,55 @@ TITLE=$(reg_field workspace_title "")
 BLOQUEADO_POR=$(reg_field bloqueado_por "")
 NAO_ANTES_DE=$(reg_field nao_antes_de "")
 
+# --- F0b (SPEC-metodologia-cockpit-2026-08-28.md §7.3 item 2): contrato do
+# papel passa a ser o frontmatter de papeis/<PAPEL>.md (model/effort/
+# acorda_por) -- o registry deixa de ser editado a mao e passa a ser DERIVADO
+# do que foi de fato usado no lancamento. PAPEIS_DIR overridable so para
+# teste isolado; default inalterado em producao.
+PAPEIS_DIR="${TERMINAL_OPEN_PAPEIS_DIR:-$HOME/Claude/docs/ai-state/terminais/papeis}"
+PAPEL_MD="$PAPEIS_DIR/$PAPEL.md"
+FRONT_MODEL=""
+FRONT_EFFORT=""
+FRONT_ACORDA_POR=""
+if [[ -f "$PAPEL_MD" ]]; then
+  FRONT_VARS=$(python3 - "$PAPEL_MD" <<'PYEOF'
+import shlex
+import sys
+
+path = sys.argv[1]
+try:
+    with open(path, encoding="utf-8") as f:
+        lines = f.read().splitlines()
+except Exception:
+    lines = []
+
+out = {"model": "", "effort": "", "acorda_por": ""}
+# Frontmatter valido: primeira linha "---", fecha na proxima "---".
+# Arquivo sem essa moldura (hoje: TODOS os papeis/*.md) -> os 3 campos
+# ficam vazios e o chamador cai no fallback do registry (nao e erro).
+if lines and lines[0].strip() == "---":
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        if ":" not in line:
+            continue
+        k, _, v = line.partition(":")
+        k = k.strip().lower()
+        v = v.strip().strip('"').strip("'")
+        if k in out:
+            out[k] = v
+
+for k, v in out.items():
+    print(f"FRONT_{k.upper()}={shlex.quote(v)}")
+PYEOF
+)
+  eval "$FRONT_VARS"
+fi
+
+if [[ -z "$FRONT_MODEL" ]]; then
+  echo "AVISO: $PAPEL_MD sem frontmatter (model/effort/acorda_por) -- caindo no model do registry (fallback F0b). Adicione o bloco --- no topo do arquivo do papel para o registry parar de depender de edicao manual." >&2
+fi
+
 echo "== terminal-open: $PAPEL (tier $TIER, agent $AGENT) =="
 
 # --- gates ---
@@ -184,11 +233,25 @@ if [[ "$DRY_RUN" -eq 0 && ! -d "$CWD" ]]; then
 fi
 
 # --- comando inicial ---
+SESSION_ID_DERIVADO=""
+MODEL_DERIVADO=""
 if [[ "$AGENT" == "claude" ]]; then
+  MODEL_REGISTRY=$(reg_field model "")
+  MODEL_DERIVADO="${FRONT_MODEL:-$MODEL_REGISTRY}"
+  MODEL_FLAG_STR=""
+  [[ -n "$MODEL_DERIVADO" ]] && MODEL_FLAG_STR=" --model $MODEL_DERIVADO"
+  EFFORT_FLAG_STR=""
+  [[ -n "$FRONT_EFFORT" ]] && EFFORT_FLAG_STR=" --effort $FRONT_EFFORT"
   if [[ "$FRESH" -eq 1 || -z "$SESSION_ID" || "$SESSION_ID" == "None" ]]; then
-    CMD="claude --dangerously-skip-permissions"
+    # Sessao nova: gera o UUID AQUI (nao deixa o cmux/claude escolher e o
+    # registry adivinhar depois) -- e o que "registry derivado" quer dizer:
+    # o proprio lancamento e a fonte do session_id, escrito no registry no
+    # fim deste script, nunca digitado a mao.
+    SESSION_ID_DERIVADO=$(python3 -c 'import uuid; print(uuid.uuid4())')
+    CMD="claude --dangerously-skip-permissions${MODEL_FLAG_STR}${EFFORT_FLAG_STR} --session-id $SESSION_ID_DERIVADO"
   else
-    CMD="claude --dangerously-skip-permissions --resume $SESSION_ID"
+    SESSION_ID_DERIVADO="$SESSION_ID"
+    CMD="claude --dangerously-skip-permissions${MODEL_FLAG_STR}${EFFORT_FLAG_STR} --resume $SESSION_ID"
   fi
 elif [[ "$AGENT" == "codex" ]]; then
   # TRUST DO DIRETORIO: o codex pergunta "Do you trust this directory?" e ESPERA resposta
@@ -282,17 +345,31 @@ if [[ -n "$BOOT" && ( "$FRESH" -eq 1 || "$AGENT" == "codex" ) ]]; then
   "$CMUX_BIN" send-key --workspace "$WS_REF" enter
 fi
 
-REGISTRY_LIB_DIR="$SCRIPT_DIR" python3 - "$REGISTRY" "$PAPEL" "${UUID:-}" "$NOW_ISO" <<'PYEOF'
+REGISTRY_LIB_DIR="$SCRIPT_DIR" python3 - "$REGISTRY" "$PAPEL" "${UUID:-}" "$NOW_ISO" \
+  "${SESSION_ID_DERIVADO:-}" "${MODEL_DERIVADO:-}" "${FRONT_EFFORT:-}" "${FRONT_ACORDA_POR:-}" <<'PYEOF'
 import os, sys
 sys.path.insert(0, os.environ["REGISTRY_LIB_DIR"])
 from registry_lib import mutate
-registry_path, papel, uuid, now_iso = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+(registry_path, papel, uuid, now_iso,
+ session_id_derivado, model_derivado, effort_derivado, acorda_por) = sys.argv[1:9]
 
 def open_papel(reg):
     entry = reg["terminais"][papel]
     entry["workspace_uuid"] = uuid if uuid else entry.get("workspace_uuid")
     entry["estado"] = "aberto"
     entry["aberto_em"] = now_iso
+    # F0b: registry passa a ser DERIVADO do lancamento (session_id/model vem
+    # do frontmatter do papel + do --session-id efetivamente usado), nunca
+    # mais editado a mao. Campo so muda quando o lancamento de fato o define
+    # (agente codex ou fallback sem frontmatter deixam o campo como estava).
+    if session_id_derivado:
+        entry["session_id"] = session_id_derivado
+    if model_derivado:
+        entry["model"] = model_derivado
+    if effort_derivado:
+        entry["effort"] = effort_derivado
+    if acorda_por:
+        entry["acorda_por"] = acorda_por
 
 try:
     mutate(registry_path, open_papel)
