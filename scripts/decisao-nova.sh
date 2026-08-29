@@ -9,22 +9,38 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage() {
   cat <<'EOF'
-Uso: decisao-nova.sh "<titulo>" --efeito "<texto>" [--recomendacao "<texto>"]
-     [--bloco 1|2|3|4] [--pr N ...] [--supersede D-0xx ...] [--papel X]
-     [--narrativa-stdin]
+Uso: decisao-nova.sh "<titulo>" --classe A|B|C|D --efeito "<texto>"
+     [--criterio "<texto>"] [--origem relogio|evento|dono]
+     [--recomendacao "<texto>"] [--bloco 1|2|3|4] [--pr N ...]
+     [--supersede D-0xx ...] [--papel X] [--narrativa-stdin] [--silencio]
 
 Cria uma entrada nova em decisoes.json (append via registry_lib.mutate —
 flock + tmp + os.replace, seguro para escritores concorrentes) e imprime
 o id criado (ex: "D-065") em stdout.
 
+  --classe         OBRIGATORIO. A|B|C|D — classe da ALCADA (ALCADA.md):
+                    A sobe ao dono; B/C o COMANDO/DE-COORD decide citando
+                    a regra; D e duplicata (ver dedupe por --pr abaixo).
   --efeito         obrigatorio. "Efeito de não decidir" — 1-2 linhas.
+  --criterio       opcional. Qual criterio LITERAL da ALCADA.md justifica
+                    a classe (ex: "A-07"). Sem isto a classe fica sem
+                    rastro do "por que".
+  --origem         opcional (default "evento"). relogio (aberta por
+                    cadencia/tick) | evento (reacao a algo que aconteceu —
+                    default) | dono (o proprio dono abriu). Vira o campo
+                    aberta_em_origem — M-2/M-15 usam para nao confundir
+                    ficha aberta por tick com ficha aberta por humano.
   --recomendacao   opcional. 1-2 linhas.
   --bloco          1 (efeito silencioso em produção) | 2 (prazo) |
                     3 (destrava fila) | 4 (produto/operação). Sem --bloco:
                     vai para 4 com aviso em stderr — quem abre decide o
                     bloco explicitamente ou aceita "sem urgência" por
-                    default seguro (nunca 1 por omissão).
-  --pr             número de PR relacionado (repetível).
+                    default seguro (nunca 1 por omissão). Independente de
+                    --classe (bloco = prioridade de triagem; classe = ALCADA).
+  --pr             número de PR relacionado (repetível). DEDUPE: se algum
+                    dos PRs ja tem ficha ABERTA, nao cria outra — devolve o
+                    D-nnn existente (stdout) com exit 9 (classe D implicita:
+                    "decisao-nova.sh recusa PR já em ficha aberta").
   --supersede      id D-0xx que esta decisão substitui (repetível).
   --papel          papel/token do chamador. Resolvido por $CMUX_WORKSPACE_ID
                     no registry (docs/ai-state/terminais/registry.json)
@@ -32,35 +48,46 @@ o id criado (ex: "D-065") em stdout.
   --narrativa-stdin lê um texto longo do stdin e grava em
                     decisoes/D-nnn.md (narrativa completa); o campo
                     "narrativa" no JSON aponta para o arquivo.
+  --silencio       nao roda decisoes-render.sh ao final (uso em lote/tick).
 
 aberta_em é carimbado em UTC pelo script (nunca digitado pelo chamador).
-Ao final, roda decisoes-render.sh para a view refletir a novidade
-imediatamente (não espera o ciclo do launchd).
+Ao final (sem --silencio), roda decisoes-render.sh para a view refletir a
+novidade imediatamente (não espera o ciclo do launchd).
 
-Exit codes: 0 ok | 2 uso inválido | 3 papel não resolvido.
+Exit codes: 0 ok | 2 uso inválido (inclui --classe ausente/invalida) |
+3 papel não resolvido | 9 dedupe (PR já tem ficha aberta — id existente
+em stdout, nao e erro de uso).
 EOF
 }
 
 TITULO=""
 EFEITO=""
+CLASSE=""
+CRITERIO=""
+ORIGEM="evento"
 RECOMENDACAO=""
 BLOCO=""
 PRS=()
 SUPERSEDE=()
 PAPEL_OVERRIDE=""
 NARRATIVA_STDIN=0
+SILENCIO=0
 POSITIONAL=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --help|-h) usage; exit 0 ;;
     --efeito) [[ $# -ge 2 ]] || { echo "RECUSADO: --efeito exige valor" >&2; exit 2; }; EFEITO="$2"; shift 2 ;;
+    --classe) [[ $# -ge 2 ]] || { echo "RECUSADO: --classe exige valor" >&2; exit 2; }; CLASSE="$2"; shift 2 ;;
+    --criterio) [[ $# -ge 2 ]] || { echo "RECUSADO: --criterio exige valor" >&2; exit 2; }; CRITERIO="$2"; shift 2 ;;
+    --origem) [[ $# -ge 2 ]] || { echo "RECUSADO: --origem exige valor" >&2; exit 2; }; ORIGEM="$2"; shift 2 ;;
     --recomendacao) [[ $# -ge 2 ]] || { echo "RECUSADO: --recomendacao exige valor" >&2; exit 2; }; RECOMENDACAO="$2"; shift 2 ;;
     --bloco) [[ $# -ge 2 ]] || { echo "RECUSADO: --bloco exige valor" >&2; exit 2; }; BLOCO="$2"; shift 2 ;;
     --pr) [[ $# -ge 2 ]] || { echo "RECUSADO: --pr exige valor" >&2; exit 2; }; PRS+=("$2"); shift 2 ;;
     --supersede) [[ $# -ge 2 ]] || { echo "RECUSADO: --supersede exige valor" >&2; exit 2; }; SUPERSEDE+=("$2"); shift 2 ;;
     --papel) [[ $# -ge 2 ]] || { echo "RECUSADO: --papel exige valor" >&2; exit 2; }; PAPEL_OVERRIDE="$2"; shift 2 ;;
     --narrativa-stdin) NARRATIVA_STDIN=1; shift ;;
+    --silencio) SILENCIO=1; shift ;;
     --) shift; while [[ $# -gt 0 ]]; do POSITIONAL+=("$1"); shift; done ;;
     *) POSITIONAL+=("$1"); shift ;;
   esac
@@ -70,6 +97,15 @@ if [[ "${#POSITIONAL[@]}" -lt 1 ]]; then usage; exit 2; fi
 TITULO="${POSITIONAL[0]}"
 
 [[ -n "$EFEITO" ]] || { echo "RECUSADO: --efeito obrigatório" >&2; exit 2; }
+case "$CLASSE" in
+  A|B|C|D) ;;
+  "") echo "RECUSADO: --classe obrigatória (A|B|C|D) — ver ALCADA.md" >&2; exit 2 ;;
+  *) echo "RECUSADO: --classe inválida '$CLASSE' — use A|B|C|D" >&2; exit 2 ;;
+esac
+case "$ORIGEM" in
+  relogio|evento|dono) ;;
+  *) echo "RECUSADO: --origem inválida '$ORIGEM' — use relogio|evento|dono" >&2; exit 2 ;;
+esac
 [[ -f "$DECISOES_JSON" ]] || { echo "RECUSADO: $DECISOES_JSON não encontrado — rode a migração primeiro" >&2; exit 1; }
 
 if [[ -n "$BLOCO" ]]; then
@@ -131,9 +167,11 @@ if [[ "${#SUPERSEDE[@]}" -gt 0 ]]; then
   SUPERSEDE_JSON=$(printf '%s\n' "${SUPERSEDE[@]}" | python3 -c 'import sys, json; print(json.dumps([x.strip() for x in sys.stdin if x.strip()]))')
 fi
 
+set +e
 NEW_ID=$(REGISTRY_LIB_DIR="$SCRIPT_DIR" \
   DECISOES_JSON="$DECISOES_JSON" \
   TITULO="$TITULO" EFEITO="$EFEITO" RECOMENDACAO="$RECOMENDACAO" BLOCO="$BLOCO" \
+  CLASSE="$CLASSE" CRITERIO="$CRITERIO" ORIGEM="$ORIGEM" \
   PAPEL="$PAPEL" PR_JSON="$PR_JSON" SUPERSEDE_JSON="$SUPERSEDE_JSON" \
   NARR_DIR="$T/decisoes" NARRATIVA_TEXT="$NARRATIVA_TEXT" \
   LOG_FILE="$T/decisoes-ingest.log" \
@@ -155,6 +193,23 @@ LOG_FILE = os.environ.get("LOG_FILE") or ""
 
 
 def do_add(reg):
+    # F0b (SPEC-metodologia-cockpit-2026-08-28.md §11 F0b; ALCADA classe D:
+    # "Duplicata... decisao-nova.sh recusa PR já em ficha aberta"). Dedupe
+    # DENTRO do lock (nao antes) -- ver duas chamadas concorrentes pro mesmo
+    # PR e so uma pode vencer a corrida de criar. Compara contra toda ficha
+    # ainda "aberta" (fechada nao compete: PR pode reabrir legitimamente).
+    pr_list = json.loads(os.environ["PR_JSON"])
+    if pr_list:
+        pr_set = set(pr_list)
+        for d in reg["decisoes"]:
+            if d.get("estado") != "aberta":
+                continue
+            existentes = set((d.get("refs") or {}).get("pr") or [])
+            if existentes & pr_set:
+                result["dedupe"] = True
+                result["id"] = d["id"]
+                return
+
     # CRITICO 1a (revisor adversarial 2026-08-28, mesma protecao aplicada em
     # decisoes-render.sh): nao confiar cegamente em reg['proximo_id'] para
     # cunhar — se ele estiver <= o maior id ja existente (corrupcao/edicao
@@ -181,8 +236,11 @@ def do_add(reg):
         "id": new_id,
         "titulo": os.environ["TITULO"],
         "origem": os.environ["PAPEL"],
+        "classe": os.environ["CLASSE"],
+        "criterio": (os.environ.get("CRITERIO") or None),
         "aberta_em": now_iso,
         "aberta_em_estimada": False,
+        "aberta_em_origem": os.environ["ORIGEM"],
         "bloco": int(os.environ["BLOCO"]),
         "estado": "aberta",
         "decidida_em": None,
@@ -210,6 +268,12 @@ except RegistryLockTimeout as e:
     print(f"RECUSADO: {e}", file=sys.stderr)
     sys.exit(5)
 
+if result.get("dedupe"):
+    print(f"DEDUPE: PR já tem ficha ABERTA -> {result['id']} (nenhuma ficha nova criada)",
+          file=sys.stderr)
+    print(result["id"])
+    sys.exit(9)
+
 if result.get("proximo_corrigido") and LOG_FILE:
     _line = (f"{now_iso} {result['id']} COLISAO-EVITADA "
              f"proximo_id {result['old_proximo']}->{result['next_free']}\n")
@@ -229,8 +293,21 @@ if result["narrativa_path"]:
         f.write(narrativa_text.rstrip() + "\n")
 PYEOF
 )
+RC=$?
+set -e
+
+if [[ "$RC" -eq 9 ]]; then
+  echo "$NEW_ID"
+  exit 9
+elif [[ "$RC" -ne 0 ]]; then
+  exit "$RC"
+fi
 
 echo "$NEW_ID"
+
+if [[ "$SILENCIO" -eq 1 ]]; then
+  exit 0
+fi
 
 RENDER="$SCRIPT_DIR/decisoes-render.sh"
 if [[ -x "$RENDER" ]]; then
