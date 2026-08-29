@@ -1,19 +1,22 @@
 #!/bin/bash
-# stop-dispatch.sh — Stop: le o payload UMA vez e roda os 4 guards de Stop em
+# stop-dispatch.sh — Stop: le o payload UMA vez e roda os 3 guards de Stop em
 # sequencia, registrando CADA UM em ~/.claude/state/hooks.log.
 #
-# F0b (SPEC-metodologia-cockpit-2026-08-28.md §7.3 item 5): "log de disparo
-# num lugar so". Antes eram 4 entradas SEPARADAS no array "Stop" de
-# settings.local.json (gap-acceptance-guard.py, completion-gate.py,
-# autonomous-persist-guard.py, papel-stop.sh) sem nenhum registro alem do
-# proprio stderr da tool call -- ninguem sabia, depois do fato, quantas vezes
-# um guard bloqueou ou passou. Mesmo espirito de pre-bash-dispatch.sh (1
-# dispatcher, todos os hooks que passam por ele entram no ratchet de §9.5.3),
-# so que aqui os 4 SEMPRE rodam (cada um e uma checagem independente --
-# diferente de pre-bash-dispatch.sh, onde o 1o bloqueio ja resolve o
-# comando) e o dispatcher devolve o PRIMEIRO codigo != 0 no final, para o
-# Stop continuar bloqueando exatamente como bloqueava com as 4 entradas
-# separadas.
+# F0b (SPEC-metodologia-cockpit-2026-08-28.md §7.3 item 5), rebaseado sobre a
+# F0a real (d7eec00: "settings.local.json sem os 6 hooks de §9.1"). papel-
+# stop.sh SAI daqui tambem -- SPEC §9.1/M2 mediu 22 disparos, TODOS falso
+# positivo; nao faz sentido tirar do array Stop e deixar vivo dentro do
+# dispatcher novo. Guards remanescentes: gap-acceptance-guard.py,
+# completion-gate.py, autonomous-persist-guard.py -- ANTES eram 3 entradas
+# SEPARADAS no array "Stop" de settings.local.json, sem nenhum registro alem
+# do proprio stderr da tool call -- ninguem sabia, depois do fato, quantas
+# vezes um guard bloqueou ou passou. Mesmo espirito de pre-bash-dispatch.sh
+# (1 dispatcher, todos os hooks que passam por ele entram no ratchet de
+# §9.5.3), so que aqui os 3 SEMPRE rodam (cada um e uma checagem
+# independente -- diferente de pre-bash-dispatch.sh, onde o 1o bloqueio ja
+# resolve o comando) e o dispatcher devolve o PRIMEIRO codigo != 0 no final,
+# para o Stop continuar bloqueando exatamente como bloqueava com as 3
+# entradas separadas (DE-MIG testa isto explicitamente antes do merge).
 #
 # Bypass individual: os bypass envs de cada guard continuam valendo
 # (GAP_GUARD_DISABLED=1, COMPLETION_GATE_DISABLED=1, etc. -- ver cada script).
@@ -65,12 +68,5 @@ for guard in gap-acceptance-guard.py completion-gate.py autonomous-persist-guard
     FINAL_RC=$rc
   fi
 done
-
-printf '%s' "$PAYLOAD" | bash "$DIR/papel-stop.sh"
-rc=$?
-log_hook "papel-stop.sh" "$rc"
-if [[ "$rc" -ne 0 && "$FINAL_RC" -eq 0 ]]; then
-  FINAL_RC=$rc
-fi
 
 exit "$FINAL_RC"
