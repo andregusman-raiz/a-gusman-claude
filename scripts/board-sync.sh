@@ -87,11 +87,30 @@ for p in prs:
     pap = papel_of_path(path) if path else None
     if pap: prs_by_papel.setdefault(pap, []).append(p)
 
+# condicao do ROADMAP que o gh nao mostra: PR com migration exige review HUMANA (DE-MIG) — APPROVED so do bot nao e luz verde
+_det = {}
+def detail(n):
+    if n in _det: return _det[n]
+    d = {"human_ok": False, "migration": False}
+    try:
+        r = subprocess.run(["gh", "pr", "view", str(n), "-R", os.environ.get("DE_REPO", "Raiz-Educacao-SA/raiz-data-engine"), "--json", "reviews,files"], capture_output=True, text=True, timeout=20)
+        j = json.loads(r.stdout or "{}")
+        bots = set(os.environ.get("DE_BOT_LOGINS", "raiz-pr-bot-aws").split(","))
+        def is_bot(login): return login in bots or login.endswith("[bot]") or re.search(r"(^|[-_])bot([-_]|$)", login) is not None
+        d["human_ok"] = any(v.get("state") == "APPROVED" and not is_bot(v.get("author", {}).get("login", "")) for v in j.get("reviews", []))
+        d["migration"] = any(re.search(r"alembic/versions|migrations/", f.get("path", "")) for f in j.get("files", []))
+    except Exception: pass
+    _det[n] = d; return d
+def falta_humana(p):
+    if p.get("reviewDecision") != "APPROVED": return False
+    d = detail(p["number"]); return d["migration"] and not d["human_ok"]
+
 def pr_label(p):
     n = p["number"]; motivo = snap.get(str(n), {}).get("motivo", "")
     rd = p.get("reviewDecision") or "sem review"; ms = p.get("mergeStateStatus") or "?"
     if p.get("isDraft"): stage, txt = 3/8, "draft"
     elif rd == "CHANGES_REQUESTED": stage, txt = 6/8, "CR por responder"
+    elif rd == "APPROVED" and falta_humana(p): stage, txt = 6/8, f"APPROVED (bot) · FALTA review DE-MIG (migration) · {ms}"
     elif rd == "APPROVED" and ms == "CLEAN": stage, txt = 7/8, "APPROVED+CLEAN → merge"
     elif rd == "APPROVED": stage, txt = 7/8, f"APPROVED · {ms}"
     else: stage, txt = 4/8, f"aguarda review · {ms}"
@@ -100,8 +119,9 @@ def pr_label(p):
 
 # resumo da fila para o DE-COORD
 n_open = len(prs); n_cr = sum(1 for p in prs if p.get("reviewDecision") == "CHANGES_REQUESTED")
-n_ok = sum(1 for p in prs if p.get("reviewDecision") == "APPROVED"); n_wait = n_open - n_cr - n_ok
-fila = f"fila: {n_open} abertos · {n_cr} CR por responder · {n_ok} aprovados · {n_wait} aguardam review"
+n_ok_all = [p for p in prs if p.get("reviewDecision") == "APPROVED"]; n_falta = sum(1 for p in n_ok_all if falta_humana(p))
+n_ok = len(n_ok_all) - n_falta; n_wait = n_open - n_cr - len(n_ok_all)
+fila = f"fila: {n_open} abertos · {n_cr} CR por responder · {n_ok} prontos p/ merge · {n_falta} aprovados s/ review DE-MIG · {n_wait} aguardam review"
 
 plan = []
 for papel, t in reg.items():
@@ -127,6 +147,10 @@ for papel, t in reg.items():
                 if b in by_branch: pr = by_branch[b]; break
         if pr is None and prs_by_papel.get(papel):
             pr = sorted(prs_by_papel[papel], key=lambda p: p.get("updatedAt",""), reverse=True)[0]
+        if pr is None:  # token WS-n da linha E- do papel casa com titulo/branch do PR (ate o #PR entrar no ROADMAP)
+            toks = {m.group(0).upper().replace("-", "") for e in ents for m in re.finditer(r"WS-?\d+", e[1], re.I)}
+            cands = [p for p in prs if toks & {m.group(0).upper().replace("-", "") for m in re.finditer(r"WS-?\d+", p.get("title", "") + " " + p.get("headRefName", ""), re.I)}]
+            if cands: pr = sorted(cands, key=lambda p: p.get("updatedAt", ""), reverse=True)[0]
         if pr is None:
             for _, resto, prova in ents:
                 m = re.search(r"#(\d{4})", resto + prova)
