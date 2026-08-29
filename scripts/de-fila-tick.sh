@@ -180,3 +180,6 @@ bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true
 
 # despacho mecanico (dono 29/08): builder ocioso/sem PR com Entrega executavel -> DESPACHO.md + acorda DE-COORD por evento
 DESPACHO=1 bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true
+
+# aprovador humano externo (dono 29/08): PR com reviewer externo pedido e sem approve no head -> WhatsApp via gusman-os (1x por PR/head, horario comercial)
+bash "$(dirname "$0")/de-aprovador-externo.sh" >/dev/null 2>&1 || true
