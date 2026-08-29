@@ -251,27 +251,10 @@
             "type": "command",
             "command": "python3 ~/Claude/.claude/hooks/autonomous-persist-guard.py",
             "statusMessage": "Autonomous journey guard (Opus 4.8 + workflows)..."
-          },
-          {
-            "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/papel-stop.sh",
-            "statusMessage": "Cockpit: handoff do dia + reporte ao COMANDO..."
           }
         ]
       }
     ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "PAPEL_STOP_SESSIONEND=1 bash ~/Claude/.claude/hooks/papel-stop.sh 2>/dev/null || true",
-            "statusMessage": "Cockpit: reporte final ao COMANDO (SessionEnd)..."
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [],
     "PreCompact": [
       {
         "hooks": [
@@ -334,45 +317,6 @@
             "type": "command",
             "command": "bash ~/Claude/.claude/hooks/pdf-read-guard.sh",
             "statusMessage": "PDF markitdown guard..."
-          }
-        ]
-      },
-      {
-        "matcher": "AskUserQuestion",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ~/Claude/.claude/hooks/decisao-em-chat-guard.py",
-            "statusMessage": "Cockpit: registrando decisão em chat (D-nnn)..."
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "AskUserQuestion",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ~/Claude/.claude/hooks/decisao-em-chat-post.py",
-            "statusMessage": "Cockpit: fechando decisão em chat com a resposta..."
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ~/Claude/.claude/hooks/prefer-workflows-guard.py",
-            "statusMessage": "Prefer agents/subagents/workflows (delegação)"
-          },
-          {
-            "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/agent-parallelism-reminder.sh",
-            "timeout": 10,
-            "statusMessage": "Parallelism check (fan-out ate 5)"
           }
         ]
       }
