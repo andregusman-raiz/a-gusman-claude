@@ -133,15 +133,27 @@ if [[ "$TIPO" == "RESOLVIDO" && -z "$REF" ]]; then
 fi
 
 HOJE="$(date -u +%Y-%m-%d)"
-LOG_HINT="escreva a prosa em $Q/log/${HOJE}.md e passe aqui so o resumo + \"ver log/${HOJE}.md §HH:MM\""
+LOG_DIA="$Q/log/${HOJE}.md"
+LOG_HINT="escreva a prosa em $LOG_DIA e passe aqui so o resumo + \"ver log/${HOJE}.md §HH:MM\""
 
-if [[ "$TEXTO" == *$'\n'* ]]; then
-  echo "RECUSADO: texto contem quebra de linha — $LOG_HINT" >&2
-  exit 5
+# F0b (pedido do dono via RESUMO): texto que estoura o teto tinha destino
+# NENHUM em ALERTAS/ORDENS -- so a recusa, e quem chamava tinha que truncar
+# na mao (6x num dia). Agora ALERTAS/ORDENS AUTO-ROTEIAM o texto INTEIRO
+# (sem teto) para log/<hoje>.md e deixam so um resumo + pointer no canal.
+# PEDIDOS mantem o teto tal como estava (fluxo estruturado de
+# pedido-novo.sh/pedido-responder.sh nao comporta prosa livre).
+TEXTO_ORIGINAL="$TEXTO"
+TEXTO_OVERFLOW=0
+if [[ "$TEXTO" == *$'\n'* || ${#TEXTO} -gt 300 ]]; then
+  TEXTO_OVERFLOW=1
 fi
-TEXTO_LEN=${#TEXTO}
-if [[ "$TEXTO_LEN" -gt 300 ]]; then
-  echo "RECUSADO: texto com $TEXTO_LEN chars (> 300) — $LOG_HINT" >&2
+
+if [[ "$TEXTO_OVERFLOW" -eq 1 && "$CANAL" != "ALERTAS" && "$CANAL" != "ORDENS" ]]; then
+  if [[ "$TEXTO" == *$'\n'* ]]; then
+    echo "RECUSADO: texto contem quebra de linha — $LOG_HINT" >&2
+  else
+    echo "RECUSADO: texto com ${#TEXTO} chars (> 300) — $LOG_HINT" >&2
+  fi
   exit 5
 fi
 
@@ -180,6 +192,35 @@ else
 fi
 
 TS="$(date -u +'%Y-%m-%d %H:%M')"
+
+if [[ "$TEXTO_OVERFLOW" -eq 1 ]]; then
+  # ALERTAS/ORDENS (unicos que chegam aqui com overflow, ver checagem acima):
+  # grava o texto INTEIRO (sem teto) em log/<hoje>.md num unico write()
+  # atomico (O_APPEND — mesmo idioma de de-claims-sync.sh), e substitui
+  # TEXTO pelo resumo curto + pointer que de fato vai para o canal.
+  mkdir -p "$Q/log"
+  LOG_DIA="$LOG_DIA" PAPEL="$PAPEL" CANAL="$CANAL" TEXTO_ORIGINAL="$TEXTO_ORIGINAL" python3 <<'PYEOF'
+import os
+import time
+
+path = os.environ["LOG_DIA"]
+papel = os.environ["PAPEL"]
+canal = os.environ["CANAL"]
+texto = os.environ["TEXTO_ORIGINAL"]
+ts_hhmm = time.strftime("%H:%MZ", time.gmtime())
+entry = f"\n## {ts_hhmm} [{papel} via canal-append {canal}]\n{texto}\n"
+fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+try:
+    os.write(fd, entry.encode("utf-8"))
+finally:
+    os.close(fd)
+PYEOF
+  TS_HHMM="$(date -u +%H:%M)"
+  RESUMO_CURTO="${TEXTO_ORIGINAL//$'\n'/ }"
+  RESUMO_CURTO="${RESUMO_CURTO:0:220}"
+  TEXTO="${RESUMO_CURTO}... (integra em log/${HOJE}.md §${TS_HHMM}Z)"
+fi
+
 if [[ -n "$REF" ]]; then
   LINE="[$TS] $PAPEL $TIPO $REF: $TEXTO"
 else
