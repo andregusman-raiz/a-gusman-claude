@@ -174,3 +174,6 @@ mkdir -p "$(dirname "$HOOKS_LOG")" 2>/dev/null
 printf '%s · de-fila-tick.sh · %s · %s · %s\n' "$TS" "$DEST_PAPEL" "$SEND_RC" "$NUMS" >> "$HOOKS_LOG" 2>/dev/null || true
 
 exit "$SEND_RC"
+
+# board-sync: preenche as colunas ROADMAP e PR/STATUS da sidebar (sem LLM; REMOVER-QUANDO no cabecalho dele)
+bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true
