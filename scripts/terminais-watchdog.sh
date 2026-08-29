@@ -10,7 +10,7 @@ Sem argumentos. Atualiza liveness.json e, para cada papel com
 estado=aberto no registry, calcula idade de silencio
 (min(jsonl_mtime_age_s, heartbeat_age_s) quando disponivel):
 
-  tier 0: 45-90min -> nudge (terminal-send.sh, sem --force desde F0b); >90min sem
+  tier 0: 45-90min -> nudge (terminal-send.sh --force); >90min sem
           sessao claude viva no cwd -> revive (terminal-open.sh)
   tier 1: >60min -> nudge
   tier 2/3: so log
@@ -159,7 +159,7 @@ for papel, entry in abertos.items():
                 msg = (f"[watchdog] seu CICLO esta parado ha {int(hb_min)}min (heartbeat), "
                        f"mesmo com atividade recente na sessao. Rode um tick agora: leia a inbox, "
                        f"o boot do papel e produza progresso — ou registre o bloqueio.")
-                subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg])
+                subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg, "--force"])
                 last_stagnant[f"{papel}:ciclo"] = time.time()
                 state_dirty = True
                 nudged_now = True
@@ -177,7 +177,7 @@ for papel, entry in abertos.items():
                        f"sem avanco no transcript. Se estiver repetindo a mesma tentativa: "
                        f"pare, releia o objetivo, e ou mude de abordagem ou registre o "
                        f"bloqueio explicito no canal do papel.")
-                subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg])
+                subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg, "--force"])
                 last_stagnant[papel] = time.time()
                 state_dirty = True
                 nudged_now = True
@@ -208,7 +208,7 @@ for papel, entry in abertos.items():
                      f"docs/ai-state/terminais/handoffs/{papel}/{hoje}.md agora (mesmo "
                      f"que curto: estado exato + proximos passos). Template: "
                      f"docs/ai-state/terminais/handoffs/TEMPLATE.md.")
-            subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg_h])
+            subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg_h, "--force"])
             last_handoff_nudge[papel] = time.time()
             state_dirty = True
             log(f"{papel} tier={tier} handoff_age_h={handoff_age_h:.1f} acao=nudge-handoff")
@@ -253,7 +253,7 @@ for papel, entry in abertos.items():
 
     if acted == "nudge":
         msg = f"[watchdog] mudo ha {int(age_min)}min — execute um tick agora: leia o boot/QUEUE do papel, produza progresso ou registre bloqueio explicito."
-        subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg])
+        subprocess.run([os.path.join(SCRIPT_DIR, "terminal-send.sh"), papel, msg, "--force"])
     elif acted == "revive":
         def mark_fechado(r):
             e = r["terminais"][papel]
