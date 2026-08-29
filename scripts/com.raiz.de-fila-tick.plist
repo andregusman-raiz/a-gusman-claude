@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  com.raiz.de-fila-tick.plist — template do tick da fila de PRs (F0b, Q0=SIM).
+
+  SPEC-metodologia-cockpit-2026-08-28.md §8.3 + §11 F0b. Substitui os 3
+  despertadores por relogio do DE-COORD (248 turnos/dia medidos, ev-custo §3)
+  por 1 processo sem LLM, custo $0, que so LE estado (gh pr list) e escreve
+  arquivo (.fila-snapshot.json) -- manda 1 mensagem ao DE-COORD via
+  terminal-send.sh SO quando ha transicao real (debounce por SHA).
+
+  NAO CARREGADO POR ESTA PR (regra explicita do builder F0b: "escreva o
+  plist mas NAO o carregue no launchd"). Para instalar de verdade:
+
+    cp ~/Claude/.claude/scripts/com.raiz.de-fila-tick.plist \
+       ~/Library/LaunchAgents/com.raiz.de-fila-tick.plist
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.raiz.de-fila-tick.plist
+
+  Prova de saida (SPEC §11 F0b): `launchctl list | grep -c com.raiz.de-fila-tick` -> 1.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.raiz.de-fila-tick</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/andregusmandeoliveira/Claude/.claude/scripts/de-fila-tick.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/andregusmandeoliveira/Claude</string>
+
+    <!-- 10 minutos, sem StartCalendarInterval (cadencia, nao horario fixo). -->
+    <key>StartInterval</key>
+    <integer>600</integer>
+
+    <key>RunAtLoad</key>
+    <false/>
+    <key>StartOnMount</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/andregusmandeoliveira/Library/Logs/de-fila-tick/tick.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/andregusmandeoliveira/Library/Logs/de-fila-tick/tick.err.log</string>
+
+    <!-- PATH minimo para gh/git/bash/python3 resolverem binarios do sistema
+         (launchd nao herda o PATH do shell interativo); inclui o caminho do
+         gh instalado via brew (opt/homebrew/bin) e do python3 do sistema. -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin</string>
+        <key>HOME</key>
+        <string>/Users/andregusmandeoliveira</string>
+    </dict>
+
+    <!-- Evita 2 execucoes sobrepostas (gh pr list pode demorar em rede
+         instavel); o script em si e idempotente (debounce por SHA), mas
+         2 instancias escrevendo o snapshot ao mesmo tempo e desperdicio,
+         nao corrupcao (mutate() tem lock proprio). -->
+    <key>AbandonProcessGroup</key>
+    <false/>
+</dict>
+</plist>
