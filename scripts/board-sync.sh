@@ -100,8 +100,12 @@ def detail(n):
     if n in _det: return _det[n]
     d = {"human_ok": False, "migration": False}
     try:
-        r = subprocess.run(["gh", "pr", "view", str(n), "-R", os.environ.get("DE_REPO", "Raiz-Educacao-SA/raiz-data-engine"), "--json", "reviews,files"], capture_output=True, text=True, timeout=20)
+        repo = os.environ.get("DE_REPO", "Raiz-Educacao-SA/raiz-data-engine")
+        r = subprocess.run(["gh", "pr", "view", str(n), "-R", repo, "--json", "reviews"], capture_output=True, text=True, timeout=20)
         j = json.loads(r.stdout or "{}")
+        # files: gh pr view/api devolvem 100 por pagina — sem --paginate um PR de 424 arquivos "tem" 100 (sonda truncada, COMANDO 29/08)
+        rf = subprocess.run(["gh", "api", f"repos/{repo}/pulls/{n}/files", "--paginate", "--jq", ".[].filename"], capture_output=True, text=True, timeout=40)
+        j["files"] = [{"path": x} for x in rf.stdout.split()]
         bots = set(os.environ.get("DE_BOT_LOGINS", "raiz-pr-bot-aws").split(","))
         def is_bot(login): return login in bots or login.endswith("[bot]") or re.search(r"(^|[-_])bot([-_]|$)", login) is not None
         d["human_ok"] = any(v.get("state") == "APPROVED" and not is_bot(v.get("author", {}).get("login", "")) for v in j.get("reviews", []))
