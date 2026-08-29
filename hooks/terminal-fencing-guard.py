@@ -128,7 +128,7 @@ def main():
                 f"[fencing] BLOQUEADO: {rel_path} e canal CONGELADO desde F0a "
                 f"(ver docs/workspace/SPEC-metodologia-cockpit-2026-08-28.md §7.3).\n"
                 f"Escritor sancionado unico: canal-append.sh (via Bash, nao esta tool).\n"
-                f"  ~/.claude/scripts/canal-append.sh ALERTAS \"<texto>\" --papel <SEU_PAPEL>\n"
+                f"  ~/.claude/scripts/canal-append.sh LOG \"<texto>\" --papel <SEU_PAPEL>\n"
                 f"Texto longo demais para canal-append.sh vai para log/<hoje>.md (sem teto) --\n"
                 f"escreva la e cite so a referencia no canal.\n"
                 f"Bypass consciente: TERMINAL_FENCING_DISABLED=1",
@@ -174,7 +174,7 @@ def main():
         f"  esta sessao          : {ws_id_atual}\n"
         f"Voce nao e a instancia que detem {dono}. Escrever aqui e o dano real do\n"
         f"split-brain (dois donos do manifesto). Caminhos corretos:\n"
-        f"  - ~/.claude/scripts/canal-append.sh ALERTAS \"<texto>\" --papel <SEU_PAPEL> (multi-writer); ou\n"
+        f"  - ~/.claude/scripts/canal-append.sh LOG \"<texto>\" --papel <SEU_PAPEL> (ALERTAS congelado, F0b); ou\n"
         f"  - fale com o papel: ~/.claude/scripts/terminal-send.sh {dono} \"<msg>\"; ou\n"
         f"  - se {dono} morreu de verdade, reabra pelo registry "
         f"(~/.claude/scripts/terminal-open.sh {dono}) em vez de escrever no lugar dele.\n"
