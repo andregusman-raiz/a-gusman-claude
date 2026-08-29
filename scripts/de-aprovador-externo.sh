@@ -5,7 +5,9 @@
 #      pedido ao humano dependia do dono lembrar. METRICA: PR com reviewer externo pedido recebe aviso em
 #      <=1 tick (10 min) em horario comercial, 1x por (PR, head). DONO-MEDICAO: DE-COORD.
 # REMOVER-QUANDO: houver 2a identidade aprovadora na frota (four-eyes interno) ou merge queue com aprovacao humana embutida.
-# GATILHO CANONICO: `gh pr edit N --add-reviewer <login>` feito pelo DE-COORD (fica visivel no GitHub); o WA e so o aviso.
+# GATILHO CANONICO (DE-COORD 29/08: --add-reviewer sozinho e escrituracao e nao pode tocar o telemovel de ninguem):
+#   label `aprovacao-humana-externa` NO PR **E** reviewer externo pedido. Tirar a label = para de avisar. 1 aviso por
+#   (PR, login) a cada 24h — NAO por head (bot faz sync varias vezes/dia; re-armar por head = spam ou perda pelo teto).
 # GUARDAS: mapa login->contato fixo (sem telefone aqui), horario 08-19 America/Sao_Paulo, 1 aviso por (PR, head),
 #          teto diario no daemon (GUSMAN_OS_WA_AUTO_MAX_PER_DAY), token lido do .env do gusman-os (nunca impresso).
 set -uo pipefail
@@ -23,7 +25,7 @@ hour=$(TZ=America/Sao_Paulo date +%H); dow=$(TZ=America/Sao_Paulo date +%u)
 if [ "$DRY" != "1" ] && { [ "$hour" -lt 8 ] || [ "$hour" -ge 19 ] || [ "$dow" -ge 6 ]; }; then echo "fora do horario comercial ($hour h, dia $dow) — nada enviado"; exit 0; fi
 mkdir -p "$(dirname "$STATE")"; [ -s "$STATE" ] || echo '{}' > "$STATE"
 TMP=$(mktemp "${TMPDIR:-/tmp}/de-aprovador.XXXXXX")
-gh pr list -R "$REPO" --state open --limit 60 --json number,title,headRefOid,reviewRequests,reviews,url > "$TMP" 2>>"${DE_APROVADOR_ERR:-/dev/null}"
+gh pr list -R "$REPO" --state open --limit 60 --json number,title,headRefOid,reviewRequests,reviews,url,labels > "$TMP" 2>>"${DE_APROVADOR_ERR:-/dev/null}"
 python3 - "$STATE" "$DAEMON" "$TOKEN" "$DRY" "$TMP" "${LOGINS[@]}" -- "${NOMES[@]}" <<'PY'
 import sys, json, subprocess, os
 state_p, daemon, token, dry, prs_file = sys.argv[1:6]
@@ -36,13 +38,19 @@ enviados = 0
 for p in prs:
     head = (p.get("headRefOid") or "")[:12]
     pedidos = {(r.get("login") or "") for r in (p.get("reviewRequests") or [])}
+    labels = {(l.get("name") or "") for l in (p.get("labels") or [])}
+    if "aprovacao-humana-externa" not in labels: continue
     for login, nome in contato.items():
         if login not in pedidos: continue
         # aprovou este head? entao nada a pedir
         ok = any(r.get("author", {}).get("login") == login and r.get("state") == "APPROVED" and (r.get("commit") or {}).get("oid", "").startswith(head) for r in (p.get("reviews") or []))
         if ok: continue
-        key = f"{p['number']}@{head}@{login}"
-        if state.get(key): continue
+        key = f"{p['number']}@{login}"
+        last = (state.get(key) or {}).get("ts", "")
+        import datetime as _dt
+        try:
+            if (_dt.datetime.now(_dt.timezone.utc) - _dt.datetime.fromisoformat(last.replace("Z", "+00:00"))).total_seconds() < 86400: continue
+        except Exception: pass
         msg = (f"Oi Marcelo, aqui é o assistente do André (gusman-os). O PR #{p['number']} do raiz-data-engine — \"{p['title'][:70]}\" — "
                f"precisa da sua aprovação humana no GitHub (o bot escalou HUMAN_REVIEW_REQUIRED e ninguém da frota pode aprovar). "
                f"Head a aprovar: {head[:7]}. O contexto está no próprio PR: {p['url']} . Quando puder, aprove ou peça mudanças. Obrigado!")
@@ -55,7 +63,7 @@ for p in prs:
             res = json.loads(r.stdout or "{}")
         except Exception as e: res = {"ok": False, "error": str(e)[:80]}
         if res.get("ok"):
-            state[key] = {"ts": __import__("datetime").datetime.utcnow().isoformat() + "Z"}; enviados += 1
+            state[key] = {"ts": _dt.datetime.now(_dt.timezone.utc).isoformat(), "head": head}; enviados += 1
             print(f"ENVIADO: {nome} · #{p['number']}@{head[:7]}")
         else:
             print(f"FALHOU: {nome} · #{p['number']}@{head[:7]} · {res.get('error')}")
