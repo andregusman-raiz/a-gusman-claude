@@ -177,3 +177,6 @@ exit "$SEND_RC"
 
 # board-sync: preenche as colunas ROADMAP e PR/STATUS da sidebar (sem LLM; REMOVER-QUANDO no cabecalho dele)
 bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true
+
+# despacho mecanico (dono 29/08): builder ocioso/sem PR com Entrega executavel -> DESPACHO.md + acorda DE-COORD por evento
+DESPACHO=1 bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true

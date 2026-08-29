@@ -37,7 +37,7 @@ decisao = line("DECISÃO DA VEZ (classe A):")
 decisao_id = (re.match(r"\s*([A-Z]-\d+|Q\d+)", decisao) or [None, "?"])[1] if decisao else "?"
 entregas = [l.strip() for l in rm if l.startswith("  E-")]
 
-PAPEIS_RE = re.compile(r"\b(COMANDO|DE-COORD|DE-MIG|DE-DATA|DE-SYNC|FUNIL)\b")
+PAPEIS_RE = re.compile(r"\b(" + "|".join(sorted((re.escape(k) for k in reg.keys()), key=len, reverse=True)) + r")\b")
 def dono_da_entrega(e):
     head = e.split(" · prova:")[0]
     m = PAPEIS_RE.search(head); return m.group(1) if m else None
@@ -240,6 +240,59 @@ for papel, t in reg.items():
             label = f"{eids} · {label}" + (f" (+{len(mine)-1} PR)" if len(mine) > 1 else "")
         else: label, stage = (f"{eids} · sem PR aberto"), (2/8 if ents else 0.0)
     plan.append((papel, uuid, desc[:6000], label[:120], stage))
+
+# --- modo DESPACHO (tick, sem LLM): builder OCIOSO x Entrega EXECUTÁVEL na sua faixa -> evento p/ DE-COORD ---
+# DOR: 29/08 os builders ficaram ociosos o dia todo com Entregas de fila no nome (DE-DATA: E-10; DE-SYNC: E-19) e so a analise humana viu.
+# REGRA (dono 29/08 19:3xZ): isso e falha de despacho, detectada por maquina; acorda o DE-COORD por evento (nao o dono, nao o RESUMO).
+if os.environ.get("DESPACHO") == "1":
+    import hashlib, time
+    OCIOSO_MIN = int(os.environ.get("DESPACHO_OCIOSO_MIN", "45"))
+    try:
+        ws = json.loads(subprocess.run([C, "rpc", "workspace.list", "{}"], capture_output=True, text=True, timeout=10).stdout or "{}")
+        ws = ws.get("workspaces", ws if isinstance(ws, list) else [])
+    except Exception: ws = []
+    last_by_uuid = {w.get("id"): (w.get("latest_submitted_at") or "") for w in ws}
+    def idle_min(uuid):
+        ts = last_by_uuid.get(uuid, "")
+        try:
+            d = datetime.datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            return int((datetime.datetime.now(datetime.timezone.utc) - d).total_seconds() // 60)
+        except Exception: return None
+    STATUS_EXEC = ("· fila", "· em curso")
+    achados = []
+    for papel, t in reg.items():
+        if t.get("tier", 9) not in (1, 2) or t.get("estado") != "aberto" or not t.get("workspace_uuid"): continue
+        im = idle_min(t["workspace_uuid"])
+        execs = []
+        for e in entregas:
+            head = e.split(" · prova:")[0]
+            if dono_da_entrega(e) != papel or "estacionad" in head: continue
+            if any(k in head for k in STATUS_EXEC): execs.append(head.split(" · ")[0])
+        meus_prs = [p["number"] for p in prs if pr_papel.get(p["number"]) == papel]
+        if os.environ.get("DRY_RUN") == "1": print(f"  {papel:<10} idle={im}min execs={execs} prs={meus_prs}")
+        if not execs: continue
+        if im is not None and im >= OCIOSO_MIN:
+            achados.append(f"{papel} ocioso há {im} min (sem prompt novo) · Entregas executáveis: {', '.join(execs)}")
+        elif not meus_prs and t.get("tier") == 1:  # tier 2 abre PR no repo proprio (funil-auditor), nao no DE
+            achados.append(f"{papel} sem PR aberto no DE · Entregas em fila/em curso no nome: {', '.join(execs)}")
+    out_p = os.path.join(os.path.dirname(rm_p), "DESPACHO.md")
+    now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%MZ")
+    body = "\n".join(achados) if achados else "— nenhum builder ocioso com Entrega executável —"
+    sig = hashlib.sha1(body.encode()).hexdigest()[:12]
+    prev_sig = ""
+    try: prev_sig = [l for l in open(out_p).read().splitlines() if l.startswith("<!-- sig:")][0][9:21]
+    except Exception: pass
+    with open(out_p, "w", encoding="utf-8") as f:
+        f.write(f"# DESPACHO (derivado pelo tick — não editar) · {now}\n<!-- sig:{sig} -->\n\n"
+                f"Regra: builder tier 1-2 ocioso ≥{OCIOSO_MIN} min com Entrega 'fila'/'em curso' no seu nome = falha de despacho. "
+                f"DE-COORD designa/nudga; COMANDO só se a Entrega estiver mal atribuída.\n\n{body}\n")
+    print(f"despacho: {len(achados)} achado(s) · sig {sig}" + (" (mudou)" if sig != prev_sig else " (igual)"))
+    if achados and sig != prev_sig:
+        send = os.path.expanduser("~/.claude/scripts/terminal-send.sh")
+        msg = f"tick/despacho: {len(achados)} builder(s) ocioso(s) com Entrega executável — leia docs/ai-state/roadmap/DESPACHO.md"
+        try: subprocess.run(["bash", send, "DE-COORD", msg], capture_output=True, text=True, timeout=30)
+        except Exception: pass
+    sys.exit(0)
 
 # --- modo impressão (board-tui.sh): fila única do ROADMAP + fila única de PRs + terminais ---
 if os.environ.get("PRINT") == "1":
