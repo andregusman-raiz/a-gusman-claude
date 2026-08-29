@@ -157,10 +157,15 @@ def entrega_do_pr(p):
     return ents[0][0] if len(ents) == 1 else ""
 
 # --- FILA ÚNICA DO ROADMAP (description do COMANDO) ---
-try:
-    code = subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "-m", "10", os.environ.get("DE_PROD_READY_URL", "https://dataengine.raizeducacao.com.br/ready")], capture_output=True, text=True, timeout=15).stdout.strip()
-except Exception: code = "?"
-prod = "PROD ok" if code == "200" else f"PROD /ready={code} ⚠"
+def probe(url):
+    try: return subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "-m", "10", url], capture_output=True, text=True, timeout=15).stdout.strip()
+    except Exception: return "?"
+base = os.environ.get("DE_PROD_URL", "https://dataengine.raizeducacao.com.br")
+rd = probe(base + "/health/readiness")
+if rd == "200": prod = "PROD ok (readiness 200)"
+else:
+    hl = probe(base + "/health")
+    prod = f"PROD readiness={rd} · liveness={hl}" + (" ⚠" if rd not in ("200", "401") or hl != "200" else " (readiness sob auth)")
 by_entrega = {}
 for p in prs:
     e = entrega_do_pr(p)
@@ -233,9 +238,11 @@ if os.environ.get("PRINT") == "1":
     pc = R if "⚠" in prod else G
     print(f"\033[1mSTATUS BOARD\033[0m {D}· fila única tiers 1-2 · {now}{N}   {pc}{prod}{N}   QUANTO FALTA {quanto[:80]}")
     print(f"{Y}DECISÃO DA VEZ:{N} {decisao[:W-16] or '—'}")
-    print(); hdr(O, f"ROADMAP — Entregas em curso ({len(entregas)})")
+    print(); hdr(O, f"ROADMAP — fila completa ({len(entregas)} linhas · em curso / fila / estacionada)")
     for i, l in enumerate(road[3:]):
         if l.startswith("      →"): print(f"{D}{l[:W]}{N}")
+        elif "· em curso" in l: print(f"{O}{l[:5]}{N}\033[1m{l[5:W]}{N}")
+        elif "estacionad" in l: print(f"{O}{l[:5]}{N}{D}{l[5:W]}{N}")
         else: print(f"{O}{l[:5]}{N}{l[5:W]}")
     print(); hdr(T, f"FILA DE PRs — DE ({n_open} abertos · {n_cr} CR por responder · {n_ok} prontos · {n_falta} aprovados s/ review DE-MIG · {n_wait} aguardam review)")
     # orçamento de linhas: cabeçalho(2)+vazio+hdr roadmap+2/E+vazio+hdr PRs+vazio+hdr terminais+1 linha+rodapé
