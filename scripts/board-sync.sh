@@ -16,7 +16,7 @@ REPO="${DE_REPO:-Raiz-Educacao-SA/raiz-data-engine}"
 DRY="${DRY_RUN:-0}"
 
 PRS=$(gh pr list -R "$REPO" --state open --limit 60 \
-  --json number,title,headRefName,reviewDecision,mergeStateStatus,isDraft,updatedAt,author 2>/dev/null || echo "[]")
+  --json number,title,headRefName,headRefOid,reviewDecision,mergeStateStatus,isDraft,updatedAt,author 2>/dev/null || echo "[]")
 
 PRS_JSON="$PRS" python3 - "$T/registry.json" "$RM" "$Q/.fila-snapshot.json" "$C" "$DRY" <<'PY'
 import json, os, re, subprocess, sys, datetime
@@ -37,15 +37,22 @@ decisao = line("DECISÃO DA VEZ (classe A):")
 decisao_id = (re.match(r"\s*([A-Z]-\d+|Q\d+)", decisao) or [None, "?"])[1] if decisao else "?"
 entregas = [l.strip() for l in rm if l.startswith("  E-")]
 
-def entregas_de(papel):
+PAPEIS_RE = re.compile(r"\b(COMANDO|DE-COORD|DE-MIG|DE-DATA|DE-SYNC|FUNIL)\b")
+def dono_da_entrega(e):
+    head = e.split(" · prova:")[0]
+    m = PAPEIS_RE.search(head); return m.group(1) if m else None
+def entregas_de(papel, apoio=True):
     out = []
     for e in entregas:
         head = e.split(" · prova:")[0]
-        if re.search(r"\b" + re.escape(papel) + r"\b", head):
-            eid = head.split(" · ")[0]
-            resto = " · ".join(head.split(" · ")[1:])
-            prova = e.split(" · prova:")[1].strip() if " · prova:" in e else ""
-            out.append((eid, resto[:90], prova[:70]))
+        if not re.search(r"\b" + re.escape(papel) + r"\b", head): continue
+        dono = dono_da_entrega(e)
+        if dono != papel and not apoio: continue
+        eid = head.split(" · ")[0] + ("" if dono == papel else "(apoio)")
+        resto = " · ".join(head.split(" · ")[1:])
+        prova = e.split(" · prova:")[1].strip() if " · prova:" in e else ""
+        out.append((eid, resto[:90], prova[:70]))
+    out.sort(key=lambda x: "(apoio)" in x[0])
     return out
 
 def ago(iso):
@@ -115,7 +122,7 @@ def pr_label(p):
     elif rd == "APPROVED": stage, txt = 7/8, f"APPROVED · {ms}"
     else: stage, txt = 4/8, f"aguarda review · {ms}"
     if motivo: txt = f"{txt} · {motivo}"
-    return f"#{n} {txt} · {ago(p.get('updatedAt',''))}", stage
+    return f"#{n} {txt} · @{(p.get('headRefOid') or '')[:7]} · {ago(p.get('updatedAt',''))}", stage
 
 # resumo da fila para o DE-COORD
 n_open = len(prs); n_cr = sum(1 for p in prs if p.get("reviewDecision") == "CHANGES_REQUESTED")
@@ -124,46 +131,99 @@ n_ok = len(n_ok_all) - n_falta; n_wait = n_open - n_cr - len(n_ok_all)
 fila = f"fila: {n_open} abertos · {n_cr} CR por responder · {n_ok} prontos p/ merge · {n_falta} aprovados s/ review DE-MIG · {n_wait} aguardam review"
 
 plan = []
+# --- papel de cada PR (worktree do DE > token WS-n da Entrega > #PR citado na Entrega) ---
+def papel_do_pr(p):
+    path = wt_branch_to_path.get(p["headRefName"]); pap = papel_of_path(path) if path else None
+    if pap: return pap
+    for papel, t in reg.items():
+        if t.get("tier", 9) > 2: continue
+        for eid, resto, prova in entregas_de(papel, apoio=False):
+            if f"#{p['number']}" in resto + prova: return papel
+            toks = {m.group(0).upper().replace("-", "") for m in re.finditer(r"WS-?\d+", resto, re.I)}
+            ptoks = {m.group(0).upper().replace("-", "") for m in re.finditer(r"WS-?\d+", p.get("title", "") + " " + p.get("headRefName", ""), re.I)}
+            if toks & ptoks: return papel
+    return None
+pr_papel = {p["number"]: papel_do_pr(p) for p in prs}
+if DRY == "1": print("pr→papel:", {n: v for n, v in pr_papel.items() if v})
+def entrega_do_pr(p):
+    pap = pr_papel.get(p["number"])
+    if not pap: return ""
+    ents = entregas_de(pap, apoio=False)
+    for eid, resto, prova in ents:
+        if f"#{p['number']}" in resto + prova: return eid
+    ptoks = {m.group(0).upper().replace("-", "") for m in re.finditer(r"WS-?\d+", p.get("title", "") + " " + p.get("headRefName", ""), re.I)}
+    for eid, resto, prova in ents:
+        if ptoks & {m.group(0).upper().replace("-", "") for m in re.finditer(r"WS-?\d+", resto, re.I)}: return eid
+    return ents[0][0] if len(ents) == 1 else ""
+
+# --- FILA ÚNICA DO ROADMAP (description do COMANDO) ---
+try:
+    code = subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "-m", "10", os.environ.get("DE_PROD_READY_URL", "https://dataengine.raizeducacao.com.br/ready")], capture_output=True, text=True, timeout=15).stdout.strip()
+except Exception: code = "?"
+prod = "PROD ok" if code == "200" else f"PROD /ready={code} ⚠"
+by_entrega = {}
+for p in prs:
+    e = entrega_do_pr(p)
+    if e: by_entrega.setdefault(e, []).append(p)
+def short_status(p):
+    rd = p.get("reviewDecision") or ""; ms = p.get("mergeStateStatus") or "?"
+    if p.get("isDraft"): return "draft"
+    if rd == "CHANGES_REQUESTED": return "CR por responder"
+    if rd == "APPROVED" and falta_humana(p): return "APPROVED(bot) · falta review DE-MIG"
+    if rd == "APPROVED": return f"APPROVED · {ms}"
+    return f"aguarda review · {ms}"
+road = [f"{prod} · QUANTO FALTA {quanto[:70]}", f"DECISÃO DA VEZ: {decisao[:90] or '—'}", ""]
+for e in entregas:
+    head = e.split(" · prova:")[0]; parts = head.split(" · "); eid = parts[0]; resto = " · ".join(parts[1:])
+    prova = e.split(" · prova:")[1].strip() if " · prova:" in e else ""
+    prs_e = sorted(by_entrega.get(eid, []), key=lambda p: p.get("updatedAt", ""), reverse=True)
+    prtxt = " | ".join(f"#{p['number']} {short_status(p)} @{(p.get('headRefOid') or '')[:7]}" for p in prs_e[:2]) or "sem PR"
+    road.append(f"{eid:<5} {resto[:95]}")
+    road.append(f"      → {prtxt}" + (f" · prova: {prova[:60]}" if prova else ""))
+if not entregas: road.append("— ROADMAP.md sem linhas E- —")
+road_txt = "\n".join(road)
+
+# --- FILA ÚNICA DE PRs (description do DE-COORD) ---
+def rank(p):
+    rd = p.get("reviewDecision") or ""; ms = p.get("mergeStateStatus") or ""
+    if p.get("isDraft"): return 5
+    if rd == "APPROVED" and not falta_humana(p): return 0
+    if rd == "APPROVED": return 1
+    if rd == "CHANGES_REQUESTED": return 3
+    return 2
+fila_lines = [fila, "ordem: prontos → aprovados s/ review humana → aguardam review → CR por responder → draft", ""]
+for p in sorted(prs, key=lambda p: (rank(p), p.get("updatedAt", ""))):
+    pap = pr_papel.get(p["number"]) or "—"; e = entrega_do_pr(p)
+    motivo = snap.get(str(p["number"]), {}).get("motivo") or ""
+    fila_lines.append(f"#{p['number']} {pap:<8} {e:<4} {short_status(p)[:38]:<38} @{(p.get('headRefOid') or '')[:7]} {ago(p.get('updatedAt',''))}" + (f" · {motivo[:30]}" if motivo else ""))
+fila_txt = "\n".join(fila_lines)
+
 for papel, t in reg.items():
     if t.get("tier", 9) > 2 or t.get("estado") != "aberto" or not t.get("workspace_uuid"): continue
     uuid = t["workspace_uuid"]
     ents = entregas_de(papel)
     if papel == "COMANDO":
-        desc = f"QUANTO FALTA {quanto[:60]} · decisão da vez: {decisao_id}"
-        label, stage = f"{n_open} PRs abertos · decisão da vez {decisao_id}", None
+        desc = road_txt
+        label, stage = f"{prod} · decisão da vez {decisao_id}", None
     elif papel == "DE-COORD":
-        desc = "integrador: cada PR entra 1 vez, na ordem, com NNN reservado; promove contadores do ROADMAP"
+        desc = fila_txt
         label, stage = fila, None
     elif papel == "RESUMO":
-        desc = "delegado de voz do dono sobre o COMANDO (A19) até a SPEC implantada — não é papel"
-        label, stage = "F1b em curso · Q2/D-090/D-091/A-011 com o dono", None
+        desc = "delegado de voz do dono sobre o COMANDO (A19) — não é papel"
+        label, stage = f"delegado A19 · {decisao_id} com o dono", None
     else:
-        desc = " | ".join(f"{eid} {resto} · prova: {prova}" if prova else f"{eid} {resto}" for eid, resto, prova in ents) or "— sem Entrega no ROADMAP —"
-        # PR do papel: branch atual do cwd/worktree, senao PR citado na Entrega
-        pr = None
-        for path in (t.get("worktree"), t.get("cwd")):
-            if path and os.path.isdir(path):
-                b = branch_of(path)
-                if b in by_branch: pr = by_branch[b]; break
-        if pr is None and prs_by_papel.get(papel):
-            pr = sorted(prs_by_papel[papel], key=lambda p: p.get("updatedAt",""), reverse=True)[0]
-        if pr is None:  # token WS-n da linha E- do papel casa com titulo/branch do PR (ate o #PR entrar no ROADMAP)
-            toks = {m.group(0).upper().replace("-", "") for e in ents for m in re.finditer(r"WS-?\d+", e[1], re.I)}
-            cands = [p for p in prs if toks & {m.group(0).upper().replace("-", "") for m in re.finditer(r"WS-?\d+", p.get("title", "") + " " + p.get("headRefName", ""), re.I)}]
-            if cands: pr = sorted(cands, key=lambda p: p.get("updatedAt", ""), reverse=True)[0]
-        if pr is None:
-            for _, resto, prova in ents:
-                m = re.search(r"#(\d{4})", resto + prova)
-                if m and int(m.group(1)) in by_num: pr = by_num[int(m.group(1))]; break
+        mine = sorted([p for p in prs if pr_papel.get(p["number"]) == papel], key=lambda p: p.get("updatedAt", ""), reverse=True)
+        pr = mine[0] if mine else None
+        eids = " ".join(eid for eid, _, _ in ents) or "sem Entrega"
+        desc = " | ".join(f"{eid} {resto}" for eid, resto, prova in ents) or "— sem Entrega no ROADMAP —"
         if pr:
             label, stage = pr_label(pr)
-            n_more = len(prs_by_papel.get(papel, [])) - 1
-            if n_more > 0: label = f"{label} (+{n_more} PR)"
-        else: label, stage = ("sem PR aberto · " + (ents[0][0] if ents else "sem Entrega")), (2/8 if ents else 0.0)
-    plan.append((papel, uuid, desc[:200], label[:120], stage))
+            label = f"{eids} · {label}" + (f" (+{len(mine)-1} PR)" if len(mine) > 1 else "")
+        else: label, stage = (f"{eids} · sem PR aberto"), (2/8 if ents else 0.0)
+    plan.append((papel, uuid, desc[:6000], label[:120], stage))
 
 for papel, uuid, desc, label, stage in plan:
-    print(f"{papel:9s} desc={desc[:70]!r} | progress={label[:60]!r} v={'' if stage is None else round(stage,2)}")
+    print(f"{papel:9s} desc={desc[:70]!r}({len(desc)}c) | progress={label[:60]!r} v={'' if stage is None else round(stage,2)}")
     if DRY == "1": continue
     subprocess.run([C, "workspace-action", "--action", "set-description", "--workspace", uuid, "--description", desc], capture_output=True, timeout=10)
     if stage is None:
