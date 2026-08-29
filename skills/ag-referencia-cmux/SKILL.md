@@ -183,7 +183,7 @@ cmux new-workspace --cwd /path/do/projeto --command "claude"   # ou codex, ou co
 cmux rename-workspace --workspace <ID> "NOME-MISSAO"
 ```
 - Escrita paralela no MESMO repo → cada sessao no SEU `git worktree` (regra ouro do workspace). Coordenador nao escreve em worktree de worker.
-- Antes de abrir mais um workspace pesado: checar `memory_pressure` e o teto de 15 sessoes (10 Claude + 5 Codex).
+- Antes de abrir mais um workspace pesado: checar `memory_pressure` e o teto de 20 sessoes (15 Claude + 5 Codex; dono, 29/08 — antes 15 = 10+5). Fonte unica: `cap` em `docs/ai-state/terminais/registry.json` — nunca repetir o numero noutro lugar.
 - cwd persistente do Bash "vaza": sempre `git -C <path>` ou `cd <abs> &&` em comandos de coordenacao ([[gotcha_codex_worktree_sandbox_e_cwd_persistente]]).
 - 0.64 aceita mais flags direto no `new-workspace` (`--name --description --cwd --command --env --layout --focus`), dispensando o `rename-workspace` separado para missao ad-hoc.
 - Para um **papel do registry** (tier 0-3), preferir `~/.claude/scripts/terminal-open.sh <PAPEL> [--fresh]` em vez do `new-workspace` cru — ele checa cap + `memory_pressure`, cria worktree se o papel pedir, aplica titulo tipado e grava o UUID em `registry.json` (ver secao "Papeis e registry"). `new-workspace` direto fica so para missao fora do modelo de papeis.
@@ -203,7 +203,7 @@ O que o cmux restaura sozinho: layout, workspaces, cwd, scrollback, historico do
 2. Sessoes Claude: `claude --resume <uuid>` por workspace (o wrapper injeta session-id — o uuid esta no transcript/`~/.cmuxterm/`).
 3. Sessoes Codex: `codex resume <rollout-id>` MANUAL por terminal — Codex nunca volta sozinho, e o resume-id pode nao sobreviver a restart do cmux (Issue #3499).
 4. ⚠ O restore automatico do gusman-os (`cmux-sessions.jsonl`) ja ficou morto 17+ dias sem ninguem notar — NAO confiar cegamente; verificar antes ([[gotcha_panic_mbuf_usb_ethernet_e_restore_cmux_morto]]).
-5. Pos-panic: NAO reabrir tudo de uma vez — auto-resume simultaneo de N sessoes + MCP set (~1GB/processo) ja causou freeze de memoria >100GB numa maquina com 36GB de RAM fisica; respeitar o teto de 15 sessoes (10 Claude + 5 Codex) e reabrir por tier, em lotes de <= 4 com `memory_pressure` entre eles (`terminais-watchdog.sh` ja faz nudge/revive automatico no tier 0, so nudge no tier 1). Comando novo 0.64 para essa etapa: `cmux restore-session` — nao testado neste ciclo [verificar].
+5. Pos-panic: NAO reabrir tudo de uma vez — auto-resume simultaneo de N sessoes + MCP set (~1GB/processo) ja causou freeze de memoria >100GB numa maquina com 36GB de RAM fisica; respeitar o teto de 20 sessoes (10 Claude + 5 Codex) e reabrir por tier, em lotes de <= 4 com `memory_pressure` entre eles (`terminais-watchdog.sh` ja faz nudge/revive automatico no tier 0, so nudge no tier 1). Comando novo 0.64 para essa etapa: `cmux restore-session` — nao testado neste ciclo [verificar].
 
 ### P7 — Broadcast na fila de PRs (Data Engine)
 Coordenador (papel `0 DE-COORD`, ver secao "Papeis e registry"; antes de 27/08 chamado de "sessao andon") e dono do manifesto; broadcast via `~/.claude/scripts/terminal-send.sh <PAPEL>` (nao `cmux send` direto num id memorizado) aos terminais tier 1 (`1 DE-MIG`, `1 DE-DATA`, `1 DE-CODEX ·codex`). Todo `gh pr create/merge` no raiz-data-engine exige CLAIM previo em `claims.json`; Codex pede via `inbox-codex.md`. Regra dos 3 ciclos: 3x CHANGES_REQUESTED sem convergir → sai da fila, volta pra SPEC.
