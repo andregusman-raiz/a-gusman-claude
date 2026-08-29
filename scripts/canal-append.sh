@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
-# canal-append.sh — ponto unico de escrita em ALERTAS.md / PEDIDOS.md / ORDENS.md.
+# canal-append.sh — ponto unico de escrita em PEDIDOS.md / log/<dia>.md.
 # Contrato: docs/ai-state/de-pr-queue (reforma de pendencias, 2026-08-28).
+#
+# F0b (decisao do dono via RESUMO, SPEC-metodologia-cockpit-2026-08-28.md
+# §7.2): ALERTAS/ORDENS/inbox SAEM da allowlist de escrita deste script.
+# Allowlist agora e {PEDIDOS, LOG}. ALERTAS.md/ORDENS.md ficam chmod 444 no
+# disco -- cinto e suspensorios: a REGRA aqui recusa ANTES de tentar abrir
+# o arquivo (nunca da PermissionError, porque nunca tenta escrever), e a
+# PERMISSAO no disco barra mesmo se a regra falhar por algum motivo. Os
+# dois nunca dependem um do outro para segurar sozinhos.
 set -euo pipefail
 
 Q="${DE_PR_QUEUE_DIR:-$HOME/Claude/docs/ai-state/de-pr-queue}"
@@ -15,24 +23,35 @@ CMUX_BIN="${CMUX_BIN:-/Applications/cmux.app/Contents/Resources/bin/cmux}"
 
 usage() {
   cat <<'EOF'
-Uso: canal-append.sh <ALERTAS|PEDIDOS|ORDENS> "<texto>" [--papel X] [--tipo T] [--ref R]
+Uso: canal-append.sh <PEDIDOS|LOG> "<texto>" [--papel X] [--tipo T] [--ref R]
      [--no-rota] [--rota PAPEL]
 
-Unico ponto de escrita permitido nos 3 canais vivos da fila DE. Carimba
-`[AAAA-MM-DD HH:MM]` em UTC (o chamador NUNCA passa hora) e apenda a
-linha final:
+ALERTAS/ORDENS/inbox SAIRAM da allowlist de escrita (F0b, decisao do dono
+via RESUMO): qualquer chamada com esses canais e RECUSADA sempre, exit 3,
+mensagem "congelado — escreva em log/<dia>.md" — o arquivo NUNCA e aberto
+(sem PermissionError possivel; ele fica chmod 444 no disco por fora).
 
-  [data hora] <PAPEL> <TIPO>[ <ref>]: <texto>
+  PEDIDOS  linha unica carimbada `[AAAA-MM-DD HH:MM] <PAPEL> <TIPO>[ <ref>]:
+           <texto>`, teto de 300 chars/1 linha (sem quebra). Acima do teto:
+           a prosa INTEIRA vai para log/<hoje>.md (sem teto) ANTES de
+           qualquer outra coisa, e so depois uma linha CURTA (resumo +
+           pointer) vai para PEDIDOS.md — nunca se recusa por tamanho,
+           nunca se perde texto.
+  LOG      anexa o texto INTEIRO, SEM TETO e sem restricao de quebra de
+           linha, em docs/ai-state/de-pr-queue/log/<hoje>.md (bloco
+           `## HH:MMZ [PAPEL via canal-append LOG]`). --tipo/--ref nao se
+           aplicam a LOG (ignorados).
 
   --papel   Papel/token do chamador. Resolvido por $CMUX_WORKSPACE_ID no
             registry (docs/ai-state/terminais/registry.json) quando
             omitido; sem match no registry E sem esta flag -> recusa.
             Processos automaticos usam token maiusculo (WATCHDOG, RENDER,
             SYNC) em vez de papel de terminal.
-  --tipo    ALERTA|ONLINE|PEDIDO|RETRATADO|RESOLVIDO|INFO (default INFO).
-            RESOLVIDO exige --ref.
-  --ref     Referencia fechada por este registro: para RESOLVIDO/RETRATADO,
-            o `[data hora] PAPEL` da linha original OU o id (P-/O-/D-/A-nnn).
+  --tipo    ALERTA|ONLINE|PEDIDO|RETRATADO|RESOLVIDO|INFO (default INFO;
+            so PEDIDOS).
+  --ref     Referencia fechada por este registro (so PEDIDOS): para
+            RESOLVIDO/RETRATADO, o `[data hora] PAPEL` da linha original
+            OU o id (P-/O-/D-/A-nnn).
   --no-rota Desliga o roteamento lateral automatico so para esta chamada.
   --rota P  Forca P como destinatario adicional do roteamento lateral
             (somado ao que o texto detectar; ainda validado contra o
@@ -53,28 +72,27 @@ NUNCA derruba o append (que ja aconteceu) — so loga em
 docs/ai-state/terminais/roteamento.log e segue (exit 0). Desligar
 globalmente: env CANAL_ROTA_DISABLED=1.
 
-Regras de texto: uma linha (sem quebra), <=300 chars. Acima disso a
-escrita e recusada (exit 5) — escreva a prosa em
-docs/ai-state/de-pr-queue/log/<hoje>.md e passe aqui so o resumo +
-"ver log/<hoje>.md §HH:MM".
+Escrita PEDIDOS: este canal TEM escritor read-modify-write
+(pedido-novo.sh/pedido-responder.sh — leem o arquivo inteiro, inserem/
+alteram uma linha, escrevem via tmp+os.replace). Um append simples pode
+cair na janela entre o read e o replace desse RMW e ser descartado
+silenciosamente. Por isso o append toma o MESMO lock exclusivo
+(`<arquivo>.lock`, fcntl flock) que o RMW usa, com timeout de 5s —
+bloqueia ate o RMW liberar, nunca perde a linha, nunca imprime "OK" sem
+ter escrito de fato.
 
-Escrita ALERTAS: um unico write() em modo append (O_APPEND), sem lock —
-ALERTAS e append-only por design (nenhum escritor faz read-modify-write
-nele), entao POSIX ja garante atomicidade entre escritores concorrentes.
+Escrita LOG: um unico write() em modo append (O_APPEND) — log/<dia>.md e
+append-only puro (nenhum escritor faz RMW nele), POSIX ja garante
+atomicidade entre escritores concorrentes.
 
-Escrita PEDIDOS/ORDENS: estes 2 canais TEM escritor read-modify-write
-(pedido-novo.sh/pedido-responder.sh/ordem-nova.sh — leem o arquivo
-inteiro, inserem/alteram uma linha, escrevem via tmp+os.replace). Um
-append simples nesses canais pode cair na janela entre o read e o
-replace desse RMW e ser descartado silenciosamente (o replace troca o
-arquivo por uma versao lida ANTES do append). Por isso, para PEDIDOS e
-ORDENS, o append toma o MESMO lock exclusivo (`<arquivo>.lock`, fcntl
-flock) que o RMW usa, com timeout de 5s — bloqueia ate o RMW liberar,
-nunca perde a linha, e nunca imprime "OK" sem ter escrito de fato.
+Falha de permissao (EACCES) em qualquer escrita real (PEDIDOS ou LOG)
+NUNCA vira traceback cru: mensagem nomeando o arquivo + a permissao atual
++ o que fazer, exit 6 — nao 1 cru.
 
-Exit codes: 0 ok | 2 uso invalido | 3 papel nao resolvido | 4 lock de
-PEDIDOS/ORDENS preso (>5s) — nada foi escrito | 5 texto fora do formato
-(quebra de linha ou >300 chars).
+Exit codes: 0 ok | 2 uso invalido | 3 canal congelado (ALERTAS/ORDENS) OU
+papel nao resolvido | 4 lock de PEDIDOS preso (>5s) — nada foi escrito |
+6 falha de permissao numa escrita real (nomeia arquivo + modo, nunca
+traceback).
 EOF
 }
 
@@ -114,35 +132,38 @@ fi
 CANAL="${POSITIONAL[0]}"
 TEXTO="${POSITIONAL[1]}"
 
+# F0b: ALERTAS/ORDENS congelados -- RECUSA IMEDIATA, antes de qualquer outra
+# validacao, sem NUNCA abrir o arquivo. Nao ha caminho de codigo daqui pra
+# frente que toque ALERTAS.md/ORDENS.md -- por isso nunca ha PermissionError
+# nesses dois, independente do chmod real no disco.
 case "$CANAL" in
-  ALERTAS) FILE="$Q/ALERTAS.md" ;;
-  PEDIDOS) FILE="$Q/PEDIDOS.md" ;;
-  ORDENS) FILE="$Q/ORDENS.md" ;;
-  *) echo "RECUSADO: canal invalido '$CANAL' — use ALERTAS|PEDIDOS|ORDENS" >&2; exit 2 ;;
+  ALERTAS|ORDENS)
+    echo "RECUSADO: canal '$CANAL' congelado — escreva em log/<dia>.md (canal-append.sh nao escreve mais em ALERTAS/ORDENS/inbox desde F0b)" >&2
+    exit 3
+    ;;
 esac
-[[ -f "$FILE" ]] || { echo "RECUSADO: canal nao encontrado: $FILE" >&2; exit 1; }
-
-case " $TIPOS_VALIDOS " in
-  *" $TIPO "*) ;;
-  *) echo "RECUSADO: --tipo invalido '$TIPO' — use um de: $TIPOS_VALIDOS" >&2; exit 2 ;;
-esac
-
-if [[ "$TIPO" == "RESOLVIDO" && -z "$REF" ]]; then
-  echo "RECUSADO: --tipo RESOLVIDO exige --ref <ref> ([data hora] PAPEL da linha original, ou id P-/O-/D-/A-nnn)" >&2
-  exit 2
-fi
 
 HOJE="$(date -u +%Y-%m-%d)"
-LOG_HINT="escreva a prosa em $Q/log/${HOJE}.md e passe aqui so o resumo + \"ver log/${HOJE}.md §HH:MM\""
+LOG_DIA="$Q/log/${HOJE}.md"
 
-if [[ "$TEXTO" == *$'\n'* ]]; then
-  echo "RECUSADO: texto contem quebra de linha — $LOG_HINT" >&2
-  exit 5
-fi
-TEXTO_LEN=${#TEXTO}
-if [[ "$TEXTO_LEN" -gt 300 ]]; then
-  echo "RECUSADO: texto com $TEXTO_LEN chars (> 300) — $LOG_HINT" >&2
-  exit 5
+case "$CANAL" in
+  PEDIDOS) FILE="$Q/PEDIDOS.md" ;;
+  LOG) FILE="$LOG_DIA" ;;
+  *) echo "RECUSADO: canal invalido '$CANAL' — use PEDIDOS|LOG (ALERTAS/ORDENS congelados, ver --help)" >&2; exit 2 ;;
+esac
+
+if [[ "$CANAL" == "LOG" ]]; then
+  mkdir -p "$Q/log"
+else
+  [[ -f "$FILE" ]] || { echo "RECUSADO: canal nao encontrado: $FILE" >&2; exit 1; }
+  case " $TIPOS_VALIDOS " in
+    *" $TIPO "*) ;;
+    *) echo "RECUSADO: --tipo invalido '$TIPO' — use um de: $TIPOS_VALIDOS" >&2; exit 2 ;;
+  esac
+  if [[ "$TIPO" == "RESOLVIDO" && -z "$REF" ]]; then
+    echo "RECUSADO: --tipo RESOLVIDO exige --ref <ref> ([data hora] PAPEL da linha original, ou id P-/O-/D-/A-nnn)" >&2
+    exit 2
+  fi
 fi
 
 PAPEL=""
@@ -179,73 +200,145 @@ else
   exit 3
 fi
 
-TS="$(date -u +'%Y-%m-%d %H:%M')"
-if [[ -n "$REF" ]]; then
-  LINE="[$TS] $PAPEL $TIPO $REF: $TEXTO"
+# write_log_entry <texto> — anexa texto INTEIRO (sem teto, sem restricao de
+# quebra) em log/<hoje>.md, num write() atomico O_APPEND. Qualquer OSError
+# (EACCES incluso) vira mensagem nomeando arquivo+permissao+remedio, nunca
+# traceback cru — exit 6.
+write_log_entry() {
+  local texto="$1"
+  LOG_DIA="$LOG_DIA" PAPEL="$PAPEL" CANAL="$CANAL" TEXTO_LOG="$texto" python3 <<'PYEOF'
+import os
+import stat
+import sys
+import time
+
+path = os.environ["LOG_DIA"]
+papel = os.environ["PAPEL"]
+canal = os.environ["CANAL"]
+texto = os.environ["TEXTO_LOG"]
+ts_hhmm = time.strftime("%H:%MZ", time.gmtime())
+entry = f"\n## {ts_hhmm} [{papel} via canal-append {canal}]\n{texto}\n"
+
+try:
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+    try:
+        os.write(fd, entry.encode("utf-8"))
+    finally:
+        os.close(fd)
+except OSError as e:
+    modo = "desconhecido"
+    try:
+        modo = oct(stat.S_IMODE(os.stat(path).st_mode))
+    except Exception:
+        pass
+    print(
+        f"RECUSADO: nao consegui escrever em {path} (permissao atual {modo}): {e}. "
+        f"Verifique a allowlist/permissao do arquivo (chmod) antes de tentar de novo.",
+        file=sys.stderr,
+    )
+    sys.exit(6)
+PYEOF
+}
+
+if [[ "$CANAL" == "LOG" ]]; then
+  write_log_entry "$TEXTO"
+  echo "OK: append em LOG (log/${HOJE}.md)"
+  echo "$TEXTO"
 else
-  LINE="[$TS] $PAPEL $TIPO: $TEXTO"
-fi
+  # CANAL == PEDIDOS daqui em diante.
+  TEXTO_ORIGINAL="$TEXTO"
+  TEXTO_OVERFLOW=0
+  if [[ "$TEXTO" == *$'\n'* || ${#TEXTO} -gt 300 ]]; then
+    TEXTO_OVERFLOW=1
+  fi
 
-# PEDIDOS/ORDENS tem escritor RMW (pedido-novo/pedido-responder/ordem-nova)
-# que le o arquivo inteiro e substitui via tmp+os.replace sob flock em
-# "<arquivo>.lock". Um append sem lock nesses 2 canais pode cair na janela
-# do RMW e ser descartado quando o replace troca o arquivo (bug real,
-# reproduzido com sleep injetado no RMW). ALERTAS e append-only puro (nenhum
-# escritor faz RMW nele) — continua sem lock, por design.
-case "$CANAL" in
-  PEDIDOS|ORDENS) NEEDS_LOCK=1 ;;
-  *) NEEDS_LOCK=0 ;;
-esac
+  TS="$(date -u +'%Y-%m-%d %H:%M')"
 
-FILE="$FILE" LINE="$LINE" NEEDS_LOCK="$NEEDS_LOCK" python3 - <<'PYEOF'
-import fcntl, os, sys, time
+  if [[ "$TEXTO_OVERFLOW" -eq 1 ]]; then
+    # A prosa INTEIRA vai pro log ANTES de qualquer outra coisa -- se isto
+    # falhar (permissao, disco cheio), o script para AQUI (exit 6 vindo de
+    # write_log_entry) e NUNCA chega a escrever um pointer em PEDIDOS
+    # apontando pra um log que nao existe. Nunca se perde texto: ou o log
+    # tem a prosa E PEDIDOS tem o pointer, ou nenhum dos dois foi escrito.
+    write_log_entry "$TEXTO_ORIGINAL"
+    TS_HHMM="$(date -u +%H:%M)"
+    RESUMO_CURTO="${TEXTO_ORIGINAL//$'\n'/ }"
+    RESUMO_CURTO="${RESUMO_CURTO:0:220}"
+    TEXTO="${RESUMO_CURTO}... (integra em log/${HOJE}.md §${TS_HHMM}Z)"
+  fi
+
+  if [[ -n "$REF" ]]; then
+    LINE="[$TS] $PAPEL $TIPO $REF: $TEXTO"
+  else
+    LINE="[$TS] $PAPEL $TIPO: $TEXTO"
+  fi
+
+  FILE="$FILE" LINE="$LINE" python3 - <<'PYEOF'
+import fcntl, os, stat, sys, time
 
 path = os.environ["FILE"]
 line = (os.environ["LINE"] + "\n").encode("utf-8")
-needs_lock = os.environ["NEEDS_LOCK"] == "1"
 LOCK_TIMEOUT = 5.0
 
 
+def falha_permissao(e):
+    modo = "desconhecido"
+    try:
+        modo = oct(stat.S_IMODE(os.stat(path).st_mode))
+    except Exception:
+        pass
+    print(
+        f"RECUSADO: nao consegui escrever em {path} (permissao atual {modo}): {e}. "
+        f"Verifique a allowlist/permissao do arquivo (chmod) antes de tentar de novo.",
+        file=sys.stderr,
+    )
+    sys.exit(6)
+
+
 def do_append():
-    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
     try:
-        os.write(fd, line)  # write() unico, O_APPEND: atomico p/ escritores concorrentes
-    finally:
-        os.close(fd)
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+        try:
+            os.write(fd, line)  # write() unico, O_APPEND: atomico p/ escritores concorrentes
+        finally:
+            os.close(fd)
+    except OSError as e:
+        falha_permissao(e)
 
 
-if not needs_lock:
-    do_append()
-else:
-    # MESMO nome de lockfile que pedido-novo.sh/pedido-responder.sh/
-    # ordem-nova.sh usam (`<arquivo>.lock`) — nome diferente = lock
-    # diferente = nenhuma protecao.
-    lock_path = path + ".lock"
+# PEDIDOS tem escritor read-modify-write (pedido-novo.sh/pedido-responder.sh
+# — leem o arquivo inteiro, inserem/alteram uma linha, escrevem via
+# tmp+os.replace). MESMO nome de lockfile que eles usam (`<arquivo>.lock`)
+# — nome diferente = lock diferente = nenhuma protecao.
+lock_path = path + ".lock"
+try:
     lock_fd = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o644)
-    deadline = time.monotonic() + LOCK_TIMEOUT
-    try:
-        while True:
-            try:
-                fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                break
-            except BlockingIOError:
-                if time.monotonic() >= deadline:
-                    print(
-                        f"RECUSADO: lock de {path} nao liberado em {LOCK_TIMEOUT}s "
-                        "(pedido-novo/pedido-responder/ordem-nova escrevendo?) — "
-                        "NADA foi escrito",
-                        file=sys.stderr,
-                    )
-                    sys.exit(4)
-                time.sleep(0.05)
-        do_append()
-    finally:
-        fcntl.flock(lock_fd, fcntl.LOCK_UN)
-        os.close(lock_fd)
+except OSError as e:
+    falha_permissao(e)
+deadline = time.monotonic() + LOCK_TIMEOUT
+try:
+    while True:
+        try:
+            fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            break
+        except BlockingIOError:
+            if time.monotonic() >= deadline:
+                print(
+                    f"RECUSADO: lock de {path} nao liberado em {LOCK_TIMEOUT}s "
+                    "(pedido-novo/pedido-responder escrevendo?) — NADA foi escrito",
+                    file=sys.stderr,
+                )
+                sys.exit(4)
+            time.sleep(0.05)
+    do_append()
+finally:
+    fcntl.flock(lock_fd, fcntl.LOCK_UN)
+    os.close(lock_fd)
 PYEOF
 
-echo "OK: append em $CANAL"
-echo "$LINE"
+  echo "OK: append em $CANAL"
+  echo "$LINE"
+fi
 
 # --- roteamento lateral automatico (ITEM 1, reforma de pendencias 2026-08-28) ---
 # Roda SEMPRE depois do append acima ter concluido — falha aqui NUNCA pode

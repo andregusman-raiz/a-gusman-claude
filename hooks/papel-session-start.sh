@@ -104,8 +104,18 @@ except Exception:
     MSG="papel assumido"
     [ -n "$SID_SHORT" ] && MSG="papel assumido; sessao ${SID_SHORT}"
     if [ -x "$SCRIPTS/canal-append.sh" ]; then
-      bash "$SCRIPTS/canal-append.sh" ALERTAS "$MSG" --papel "$PAPEL" --tipo ONLINE >/dev/null 2>&1 || \
-        echo "[papel-session-start] AVISO: canal-append.sh falhou (papel=$PAPEL)" >&2
+      # F0b (coordenador, medicao 2026-08-29): ALERTAS congelado (chmod 444,
+      # F0a) -- alvo agora e' LOG (log/<hoje>.md, sem teto). rc SEMPRE
+      # registrado em hooks.log (sucesso E falha) -- um chamador que falha
+      # calado (o `|| true` antigo) e' exatamente o defeito que a causa 6 do
+      # diagnostico ("vermelho que ninguem le") descreve; nao se repete aqui.
+      HOOKS_LOG="${HOOKS_LOG_PATH:-$HOME/.claude/state/hooks.log}"
+      bash "$SCRIPTS/canal-append.sh" LOG "$MSG" --papel "$PAPEL" >/dev/null 2>&1
+      RC=$?
+      mkdir -p "$(dirname "$HOOKS_LOG")" 2>/dev/null
+      printf '%s \xc2\xb7 papel-session-start \xc2\xb7 %s \xc2\xb7 %s \xc2\xb7 LOG\n' \
+        "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$RC" >> "$HOOKS_LOG" 2>/dev/null
+      [ "$RC" -ne 0 ] && echo "[papel-session-start] AVISO: canal-append.sh LOG falhou rc=$RC (papel=$PAPEL) — ver hooks.log" >&2
     fi
     mkdir -p "$ONLINE_STATE_DIR" 2>/dev/null
     ONLINE_STATE_TMP="$ONLINE_STATE_FILE.tmp"

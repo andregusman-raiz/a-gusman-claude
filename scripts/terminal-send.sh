@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
-# terminal-send.sh — envia mensagem a um papel, com checagem de marcador de destino.
+# terminal-send.sh — envia mensagem a um papel, lendo a tela do DESTINO.
+#
+# F0b (docs/workspace/SPEC-metodologia-cockpit-2026-08-28.md §7.3 item 1):
+# `--force` foi REMOVIDO — era o vetor do incidente D-064 (28/08): mensagem
+# enviada a um terminal com AskUserQuestion aberto virou RESPOSTA a uma
+# pergunta do dono. A checagem de MARCADOR (exit 4, "tela nao mostra
+# basename/frente/titulo") tambem foi removida: ela recusava mensagem
+# legitima e o texto SUMIA (nao ia para lugar nenhum) — 67 recusas/dia
+# medidas (ev-harness §8). A UNICA guarda que sobrevive e a de MENU ABERTO:
+# nunca pulavel, com retry (a pergunta do dono pode fechar sozinha em
+# segundos) e falha REGISTRADA (nunca silenciosa) se continuar aberta.
 set -euo pipefail
 
 CMUX_BIN="${CMUX_BIN:-/Applications/cmux.app/Contents/Resources/bin/cmux}"
@@ -11,24 +21,31 @@ LOG="$T/send.log"
 
 usage() {
   cat <<'EOF'
-Uso: terminal-send.sh <PAPEL> "<mensagem>" [--force]
+Uso: terminal-send.sh <PAPEL> "<mensagem>"
 
-Resolve o papel, le a tela 2x com 1s de intervalo (cache stale do
-read-screen), exige que a tela mostre um marcador de destino (basename
-do cwd, a frente, ou o titulo do workspace) e que a ultima linha nao
-pareca input parcialmente digitado, entao envia a mensagem (send +
-send-key enter). Loga em docs/ai-state/terminais/send.log.
+Resolve o papel (terminal-resolve.sh -> workspace_uuid AO VIVO, nunca
+`[selected]`/indice posicional), le a TELA DO DESTINO e recusa enviar
+enquanto ela mostrar um menu de decisao aberto (AskUserQuestion/permissao/
+selector) — reter-tenta ate 3x em ~60s e so entao falha, registrando em
+docs/ai-state/terminais/send.log. Sem essa condicao, envia (send +
+send-key enter) e confirma a entrega lendo a tela de novo.
 
-  --force   pula as duas checagens de seguranca (marcador + input parcial)
+Nao ha flag de bypass: a guarda de menu aberto NAO e pulavel (incidente
+D-064, 28/08 — um Enter no lugar errado respondeu pelo dono). Mensagem
+maior que TERMINAL_SEND_MAXLEN (default 600) e recusada — escreva o
+conteudo em arquivo e mande so o path.
 EOF
 }
 
-FORCE=0
 ARGS=()
 for a in "$@"; do
   case "$a" in
     --help|-h) usage; exit 0 ;;
-    --force) FORCE=1 ;;
+    -*)
+      echo "RECUSADO: flag desconhecida '$a'. terminal-send.sh nao aceita mais --force" >&2
+      echo "(removido em F0b — vetor do incidente D-064; ver SPEC-metodologia-cockpit-2026-08-28.md §7.3.1)." >&2
+      exit 2
+      ;;
     *) ARGS+=("$a") ;;
   esac
 done
@@ -39,7 +56,7 @@ MSG="${ARGS[1]}"
 
 MAXLEN=${TERMINAL_SEND_MAXLEN:-600}
 if [[ ${#MSG} -gt $MAXLEN && "${FORCE_LONG:-0}" != "1" ]]; then
-  echo "RECUSADO: mensagem com ${#MSG} chars (> $MAXLEN). cmux send trunca texto longo — escreva o conteudo em arquivo (ALERTAS.md/ORDENS.md/handoff) e mande so o path. FORCE_LONG=1 ignora." >&2
+  echo "RECUSADO: mensagem com ${#MSG} chars (> $MAXLEN). cmux send trunca texto longo — escreva o conteudo em arquivo (canal-append.sh LOG, PEDIDOS.md ou handoff) e mande so o path. FORCE_LONG=1 ignora." >&2
   exit 5
 fi
 
@@ -51,25 +68,30 @@ RESOLVE_JSON=$("$SCRIPT_DIR/terminal-resolve.sh" "$PAPEL" 2>/dev/null) || {
 }
 
 UUID=$(echo "$RESOLVE_JSON" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("workspace_uuid_live") or d.get("workspace_uuid") or "")')
-CWD=$(echo "$RESOLVE_JSON" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("cwd") or "")')
-FRENTE=$(echo "$RESOLVE_JSON" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("frente") or "")')
-TITLE=$(echo "$RESOLVE_JSON" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("workspace_title") or "")')
+SESSION_ID_ALVO=$(echo "$RESOLVE_JSON" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("session_id") or "")')
 
 [[ -z "$UUID" ]] && { echo "ERRO: workspace vivo nao encontrado para $PAPEL" >&2; exit 3; }
 
-SCREEN1=$("$CMUX_BIN" read-screen --workspace "$UUID" --lines 15 2>/dev/null || true)
-sleep 1
-SCREEN2=$("$CMUX_BIN" read-screen --workspace "$UUID" --lines 15 2>/dev/null || true)
-SCREEN="$SCREEN2"
-[[ -z "$SCREEN" ]] && SCREEN="$SCREEN1"
+# --- GUARDA DE MENU ABERTO (unica guarda que sobrevive a F0b) ---
+# Incidente 2026-08-28 (2x): mensagem enviada a um terminal com AskUserQuestion
+# aberto virou RESPOSTA a pergunta do dono (D-064 respondida por engano, depois
+# anulada). Duas fontes, checadas a cada tentativa: (a) padrao textual na tela
+# do DESTINO (regex de menu/selecao) e (b) feed estruturado do cmux (question/
+# permission/exit_plan pendente casando workstream_id -> session_id do papel).
+# Retry: a pergunta do dono pode ser respondida por ELE nesses segundos — falhar
+# na 1a tentativa perderia mensagem legitima por coincidencia de timing. Falha
+# APOS os retries e SEMPRE registrada em send.log (nunca silenciosa, nunca vai
+# para inbox — inbox foi descontinuada em F0a).
+MENU_RE='Esc to cancel|Enter to (select|confirm|submit)|to select|↑/↓|\(Recommended\)|\(Recomendado\)|❯ *[0-9]+\.|Do you want to|Yes, and don|No, and tell'
+MENU_RETRIES="${TERMINAL_SEND_MENU_RETRIES:-3}"
+MENU_RETRY_SLEEP_S="${TERMINAL_SEND_MENU_RETRY_SLEEP_S:-20}"
 
-# --- GUARDA DE MENU ABERTO: NAO e pulavel por --force ---
-# Incidente 2026-08-28 (2x): mensagem enviada a um terminal que tinha AskUserQuestion
-# aberto virou RESPOSTA a pergunta do dono (D-064 respondida "SSO Google" por engano,
-# depois anulada). As checagens de marcador/input parcial sao pulaveis por --force; esta
-# NAO pode ser, porque o dano nao e "mensagem no lugar errado" — e decisao do dono
-# falsificada. Fonte: feed do cmux (estruturado), casando workstream_id -> session_id do papel.
-MENU_ABERTO=$(CMUX_BIN="$CMUX_BIN" SESSION_ID="$(echo "$RESOLVE_JSON" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("session_id") or "")')" python3 <<'PYEOF' 2>/dev/null
+feed_menu_reason() {
+  # Imprime uma razao nao-vazia se o feed do cmux mostra question/permission/
+  # exit_plan pendente para a sessao do papel; vazio se nao ha ou se o feed
+  # estiver indisponivel (fail-open: nao inventa bloqueio por erro de leitura).
+  [[ -z "$SESSION_ID_ALVO" ]] && return 0
+  CMUX_BIN="$CMUX_BIN" SESSION_ID="$SESSION_ID_ALVO" python3 <<'PYEOF' 2>/dev/null
 import json, os, subprocess
 sid = os.environ.get("SESSION_ID") or ""
 if not sid:
@@ -88,61 +110,40 @@ for i in items:
         continue
     ws = str(i.get("workstream_id") or i.get("request_id") or "")
     if sid and sid in ws:
-        print(f'{i.get("kind")}|{str(i.get("title") or "")[:40]}')
+        print(f'feed:{i.get("kind")}:{str(i.get("title") or "")[:40]}')
         break
 PYEOF
-)
-if [[ -n "$MENU_ABERTO" ]]; then
-  echo "RECUSADO: $PAPEL tem ${MENU_ABERTO%%|*} ABERTA esperando o dono (${MENU_ABERTO#*|})." >&2
+}
+
+RAZAO=""
+TENTATIVA=1
+while [[ "$TENTATIVA" -le "$MENU_RETRIES" ]]; do
+  SCREEN=$("$CMUX_BIN" read-screen --workspace "$UUID" --lines 15 2>/dev/null || true)
+  RAZAO=""
+  if echo "$SCREEN" | grep -qE "$MENU_RE"; then
+    RAZAO="tela:menu-visivel"
+  else
+    FEED_HIT="$(feed_menu_reason || true)"
+    [[ -n "$FEED_HIT" ]] && RAZAO="$FEED_HIT"
+  fi
+  [[ -z "$RAZAO" ]] && break
+  if [[ "$TENTATIVA" -lt "$MENU_RETRIES" ]]; then
+    sleep "$MENU_RETRY_SLEEP_S"
+  fi
+  TENTATIVA=$((TENTATIVA + 1))
+done
+
+if [[ -n "$RAZAO" ]]; then
+  mkdir -p "$T"
+  printf '%s FALHA-MENU-ABERTO papel=%s uuid=%s razao=%s tentativas=%s\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$UUID" "$RAZAO" "$MENU_RETRIES" >> "$LOG"
+  echo "RECUSADO: $PAPEL continua com MENU DE DECISAO aberto apos $MENU_RETRIES tentativas ($RAZAO)." >&2
   echo "Enviar agora faria seu texto virar a RESPOSTA dessa pergunta — ja aconteceu 2x em 28/08" >&2
-  echo "(D-064 foi respondida por engano e precisou ser anulada)." >&2
-  echo "Esta guarda NAO e pulavel por --force. Escreva no canal de arquivo e espere o dono responder:" >&2
-  echo "  ~/.claude/scripts/canal-append.sh ALERTAS \"<texto>\" --papel <SEU_PAPEL>" >&2
-  echo "Bypass consciente (so se souber que a pergunta nao e do dono): TERMINAL_SEND_MENU_OK=1" >&2
-  [[ "${TERMINAL_SEND_MENU_OK:-0}" != "1" ]] && exit 6
-  echo "AVISO: TERMINAL_SEND_MENU_OK=1 — prosseguindo por bypass explicito." >&2
-fi
-
-if [[ "$FORCE" -eq 0 ]]; then
-  BASENAME=$(basename "$CWD")
-  MARK_OK=0
-  if [[ -n "$BASENAME" ]] && echo "$SCREEN" | grep -qF -- "$BASENAME"; then MARK_OK=1; fi
-  if [[ "$MARK_OK" -eq 0 && -n "$FRENTE" ]] && echo "$SCREEN" | grep -qF -- "$FRENTE"; then MARK_OK=1; fi
-  if [[ "$MARK_OK" -eq 0 && -n "$TITLE" ]] && echo "$SCREEN" | grep -qF -- "$TITLE"; then MARK_OK=1; fi
-  if [[ "$MARK_OK" -eq 0 ]]; then
-    echo "RECUSADO: tela de $PAPEL nao mostra marcador de destino ($BASENAME / $FRENTE / $TITLE) — use --force" >&2
-    exit 4
-  fi
-
-  LAST_LINE=$(echo "$SCREEN" | grep -v '^[[:space:]]*$' | tail -1 || true)
-  # heuristica: prompt com texto colado logo apos '>' ou '|' sem espaco final
-  # sugere input digitado e ainda nao enviado.
-  if echo "$LAST_LINE" | grep -qE '^[[:space:]]*[>│|][[:space:]]*[^[:space:]]'; then
-    echo "RECUSADO: ultima linha de $PAPEL parece input parcialmente digitado: '$LAST_LINE' — use --force" >&2
-    exit 4
-  fi
-fi
-
-# GUARD (28/08, incidente D-064): se a tela do destino mostra um MENU DE PERGUNTA
-# (AskUserQuestion / permissao / seletor), um Enter aqui RESPONDE PELO DONO. Vale
-# mesmo com --force. Nesse caso a mensagem vai para a inbox do papel e NAO e enviada.
-MENU_RE='Esc to cancel|Enter to (select|confirm|submit)|to select|↑/↓|\(Recommended\)|\(Recomendado\)|❯ *[0-9]+\.|Do you want to|Yes, and don|No, and tell'
-if echo "$SCREEN" | grep -qE "$MENU_RE"; then
-  INBOX="$HOME/Claude/docs/ai-state/terminais/inbox-${PAPEL}"
-  mkdir -p "$INBOX"
-  F="$INBOX/$(date -u +%Y%m%dT%H%M%SZ)-from-${FROM:-desconhecido}.md"
-  printf '%s\n' "# adiado $(date -u +%Y-%m-%dT%H:%MZ) — menu de decisao aberto em $PAPEL" "from: ${FROM:-desconhecido}" "" "$MSG" > "$F"
-  # SINAL: gravar na inbox nao acorda ninguem — o COMANDO roda em ciclo de 25min e
-  # mensagens ficaram ate 1h paradas (medido 28/08). O arquivo continua sendo o canal
-  # de verdade; o sinal so encurta a espera. set-status aparece na sidebar sem roubar
-  # foco nem digitar nada no pane (send/send-key aqui responderiam o menu — proibido).
-  "$CMUX_BIN" set-status inbox "📥 ${FROM:-peer}: mensagem adiada (menu aberto)" \
-      --workspace "$UUID" --priority 80 >/dev/null 2>&1 || true
-  "$CMUX_BIN" notify --title "Mensagem adiada — $PAPEL" \
-      --body "de ${FROM:-desconhecido}: menu aberto; ver inbox-$PAPEL" >/dev/null 2>&1 || true
-  echo "ADIADO: $PAPEL esta com MENU DE DECISAO aberto na tela (um Enter responderia pelo dono). Mensagem gravada em $F — o papel le a inbox no proximo ciclo; reenvie depois se for urgente." >&2
+  echo "(D-064 foi respondida por engano e precisou ser anulada). Esta guarda NAO tem bypass." >&2
+  echo "Espere o dono responder e reenvie; falha registrada em $LOG." >&2
   exit 5
 fi
+
 "$CMUX_BIN" send --workspace "$UUID" "$MSG"
 "$CMUX_BIN" send-key --workspace "$UUID" enter
 
