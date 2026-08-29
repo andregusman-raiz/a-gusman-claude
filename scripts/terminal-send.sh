@@ -56,7 +56,7 @@ MSG="${ARGS[1]}"
 
 MAXLEN=${TERMINAL_SEND_MAXLEN:-600}
 if [[ ${#MSG} -gt $MAXLEN && "${FORCE_LONG:-0}" != "1" ]]; then
-  echo "RECUSADO: mensagem com ${#MSG} chars (> $MAXLEN). cmux send trunca texto longo — escreva o conteudo em arquivo (ALERTAS.md/ORDENS.md/handoff) e mande so o path. FORCE_LONG=1 ignora." >&2
+  echo "RECUSADO: mensagem com ${#MSG} chars (> $MAXLEN). cmux send trunca texto longo — escreva o conteudo em arquivo (canal-append.sh LOG, PEDIDOS.md ou handoff) e mande so o path. FORCE_LONG=1 ignora." >&2
   exit 5
 fi
 

@@ -10,7 +10,7 @@
 # mesmo espirito de terminais-watchdog.sh / radar-prazos.sh):
 #
 #   1) AUTORIZACOES.md: A-nnn CONCEDIDA ha mais de AUTORIZACAO_MAX_H horas
-#      sem GASTA -> alerta em ALERTAS.md (1x por episodio; re-alerta so apos
+#      sem GASTA -> alerta em log/<hoje>.md (canal-append.sh LOG) (1x por episodio; re-alerta so apos
 #      SYNC_REALERT_H horas). NUNCA muda o estado da autorizacao — so alerta.
 #      Nao depende de gh; roda mesmo sem GitHub CLI no PATH.
 #
@@ -43,7 +43,6 @@ CLAIMS="$Q/claims.json"
 QUEUE_MD="$Q/QUEUE.md"
 AUTORIZACOES_MD="$Q/AUTORIZACOES.md"
 STATE="$Q/.claims-sync-state.json"
-ALERTAS_MD="$Q/ALERTAS.md"
 LOG_DIR="$Q/log"
 ARCHIVE_DIR="${TERMINAIS_ARCHIVE_DIR:-$HOME/Claude/docs/ai-state/terminais/arquivo}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -56,8 +55,8 @@ Tres verificacoes independentes (uma falhando nao aborta as outras):
 
 1) AUTORIZACOES (roda sempre; nao precisa de gh nem de --apply):
    AUTORIZACOES.md -> A-nnn CONCEDIDA sem GASTA ha mais de
-   AUTORIZACAO_MAX_H horas (default 12) gera alerta em ALERTAS.md via
-   canal-append.sh --papel SYNC --tipo ALERTA (1x por episodio; re-alerta
+   AUTORIZACAO_MAX_H horas (default 12) gera alerta em log/<hoje>.md via
+   canal-append.sh LOG --papel SYNC (1x por episodio; re-alerta
    so apos SYNC_REALERT_H horas, default 24). Ignora autorizacoes com a
    palavra PERMANENTE (nao se consomem). NUNCA muda o estado da autorizacao.
 
@@ -101,7 +100,7 @@ HOJE="$(date -u +%Y-%m-%d)"
 NOW_HHMM="$(date -u +%H:%M)"
 
 REPO="$REPO" Q="$Q" CLAIMS="$CLAIMS" QUEUE_MD="$QUEUE_MD" \
-AUTORIZACOES_MD="$AUTORIZACOES_MD" STATE="$STATE" ALERTAS_MD="$ALERTAS_MD" \
+AUTORIZACOES_MD="$AUTORIZACOES_MD" STATE="$STATE" \
 LOG_DIR="$LOG_DIR" ARCHIVE_DIR="$ARCHIVE_DIR" SCRIPT_DIR="$SCRIPT_DIR" \
 APPLY="$APPLY" GH_OK="$GH_OK" TS_COMPACT="$TS_COMPACT" HOJE="$HOJE" \
 NOW_HHMM="$NOW_HHMM" \
@@ -117,7 +116,6 @@ CLAIMS = os.environ["CLAIMS"]
 QUEUE_MD = os.environ["QUEUE_MD"]
 AUTORIZACOES_MD = os.environ["AUTORIZACOES_MD"]
 STATE = os.environ["STATE"]
-ALERTAS_MD = os.environ["ALERTAS_MD"]
 LOG_DIR = os.environ["LOG_DIR"]
 ARCHIVE_DIR = os.environ["ARCHIVE_DIR"]
 SCRIPT_DIR = os.environ["SCRIPT_DIR"]
@@ -161,25 +159,51 @@ def ensure_state():
 
 
 def canal_append_alertas(texto):
+    # F0b (coordenador, medicao propria 2026-08-29): ALERTAS.md ficou chmod
+    # 444 (F0a) -- este escritor abria o arquivo DIRETO (sem passar por
+    # canal-append.sh), entao a correcao do canal-append.sh sozinha NAO
+    # protegia este ponto. Alvo agora e log/<hoje>.md (canal-append.sh LOG,
+    # sem teto), nos dois caminhos (canal-append.sh presente OU fallback).
+    # rc sempre registrado em hooks.log -- sucesso silencioso e' tao ruim
+    # quanto falha silenciosa (nao dava pra saber se o alerta realmente
+    # foi escrito).
     canal_append_sh = os.path.join(SCRIPT_DIR, "canal-append.sh")
+    hooks_log = os.environ.get("HOOKS_LOG_PATH") or os.path.expanduser("~/.claude/state/hooks.log")
+
+    def log_rc(rc):
+        try:
+            os.makedirs(os.path.dirname(hooks_log), exist_ok=True)
+            ts_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            fd = os.open(hooks_log, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+            try:
+                os.write(fd, f"{ts_iso} \u00b7 de-claims-sync.sh \u00b7 SYNC \u00b7 {rc} \u00b7 LOG\n".encode("utf-8"))
+            finally:
+                os.close(fd)
+        except Exception:
+            pass
+
     if os.path.isfile(canal_append_sh):
         r = subprocess.run(
-            [canal_append_sh, "ALERTAS", texto, "--papel", "SYNC", "--tipo", "ALERTA"],
+            [canal_append_sh, "LOG", texto, "--papel", "SYNC"],
             capture_output=True, text=True, timeout=10,
         )
+        log_rc(r.returncode)
         if r.returncode != 0:
             print(f"  ERRO canal-append.sh: {r.stderr.strip()}")
             return False
         return True
-    # Fallback (canal-append.sh ainda nao existe neste checkout): append direto,
-    # write() unico em modo append — mesmo contrato de atomicidade do helper.
+    # Fallback (canal-append.sh ainda nao existe neste checkout): append
+    # direto em log/<hoje>.md -- write() unico em modo append, mesmo
+    # contrato de atomicidade do helper.
     ts = now_utc().strftime("%Y-%m-%d %H:%M")
-    line = f"[{ts}] SYNC ALERTA: {texto}\n"
-    fd = os.open(ALERTAS_MD, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+    line = f"[{ts}] SYNC INFO: {texto}\n"
+    log_path_fallback = os.path.join(LOG_DIR, f"{HOJE}.md")
+    fd = os.open(log_path_fallback, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
     try:
         os.write(fd, line.encode("utf-8"))
     finally:
         os.close(fd)
+    log_rc(0)
     return True
 
 
