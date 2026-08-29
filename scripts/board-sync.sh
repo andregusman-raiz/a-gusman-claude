@@ -233,38 +233,41 @@ for papel, t in reg.items():
 
 # --- modo impressão (board-tui.sh): fila única do ROADMAP + fila única de PRs + terminais ---
 if os.environ.get("PRINT") == "1":
+    import textwrap
     O, T, B, G, R, Y, D, N = "\033[38;5;208m", "\033[38;5;79m", "\033[38;5;111m", "\033[38;5;150m", "\033[38;5;203m", "\033[38;5;221m", "\033[2m", "\033[0m"
-    W = int(os.environ.get("COLUMNS") or 120)
-    try: H = int(os.environ.get("LINES") or subprocess.run(["tput", "lines"], capture_output=True, text=True, timeout=3).stdout.strip() or 45)
-    except Exception: H = 45
-    def hdr(color, txt): print(f"{color}\033[1m{txt}\033[0m{color} {'─'*max(0, W-len(txt)-2)}{N}")
+    W = max(60, int(os.environ.get("COLUMNS") or 120))
+    def hdr(color, txt):
+        txt = txt if len(txt) <= W-2 else txt[:W-3] + "…"
+        print(f"{color}\033[1m{txt}\033[0m{color} {'─'*max(0, W-len(txt)-2)}{N}")
+    def wrap(txt, indent=0, first=""):
+        # quebra em vez de truncar; indentação pendurada
+        return textwrap.fill(txt, width=W, initial_indent=first, subsequent_indent=" "*indent, break_long_words=False, break_on_hyphens=False)
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%H:%M:%SZ")
     pc = R if "⚠" in prod else G
-    print(f"\033[1mSTATUS BOARD\033[0m {D}· fila única tiers 1-2 · {now}{N}   {pc}{prod}{N}   QUANTO FALTA {quanto[:80]}")
-    print(f"{Y}DECISÃO DA VEZ:{N} {decisao[:W-16] or '—'}")
+    print(f"\033[1mSTATUS BOARD\033[0m {D}· fila única tiers 1-2 · {now} · redesenha só quando muda{N}")
+    print(f"{pc}{prod}{N}")
+    print(wrap(f"QUANTO FALTA: {quanto}", indent=14))
+    print(f"{Y}" + wrap(f"DECISÃO DA VEZ: {decisao or '—'}", indent=16) + N)
     print(); hdr(O, f"ROADMAP — fila completa ({len(entregas)} linhas · em curso / fila / estacionada)")
-    for i, l in enumerate(road[3:]):
-        if l.startswith("      →"): print(f"{D}{l[:W]}{N}")
-        elif "· em curso" in l: print(f"{O}{l[:5]}{N}\033[1m{l[5:W]}{N}")
-        elif "estacionad" in l: print(f"{O}{l[:5]}{N}{D}{l[5:W]}{N}")
-        else: print(f"{O}{l[:5]}{N}{l[5:W]}")
+    for l in road[3:]:
+        if l.startswith("      →"): print(f"{D}" + wrap(l.strip(), indent=8, first="      ") + N)
+        else:
+            eid, rest = l[:5], l[5:].strip()
+            col = "\033[1m" if "· em curso" in rest else (D if "estacionad" in rest else "")
+            line = wrap(rest, indent=6, first=f"{eid.strip():<6}")
+            print(f"{O}{line[:6]}{N}{col}{line[6:]}{N}")
     print(); hdr(T, f"FILA DE PRs — DE ({n_open} abertos · {n_cr} CR por responder · {n_ok} prontos · {n_falta} aprovados s/ review DE-MIG · {n_wait} aguardam review)")
-    # orçamento de linhas: cabeçalho(2)+vazio+hdr roadmap+2/E+vazio+hdr PRs+vazio+hdr terminais+1 linha+rodapé
-    usados = 2 + 1 + 1 + 2*len(entregas) + 1 + 1 + 1 + 1 + 1 + 1
-    pr_budget = max(3, H - usados)
-    lines_pr = fila_lines[3:]
-    show = lines_pr if len(lines_pr) <= pr_budget else lines_pr[:pr_budget-1]
-    for l in show:
+    print(f"{D}ordem: prontos → aprovados s/ review humana → aguardam review → CR por responder → draft{N}")
+    for l in fila_lines[3:]:
         col = G if "APPROVED ·" in l else (Y if "APPROVED(bot)" in l else (R if "CR por responder" in l else (D if "draft" in l else N)))
-        print(f"{col}{l[:W]}{N}")
-    if len(show) < len(lines_pr): print(f"{D}… +{len(lines_pr)-len(show)} PRs (todos 'CR por responder' → autores) — aumente o pane para ver{N}")
+        print(f"{col}" + wrap(l, indent=6) + N)
     print(); hdr(B, "TERMINAIS (tiers 0-2) · agora")
-    cells = []
     for papel, uuid, desc, label, stage in sorted(plan, key=lambda x: (reg.get(x[0], {}).get("tier", 9), x[0])):
-        if papel in ("RESUMO", "COMANDO", "DE-COORD"): continue
-        cells.append(f"{B}{papel}{N} {label.split(' · @')[0][:44]}")
-    print("  ·  ".join(cells)[:W*2])
-    print(f"{D}fonte: ROADMAP.md · gh pr list · registry.json · board-sync.sh — {now} · a cada {os.environ.get('BOARD_TUI_REFRESH','60')}s{N}")
+        t = reg.get(papel, {})
+        pre = f"{t.get('tier','?')} {papel:<9} "
+        line = wrap(label, indent=len(pre), first=pre)
+        print(f"{B}{line[:len(pre)]}{N}{line[len(pre):]}")
+    print(f"\n{D}fonte: ROADMAP.md (manuscrito do COMANDO) · gh pr list (ao vivo) · registry.json · board-sync.sh — {now}{N}")
     sys.exit(0)
 
 for papel, uuid, desc, label, stage in plan:
