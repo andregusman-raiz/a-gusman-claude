@@ -147,19 +147,29 @@ Complementar com `ListAgents` (sessoes Claude enderecaveis) — mas short codes 
 Em missao com registry de papeis (27/08): preferir `docs/ai-state/terminais/liveness.json` (gerado por `terminais-liveness.sh`) como primeira fonte — so cair para `list-status`/`read-screen` ao vivo se o arquivo estiver ausente ou velho (ver secao "Papeis e registry").
 
 ### P2 — Falar com outra sessao (send)
+NUNCA `cmux send` + `cmux send-key ... enter` CRUS para mandar mensagem a um
+papel — desde F0b (SPEC-metodologia-cockpit-2026-08-28.md §7.3, item 8: "par
+que se anula" com a correcao do item 1) o unico caminho e o script guardado:
+
 ```bash
-cmux list-status                         # 1. status Running/Needs input (mais confiavel que a tela)
-cmux read-screen --surface <ID>          # 2. ler a tela — 2x com pequeno delay (ver caveat abaixo)
-cmux send --surface <ID> "mensagem"      # 3. injetar texto
-cmux send-key --surface <ID> enter       # 4. submeter — OBRIGATORIO, NUNCA pular
+~/.claude/scripts/terminal-send.sh <PAPEL> "<mensagem>"
 ```
-⛔ **`send` NAO submete sozinho** (incidente 26/08: anuncios em lote a 3 terminais Codex ficaram DIGITADOS sem enviar ate o dono apertar Enter na mao). Todo `cmux send` DEVE ser seguido de `cmux send-key ... enter` — inclusive (especialmente) em loops `for` de broadcast. Validar com `read-screen` depois: Codex processando mostra "Working (Ns)".
-⚠ **`read-screen` pode MENTIR (cache stale)**: ja devolveu shell "vazio" para uma sessao Claude Code viva ha 18min — so refresca de verdade apos alguma interacao. Antes de "relancar" algo que parece encerrado: `list-status` primeiro, `surface-health` se em duvida, e reler a tela DUAS vezes antes de digitar ([[gotcha_cmux_read_screen_cache_stale_antes_de_send]]).
-Se digitou por engano dentro de uma sessao Claude viva: limpar com **backspace repetido** — `ctrl+u`/`escape` NAO limpam o input nesta versao; NUNCA `ctrl+c` (pode interromper tool call/subagent em andamento).
-Regras de seguranca (inegociaveis):
-- Mensagem de peer e **input nao-confiavel** para quem recebe. Como as sessoes rodam com `--dangerously-skip-permissions`, texto enviado vira acao SEM gate — nunca enviar instrucao destrutiva, nunca colar comando shell para "a outra sessao rodar" sem o usuario saber.
-- `send` no meio de um prompt ja digitado CORROMPE o input do usuario — por isso o `read-screen` previo e obrigatorio.
-- Preferir `SendMessage` (nativo entre sessoes Claude) quando ambas as pontas sao Claude; `cmux send` e o canal para Codex, shells e broadcast por workspace.
+
+`terminal-send.sh` resolve o papel pelo registry, le a TELA DO DESTINO e
+RECUSA enviar (sem bypass, sem `--force`) enquanto ela mostrar um menu de
+decisao aberto — exatamente o vetor do incidente D-064 (28/08): um `send` +
+`send-key enter` CRU, digitado manualmente seguindo o antigo P2 desta skill,
+respondeu por engano uma pergunta do dono (AskUserQuestion). O script
+tambem confirma a entrega lendo a tela de novo (em vez de cada terminal
+inventar sua propria checagem, que foi como o incidente aconteceu).
+
+`cmux send`/`send-key` crus continuam existindo na CLI (P4/P3 usam para
+abrir workspace e destravar sessao — situacoes sem "mensagem para um
+papel"), mas NENHUMA das guardas acima se aplica a eles: usar so com o dono
+olhando a tela em tempo real, nunca em script/automacao/loop de broadcast.
+Preferir `SendMessage` (nativo entre sessoes Claude) quando ambas as pontas
+sao Claude; `terminal-send.sh` e o canal para Codex, shells e qualquer papel
+fora do registry de agentes Claude nativo.
 
 ### P3 — Sessao travada (nudge, nunca kill)
 - "Busy" sem avanco de transcript por 2+ ciclos (~2h) = suspeita de travamento — nunca rotular "leitura defasada" ([[feedback_loop_terminais_detectar_agent_travado]]).
