@@ -182,13 +182,23 @@ def short_status(p):
     if rd == "APPROVED": return f"APPROVED · {ms}"
     return f"aguarda review · {ms}"
 road = [f"{prod} · QUANTO FALTA {quanto[:70]}", f"DECISÃO DA VEZ: {decisao[:90] or '—'}", ""]
-for e in entregas:
-    head = e.split(" · prova:")[0]; parts = head.split(" · "); eid = parts[0]; resto = " · ".join(parts[1:])
-    prova = e.split(" · prova:")[1].strip() if " · prova:" in e else ""
-    prs_e = sorted(by_entrega.get(eid, []), key=lambda p: p.get("updatedAt", ""), reverse=True)
-    prtxt = " | ".join(f"#{p['number']} {short_status(p)} @{(p.get('headRefOid') or '')[:7]}" for p in prs_e[:2]) or "sem PR"
-    road.append(f"{eid:<5} {resto[:95]}")
-    road.append(f"      → {prtxt}" + (f" · prova: {prova[:60]}" if prova else ""))
+# percorre o ROADMAP na ordem: faixas (## ...), contadores por faixa, marcos, caminho crítico, Entregas
+for l in rm:
+    if l.startswith("## "):
+        road.append(""); road.append("§ " + l[3:].strip())
+    elif l.startswith("QUANTO FALTA:") and road and road[-1].startswith("§ "):
+        road.append("  " + l.strip())
+    elif l.startswith(("MARCO", "SUSTENT", "CAMINHO")):
+        road.append("· " + l.strip()[:160])
+    elif l.startswith("  P") and "✅" in l or l.startswith("  P") and "⏳" in l:
+        road.append("    " + l.strip())
+    elif l.startswith("  E-"):
+        e = l.strip(); head = e.split(" · prova:")[0]; parts = head.split(" · "); eid = parts[0]; resto = " · ".join(parts[1:])
+        prova = e.split(" · prova:")[1].strip() if " · prova:" in e else ""
+        prs_e = sorted(by_entrega.get(eid, []), key=lambda p: p.get("updatedAt", ""), reverse=True)
+        prtxt = " | ".join(f"#{p['number']} {short_status(p)} @{(p.get('headRefOid') or '')[:7]}" for p in prs_e[:2]) or "sem PR"
+        road.append(f"{eid:<5} {resto}")
+        road.append(f"      → {prtxt}" + (f" · prova: {prova}" if prova else ""))
 if not entregas: road.append("— ROADMAP.md sem linhas E- —")
 road_txt = "\n".join(road)
 
@@ -250,6 +260,10 @@ if os.environ.get("PRINT") == "1":
     print(f"{Y}" + wrap(f"DECISÃO DA VEZ: {decisao or '—'}", indent=16) + N)
     print(); hdr(O, f"ROADMAP — fila completa ({len(entregas)} linhas · em curso / fila / estacionada)")
     for l in road[3:]:
+        if l.startswith("§ "): print(f"\033[1m{O}{l}{N}"); continue
+        if l.startswith("  QUANTO") or l.startswith("    P"): print(f"{D}{wrap(l.strip(), indent=4, first='  ')}{N}"); continue
+        if l.startswith("· "): print(f"{Y}{wrap(l[2:], indent=2)}{N}"); continue
+        if l == "": print(); continue
         if l.startswith("      →"): print(f"{D}" + wrap(l.strip(), indent=8, first="      ") + N)
         else:
             eid, rest = l[:5], l[5:].strip()
