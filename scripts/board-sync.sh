@@ -144,7 +144,7 @@ def papel_do_pr(p):
             if toks & ptoks: return papel
     return None
 pr_papel = {p["number"]: papel_do_pr(p) for p in prs}
-if DRY == "1": print("pr→papel:", {n: v for n, v in pr_papel.items() if v})
+if DRY == "1" and os.environ.get("PRINT") != "1": print("pr→papel:", {n: v for n, v in pr_papel.items() if v})
 def entrega_do_pr(p):
     pap = pr_papel.get(p["number"])
     if not pap: return ""
@@ -221,6 +221,40 @@ for papel, t in reg.items():
             label = f"{eids} · {label}" + (f" (+{len(mine)-1} PR)" if len(mine) > 1 else "")
         else: label, stage = (f"{eids} · sem PR aberto"), (2/8 if ents else 0.0)
     plan.append((papel, uuid, desc[:6000], label[:120], stage))
+
+# --- modo impressão (board-tui.sh): fila única do ROADMAP + fila única de PRs + terminais ---
+if os.environ.get("PRINT") == "1":
+    O, T, B, G, R, Y, D, N = "\033[38;5;208m", "\033[38;5;79m", "\033[38;5;111m", "\033[38;5;150m", "\033[38;5;203m", "\033[38;5;221m", "\033[2m", "\033[0m"
+    W = int(os.environ.get("COLUMNS") or 120)
+    try: H = int(os.environ.get("LINES") or subprocess.run(["tput", "lines"], capture_output=True, text=True, timeout=3).stdout.strip() or 45)
+    except Exception: H = 45
+    def hdr(color, txt): print(f"{color}\033[1m{txt}\033[0m{color} {'─'*max(0, W-len(txt)-2)}{N}")
+    now = datetime.datetime.now(datetime.timezone.utc).strftime("%H:%M:%SZ")
+    pc = R if "⚠" in prod else G
+    print(f"\033[1mSTATUS BOARD\033[0m {D}· fila única tiers 1-2 · {now}{N}   {pc}{prod}{N}   QUANTO FALTA {quanto[:80]}")
+    print(f"{Y}DECISÃO DA VEZ:{N} {decisao[:W-16] or '—'}")
+    print(); hdr(O, f"ROADMAP — Entregas em curso ({len(entregas)})")
+    for i, l in enumerate(road[3:]):
+        if l.startswith("      →"): print(f"{D}{l[:W]}{N}")
+        else: print(f"{O}{l[:5]}{N}{l[5:W]}")
+    print(); hdr(T, f"FILA DE PRs — DE ({n_open} abertos · {n_cr} CR por responder · {n_ok} prontos · {n_falta} aprovados s/ review DE-MIG · {n_wait} aguardam review)")
+    # orçamento de linhas: cabeçalho(2)+vazio+hdr roadmap+2/E+vazio+hdr PRs+vazio+hdr terminais+1 linha+rodapé
+    usados = 2 + 1 + 1 + 2*len(entregas) + 1 + 1 + 1 + 1 + 1 + 1
+    pr_budget = max(3, H - usados)
+    lines_pr = fila_lines[3:]
+    show = lines_pr if len(lines_pr) <= pr_budget else lines_pr[:pr_budget-1]
+    for l in show:
+        col = G if "APPROVED ·" in l else (Y if "APPROVED(bot)" in l else (R if "CR por responder" in l else (D if "draft" in l else N)))
+        print(f"{col}{l[:W]}{N}")
+    if len(show) < len(lines_pr): print(f"{D}… +{len(lines_pr)-len(show)} PRs (todos 'CR por responder' → autores) — aumente o pane para ver{N}")
+    print(); hdr(B, "TERMINAIS (tiers 0-2) · agora")
+    cells = []
+    for papel, uuid, desc, label, stage in sorted(plan, key=lambda x: (reg.get(x[0], {}).get("tier", 9), x[0])):
+        if papel in ("RESUMO", "COMANDO", "DE-COORD"): continue
+        cells.append(f"{B}{papel}{N} {label.split(' · @')[0][:44]}")
+    print("  ·  ".join(cells)[:W*2])
+    print(f"{D}fonte: ROADMAP.md · gh pr list · registry.json · board-sync.sh — {now} · a cada {os.environ.get('BOARD_TUI_REFRESH','60')}s{N}")
+    sys.exit(0)
 
 for papel, uuid, desc, label, stage in plan:
     print(f"{papel:9s} desc={desc[:70]!r}({len(desc)}c) | progress={label[:60]!r} v={'' if stage is None else round(stage,2)}")
