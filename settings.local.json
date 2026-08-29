@@ -239,23 +239,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/Claude/.claude/hooks/gap-acceptance-guard.py",
-            "statusMessage": "Gap acceptance guard..."
-          },
-          {
-            "type": "command",
-            "command": "python3 ~/Claude/.claude/hooks/completion-gate.py",
-            "statusMessage": "Completion gate (typecheck/lint/test)..."
-          },
-          {
-            "type": "command",
-            "command": "python3 ~/Claude/.claude/hooks/autonomous-persist-guard.py",
-            "statusMessage": "Autonomous journey guard (Opus 4.8 + workflows)..."
-          },
-          {
-            "type": "command",
-            "command": "bash ~/Claude/.claude/hooks/papel-stop.sh",
-            "statusMessage": "Cockpit: handoff do dia + reporte ao COMANDO..."
+            "command": "bash ~/Claude/.claude/hooks/stop-dispatch.sh",
+            "statusMessage": "Cockpit: gap acceptance + completion gate + autonomous persist + handoff do dia..."
           }
         ]
       }
