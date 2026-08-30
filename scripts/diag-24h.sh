@@ -8,7 +8,7 @@
 set -uo pipefail
 AI="$HOME/Claude/docs/ai-state"; OUT="$AI/diag"; mkdir -p "$OUT"; STAMP="$HOME/.claude/state/diag-24h.last"; mkdir -p "$(dirname "$STAMP")"
 HOUR_UTC="${DIAG_HOUR_UTC:-09}"   # 06:00 local (America/Sao_Paulo) — antes do dia útil
-TODAY=$(date -u +%Y-%m-%d); NOW=$(date -u +%Y-%m-%dT%H:%MZ)
+TODAY=$(date -u +%Y-%m-%d); NOW=$(date -u +%Y-%m-%dT%H:%MZ); PRAZO=$(date -u -v+3H +%H:%MZ)   # prazo relativo à geração (run forçado tardio não gera prazo no passado)
 if [ "${DIAG_FORCE:-0}" != "1" ]; then
   [ "$(date -u +%H)" -ge "$HOUR_UTC" ] || exit 0
   [ "$(cat "$STAMP" 2>/dev/null)" != "$TODAY" ] || exit 0
@@ -77,7 +77,7 @@ FALTAM=""; if [ -n "$PREV" ]; then for p in $PAPEIS; do grep -q "^### $p" "$PREV
 {
 cat <<EOM
 # DIAG-24H · $TODAY · gerado $NOW por diag-24h.sh (sem LLM) · janela: últimas 24 h
-> Obrigatório (ordem do dono 30/08/2026): OTIMIZADOR preenche §3 e §4 até 12:00Z; COMANDO decide/despacha §5; cada papel do DE/clientes deixa seu bloco em §6 no mesmo dia. O tick de amanhã acusa quem não deixou.
+> Obrigatório (ordem do dono 30/08/2026): OTIMIZADOR preenche §3 e §4 até $PRAZO (3 h após a geração); COMANDO decide/despacha §5; cada papel do DE/clientes deixa seu bloco em §6 no mesmo dia. O tick de amanhã acusa quem não deixou.
 > Papéis obrigados hoje: $PAPEIS
 
 ## 1. Números (mecânicos)
@@ -110,6 +110,6 @@ for p in $PAPEIS; do echo "### $p"; echo "_(pendente)_"; echo; done
 } > "$F"
 echo "$TODAY" > "$STAMP"
 printf '%s\n' "- $(date -u +%H:%MZ) tick/diag-24h: DIAG-24H-$TODAY.md gerado (§1 números + §2 verificação); OTIMIZADOR acordado para §3/§4; papéis: $PAPEIS" >> "$L2"
-bash "$HOME/.claude/scripts/terminal-send.sh" OTIMIZADOR "tick/diag-24h: DIAG-24H-$TODAY.md gerado — leia docs/ai-state/diag/DIAG-24H-$TODAY.md e preencha §3 (falhas c/ mecanismo) e §4 (oportunidades token/velocidade/roadmap) até 12:00Z; depois avise o COMANDO para §5." >/dev/null 2>&1 || true
+bash "$HOME/.claude/scripts/terminal-send.sh" OTIMIZADOR "tick/diag-24h: DIAG-24H-$TODAY.md gerado — leia docs/ai-state/diag/DIAG-24H-$TODAY.md e preencha §3 (falhas c/ mecanismo) e §4 (oportunidades token/velocidade/roadmap) até $PRAZO; depois avise o COMANDO para §5." >/dev/null 2>&1 || true
 bash "$HOME/.claude/scripts/terminal-send.sh" COMANDO "tick/diag-24h: DIAG-24H-$TODAY.md gerado (docs/ai-state/diag/). Tua parte: §5 decidir/despachar após o OTIMIZADOR; e cobrar o bloco §6 de cada papel do DE/clientes hoje." >/dev/null 2>&1 || true
 echo "diag-24h: $F"
