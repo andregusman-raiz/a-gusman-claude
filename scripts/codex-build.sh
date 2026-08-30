@@ -87,6 +87,20 @@ WORKDIR="$REPO_ROOT"
 if [ "$NOWT" = "0" ]; then
   [ -e "$WT" ] && { echo "❌ worktree já existe: $WT — remova ou use outro slug." >&2; exit 4; }
   WORKDIR="$WT"
+else
+  # 2026-08-30: em --no-worktree o cbuild não criava branch nenhuma, mas o prompt
+  # continuava a mandar o Codex trabalhar em `codex/<slug>`. O sandbox do Codex não
+  # escreve refs no .git comum, logo o `checkout -b` dele morria com
+  # "cannot lock ref ...: Operation not permitted" e o build acabava sem produzir
+  # nada. A branch passa a ser criada AQUI, onde há permissões.
+  if [ "$(git -C "$WORKDIR" rev-parse --abbrev-ref HEAD)" != "$BRANCH" ]; then
+    if git -C "$WORKDIR" show-ref --verify --quiet "refs/heads/$BRANCH"; then
+      git -C "$WORKDIR" checkout -q "$BRANCH" || { echo "❌ não consegui mudar para $BRANCH" >&2; exit 4; }
+    else
+      git -C "$WORKDIR" checkout -q -b "$BRANCH" || { echo "❌ não consegui criar $BRANCH" >&2; exit 4; }
+    fi
+    echo "▶ --no-worktree: $WORKDIR posto na branch $BRANCH (o Codex não a consegue criar)"
+  fi
 fi
 
 # ── prompt canônico + guardrails anti-destrutivos ────────────────────────────
