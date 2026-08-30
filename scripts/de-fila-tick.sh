@@ -190,3 +190,4 @@ bash "$(dirname "$0")/diag-24h.sh" >/dev/null 2>&1 || true
 # canal in-band (SendMessage/UDS): endereco por papel + ledger mecanico dos receptores (DIAGNOSTICO-comunicacao-terminais-2026-08-30)
 bash "$(dirname "$0")/enderecos-sync.sh" >/dev/null 2>&1 || true
 bash "$(dirname "$0")/msg-ledger.sh" >/dev/null 2>&1 || true
+bash "$(dirname "$0")/comunicacao-obrigatoria.sh" >/dev/null 2>&1 || true

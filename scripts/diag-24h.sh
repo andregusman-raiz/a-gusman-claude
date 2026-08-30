@@ -90,6 +90,7 @@ cat <<EOM
 - Deploys Railway 24 h: $DEPLOYS
 - Prod (sondas do tick): $PRODDOWN · thread-errors 24 h: $THREADERR
 - Roadmap: $ENTTOT Entregas · $ENT
+- Comunicação obrigatória (eventos × ledger, graça 15 min): $(bash "$HOME/.claude/scripts/comunicacao-obrigatoria.sh" 2>/dev/null | sed "s/^comunicacao-obrigatoria: //") — detalhe em terminais/COMUNICACAO-EM-FALTA.md
 
 ## 2. Verificação mecânica das recomendações anteriores
 $VER

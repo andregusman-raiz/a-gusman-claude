@@ -30,7 +30,7 @@ for sid,papel in sid2papel.items():
                 if len(body)>200: big+=1
                 k=(papel,m.group(1),pid)
                 if k in seen: continue
-                seen.add(k); new.append({'ts':m.group(1),'from':frm,'from_pid':int(pid),'to':papel,'chars':len(body),'preview':body[:120].replace('\\n',' ')})
+                seen.add(k); new.append({'ts':m.group(1),'from':frm,'from_pid':int(pid),'to':papel,'chars':len(body),'preview':body[:300].replace('\\n',' ')})
 with open(led,'a') as fh:
     for e in sorted(new,key=lambda e:e['ts']): fh.write(json.dumps(e,ensure_ascii=False)+'\n')
 print(f'in-band {H}h: {n} msgs · >200 chars: {big} · novas no ledger: {len(new)} · pares: '+' '.join(f'{a}→{b}={c}' for (a,b),c in tot.most_common(8)))

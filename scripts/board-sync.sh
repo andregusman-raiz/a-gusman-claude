@@ -349,6 +349,17 @@ if os.environ.get("PRINT") == "1":
             col = "\033[1m" if "· em curso" in rest else (D if "estacionad" in rest else "")
             line = wrap(rest, indent=6, first=f"{eid.strip():<6}")
             print(f"{O}{line[:6]}{N}{col}{line[6:]}{N}")
+    # § COMUNICAÇÃO — eventos obrigatórios × ledger (comunicacao-obrigatoria.sh; derivado, sem LLM)
+    _cf = os.path.join(os.path.dirname(rm_p), "..", "terminais", "COMUNICACAO-EM-FALTA.md")
+    if os.path.exists(_cf):
+        _cl = [l.rstrip("\n") for l in open(_cf, encoding="utf-8")]
+        _sum = next((l.strip("* ") for l in _cl if l.startswith("**")), "")
+        _falta = [l for l in _cl if "EM FALTA" in l]
+        print(); hdr(R if _falta else G, f"COMUNICAÇÃO OBRIGATÓRIA — {_sum[:90]}")
+        for l in _falta[:8]:
+            c = [x.strip() for x in l.strip("|").split("|")]
+            if len(c) >= 4: print(f"{R}" + wrap(f"{c[0]} {c[1]} → {c[2]} · {c[3]}", indent=4, first="  ") + N)
+        if len(_falta) > 8: print(f"{D}  … +{len(_falta)-8} em falta (terminais/COMUNICACAO-EM-FALTA.md){N}")
     print(); hdr(T, f"FILA DE PRs — DE ({n_open} abertos · {n_cr} CR por responder · {n_ok} prontos · {n_falta} aprovados s/ review DE-MIG · {n_wait} aguardam review)")
     print(f"{D}ordem: prontos → aprovados s/ review humana → aguardam review → CR por responder → draft{N}")
     for l in fila_lines[3:]:
