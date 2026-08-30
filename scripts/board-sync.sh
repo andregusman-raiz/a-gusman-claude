@@ -354,6 +354,20 @@ if os.environ.get("PRINT") == "1":
             col = "\033[1m" if "· em curso" in rest else (D if "estacionad" in rest else "")
             line = wrap(rest, indent=6, first=f"{eid.strip():<6}")
             print(f"{O}{line[:6]}{N}{col}{line[6:]}{N}")
+    # § RESULTADOS — últimos RESULT records (results.jsonl; a fonte de "o que foi entregue", nunca mensagem)
+    _rf = os.path.join(os.path.dirname(rm_p), "results.jsonl")
+    if os.path.exists(_rf):
+        import datetime as _dt
+        _rs = []
+        for _l in open(_rf, encoding="utf-8"):
+            try: _rs.append(json.loads(_l))
+            except Exception: pass
+        _cut = ( _dt.datetime.now(_dt.timezone.utc) - _dt.timedelta(hours=24) ).strftime("%Y-%m-%dT%H:%M:%SZ")
+        _rs = [r for r in _rs if r.get("ts","") >= _cut]
+        _d = sum(1 for r in _rs if r.get("status")=="done"); _b = [r for r in _rs if r.get("status")!="done"]
+        print(); hdr(G if not _b else Y, f"RESULTADOS 24 h — {_d} done · {len(_b)} blocked/failed (roadmap/results.jsonl)")
+        for r in _rs[-6:]:
+            print(wrap(f"{r.get('ts','')[11:16]}Z {r.get('task')} {r.get('status')} ({r.get('papel')}) {str(r.get('nota',''))[:60]}", indent=4, first="  "))
     # § COMUNICAÇÃO — eventos obrigatórios × ledger (comunicacao-obrigatoria.sh; derivado, sem LLM)
     _cf = os.path.join(os.path.dirname(rm_p), "..", "terminais", "COMUNICACAO-EM-FALTA.md")
     if os.path.exists(_cf):

@@ -90,9 +90,13 @@ post_steps() {
   _t0=$(date +%s); bash "$(dirname "$0")/diag-24h.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=diag-24h rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
 
   # canal in-band (SendMessage/UDS): endereco por papel + ledger mecanico dos receptores (DIAGNOSTICO-comunicacao-terminais-2026-08-30)
+  _t0=$(date +%s); bash "$(dirname "$0")/deploy-lote.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=deploy-lote rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/enderecos-sync.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=enderecos-sync rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/msg-ledger.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=msg-ledger rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/comunicacao-obrigatoria.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=comunicacao-obrigatoria rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+  _t0=$(date +%s); bash "$(dirname "$0")/queue-derive.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=queue-derive rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+  _t0=$(date +%s); bash "$(dirname "$0")/fila-empurra.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=fila-empurra rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+  _t0=$(date +%s); bash "$(dirname "$0")/tick-acorda.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=tick-acorda rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
 }
 trap post_steps EXIT
 
@@ -130,6 +134,8 @@ def qualifica(pr):
         return None
     if pr.get("reviewDecision") == "APPROVED" and pr.get("mergeStateStatus") == "CLEAN":
         return "APPROVED+CLEAN"
+    if pr.get("reviewDecision") == "CHANGES_REQUESTED":
+        return "CR-NOVO"   # 30/08 (dono): CR novo do bot acorda o DE-COORD — 12 PRs ficaram 5-103 h sem resposta
     if pr.get("mergeStateStatus") in ("DIRTY", "BLOCKED"):
         return "merge-falhou"
     for chk in (pr.get("statusCheckRollup") or []):

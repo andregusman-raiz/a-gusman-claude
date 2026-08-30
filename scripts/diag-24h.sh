@@ -113,6 +113,13 @@ for papel,tt in reg.items():
 print(' '.join(out) or '-')
 PY
 )
+- RESULT records 24 h (roadmap/results.jsonl): $(awk -v s="$SINCE" -F'"' '$4>=s' "$AI/roadmap/results.jsonl" 2>/dev/null | python3 -c "
+import sys,json,collections
+c=collections.Counter()
+for l in sys.stdin:
+    try: c[json.loads(l).get('status')]+=1
+    except Exception: pass
+print(dict(c) or 0)")
 - Comunicação obrigatória (eventos × ledger, graça 15 min): $(bash "$HOME/.claude/scripts/comunicacao-obrigatoria.sh" 2>/dev/null | sed "s/^comunicacao-obrigatoria: //") — detalhe em terminais/COMUNICACAO-EM-FALTA.md
 
 ## 2. Verificação mecânica das recomendações anteriores
