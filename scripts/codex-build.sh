@@ -128,13 +128,27 @@ fi
 # `--` obrigatório (codex-cli >=0.145): sem ele o exec ignora o prompt posicional,
 # lê stdin vazio e sai 0 sem fazer NADA — "success vazio" (gotcha 2026-07-23).
 echo "▶ codex --profile build exec (em $WORKDIR)"
+HEAD_ANTES=$(git -C "$WORKDIR" rev-parse HEAD 2>/dev/null || echo "-")
 CODEX_EXIT=0
 ( cd "$WORKDIR" && codex --profile build exec -- "$PROMPT" ) || CODEX_EXIT=$?
 
-# Guard anti-success-vazio: exec "ok" sem NENHUMA mudança no worktree = falha.
-if [ "$CODEX_EXIT" = "0" ] && [ "$NOWT" != "1" ]; then
+# Guard anti-success-vazio: exec "ok" sem NENHUMA mudança = falha.
+#
+# 2026-08-30: o guard estava condicionado a `[ "$NOWT" != "1" ]`, logo NÃO corria
+# em --no-worktree — exactamente o modo em que mais faz falta. Consequência
+# medida: o Codex recusou construir (conflito entre a SPEC e os guardrails),
+# saiu 0 sem tocar em nada, e o ledger gravou `codex_exit:0` = "build ok".
+# `rev-list @{u}..HEAD` não se aplica sem worktree próprio, mas
+# `status --porcelain` aplica-se sempre: em --no-worktree exige-se CHANGED>0
+# (commits do Codex também deixam rasto porque o HEAD do repo avança —
+# comparado contra o HEAD capturado ANTES do exec).
+if [ "$CODEX_EXIT" = "0" ]; then
   CHANGED=$(git -C "$WORKDIR" status --porcelain | grep -cv "^?? docs/specs/" || true)
-  AHEAD=$(git -C "$WORKDIR" rev-list --count "@{u}..HEAD" 2>/dev/null || git -C "$WORKDIR" rev-list --count "$(git -C "$REPO_ROOT" rev-parse HEAD)..HEAD" 2>/dev/null || echo 0)
+  if [ "$NOWT" = "1" ]; then
+    AHEAD=$([ "$(git -C "$WORKDIR" rev-parse HEAD)" != "$HEAD_ANTES" ] && echo 1 || echo 0)
+  else
+    AHEAD=$(git -C "$WORKDIR" rev-list --count "@{u}..HEAD" 2>/dev/null || git -C "$WORKDIR" rev-list --count "$(git -C "$REPO_ROOT" rev-parse HEAD)..HEAD" 2>/dev/null || echo 0)
+  fi
   if [ "${CHANGED:-0}" = "0" ] && [ "${AHEAD:-0}" = "0" ]; then
     echo "❌ codex exec saiu 0 mas NÃO produziu nenhuma mudança (success vazio) — abortando." >&2
     CODEX_EXIT=97
