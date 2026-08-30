@@ -62,6 +62,40 @@ EOF
   esac
 done
 
+
+# 30/08 (achado do Codex-juiz; 2ª correção 18:3xZ): os passos pós-tick ficavam DEPOIS dos `exit 0` de
+# SEM_TRANSICAO/LOCK_PRESO — o caminho comum — e nunca corriam. Agora correm por `trap ... EXIT` em TODA saída,
+# exceto --help/--dry-run e LOCK_PRESO (SKIP_POST=1). Cada passo regista rc e duração em terminais/tick.log.
+TICK_LOG="$HOME/Claude/docs/ai-state/terminais/tick.log"
+SKIP_POST=0
+post_steps() {
+  [[ "${SKIP_POST:-0}" -eq 1 || "${DRY_RUN:-0}" -eq 1 ]] && return 0
+  local _lk="$HOME/.claude/state/de-fila-tick.post.lock"
+  if ! mkdir "$_lk" 2>/dev/null; then
+    # lock com mais de 9 min = morto (tick anterior travou); senão, outro tick ainda a correr os passos
+    if [[ -n "$(find "$_lk" -maxdepth 0 -mmin +9 2>/dev/null)" ]]; then rmdir "$_lk" 2>/dev/null; mkdir "$_lk" 2>/dev/null || return 0; else return 0; fi
+  fi
+  trap 'rmdir "$_lk" 2>/dev/null' RETURN
+
+  # board-sync: preenche as colunas ROADMAP e PR/STATUS da sidebar (sem LLM; REMOVER-QUANDO no cabecalho dele)
+  _t0=$(date +%s); bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=board-sync rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+
+  # despacho mecanico (dono 29/08): builder ocioso/sem PR com Entrega executavel -> DESPACHO.md + acorda DE-COORD por evento
+  _t0=$(date +%s); DESPACHO=1 bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=board-sync rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+
+  # aprovador humano externo (dono 29/08): PR com reviewer externo pedido e sem approve no head -> WhatsApp via gusman-os (1x por PR/head, horario comercial)
+  _t0=$(date +%s); bash "$(dirname "$0")/de-aprovador-externo.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=de-aprovador-externo rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+
+  # diagnostico diario obrigatorio (dono 30/08): 1x/dia apos 09:00Z gera docs/ai-state/diag/DIAG-24H-<data>.md e acorda OTIMIZADOR/COMANDO por evento
+  _t0=$(date +%s); bash "$(dirname "$0")/diag-24h.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=diag-24h rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+
+  # canal in-band (SendMessage/UDS): endereco por papel + ledger mecanico dos receptores (DIAGNOSTICO-comunicacao-terminais-2026-08-30)
+  _t0=$(date +%s); bash "$(dirname "$0")/enderecos-sync.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=enderecos-sync rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+  _t0=$(date +%s); bash "$(dirname "$0")/msg-ledger.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=msg-ledger rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+  _t0=$(date +%s); bash "$(dirname "$0")/comunicacao-obrigatoria.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=comunicacao-obrigatoria rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+}
+trap post_steps EXIT
+
 if ! command -v gh >/dev/null 2>&1; then
   echo "de-fila-tick: gh CLI ausente -- nada a fazer, saindo limpo (sem alterar snapshot)." >&2
   exit 0
@@ -150,7 +184,7 @@ else:
 PYEOF
 )
 
-echo "$RESULT" | grep -q "^LOCK_PRESO" && { echo "de-fila-tick: $RESULT" >&2; exit 0; }
+echo "$RESULT" | grep -q "^LOCK_PRESO" && { echo "de-fila-tick: $RESULT" >&2; SKIP_POST=1; exit 0; }
 
 if [[ "$RESULT" == "SEM_TRANSICAO" ]]; then
   echo "de-fila-tick: sem transicao que exija julgamento. Nenhuma mensagem enviada."
@@ -173,21 +207,5 @@ TS="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 mkdir -p "$(dirname "$HOOKS_LOG")" 2>/dev/null
 printf '%s · de-fila-tick.sh · %s · %s · %s\n' "$TS" "$DEST_PAPEL" "$SEND_RC" "$NUMS" >> "$HOOKS_LOG" 2>/dev/null || true
 
+
 exit "$SEND_RC"
-
-# board-sync: preenche as colunas ROADMAP e PR/STATUS da sidebar (sem LLM; REMOVER-QUANDO no cabecalho dele)
-bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true
-
-# despacho mecanico (dono 29/08): builder ocioso/sem PR com Entrega executavel -> DESPACHO.md + acorda DE-COORD por evento
-DESPACHO=1 bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true
-
-# aprovador humano externo (dono 29/08): PR com reviewer externo pedido e sem approve no head -> WhatsApp via gusman-os (1x por PR/head, horario comercial)
-bash "$(dirname "$0")/de-aprovador-externo.sh" >/dev/null 2>&1 || true
-
-# diagnostico diario obrigatorio (dono 30/08): 1x/dia apos 09:00Z gera docs/ai-state/diag/DIAG-24H-<data>.md e acorda OTIMIZADOR/COMANDO por evento
-bash "$(dirname "$0")/diag-24h.sh" >/dev/null 2>&1 || true
-
-# canal in-band (SendMessage/UDS): endereco por papel + ledger mecanico dos receptores (DIAGNOSTICO-comunicacao-terminais-2026-08-30)
-bash "$(dirname "$0")/enderecos-sync.sh" >/dev/null 2>&1 || true
-bash "$(dirname "$0")/msg-ledger.sh" >/dev/null 2>&1 || true
-bash "$(dirname "$0")/comunicacao-obrigatoria.sh" >/dev/null 2>&1 || true
