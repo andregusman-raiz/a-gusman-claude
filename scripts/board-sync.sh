@@ -267,6 +267,11 @@ for papel, t in reg.items():
 # REGRA (dono 29/08 19:3xZ): isso e falha de despacho, detectada por maquina; acorda o DE-COORD por evento (nao o dono, nao o RESUMO).
 if os.environ.get("DESPACHO") == "1":
     import hashlib, time
+    # sonda de prod persistida (alimenta o diag-24h: fração do tempo com readiness ≠ 200) — 1 linha por tick, sem LLM
+    try:
+        _rc = subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "-m", "10", os.environ.get("DE_PROD_URL", "https://dataengine.raizeducacao.com.br") + "/health/readiness"], capture_output=True, text=True, timeout=15).stdout.strip()
+        with open(os.path.join(os.path.dirname(rm_p), "PROD-PROBE.jsonl"), "a") as _f: _f.write(json.dumps({"ts": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "readiness": _rc}) + "\n")
+    except Exception: pass
     OCIOSO_MIN = int(os.environ.get("DESPACHO_OCIOSO_MIN", "45"))
     try:
         ws = json.loads(subprocess.run([C, "rpc", "workspace.list", "{}"], capture_output=True, text=True, timeout=10).stdout or "{}")

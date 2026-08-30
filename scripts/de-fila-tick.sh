@@ -183,3 +183,6 @@ DESPACHO=1 bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true
 
 # aprovador humano externo (dono 29/08): PR com reviewer externo pedido e sem approve no head -> WhatsApp via gusman-os (1x por PR/head, horario comercial)
 bash "$(dirname "$0")/de-aprovador-externo.sh" >/dev/null 2>&1 || true
+
+# diagnostico diario obrigatorio (dono 30/08): 1x/dia apos 09:00Z gera docs/ai-state/diag/DIAG-24H-<data>.md e acorda OTIMIZADOR/COMANDO por evento
+bash "$(dirname "$0")/diag-24h.sh" >/dev/null 2>&1 || true
