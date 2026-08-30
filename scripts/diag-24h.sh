@@ -47,7 +47,7 @@ for papel,tt in reg.items():
     sid=tt.get('session_id') or ''
     if not sid: continue
     n=0
-    for f in glob.glob(os.path.expanduser(f'~/.claude/projects/-Users-andregusmandeoliveira-Claude/{sid}*.jsonl')):
+    for f in glob.glob(os.path.expanduser(f'~/.claude/projects/*/{sid}*.jsonl')):
         for l in open(f, errors='ignore'):
             if '"compact' in l and (y in l or t in l): n+=1
     out.append(f"{papel}={n}")
@@ -70,6 +70,13 @@ chk "lead time/idade nas linhas E- (O9)" "$(grep -hcE '^  E-.*(há [0-9]+h|desde
 chk "decisões stale >24h (O10)" "$(grep -oE 'Stale[^:]*: [0-9]+' "$AI/terminais/DECISOES-PENDENTES.md" 2>/dev/null | grep -oE '[0-9]+$')"
 chk "E-44 gate curto — status" "$(grep -hE '^  E-44' "$AI"/roadmap/[a-z]*.md 2>/dev/null | grep -oE '· (em curso|fila|pronta|PRONTA|estacionad[ao])' | head -1)"
 chk "thread-errors em prod (24h)" "$THREADERR"
+chk "TICK pós-passos executados (24h, terminais/tick.log)" "$(awk -v s="$SINCE" '$1 >= s' "$AI/terminais/tick.log" 2>/dev/null | grep -oE 'step=[a-z0-9-]+' | sort | uniq -c | awk '{printf "%s×%s ", $2, $1}')"
+chk "TICK pós-passos com rc≠0 (24h)" "$(awk -v s="$SINCE" '$1 >= s' "$AI/terminais/tick.log" 2>/dev/null | grep -vc 'rc=0' | tr -d ' ')"
+chk "DESPACHO.md idade" "$(python3 -c "import os,time; p='$AI/roadmap/DESPACHO.md'; print(f'{(time.time()-os.path.getmtime(p))/60:.0f} min' if os.path.exists(p) else 'ausente')")"
+chk "REGRA critério temporal ≤30 min + prova causal instalada (dono 30/08)" "$(grep -ciE '30 min.*prova causal|prova causal.*30 min|menor que prova o efeito' "$AI/terminais/ALCADA.md" "$AI/terminais/papeis/_POLITICAS-COMUNS.md" 2>/dev/null | awk -F: '{s+=$2} END{print s+0}') refs"
+chk "REGRA congelamento só merge/deploy, nunca construção instalada (dono 30/08)" "$(grep -ciE 'congelamento.*(nunca|não|nao).*(constru|builder)|bloqueia s[óo] merge' "$AI/terminais/ALCADA.md" "$AI/terminais/papeis/_POLITICAS-COMUNS.md" 2>/dev/null | awk -F: '{s+=$2} END{print s+0}') refs"
+chk "EFEITO: congelamento ativo × builders sem atribuição (DESPACHO)" "auto_merge=$(gh api repos/$REPO --jq '.allow_auto_merge' 2>/dev/null) · builders acusados=$(grep -cE 'ocioso|sem atribui' "$AI/roadmap/DESPACHO.md" 2>/dev/null)"
+chk "EFEITO: janelas/critérios pré-registados >30 min hoje" "$(grep -hoiE '(crit[ée]rio|janela)[^.\n]{0,80}\b([2-9]|[1-9][0-9]) ?h\b' "$L2" "$AI"/de-pr-queue/_incidentes/*/README.md 2>/dev/null | wc -l | tr -d ' ') menções"
 } )
 # ---------- papéis que devem deixar bloco ----------
 PAPEIS=$(python3 -c "import json,os; r=json.load(open(os.path.expanduser('$AI/terminais/registry.json')))['terminais']; print(' '.join(p for p,t in r.items() if t.get('estado')=='aberto' and t.get('tier',9)<=2 and p!='RESUMO'))")
@@ -90,6 +97,22 @@ cat <<EOM
 - Deploys Railway 24 h: $DEPLOYS
 - Prod (sondas do tick): $PRODDOWN · thread-errors 24 h: $THREADERR
 - Roadmap: $ENTTOT Entregas · $ENT
+- Subagentes (delegação controlada, dono 30/08): $(python3 - "$Y" "$TODAY" <<'PY'
+import json,os,glob,sys,re,collections
+y,t=sys.argv[1],sys.argv[2]; reg=json.load(open(os.path.expanduser('~/Claude/docs/ai-state/terminais/registry.json')))['terminais']
+P=os.path.expanduser('~/.claude/projects'); out=[]
+for papel,tt in reg.items():
+    sid=tt.get('session_id')
+    if not sid or tt.get('estado')!='aberto' or tt.get('tier',9)>2: continue
+    n=0; ghosts=0
+    for f in glob.glob(f'{P}/*/{sid}*.jsonl'):
+        for l in open(f,errors='ignore'):
+            if '"tool_use"' in l and '"name":"Agent"' in l and (t in l or y in l): n+=1
+    sub=glob.glob(f'{P}/{sid}/subagents/agent-*.jsonl'); 
+    out.append(f"{papel}={n}")
+print(' '.join(out) or '-')
+PY
+)
 - Comunicação obrigatória (eventos × ledger, graça 15 min): $(bash "$HOME/.claude/scripts/comunicacao-obrigatoria.sh" 2>/dev/null | sed "s/^comunicacao-obrigatoria: //") — detalhe em terminais/COMUNICACAO-EM-FALTA.md
 
 ## 2. Verificação mecânica das recomendações anteriores

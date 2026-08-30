@@ -32,10 +32,11 @@ try:
     for i in c:
         if isinstance(i,dict) and i.get('pr') and i.get('owner'): pr_owner[int(i['pr'])]=i['owner']
 except Exception: pass
-def prdest(n): return {pr_owner[n]} if n in pr_owner else '*'
+def prdest(n): return {pr_owner[n]} if n in pr_owner else {'DE-COORD'}   # PR sem claim = erro de modelagem → DE-COORD, nunca 'qualquer papel'
 # 1) decisões abertas → COMANDO ; decididas → origem
 try:
-    for d in json.load(open(f'{T}/decisoes.json')):
+    _dd=json.load(open(f'{T}/decisoes.json')); _dd=_dd.get('decisoes',_dd) if isinstance(_dd,dict) else _dd
+    for d in [x for x in _dd if isinstance(x,dict) and x.get('id')]:
         a=d.get('aberta_em'); 
         if a and P(a)>=since and d.get('origem')!='COMANDO': ev.append((P(a),f"{d['id']} aberta ({d.get('classe','?')}) por {d.get('origem')}",{'COMANDO'},re.escape(d['id'])))
         de=d.get('decidida_em')
@@ -86,7 +87,7 @@ for ts,name,dest,pat in sorted(ev,key=lambda e:e[0]):
     if r: st=f'✓ {r}'
     elif age<GRACE: st=f'… pendente ({GRACE-int(age)} min)'; pend+=1
     else: st=f'⚠ EM FALTA há {int(age)} min'; falta+=1
-    rows.append(f"| {ts.strftime('%d %H:%M')}Z | {name} | {'/'.join(sorted(dest)) if dest!='*' else 'qualquer papel'} | {st} |")
+    rows.append(f"| {ts.strftime('%d %H:%M')}Z | {name} | {'/'.join(sorted(dest))} | {st} |")
 hdr=f"# COMUNICAÇÃO OBRIGATÓRIA — derivado por comunicacao-obrigatoria.sh {now.strftime('%Y-%m-%dT%H:%MZ')} · 24 h · graça {GRACE} min\n\n**{falta} em falta · {pend} pendentes · {len(ev)-falta-pend} cobertos · {len(ev)} eventos** (ledger: {len(msgs)} msgs = send.log + msg-ledger)\n\n| evento (ts) | o quê | destino obrigatório | estado |\n|---|---|---|---|\n"
 tmp=f'{T}/COMUNICACAO-EM-FALTA.md.tmp'; open(tmp,'w').write(hdr+'\n'.join(rows)+'\n'); os.replace(tmp,f'{T}/COMUNICACAO-EM-FALTA.md')
 print(f'comunicacao-obrigatoria: {falta} em falta · {pend} pendentes · {len(ev)-falta-pend} cobertos · {len(ev)} eventos · ledger {len(msgs)} msgs')

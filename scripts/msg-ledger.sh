@@ -5,7 +5,7 @@
 set -uo pipefail
 python3 - "${MSG_HOURS:-24}" <<'PY'
 import json,glob,os,re,sys,datetime,collections
-H=int(sys.argv[1]); AI=os.path.expanduser('~/Claude/docs/ai-state/terminais'); P=os.path.expanduser('~/.claude/projects/-Users-andregusmandeoliveira-Claude')
+H=int(sys.argv[1]); AI=os.path.expanduser('~/Claude/docs/ai-state/terminais'); P=os.path.expanduser('~/.claude/projects')
 reg=json.load(open(f'{AI}/registry.json'))['terminais']; sid2papel={t['session_id']:p for p,t in reg.items() if t.get('session_id')}
 pid2papel={}
 for f in glob.glob(os.path.expanduser('~/.claude/sessions/*.json')):
@@ -20,7 +20,7 @@ if os.path.exists(led):
 rx=re.compile(r'<cross-session-message from=\\"uds:/tmp/cc-socks/(\d+)\.sock\\"[^>]*>(.*?)</cross-session-message>',re.S)
 new=[]; tot=collections.Counter(); big=0; n=0
 for sid,papel in sid2papel.items():
-    for f in glob.glob(f'{P}/{sid}*.jsonl'):
+    for f in glob.glob(f'{P}/*/{sid}*.jsonl'):
         for l in open(f,errors='ignore'):
             if 'cross-session-message' not in l: continue
             m=re.search(r'"timestamp":"([^"]+)"',l)

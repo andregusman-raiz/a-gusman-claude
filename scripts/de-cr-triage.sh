@@ -78,7 +78,7 @@ GATE_PATTERN='Smoke suite|smoke shard|Alembic single-head|migration drift|Verify
 FILELINE_PATTERN='[A-Za-z0-9_./-]+\.(py|sql|ya?ml|yml|md|ts):[0-9]+'
 PATH_PATTERN='(^|[^A-Za-z0-9_])(app|alembic|scripts|tests)/[A-Za-z0-9_./-]+'
 
-MECANICO=0 SUBST_ARQ=0 SUBST_INF=0 SUBST_CYCLES=0 i=0
+MECANICO=0 SUBST_ARQ=0 SUBST_INF=0 SUBST_REVIEWS=0 i=0
 
 printf '%-3s %-12s %-24s %s\n' "#" "DATA" "CLASSE" "AÇÃO (playbook)"
 printf '%-3s %-12s %-24s %s\n' "---" "------------" "------------------------" "----------------------------------------"
@@ -97,12 +97,12 @@ while IFS=$'\t' read -r submitted body; do
     CLASS="SUBSTANTIVO-ARQUIVO"
     ACAO="calibração 5/5 real (regra 0.5) -> corrigir DIRETO, sem contestar"
     SUBST_ARQ=$((SUBST_ARQ + 1))
-    SUBST_CYCLES=$((SUBST_CYCLES + 1))
+    SUBST_REVIEWS=$((SUBST_REVIEWS + 1))
   else
     CLASS="SUBSTANTIVO-INFERÊNCIA"
     ACAO="calibração 2/2 ERRADA (regra 0.5) -> ler código antes de obedecer; contestar c/ evidência se refutável"
     SUBST_INF=$((SUBST_INF + 1))
-    SUBST_CYCLES=$((SUBST_CYCLES + 1))
+    SUBST_REVIEWS=$((SUBST_REVIEWS + 1))
   fi
 
   DATESHORT=$(cut -c1-10 <<<"$submitted")
@@ -110,11 +110,11 @@ while IFS=$'\t' read -r submitted body; do
 done < <(jq -r '.[] | [.submittedAt, ((.body // "") | gsub("\r\n|\n|\t"; " "))] | @tsv' <<<"$REVIEWS_JSON")
 
 echo
-echo "Resumo: MECÂNICO=$MECANICO  SUBSTANTIVO-ARQUIVO=$SUBST_ARQ  SUBSTANTIVO-INFERÊNCIA=$SUBST_INF  (ciclos substantivos=$SUBST_CYCLES)"
+echo "Resumo: MECÂNICO=$MECANICO  SUBSTANTIVO-ARQUIVO=$SUBST_ARQ  SUBSTANTIVO-INFERÊNCIA=$SUBST_INF  (reviews substantivos=$SUBST_REVIEWS — reviews brutos por push NÃO são rodadas; arbitragem P6 exige arquivo de TESES abertas, não este contador)"
 
-if [[ "$SUBST_CYCLES" -ge 3 ]]; then
+if [[ "$SUBST_REVIEWS" -ge 3 ]]; then
   echo
-  echo "⚠️⚠️⚠️ REGRA DOS 3 CICLOS: $SUBST_CYCLES ciclos substantivos sem convergir neste PR."
+  echo "⚠️ $SUBST_REVIEWS reviews substantivos neste PR (contagem por push, NÃO por tese). Para o P6 (árbitro humano) é preciso listar as TESES ainda abertas — este número sozinho não escala nada (Codex 30/08: reviews brutos ≠ rodadas)."
   echo "    Não insistir em mais um patch incremental — voltar para SPEC/redesign"
   echo "    (mesmo padrão de #6306 e #6301). Ver BOT-REVIEW-BEST-PRACTICES.md seção (iii)."
 fi

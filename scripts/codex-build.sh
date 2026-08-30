@@ -109,6 +109,12 @@ if [ "$DRY" = "1" ]; then
 fi
 
 if [ "$NOWT" = "0" ]; then
+  # 30/08 (Codex-juiz, achado P8): antes de abrir worktree, correr o critério RED/aceite contra o head ATUAL —
+  # se já passa, o build é no-op (caso medido hoje: R4b/R4c/R4d já estavam no main; 3 greps evitavam o ciclo inteiro).
+  if [[ -n "${CBUILD_RED_COMMAND:-}" ]] && (cd "$REPO_ROOT" && bash -c "$CBUILD_RED_COMMAND" >/dev/null 2>&1); then
+    printf 'ALREADY_SATISFIED: CBUILD_RED_COMMAND passa no head atual (%s) — nada a construir.\n' "$(git -C "$REPO_ROOT" rev-parse --short HEAD)" >&2
+    exit 20
+  fi
   git -C "$REPO_ROOT" worktree add "$WT" -b "$BRANCH"
   # SPEC recém-escrita/editada pode não estar commitada — sincroniza no worktree
   if ! cmp -s "$SPEC_ABS" "$WT/$SPEC_REL" 2>/dev/null; then
