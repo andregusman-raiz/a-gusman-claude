@@ -188,7 +188,7 @@ echo "▶ Re-rodando gates localmente (não confio no reporte do Codex)…"
 # ── log auditável ────────────────────────────────────────────────────────────
 printf '{"ts":"%s","spec":"%s","repo":"%s","branch":"%s","worktree":"%s","gates":"%s","codex_exit":%d,"gates_exit":%d}\n' \
   "$(date -u +%FT%TZ)" "$SPEC_REL" "$REPO_ROOT" "$BRANCH" "$([ "$NOWT" = "1" ] && echo "-" || echo "$WT")" \
-  "$(printf '%s' "$GATES" | sed 's/"/\\"/g')" "$CODEX_EXIT" "$GATES_EXIT" >> "$HOME/.codex/handoffs.jsonl"
+  "$(printf '%s' "$GATES" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')" "$CODEX_EXIT" "$GATES_EXIT" >> "$HOME/.codex/handoffs.jsonl"
 
 echo ""
 echo "▶ Próximos passos (rule hybrid-fable-codex, fases 3-4):"
