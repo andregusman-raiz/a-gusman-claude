@@ -71,6 +71,25 @@ UUID=$(echo "$RESOLVE_JSON" | python3 -c 'import json,sys; d=json.load(sys.stdin
 SESSION_ID_ALVO=$(echo "$RESOLVE_JSON" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("session_id") or "")')
 
 [[ -z "$UUID" ]] && { echo "ERRO: workspace vivo nao encontrado para $PAPEL" >&2; exit 3; }
+# Dono 30/08/2026 ("in-messages somente"): sessao Claude -> sessao Claude NAO usa a tela. O canal de tela morre em menu aberto
+# (108 recusas/dia, >=187 min de COMANDO inalcancavel) e pode colidir com o dono a digitar (D-064). Entre sessoes Claude o
+# transporte e SendMessage ao socket do destino (fila, msg_id, notify_when_idle). A tela fica para scripts sem LLM (tick,
+# CLAUDECODE vazio), terminais Codex e o console do dono. Diagnostico: docs/workspace/DIAGNOSTICO-comunicacao-terminais-2026-08-30.md
+if [[ -n "${CLAUDECODE:-}" && -z "${TERMINAL_SEND_TELA_OK:-}" ]]; then
+  SOCK=$(python3 -c "import json,os,sys
+try:
+  e=json.load(open(os.path.expanduser('~/Claude/docs/ai-state/terminais/enderecos.json'))).get('$PAPEL')
+  s=e and e.get('sock'); print(s if s and os.path.exists(s) else '')
+except Exception: print('')" 2>/dev/null)
+  if [[ -n "$SOCK" ]]; then
+    echo "RECUSADO (canal de tela desligado entre sessoes Claude — dono 30/08): envie com a tool SendMessage(to: \"uds:$SOCK\", message: <=200 chars, ponteiro para artefacto). Codex/console do dono continuam pela tela." >&2
+    ORIG=$(python3 -c "import json,os
+r=json.load(open(os.path.expanduser('~/Claude/docs/ai-state/terminais/registry.json')))['terminais']; w=os.environ.get('CMUX_WORKSPACE_ID','')
+print(next((p for p,t in r.items() if t.get('workspace_uuid')==w),'?'))" 2>/dev/null)
+    printf '%s %s-%s from=%s to=%s RECUSADO-TELA-USE-SENDMESSAGE sock=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${ORIG:-?}" "$(date -u +%Y%m%dT%H%M%SZ)" "${ORIG:-?}" "$PAPEL" "$SOCK" >> "$LOG" 2>/dev/null || true
+    exit 6
+  fi
+fi
 
 # --- GUARDA DE MENU ABERTO (unica guarda que sobrevive a F0b) ---
 # Incidente 2026-08-28 (2x): mensagem enviada a um terminal com AskUserQuestion

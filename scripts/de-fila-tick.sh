@@ -174,3 +174,20 @@ mkdir -p "$(dirname "$HOOKS_LOG")" 2>/dev/null
 printf '%s · de-fila-tick.sh · %s · %s · %s\n' "$TS" "$DEST_PAPEL" "$SEND_RC" "$NUMS" >> "$HOOKS_LOG" 2>/dev/null || true
 
 exit "$SEND_RC"
+
+# board-sync: preenche as colunas ROADMAP e PR/STATUS da sidebar (sem LLM; REMOVER-QUANDO no cabecalho dele)
+bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true
+
+# despacho mecanico (dono 29/08): builder ocioso/sem PR com Entrega executavel -> DESPACHO.md + acorda DE-COORD por evento
+DESPACHO=1 bash "$(dirname "$0")/board-sync.sh" >/dev/null 2>&1 || true
+
+# aprovador humano externo (dono 29/08): PR com reviewer externo pedido e sem approve no head -> WhatsApp via gusman-os (1x por PR/head, horario comercial)
+bash "$(dirname "$0")/de-aprovador-externo.sh" >/dev/null 2>&1 || true
+
+# diagnostico diario obrigatorio (dono 30/08): 1x/dia apos 09:00Z gera docs/ai-state/diag/DIAG-24H-<data>.md e acorda OTIMIZADOR/COMANDO por evento
+bash "$(dirname "$0")/diag-24h.sh" >/dev/null 2>&1 || true
+
+# canal in-band (SendMessage/UDS): endereco por papel + ledger mecanico dos receptores (DIAGNOSTICO-comunicacao-terminais-2026-08-30)
+bash "$(dirname "$0")/enderecos-sync.sh" >/dev/null 2>&1 || true
+bash "$(dirname "$0")/msg-ledger.sh" >/dev/null 2>&1 || true
+bash "$(dirname "$0")/comunicacao-obrigatoria.sh" >/dev/null 2>&1 || true
