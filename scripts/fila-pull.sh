@@ -10,6 +10,18 @@ python3 - "$Q" "$R" "$PA" "$PEEK" <<'PY'
 import sys,json,fcntl,datetime,os
 q,r,papel,peek=sys.argv[1:5]
 done={ (json.loads(l).get("task") or "") for l in open(r) if '"done"' in l } if os.path.exists(r) else set()
+# 30/08 23:4xZ: o estado DERIVA do ultimo RESULT (regra em _POLITICAS-COMUNS), mas o pull so lia a fila.
+# Caso medido: E-35b 'bloqueada' em fila-funil e 'fila' em fila-prontidao (o filas-sync criou a 2a row);
+# o ultimo RESULT e blocked, e o pull ia oferece-la ao FUNIL — que foi quem a devolveu bloqueada.
+# Ultimo RESULT por task; se for blocked/failed, a task nao e puxavel em fila NENHUMA ate haver RESULT novo.
+ult={}
+if os.path.exists(r):
+    for l in open(r):
+        try: d=json.loads(l)
+        except Exception: continue
+        k=d.get("task") or d.get("tarefa")
+        if k: ult[k]=(d.get("estado") or d.get("status") or "")
+travadas={k for k,v in ult.items() if v in ("blocked","failed")}
 with open(q,"r+") as fh:
     fcntl.flock(fh,fcntl.LOCK_EX)
     rows=[json.loads(l) for l in fh if l.strip()]
@@ -23,6 +35,7 @@ with open(q,"r+") as fh:
         # a E-10, que a linha do roadmap marca como DE-DATA, e teve de a devolver como blocked.
         # A frente NAO e o builder: fila-funil tem seccao do DE e seccao do consumidor.
         # So filtra quando o campo esta preenchido — tarefa sem sugestao continua a ser de quem chegar.
+        if (row.get("task") or "") in travadas: continue   # ultimo RESULT blocked/failed: nao se oferece
         bs=(row.get("builder_sugerido") or "")
         if bs and papel not in bs: continue
         deps=row.get("depende_de") or []
