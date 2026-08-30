@@ -48,7 +48,18 @@ entregas = [l.strip() for l in rm if l.startswith("  E-")]
 
 PAPEIS_RE = re.compile(r"\b(" + "|".join(sorted((re.escape(k) for k in reg.keys()), key=len, reverse=True)) + r")\b")
 def dono_da_entrega(e):
+    # 30/08: era PAPEIS_RE.search(head) — devolvia o PRIMEIRO nome de papel em QUALQUER sitio da
+    # linha, prosa incluida. A E-45 diz "(pedido do FUNIL 27/08...)" e ia para o FUNIL, que e o
+    # REQUERENTE; o executor e o DE-DATA. Casar TEXTO onde se devia ler RELACAO.
+    # O roadmap ja poe o dono num CAMPO POSICIONAL: "E-22 · <desc> · DE-DATA · fila".
+    # Le-se o campo: segmento cujas partes (separadas por /) sao TODAS nomes de papel. Prosa nunca
+    # qualifica, porque traz outras palavras. Fallback ao comportamento antigo se nao houver campo.
     head = e.split(" · prova:")[0]
+    for seg in reversed([s.strip() for s in head.split("·")]):
+        if not seg: continue
+        partes = [x.strip() for x in seg.split("/") if x.strip()]
+        if partes and all(x in reg for x in partes):
+            return partes[0]
     m = PAPEIS_RE.search(head); return m.group(1) if m else None
 def entregas_de(papel, apoio=True):
     out = []
