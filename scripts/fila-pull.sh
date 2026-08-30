@@ -18,6 +18,13 @@ with open(q,"r+") as fh:
         if row.get("status")!="fila": continue
         if (row.get("task") or "") in done:
             row["status"]="done"; continue   # reconcilia rótulo velho com results.jsonl
+        # 30/08: o fila-empurra ja filtrava por builder_sugerido (fila_empurra.py:54-56) e o pull
+        # nao filtrava nada — puxava a 1a elegivel fosse de quem fosse. Efeito medido: o FUNIL puxou
+        # a E-10, que a linha do roadmap marca como DE-DATA, e teve de a devolver como blocked.
+        # A frente NAO e o builder: fila-funil tem seccao do DE e seccao do consumidor.
+        # So filtra quando o campo esta preenchido — tarefa sem sugestao continua a ser de quem chegar.
+        bs=(row.get("builder_sugerido") or "")
+        if bs and papel not in bs: continue
         deps=row.get("depende_de") or []
         if all(d in done for d in deps): pick=row; break
     if not pick:
