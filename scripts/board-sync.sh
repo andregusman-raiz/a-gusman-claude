@@ -151,7 +151,12 @@ try:
     _cl = json.load(open(os.path.join(os.path.dirname(snap_p), "claims.json"))).get("claims", {})
     for br, c in (_cl.items() if isinstance(_cl, dict) else []):
         if not isinstance(c, dict): continue
-        term = c.get("terminal")
+        # 30/08: o produtor passou a escrever `owner` (1 -> 6 preenchidos hoje) e este consumidor
+        # so lia `terminal`. Claim sem `terminal` caia na heuristica de tokens WS-n do branch, e o
+        # #6402 (owner=DE-DATA, branch fix/ws0b-...) era atribuido ao 1o papel do registry com WS-0:
+        # o DE-DATA aparecia "sem PR aberto" e outro papel levava credito de PR alheio.
+        # A28(a) ja dizia que o vinculo papel<->PR "vem do claims.json e so de la".
+        term = c.get("owner") or c.get("terminal")
         if term in reg: claims_by_branch[br] = term
         if term in reg and str(c.get("pr") or "").isdigit(): claims_by_pr[int(c["pr"])] = term
 except Exception: pass
