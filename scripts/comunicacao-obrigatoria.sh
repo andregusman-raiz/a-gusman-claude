@@ -21,10 +21,19 @@ if os.path.exists(f'{T}/msg-ledger.jsonl'):
         except: continue
         if e['ts']>=since.isoformat(): msgs.append((P(e['ts']),e['from'],e['to'],e.get('preview','')))
 def ok(ts,dest,pat):
+    # 30/08: o limite superior era ts+GRACE, logo responder TARDE nunca limpava o alarme — o evento
+    # ficava EM FALTA para sempre mesmo respondido (caso medido: #6177, evento 14:44Z, resposta
+    # 19:25:08Z do DE-COORD ao DE-BUILD-B citando #6177, destino certo, e continuava "EM FALTA ha
+    # 311 min"). A metrica media "nao respondido DENTRO do prazo" e era lida como "em falta", nunca
+    # podia chegar a zero, e depois do prazo nao havia incentivo nenhum para responder.
+    # Agora sao DUAS perguntas separadas: houve resposta? (sem limite superior) e veio a tempo? (GRACE).
     lim=ts+dt.timedelta(minutes=GRACE); rx=re.compile(pat,re.I)
+    achou=None
     for mt,f,t,x in msgs:
-        if ts-dt.timedelta(minutes=2)<=mt<=lim and (dest=='*' or t in dest) and rx.search(x): return f'{f}→{t} {mt.strftime("%H:%M")}Z'
-    return None
+        if ts-dt.timedelta(minutes=2)<=mt and (dest=='*' or t in dest) and rx.search(x):
+            marca='' if mt<=lim else ' (tarde)'
+            if achou is None or mt<achou[0]: achou=(mt,f'{f}→{t} {mt.strftime("%H:%M")}Z{marca}')
+    return achou[1] if achou else None
 ev=[]  # (ts, evento, destino, padrao)
 pr_owner={}
 try:
@@ -35,6 +44,8 @@ except Exception: pass
 def prdest(n): return {pr_owner[n]} if n in pr_owner else {'DE-COORD'}   # PR sem claim = erro de modelagem → DE-COORD, nunca 'qualquer papel'
 # 1) decisões abertas → COMANDO ; decididas → origem
 try:
+    _sz=os.path.getsize(f'{T}/decisoes.json')
+    if _sz>50*1024*1024: raise RuntimeError(f'decisoes.json com {_sz//1048576} MB — não carregado (30/08: ficha D-093 com 3,5 GB); fonte de decisões ignorada até reparo')
     _dd=json.load(open(f'{T}/decisoes.json')); _dd=_dd.get('decisoes',_dd) if isinstance(_dd,dict) else _dd
     for d in [x for x in _dd if isinstance(x,dict) and x.get('id')]:
         a=d.get('aberta_em'); 
