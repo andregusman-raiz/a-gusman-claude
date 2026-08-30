@@ -29,7 +29,27 @@
 - **Decisões fechadas**: arquitetura, nomes, contratos, schema — zero "a definir"/"TBD"
 - **Critérios de aceite verificáveis** (comando + resultado esperado)
 - **Gates do repo** explícitos (typecheck/lint/test do projeto)
-- **Escopo negativo**: o que NÃO tocar
+- **Escopo negativo**: o que NÃO tocar — e cada proibição carrega a sua **cláusula de fuga**:
+  *"se cumprir esta proibição tornar o critério de aceite insatisfazível, PARA e traz a pergunta —
+  não entregues a versão que cabe na proibição."*
+  Razão (medida em 2026-08-30, 6 defeitos de SPEC numa frente): a cláusula geral
+  "ambiguidade → devolve perguntas" **não dispara em proibição**, porque proibição não é ambígua —
+  é clara, e é a clareza que a torna perigosa. O executor não tem nada a esclarecer, tem regra
+  explícita a cumprir; entrega o que cabe na proibição e o defeito nasce silencioso.
+  O gatilho é ancorado em **"o critério torna-se insatisfazível"** (verificável por quem obedece
+  à risca), não em "a solução correta exige" (juízo, que o executor literal não faz).
+- **Distinguir os dois tipos de proibição**, porque o executor cumpre ambas igual:
+  *"não decidas isto"* (podes tocar, a escolha é de quem especifica) × *"não toques nisto"*
+  (fora de alcance). Escrever a segunda quando se quer a primeira é o que fabrica a lacuna.
+- **O que a cláusula de fuga NÃO apanha** (declarado para ninguém a tomar por suficiente):
+  ela exige que o executor **detecte** a insatisfazibilidade, e isso só é possível com
+  **conflito aberto** — a proibição a chocar de frente com o critério, visível no ASSESS.
+  O caso oposto não lhe é detectável por construção: o executor cumpre, entrega, e satisfaz
+  a **letra** de tudo, porque a SPEC proibia uma coisa e nunca exigiu a outra que era precisa
+  (caso medido: proibido mexer na lista de `testIgnore`, e a SPEC nunca disse que o spec tinha
+  de sair da suíte mock; o defeito só apareceu ao correr o conjunto inteiro).
+  **Par completo, e nenhuma metade substitui a outra**: cláusula de fuga para o visível;
+  gates próprios de quem especifica, sobre a suíte COMPLETA, para o invisível.
 
 ## Guardrails anti-destrutivos (cbuild injeta SEMPRE no prompt)
 

@@ -31,6 +31,26 @@ grep -qiE "crit[ée]rios? de aceite|acceptance criteria" "$SPEC_ABS" \
   || lint_fail="$lint_fail\n  - sem seção de critérios de aceite"
 grep -qiE "escopo negativo|n[aã]o tocar|out of scope|do not touch" "$SPEC_ABS" \
   || lint_fail="$lint_fail\n  - sem escopo negativo (o que NÃO tocar)"
+
+# Verde falso medido 2026-08-30: os greps acima varrem o FICHEIRO INTEIRO, logo uma
+# SPEC com N work-streams passa se apenas UM deles tiver escopo negativo. Presença
+# no ficheiro não é presença na secção. Quando houver >=2 work-streams, exigir os
+# marcadores em CADA um. Abaixo de 2, mantém-se o comportamento antigo.
+ws_lint="$(awk '
+  /^#{2,4}[[:space:]]*(WS-|E-[0-9]|Onda[[:space:]]|Fase[[:space:]])/ {
+    if (n > 0) { if (!ac[n]) falta = falta " " nome[n] ":aceite"; if (!en[n]) falta = falta " " nome[n] ":escopo-negativo" }
+    n++; nome[n] = $0; sub(/^#+[[:space:]]*/, "", nome[n]); sub(/[[:space:]].*$/, "", nome[n]); next
+  }
+  n > 0 && tolower($0) ~ /crit[eé]rios? de aceite|acceptance criteria/ { ac[n] = 1 }
+  n > 0 && tolower($0) ~ /escopo negativo|n[aã]o tocar|out of scope|do not touch/ { en[n] = 1 }
+  END {
+    if (n > 0) { if (!ac[n]) falta = falta " " nome[n] ":aceite"; if (!en[n]) falta = falta " " nome[n] ":escopo-negativo" }
+    if (n >= 2 && falta != "") print falta
+  }
+' "$SPEC_ABS")"
+if [ -n "$ws_lint" ]; then
+  lint_fail="$lint_fail\n  - work-streams sem marcador PRÓPRIO (presença no ficheiro != na secção):$ws_lint"
+fi
 if grep -qiE "\bTBD\b|a definir" "$SPEC_ABS"; then
   lint_fail="$lint_fail\n  - contém 'TBD'/'a definir' (decisões não fechadas)"
 fi

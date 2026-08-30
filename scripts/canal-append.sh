@@ -154,6 +154,43 @@ LOG_DIA="$Q/log/${HOJE}.md"
 # silencio). Carimbado 1x aqui, reutilizado pelos dois ramos.
 TS="$(date -u +'%Y-%m-%d %H:%M')"
 
+# --- GUARDA DE CARIMBO (2026-08-30): hora escrita a mao no CORPO que diverge do relogio.
+# Nao bloqueia; avisa em stderr no momento da escrita. Duas vezes em dois dias alguem
+# escreveu HH:MMZ de cabeca (15h e 19 min de deriva) e DERIVOU numeros dessa hora falsa.
+# O carimbo automatico do canal esta certo; o perigo e a hora no meio da frase.
+_agora_min=$(( 10#$(date -u +%H) * 60 + 10#$(date -u +%M) ))
+while read -r _hm; do
+  [ -z "$_hm" ] && continue
+  _h=${_hm%%:*}; _m=${_hm#*:}; _m=${_m%Z}
+  _t=$(( 10#$_h * 60 + 10#$_m ))
+  _d=$(( _t > _agora_min ? _t - _agora_min : _agora_min - _t ))
+  [ "$_d" -gt 10 ] && echo "AVISO carimbo: o corpo diz ${_hm} e agora sao $(date -u +%H:%MZ) (${_d} min de diferenca). Se derivaste numeros dessa hora, re-deriva." >&2
+
+done <<< "$( printf "%s" "${TEXTO:-}" | grep -oE '([01][0-9]|2[0-3]):[0-5][0-9]Z' | sort -u)"
+# ── cap de tamanho (T-a do DIAG-24H 2026-08-30) ──────────────────────────────
+# Medido no log de 2026-08-30: 81 entradas, 78.228 palavras; as 5 MAIORES somam
+# 30% do total. A cauda e o problema, nao a entrada de 350 palavras.
+# Faseado de proposito: BLOQUEIA so o extremo inequivoco (>2000 palavras SEM
+# citar ficheiro — eram 3 de 81, cumprir custa quase nada) e AVISA a partir de
+# 300 para medir adopcao antes de apertar. Bloquear a 300 hoje recusaria 34 de
+# 81 entradas, que e partir o fluxo que se quer corrigir (licao ja paga: gate
+# que exige marcador com adopcao zero).
+_wc=$(printf '%s' "$TEXTO" | wc -w | tr -d ' ')
+if [ "$_wc" -gt 300 ]; then
+  echo "AVISO tamanho: ${_wc} palavras. Acima de 300 o sitio do conteudo e um artefacto; aqui fica o ponteiro." >&2
+fi
+if [ "$_wc" -gt 2000 ] && ! printf '%s' "$TEXTO" | grep -qE '(docs/|\.claude/|~/|/[a-z_]+/[a-z_.-]+\.(md|json|jsonl|sh|py))'; then
+  if [ "${CANAL_CAP_DISABLED:-0}" = "1" ]; then
+    echo "AVISO: cap de ${_wc} palavras ignorado por CANAL_CAP_DISABLED=1." >&2
+  else
+    echo "BLOQUEADO: ${_wc} palavras sem citar nenhum ficheiro." >&2
+    echo "  Escreve o conteudo num artefacto (docs/...) e poe aqui o ponteiro." >&2
+    echo "  Emergencia: CANAL_CAP_DISABLED=1 no comando." >&2
+    exit 3
+  fi
+fi
+
+
 case "$CANAL" in
   PEDIDOS) FILE="$Q/PEDIDOS.md" ;;
   LOG) FILE="$LOG_DIA" ;;
