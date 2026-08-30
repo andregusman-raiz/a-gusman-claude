@@ -157,7 +157,17 @@ CODEX_EXIT=0
 # (commits do Codex também deixam rasto porque o HEAD do repo avança —
 # comparado contra o HEAD capturado ANTES do exec).
 if [ "$CODEX_EXIT" = "0" ]; then
-  CHANGED=$(git -C "$WORKDIR" status --porcelain | grep -cv "^?? docs/specs/" || true)
+  # Ficheiros que NUNCA são produto de um build têm de sair da conta, senão
+  # tornam CHANGED permanentemente >=1 e o guard fica incapaz de detectar vazio.
+  # Medido 2026-08-30, na PRIMEIRA corrida do próprio guard: `.claude/AUTO_CONTEXT.md`
+  # é reescrito por hook a cada evento de sessão, logo estava sempre modificado —
+  # o Codex recusou construir, não commitou nada, e o guard deixou passar.
+  # A exclusão é NOMEADA e ecoada: um filtro silencioso reintroduz o mesmo problema
+  # noutro sítio.
+  CHANGED_RAW=$(git -C "$WORKDIR" status --porcelain | grep -v "^?? docs/specs/" || true)
+  CHANGED_IGN=$(printf '%s\n' "$CHANGED_RAW" | grep -cE "\.claude/AUTO_CONTEXT\.md$" || true)
+  CHANGED=$(printf '%s\n' "$CHANGED_RAW" | grep -cvE "^$|\.claude/AUTO_CONTEXT\.md$" || true)
+  [ "${CHANGED_IGN:-0}" != "0" ] && echo "▶ guard: $CHANGED_IGN ficheiro(s) gerado(s) pelo harness excluído(s) da contagem"
   if [ "$NOWT" = "1" ]; then
     AHEAD=$([ "$(git -C "$WORKDIR" rev-parse HEAD)" != "$HEAD_ANTES" ] && echo 1 || echo 0)
   else
