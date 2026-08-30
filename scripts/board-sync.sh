@@ -30,7 +30,7 @@ rm = open(rm_p, encoding="utf-8").read().splitlines() if os.path.exists(rm_p) el
 # rev 6 (29/08): ROADMAP.md e INDICE; as Entregas vivem em roadmap/<programa>.md. Concatena na ordem em que o indice
 # os cita (linhas "· roadmap/<x>.md ·"); ficheiros nao citados entram depois, por nome. Cada programa vira "## <programa>".
 _dir = os.path.dirname(rm_p); _cit = re.findall(r"roadmap/([a-z0-9_-]+)\.md", "\n".join(rm))
-_all = sorted(f[:-3] for f in os.listdir(_dir) if f.endswith(".md") and f not in ("ROADMAP.md", "ENTREGAS.md", "MEDICOES.md", "DESPACHO.md") and not f.startswith("_"))
+_all = sorted(f[:-3] for f in os.listdir(_dir) if f.endswith(".md") and f[0].islower())  # programas = minusculos; indices/derivados (ROADMAP, DESPACHO, MUDOU, MEDICOES) e _intake ficam fora
 for prog in [c for c in _cit if c in _all] + [a for a in _all if a not in _cit]:
     try: body = open(os.path.join(_dir, prog + ".md"), encoding="utf-8").read().splitlines()
     except Exception: continue
