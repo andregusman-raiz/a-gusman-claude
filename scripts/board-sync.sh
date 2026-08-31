@@ -218,6 +218,40 @@ def short_status(p):
     if rd == "APPROVED" and falta_humana(p): return "APPROVED(bot) · falta review DE-MIG"
     if rd == "APPROVED": return f"APPROVED · {ms}"
     return f"aguarda review · {ms}"
+# 30/08 23:0xZ (auditoria do FUNIL: "board seletivamente atual"): a linha E- do .md é PROSA de várias mãos e nunca recebe
+# retratações; estado/prova/bloqueio vivem em results.jsonl (último registro vale) e filas/*.jsonl. O board passa a
+# DERIVAR o estado dessas fontes, cortar a prosa no título e carimbar a idade do texto (git blame) — nunca mais
+# mostra "· fila/pronta/em curso" nem "prova:/bloqueio:" escritos à mão.
+import subprocess as _sp, glob as _gl
+_ult = {}   # task -> último result
+try:
+    for _l in open(os.path.join(os.path.dirname(rm_p), "results.jsonl"), encoding="utf-8"):
+        try: _e = json.loads(_l); _ult[_e["task"]] = _e
+        except Exception: pass
+except Exception: pass
+_fila = {}  # task -> row da fila
+for _q in _gl.glob(os.path.join(os.path.dirname(rm_p), "filas", "fila-*.jsonl")):
+    for _l in open(_q, encoding="utf-8"):
+        try: _r = json.loads(_l); _fila[_r["task"]] = _r
+        except Exception: pass
+_blame = {}  # (prog, eid) -> idade em horas do texto da linha
+try:
+    for _prog in _all:
+        _f = os.path.join(_dir, _prog + ".md")
+        _out = _sp.run(["git", "blame", "--line-porcelain", "--", _f], cwd=os.path.expanduser("~/Claude"), capture_output=True, text=True, timeout=30).stdout
+        _t = None
+        for _ln in _out.splitlines():
+            if _ln.startswith("author-time "): _t = int(_ln.split()[1])
+            elif _ln.startswith("\t  E-") and _t:
+                _eid = _ln[1:].strip().split(" ")[0]; _blame[(_prog, _eid)] = (datetime.datetime.now(datetime.timezone.utc).timestamp() - _t) / 3600
+except Exception: pass
+def estado_derivado(eid):
+    r = _ult.get(eid); f = _fila.get(eid) or {}
+    if r and r.get("status") == "done": return "PRONTA", r
+    if r and r.get("status") in ("blocked", "failed"): return "BLOQUEADA", r
+    if r and r.get("status") == "retracted": return "RETRATADA", r
+    st = f.get("status", "")
+    return {"puxada": "EM CURSO", "done": "PRONTA", "bloqueada": "BLOQUEADA", "estacionada": "ESTACIONADA"}.get(st, "FILA"), None
 road = [f"{prod} · QUANTO FALTA {quanto[:70]}", f"DECISÃO DA VEZ: {decisao[:90] or '—'}", ""]
 # percorre o ROADMAP na ordem: faixas (## ...), contadores por faixa, marcos, caminho crítico, Entregas
 for l in rm:
@@ -230,12 +264,30 @@ for l in rm:
     elif l.startswith("  P") and "✅" in l or l.startswith("  P") and "⏳" in l:
         road.append("    " + l.strip())
     elif l.startswith("  E-"):
-        e = l.strip(); head = e.split(" · prova:")[0]; parts = head.split(" · "); eid = parts[0]; resto = " · ".join(parts[1:])
-        prova = e.split(" · prova:")[1].strip() if " · prova:" in e else ""
+        e = l.strip(); parts = e.split(" · "); eid = parts[0]; titulo = (parts[1] if len(parts) > 1 else "").strip()[:90].rstrip(" ·")
+        est, r = estado_derivado(eid)
         prs_e = sorted(by_entrega.get(eid, []), key=lambda p: p.get("updatedAt", ""), reverse=True)
+        if r:   # PR citado no RESULT (campo pr ou "#NNNN" na nota) também conta como PR da Entrega
+            _nums = {str(r.get("pr") or "").strip()} | set(re.findall(r"#(\d{4,5})", str(r.get("nota", "")) + " " + str(r.get("prova_cmd", ""))))
+            _nums = {n for n in _nums if n}
+            _known = {str(p["number"]) for p in prs_e}
+            for _p in prs:
+                if str(_p["number"]) in _nums and str(_p["number"]) not in _known: prs_e.append(_p)
+            # `prs` só tem PRs ABERTOS: alerta só quando o PR citado ainda está aberto (merged/closed não aparecem aqui)
+            if est == "PRONTA" and any(str(p["number"]) in _nums for p in prs):
+                est = "PRONTA ⚠ PR ainda aberto (prova antes do merge?)"
         prtxt = " | ".join(f"#{p['number']} {short_status(p)} @{(p.get('headRefOid') or '')[:7]}" for p in prs_e[:2]) or "sem PR"
-        road.append(f"{eid:<5} {resto}")
-        road.append(f"      → {prtxt}" + (f" · prova: {prova}" if prova else ""))
+        _prog_atual = next((x[3:].split(" — ")[0].replace("PROGRAMA ", "").strip() for x in reversed(rm[:rm.index(l)+1]) if x.startswith("## PROGRAMA")), "")
+        _age = _blame.get((_prog_atual, eid)); _agetxt = f"texto há {_age:.0f}h" if _age is not None else "texto s/ carimbo"
+        _pux = _fila.get(eid, {}).get("puxada_por"); _quem = f" · {_pux}" if _pux and est == "EM CURSO" else ""
+        road.append(f"{eid:<5} {titulo} · {est}{_quem} · {_agetxt}")
+        if r: road.append(f"      → RESULT {r.get('status')} {r.get('papel')} {str(r.get('ts',''))[5:16]}Z: {str(r.get('nota') or r.get('prova_cmd') or '')[:110]}")
+        road.append(f"      → {prtxt}")
+_no_md = [t for t in _ult if t.startswith("E-") and not any(x.strip().startswith(t + " ") or x.strip().startswith(t + " ·") for x in entregas)]
+if _no_md:
+    road.append(""); road.append("§ RESULTS sem linha no roadmap (fatias/extras)")
+    for t in sorted(_no_md):
+        r = _ult[t]; road.append(f"{t:<7} {r.get('status')} {r.get('papel')} {str(r.get('ts',''))[5:16]}Z: {str(r.get('nota') or '')[:100]}")
 if not entregas: road.append("— ROADMAP.md sem linhas E- —")
 road_txt = "\n".join(road)
 
@@ -285,8 +337,11 @@ if os.environ.get("DESPACHO") == "1":
     import hashlib, time
     # sonda de prod persistida (alimenta o diag-24h: fração do tempo com readiness ≠ 200) — 1 linha por tick, sem LLM
     try:
-        _rc = subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "-m", "10", os.environ.get("DE_PROD_URL", "https://dataengine.raizeducacao.com.br") + "/health/readiness"], capture_output=True, text=True, timeout=15).stdout.strip()
-        with open(os.path.join(os.path.dirname(rm_p), "PROD-PROBE.jsonl"), "a") as _f: _f.write(json.dumps({"ts": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "readiness": _rc}) + "\n")
+        # 31/08 (apagão 11:35–11:56Z: só tínhamos o código): grava DNS/TCP/IP separados para distinguir "resolução daqui" de "edge recusa"
+        _out = subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code} %{time_namelookup} %{time_connect} %{time_total} %{remote_ip}", "-m", "10", os.environ.get("DE_PROD_URL", "https://dataengine.raizeducacao.com.br") + "/health/readiness"], capture_output=True, text=True, timeout=15).stdout.strip().split()
+        _rc = _out[0] if _out else "ERR"
+        _rec = {"ts": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "readiness": _rc, "namelookup_s": (_out[1] if len(_out) > 1 else None), "connect_s": (_out[2] if len(_out) > 2 else None), "total_s": (_out[3] if len(_out) > 3 else None), "remote_ip": (_out[4] if len(_out) > 4 else None), "observador": "laptop-dono"}
+        with open(os.path.join(os.path.dirname(rm_p), "PROD-PROBE.jsonl"), "a") as _f: _f.write(json.dumps(_rec) + "\n")
     except Exception: pass
     OCIOSO_MIN = int(os.environ.get("DESPACHO_OCIOSO_MIN", "45"))
     try:
@@ -300,7 +355,12 @@ if os.environ.get("DESPACHO") == "1":
             d = datetime.datetime.fromisoformat(ts.replace("Z", "+00:00"))
             return int((datetime.datetime.now(datetime.timezone.utc) - d).total_seconds() // 60)
         except Exception: return None
-    STATUS_EXEC = ("· fila", "· em curso")
+    # E-49 (31/08): antes lia STATUS_EXEC = ("· fila", "· em curso") no TEXTO da linha do roadmap
+    # -- rotulo de prosa, que sobrevive a entrega ja feita se ninguem reescrever a linha. filas-
+    # sync.sh:47 ja tem a regra "rotulo do .md nao vale como estado; results.jsonl decide"; aqui
+    # reusa-se estado_derivado(eid), a mesma funcao que a impressao do board ja usa, em vez de
+    # duplicar/ignorar essa regra. Custo medido: FUNIL acusado de 244min ocioso citando 2 Entregas
+    # que ele proprio entregara na vespera (E-10/E-19), porque a linha do roadmap nunca foi reescrita.
     achados = []
     for papel, t in reg.items():
         if t.get("tier", 9) not in (1, 2) or t.get("estado") != "aberto" or not t.get("workspace_uuid"): continue
@@ -308,8 +368,18 @@ if os.environ.get("DESPACHO") == "1":
         execs = []
         for e in entregas:
             head = e.split(" · prova:")[0]
-            if dono_da_entrega(e) != papel or "estacionad" in head: continue
-            if any(k in head for k in STATUS_EXEC): execs.append(head.split(" · ")[0])
+            if dono_da_entrega(e) != papel: continue
+            eid = head.split(" · ")[0]
+            est, _ = estado_derivado(eid)
+            if est not in ("FILA", "EM CURSO"): continue
+            # E-49 cont. (31/08, achado do DE-COORD apos o fix inicial): FILA/EM CURSO nao bastam --
+            # fora_da_janela=True e depende_de nao satisfeito sao campos da MESMA fila, e um deles
+            # ja acusou o FUNIL de ocioso citando E-12 (fora_da_janela=True, depende_de=[E-4] bloqueada).
+            fq = _fila.get(eid) or {}
+            if fq.get("fora_da_janela"): continue
+            deps = fq.get("depende_de") or []
+            if any(estado_derivado(d)[0] != "PRONTA" for d in deps): continue
+            execs.append(eid)
         meus_prs = [p["number"] for p in prs if pr_papel.get(p["number"]) == papel]
         if os.environ.get("DRY_RUN") == "1": print(f"  {papel:<10} idle={im}min execs={execs} prs={meus_prs}")
         if not execs: continue
@@ -374,7 +444,7 @@ if os.environ.get("PRINT") == "1":
             try: _rs.append(json.loads(_l))
             except Exception: pass
         _cut = ( _dt.datetime.now(_dt.timezone.utc) - _dt.timedelta(hours=24) ).strftime("%Y-%m-%dT%H:%M:%SZ")
-        _rs = [r for r in _rs if r.get("ts","") >= _cut]
+        _rs = [r for r in _rs if r.get("ts","") >= _cut and not str(r.get("task","")).lower().startswith("posto") and r.get("status") != "posto"]
         _d = sum(1 for r in _rs if r.get("status")=="done"); _b = [r for r in _rs if r.get("status")!="done"]
         print(); hdr(G if not _b else Y, f"RESULTADOS 24 h — {_d} done · {len(_b)} blocked/failed (roadmap/results.jsonl)")
         for r in _rs[-6:]:
