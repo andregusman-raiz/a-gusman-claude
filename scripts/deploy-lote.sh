@@ -16,7 +16,33 @@ cd "$REPO_DIR" 2>/dev/null || { echo "$now deploy-lote: repo ausente $REPO_DIR" 
 git fetch -q origin main "$REL" 2>/dev/null || { echo "$now deploy-lote: fetch falhou (branch $REL existe?)" >> "$LOG"; exit 1; }
 MAIN=$(git rev-parse origin/main); CUR=$(git rev-parse "origin/$REL" 2>/dev/null || echo "")
 [[ -z "$CUR" ]] && { echo "$now deploy-lote: origin/$REL inexistente — criar primeiro (SPEC §1.1)" >> "$LOG"; exit 1; }
-[[ "$MAIN" == "$CUR" ]] && exit 0                                   # nada novo
+if [[ "$MAIN" == "$CUR" ]]; then
+  # 30/08 21:59Z: lote 49cec9eb FAILED e o batcher não tinha re-tentativa — pipeline parava até ao próximo merge.
+  # CORRIGIDO 31/08 00:1xZ — a causa que esta linha afirmava ("advisory lock ocupado por job dbt vivo") foi RETRACTADA
+  # na mesma noite: o veredito FATAL saiu às 21:56:34Z, ANTES da primeira execução que tocou o banco (21:59:04Z), logo
+  # não pode ter contribuído. A causa medida foi models_changed_since_build — o #6406 acrescentou 8 ficheiros sob dbt/
+  # (todos candidate, nenhum governado) e invalidou a prova do ledger, porque governed_models_hash() faz hash da
+  # closure INTEIRA apesar do nome. Fica escrito para não ensinar a lição errada a quem ler a seguir.
+  # LIMITE CONHECIDO: este retry foi desenhado para condição TRANSITÓRIA (lock que liberta). Contra condição
+  # PERSISTENTE — p.ex. janela Alembic não aprovada (00:00Z 31/08) — esgota as 3 tentativas e cala-se, com a produção
+  # parada e sem sinal. Retry esgotado NÃO é o mesmo que nada a fazer.
+  # Agora: último deployment FAILED do MESMO commit e sem commit novo → redeploy a cada ≥30 min, máx 3 por commit.
+  RS="$HOME/.claude/state/deploy-lote.retry"; RC=$(cat "$RS" 2>/dev/null || echo "none 0 0"); set -- $RC; rsha=$1; rn=$2; rts=$3
+  [[ "$rsha" != "$MAIN" ]] && { rn=0; rts=$ts; echo "$MAIN 0 $ts" > "$RS"; }   # 1º avistamento: só arma o relógio (retry ≥30 min depois)
+  LAST=$(railway deployment list --json 2>/dev/null | python3 -c "
+import sys,json
+d=json.load(sys.stdin); d=d if isinstance(d,list) else d.get('deployments',[])
+x=[e.get('node',e) for e in d][:1]
+print((x[0].get('status','') + ' ' + str(x[0].get('meta',{}).get('commitHash') or x[0].get('commitHash') or '')) if x else '')" 2>/dev/null)
+  if [[ "$LAST" == FAILED* && $rn -lt 3 && $(( ts - rts )) -ge 1800 ]]; then
+    if yes | railway redeploy >/dev/null 2>&1; then
+      echo "$MAIN $((rn+1)) $ts" > "$RS"; echo "$now deploy-lote: RETRY $((rn+1))/3 do commit ${MAIN:0:8} (último deployment FAILED) via railway redeploy" >> "$LOG"
+    else
+      echo "$now deploy-lote: railway redeploy falhou (retry $((rn+1)))" >> "$LOG"
+    fi
+  fi
+  exit 0
+fi
 git merge-base --is-ancestor "$CUR" "$MAIN" || { echo "$now deploy-lote: $REL NÃO é ancestral de main (divergiu) — intervenção humana" >> "$LOG"; exit 2; }
 # rev 2 (juiz): condição "fila vazia" REMOVIDA — anteciparia todo merge. Só hora + manual. Lock único tick↔manual.
 LK="$HOME/.claude/state/deploy-lote.lock"
