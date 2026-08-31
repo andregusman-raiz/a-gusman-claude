@@ -48,8 +48,15 @@ def _pr_ok(e):
     nums={int(x) for n in nums for s in _flat(n) for x in re.split(r'[,\s;]+',s) if x.isdigit()}
     if not nums or _merged is None: return True
     return any(n in _merged for n in nums)
+# 31/08 18:5xZ (achado DE-COORD): o mesmo conjunto `done` respondia a DUAS perguntas — (a) "dependencia
+# satisfeita?" (exigir PR merged: CERTO) e (b) "tarefa feita, nao re-oferecas" (exigir merged: ERRADO —
+# E-53 done citando #6437 CONGELADO foi re-empurrada ao DE-MIG a cada tick, 17:57 e 18:43, sem convergir).
+# Agora: done_result (RESULT basta) suprime re-oferta/relembrete/reconciliacao; done (com _pr_ok) so p/ deps.
+done_result=set()
 for t,e in ult.items():
-    if e.get('status')=='done' and _pr_ok(e): done.add(t)
+    if e.get('status')=='done':
+        done_result.add(t)
+        if _pr_ok(e): done.add(t)
     elif e.get('status') in ('blocked','failed'): ruim[t]=(e.get('papel'), e.get('nota','')[:80])   # 30/08: guardar QUEM bloqueou — blocked de nao-dono nao e bloqueio, e devolucao
 STp=os.path.expanduser('~/.claude/state/fila-empurra.json'); st=json.load(open(STp)) if os.path.exists(STp) else {}
 lembr=st.get('lembretes',{})
@@ -60,7 +67,7 @@ if not DRY:
         with open(q,'r+') as fh:
             fcntl.flock(fh,fcntl.LOCK_EX); rows=load(q); ch=False
             for r in rows:
-                if r['task'] in done and r.get('status')!='done': r['status']='done'; ch=True
+                if r['task'] in done_result and r.get('status')!='done': r['status']='done'; ch=True
                 elif r['task'] in ruim and r.get('status')=='puxada':
                     _p,_n=ruim[r['task']]
                     if _p and r.get('puxada_por') and _p!=r.get('puxada_por'): r['status']='fila'; r.pop('puxada_por',None); r['devolvida']=f'blocked por {_p}, que nao a puxou'
@@ -94,7 +101,7 @@ for papel,t in builders:
     mine=[]
     for q in filas:
         for r in load(q):
-            if r.get('status')=='puxada' and r.get('puxada_por')==papel and r['task'] not in done and r['task'] not in ruim:
+            if r.get('status')=='puxada' and r.get('puxada_por')==papel and r['task'] not in done_result and r['task'] not in ruim:
                 try: age=(now-datetime.datetime.fromisoformat(r.get('puxada_em','').replace('Z','+00:00'))).total_seconds()/60
                 except Exception: age=10**6
                 mine.append((age,r,q))
@@ -114,7 +121,7 @@ for papel,t in builders:
     for pref in (True,False):
         for q in filas:
             for r in load(q):
-                if r.get('status')!='fila' or r.get('task') in done or r.get('task') in ruim or r.get('fora_da_janela'): continue
+                if r.get('status')!='fila' or r.get('task') in done_result or r.get('task') in ruim or r.get('fora_da_janela'): continue
                 ex=executor(r.get('builder_sugerido'))
                 if pref and ex!=papel: continue
                 if not pref and ex: continue
