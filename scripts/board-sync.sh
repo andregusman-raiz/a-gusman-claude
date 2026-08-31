@@ -108,12 +108,13 @@ def papel_of_path(path):
     for papel, keys in KEYS.items():
         if any(k in low for k in keys): return papel
     return None
-prs_by_papel = {}
-for p in prs:
-    path = wt_branch_to_path.get(p["headRefName"])
-    pap = papel_of_path(path) if path else None
-    if pap: prs_by_papel.setdefault(pap, []).append(p)
-
+# 31/08 (achado do FUNIL; corrigido COMANDO apos enumerar os consumidores): o bloco prs_by_papel
+# (worktree-only) que aqui vivia era CODIGO MORTO — nunca lido; o board real usa pr_papel (l.~180),
+# que e CLAIMS-FIRST (owner/terminal) e hoje atribui DE-BUILD-B via claim (#6417/#6439 medidos).
+# O aviso de "sem papel" abaixo foi MOVIDO para depois de pr_papel e passou a medir a atribuicao
+# REAL (claims>worktree>entrega>tokens) — como estava, media so papel_of_path e alarmava falso para
+# PRs perfeitamente atribuidos por claim. Regra mantida (e do FUNIL, e boa): total = partes nomeadas
+# + resto, e o resto tem de FALHAR visivel, nao diluir — aplicada ao total CERTO.
 # condicao do ROADMAP que o gh nao mostra: PR com migration exige review HUMANA (DE-MIG) — APPROVED so do bot nao e luz verde
 _det = {}
 def detail(n):
@@ -185,6 +186,9 @@ def papel_do_pr(p):
             if toks & ptoks: return papel
     return None
 pr_papel = {p["number"]: papel_do_pr(p) for p in prs}
+_sem_papel = [p["number"] for p in prs if not pr_papel.get(p["number"])]
+if _sem_papel:
+    print(f"⚠ {len(_sem_papel)} de {len(prs)} PR(s) SEM PAPEL na atribuicao real do board (claims>worktree>entrega>tokens): {_sem_papel}")
 if DRY == "1" and os.environ.get("PRINT") != "1": print("pr→papel:", {n: v for n, v in pr_papel.items() if v})
 def entrega_do_pr(p):
     pap = pr_papel.get(p["number"])
