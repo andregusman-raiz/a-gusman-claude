@@ -97,6 +97,12 @@ for l in open(kop):
     if tries[k]>=3:
         open(tl,'a').write(f"{datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')} step=tick-acorda ABANDONADO após 3 falhas: {k[:80]}\n")
 st['sent']=sorted(sent)[-500:]; st['tries']=tries
-json.dump(st,open(STp,'w'))
+# open(...,'w') TRUNCA antes do dump: leitor concorrente ve ficheiro VAZIO e le-o como
+# "nada enviado ainda" -> re-alarma tudo. tmp no MESMO dir + os.replace = troca atomica.
+# (decisao COMANDO 31/08 15:0xZ; padrao ja medido 4/25 vs 25/25 noutro ledger)
+import tempfile as _tf
+_fd,_tmp=_tf.mkstemp(dir=os.path.dirname(STp) or '.'); os.close(_fd)
+with open(_tmp,'w') as _f: json.dump(st,_f)
+os.replace(_tmp,STp)
 PY
 rm -f "$EV" "$OK" "$KO"
