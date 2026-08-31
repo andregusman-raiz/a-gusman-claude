@@ -8,6 +8,9 @@
 # MANUAL: DEPLOY_LOTE_NOW=1 bash deploy-lote.sh (hotfix). DRY: DEPLOY_LOTE_DRY=1.
 set -uo pipefail
 REPO_DIR="${DE_REPO_DIR:-$HOME/Claude/GitHub/raiz-data-engine}"; REPO="${DE_REPO:-Raiz-Educacao-SA/raiz-data-engine}"
+# 31/08 21:5xZ: `railway service source connect --service X` MUDA o serviço linkado do diretório — os comandos sem
+# --service passariam a agir sobre o serviço errado (medido: variáveis e estado do batcher iriam para o crons).
+SVC="${DE_RAILWAY_SERVICE:-raiz-data-engine}"
 REL="${DEPLOY_LOTE_BRANCH:-deploy/railway}"; MIN_GAP="${DEPLOY_LOTE_MIN_GAP_S:-3600}"
 LOG="$HOME/Claude/docs/ai-state/terminais/deploy-lote.log"; STATE="$HOME/.claude/state/deploy-lote.last"; FLAG="$HOME/.claude/state/deploy-lote.enabled"
 now=$(date -u +%Y-%m-%dT%H:%M:%SZ); ts=$(date +%s)
@@ -29,13 +32,13 @@ if [[ "$MAIN" == "$CUR" ]]; then
   # Agora: último deployment FAILED do MESMO commit e sem commit novo → redeploy a cada ≥30 min, máx 3 por commit.
   RS="$HOME/.claude/state/deploy-lote.retry"; RC=$(cat "$RS" 2>/dev/null || echo "none 0 0"); set -- $RC; rsha=$1; rn=$2; rts=$3
   [[ "$rsha" != "$MAIN" ]] && { rn=0; rts=$ts; echo "$MAIN 0 $ts" > "$RS"; }   # 1º avistamento: só arma o relógio (retry ≥30 min depois)
-  LAST=$(railway deployment list --json 2>/dev/null | python3 -c "
+  LAST=$(railway deployment list --service "$SVC" --json 2>/dev/null | python3 -c "
 import sys,json
 d=json.load(sys.stdin); d=d if isinstance(d,list) else d.get('deployments',[])
 x=[e.get('node',e) for e in d][:1]
 print((x[0].get('status','') + ' ' + str(x[0].get('meta',{}).get('commitHash') or x[0].get('commitHash') or '')) if x else '')" 2>/dev/null)
   if [[ "$LAST" == FAILED* && $rn -lt 3 && $(( ts - rts )) -ge 1800 ]]; then
-    if yes | railway redeploy >/dev/null 2>&1; then
+    if yes | railway redeploy --service "$SVC" >/dev/null 2>&1; then
       echo "$MAIN $((rn+1)) $ts" > "$RS"; echo "$now deploy-lote: RETRY $((rn+1))/3 do commit ${MAIN:0:8} (último deployment FAILED) via railway redeploy" >> "$LOG"
     else
       echo "$now deploy-lote: railway redeploy falhou (retry $((rn+1)))" >> "$LOG"
@@ -59,7 +62,7 @@ fi
 # 31/08 02:1xZ (lacuna apontada pelo COMANDO): o estado dos deployments só era lido no ramo do retry — com commit novo o lote
 # saía por cima de um deployment ainda em voo (Railway REMOVE o anterior = o churn que o batcher existe para evitar).
 # Agora: deployment em BUILDING/DEPLOYING/INITIALIZING/QUEUED → adia este tick sem consumir o relógio da hora.
-EMVOO=$(railway deployment list --json 2>/dev/null | python3 -c "
+EMVOO=$(railway deployment list --service "$SVC" --json 2>/dev/null | python3 -c "
 import sys,json
 d=json.load(sys.stdin); d=d if isinstance(d,list) else d.get('deployments',[])
 x=[e.get('node',e) for e in d][:1]
@@ -78,7 +81,7 @@ for p in sys.stdin.read().split():
     else: A.add("outros")
 print(",".join(sorted(A)) or "outros")')
 if [[ "${DEPLOY_LOTE_DRY:-0}" == "1" ]]; then echo "[dry] $REL: ${CUR:0:8}→${MAIN:0:8} areas=$AREAS motivo=$motivo"; exit 0; fi
-railway variables --set "RDE_DEPLOY_CHANGED_AREAS=$AREAS" --set "RDE_DEPLOY_PREV_SHA=$CUR" --set "RDE_DEPLOY_TARGET_SHA=$MAIN" --skip-deploys >/dev/null 2>&1 || { echo "$now deploy-lote: railway variables falhou — lote NÃO enviado" >> "$LOG"; exit 3; }
+railway variables --service "$SVC" --set "RDE_DEPLOY_CHANGED_AREAS=$AREAS" --set "RDE_DEPLOY_PREV_SHA=$CUR" --set "RDE_DEPLOY_TARGET_SHA=$MAIN" --skip-deploys >/dev/null 2>&1 || { echo "$now deploy-lote: railway variables falhou — lote NÃO enviado" >> "$LOG"; exit 3; }
 if git push -q --force-with-lease="refs/heads/$REL:$CUR" origin "$MAIN:refs/heads/$REL" 2>>"$LOG"; then
   echo "$ts" > "$STATE"; echo "$now deploy-lote: $REL ${CUR:0:8}→${MAIN:0:8} areas=$AREAS motivo=$motivo" >> "$LOG"
 else
