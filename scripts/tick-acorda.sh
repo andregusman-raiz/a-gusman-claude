@@ -42,6 +42,8 @@ try:
         for l in open(rf):
             try: e=json.loads(l)
             except: continue
+            if e.get('status')=='posto': continue   # mecanismo: o STATUS é o campo (31/08)
+            if str(e.get('task','')).lower().startswith('posto') and str(e.get('ts',''))<'2026-08-31T06:00': continue   # compat: posto-* registados como blocked ANTES do status existir
             if e.get('status') in ('blocked','failed','retracted'):
                 ev('COMANDO',f"tick/acorda: RESULT {e.get('status')} em {e.get('task')} ({e.get('papel')}): {str(e.get('nota',''))[:120]} — leia roadmap/results.jsonl",f"result|{e.get('ts')}|{e.get('task')}")
 except Exception: pass
@@ -57,8 +59,9 @@ try:
             if key not in sent and tries.get(key,0)<3: novos.append((key,f"#{pr['number']}×{k}"))
     if novos:
         ev('DE-COORD',f"tick/acorda: HUMAN_REVIEW_REQUIRED do bot (review COMMENTED, invisível ao reviewDecision) em {' '.join(n for _,n in novos[:6])} — triar o humano (dono/Marcelo) e acionar de-aprovador-externo se for o caso.","human|"+"+".join(k for k,_ in novos))
-        # chaves individuais também contam como enviadas quando o agregado sai (ver commit abaixo)
-        out[-1]=(out[-1][0],out[-1][1],out[-1][2]+"|"+"|".join(k for k,_ in novos))
+        # NAO mutar a chave aqui: ev() testa a chave e o ledger tem de gravar A MESMA
+        # (31/08: a mutacao gravava human|A+B|A|B e ev() testava human|A+B -> nunca casava,
+        #  logo o alarme repetia para sempre; os individuais sao expandidos no leitor abaixo)
 except Exception: pass
 # 3) passo do tick com rc!=0 (novo)
 try:
@@ -79,11 +82,13 @@ sent=set(st.get('sent',[])); tries=st.get('tries',{})
 for l in open(okp):
     k=l.strip()
     if not k: continue
-    for sub in k.split('|human|') if k.startswith('human|') else [k]: pass
     sent.add(k)
+    # agregado human|<k1>+<k2>: gravar TAMBEM cada chave individual human|<pr>|<n>,
+    # senao cada nova combinacao de PRs gera chave nova e o alarme nunca silencia.
+    # A contagem <n> faz parte da chave: comentario NOVO do bot muda n -> volta a disparar.
     if k.startswith('human|'):
-        for part in k.split('|')[1:]:
-            if part.startswith('human') or not part: continue
+        for part in k[len('human|'):].split('+'):
+            if part.startswith('human|'): sent.add(part)
     tries.pop(k,None)
 for l in open(kop):
     k=l.strip()
