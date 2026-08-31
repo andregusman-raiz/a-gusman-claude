@@ -13,7 +13,7 @@ for qq in glob.glob(f'{D}/filas/fila-*.jsonl'):
     for l in open(qq):
         try: todas.add(json.loads(l)['task'])
         except Exception: pass
-for prog in ('funil','parcelas','prontidao','sustentacao'):
+for prog in ('funil','parcelas','prontidao','sustentacao','salarios'):
     md=f'{D}/{prog}.md'; q=f'{D}/filas/fila-{prog}.jsonl'
     if not os.path.exists(md): continue
     have=todas
