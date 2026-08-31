@@ -56,6 +56,17 @@ if [[ "${DEPLOY_LOTE_NOW:-0}" == "1" ]]; then motivo="manual"
 elif (( gap >= MIN_GAP )); then motivo="hora"
 fi
 [[ -z "$motivo" ]] && exit 0
+# 31/08 02:1xZ (lacuna apontada pelo COMANDO): o estado dos deployments só era lido no ramo do retry — com commit novo o lote
+# saía por cima de um deployment ainda em voo (Railway REMOVE o anterior = o churn que o batcher existe para evitar).
+# Agora: deployment em BUILDING/DEPLOYING/INITIALIZING/QUEUED → adia este tick sem consumir o relógio da hora.
+EMVOO=$(railway deployment list --json 2>/dev/null | python3 -c "
+import sys,json
+d=json.load(sys.stdin); d=d if isinstance(d,list) else d.get('deployments',[])
+x=[e.get('node',e) for e in d][:1]
+print(x[0].get('status','') if x else '')" 2>/dev/null)
+case "$EMVOO" in BUILDING|DEPLOYING|INITIALIZING|QUEUED|WAITING)
+  echo "$now deploy-lote: adiado — deployment em voo ($EMVOO); lote ${CUR:0:8}→${MAIN:0:8} sai no próximo tick" >> "$LOG"; exit 0;;
+esac
 AREAS=$(git diff --name-only "$CUR" "$MAIN" | python3 -c '
 import sys,re
 A=set()
