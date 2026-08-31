@@ -26,7 +26,7 @@ DEC=$(grep -E "^- (Abertas|Stale|Decididas)" "$AI/terminais/DECISOES-PENDENTES.m
 MERGED=$(gh pr list -R "$REPO" --state merged --search "merged:>=$SINCE" --json number --jq 'length' 2>/dev/null || echo "?")
 OPEN=$(gh pr list -R "$REPO" --state open --json number --jq 'length' 2>/dev/null || echo "?")
 OLD7=$(gh pr list -R "$REPO" --state open --json createdAt --jq "[.[] | select(.createdAt < \"$(date -u -v-7d +%Y-%m-%dT%H:%M:%SZ)\")] | length" 2>/dev/null || echo "?")
-DEPLOYS=$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway deployment list --json 2>/dev/null | python3 -c "
+DEPLOYS=$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway deployment list --service "${DE_RAILWAY_SERVICE:-raiz-data-engine}" --json 2>/dev/null | python3 -c "
 import sys,json,collections; d=json.load(sys.stdin); d=d if isinstance(d,list) else d.get('deployments',[]); c=collections.Counter(); n=0
 for x in d:
     x=x.get('node',x)
@@ -35,7 +35,7 @@ print(n, dict(c))" 2>/dev/null || echo "?")
 PROBE="$AI/roadmap/PROD-PROBE.jsonl"; PRODDOWN=$(awk -v s="$SINCE" -F'"' '$4 >= s' "$PROBE" 2>/dev/null | python3 -c "
 import sys,json; L=[json.loads(l) for l in sys.stdin if l.strip()]; n=len(L); bad=sum(1 for x in L if str(x.get('readiness'))!='200')
 print(f'{bad}/{n} sondas ≠200 (≈{(bad/n*100 if n else 0):.0f}% do tempo)' if n else 'sem sondas (PROD-PROBE.jsonl vazio)')" 2>/dev/null)
-THREADERR=$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway logs --json -S "$SINCE" -f "can't start new thread" -n 5000 2>/dev/null | wc -l | tr -d ' ')
+THREADERR=$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway logs --service "${DE_RAILWAY_SERVICE:-raiz-data-engine}" --json -S "$SINCE" -f "can't start new thread" -n 5000 2>/dev/null | wc -l | tr -d ' ')
 ENT=$(grep -hE "^  E-" "$AI"/roadmap/[a-z]*.md 2>/dev/null | grep -oE "· (em curso|fila|estacionad[ao]|pronta|PRONTA)" | sort | uniq -c | awk '{printf "%s=%s ", $3, $1}'); ENTTOT=$(grep -hcE "^  E-" "$AI"/roadmap/[a-z]*.md 2>/dev/null | awk '{s+=$1} END{print s+0}')
 MEM=$(find "$HOME/.claude/projects/-Users-andregusmandeoliveira-Claude/memory" -name "*.md" -newermt "$(date -u -v-24H +%Y-%m-%dT%H:%M:%S)" 2>/dev/null | wc -l | tr -d ' ')
 COMPACT=$(python3 - "$Y" "$TODAY" <<'PY'
@@ -62,7 +62,7 @@ chk "strict na main (O2)" "$(gh api repos/$REPO/branches/main/protection --jq '.
 chk "allow_auto_merge (G1 hold=estado)" "$(gh api repos/$REPO --jq '.allow_auto_merge' 2>/dev/null)"
 chk "rulesets/merge queue (Q2)" "$(gh api repos/$REPO/rulesets --jq 'length' 2>/dev/null)"
 chk "PRs abertos >7d (O4)" "$OLD7"
-chk "caps threads nativas no Railway (D-097)" "$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway variables --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([k for k in d if any(s in k for s in ('OPENBLAS','OMP_NUM','MKL_NUM','NUMEXPR','ARROW_NUM'))]),'/5')" 2>/dev/null)"
+chk "caps threads nativas no Railway (D-097)" "$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway variables --service "${DE_RAILWAY_SERVICE:-raiz-data-engine}" --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([k for k in d if any(s in k for s in ('OPENBLAS','OMP_NUM','MKL_NUM','NUMEXPR','ARROW_NUM'))]),'/5')" 2>/dev/null)"
 chk "tick tem board-sync/DESPACHO/aprovador (branch spec/board-sync mergeada)" "$(grep -c 'board-sync\|DESPACHO\|de-aprovador' "$HOME/Claude/.claude/scripts/de-fila-tick.sh" 2>/dev/null) refs"
 chk "cap mecânico de palavras no canal-append (T1)" "$(grep -cE 'wc -w|MAX_WORDS' "$HOME/Claude/.claude/scripts/canal-append.sh" 2>/dev/null)"
 chk "defaults noturnos na ALCADA (G2)" "$(grep -ciE 'noturn' "$AI/terminais/ALCADA.md" 2>/dev/null)"
