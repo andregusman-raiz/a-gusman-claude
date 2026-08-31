@@ -9,7 +9,13 @@ D="$HOME/Claude/docs/ai-state/roadmap"; Q="$D/filas/fila-$FR.jsonl"; R="$D/resul
 python3 - "$Q" "$R" "$PA" "$PEEK" <<'PY'
 import sys,json,fcntl,datetime,os,re
 q,r,papel,peek=sys.argv[1:5]
-done={ (json.loads(l).get("task") or "") for l in open(r) if '"done"' in l } if os.path.exists(r) else set()
+# 31/08 (claude-8a; revisto COMANDO): "done" era substring sobre TODAS as linhas → Entrega reaberta (retracted/blocked depois) voltava a done. Agora: ÚLTIMO RESULT por task.
+_ult={}
+if os.path.exists(r):
+    for l in open(r):
+        try: e=json.loads(l); _ult[e.get("task")]=e.get("status")
+        except Exception: pass
+done={t for t,st in _ult.items() if st=="done"}
 # 30/08 23:4xZ: o estado DERIVA do ultimo RESULT (regra em _POLITICAS-COMUNS), mas o pull so lia a fila.
 # Caso medido: E-35b 'bloqueada' em fila-funil e 'fila' em fila-prontidao (o filas-sync criou a 2a row);
 # o ultimo RESULT e blocked, e o pull ia oferece-la ao FUNIL — que foi quem a devolveu bloqueada.
@@ -51,6 +57,7 @@ travadas=set()
 with open(q,"r+") as fh:
     fcntl.flock(fh,fcntl.LOCK_EX)
     rows=[json.loads(l) for l in fh if l.strip()]
+    changed=False
     pick=None
     for row in rows:
         if row.get("status")!="fila": continue
@@ -59,7 +66,7 @@ with open(q,"r+") as fh:
         # O campo e DERIVADO pelo filas-sync a cada tick; e a unica representacao do facto.
         if row.get("fora_da_janela"): continue
         if (row.get("task") or "") in done:
-            row["status"]="done"; continue   # reconcilia rótulo velho com results.jsonl
+            row["status"]="done"; changed=True; continue   # reconcilia rótulo velho com results.jsonl
         # 30/08: o fila-empurra ja filtrava por builder_sugerido (fila_empurra.py:54-56) e o pull
         # nao filtrava nada — puxava a 1a elegivel fosse de quem fosse. Efeito medido: o FUNIL puxou
         # a E-10, que a linha do roadmap marca como DE-DATA, e teve de a devolver como blocked.
@@ -70,14 +77,26 @@ with open(q,"r+") as fh:
         if dn and papel not in dn: continue   # so quem pode iniciar (executor ou especificador) puxa
         deps=row.get("depende_de") or []
         if all(d in done for d in deps): pick=row; break
+    def persist():
+        fh.seek(0); fh.truncate()
+        for row in rows: fh.write(json.dumps(row,ensure_ascii=False)+"\n")
+    # achado do FUNIL (31/08): a reconciliacao "status=done" acima so sobrevivia no disco se,
+    # NA MESMA invocacao, houvesse tambem uma tarefa elegivel pra puxar (o unico "fh.write" ficava
+    # depois dos dois exits). Numa fila ja toda done -- o caso em que a reconciliacao era precisa --
+    # ela era calculada em memoria e perdida. Custo medido: E-46 ficou "fila" no disco desde 02:11Z
+    # apesar de done, e virou "executavel parada ha 8h30" no nome do FUNIL. Conserto: persistir
+    # sempre que algum row mudou, EXCEPTO em --peek (peek nao deve mutar -- desenho correto, mantido).
+    if peek=="--peek":
+        if not pick:
+            bloq=sum(1 for x in rows if x.get("status")=="fila")
+            print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila, bloqueadas por dependência)"); sys.exit(0)
+        print("PRÓXIMA (peek):", json.dumps(pick,ensure_ascii=False)[:400]); sys.exit(0)
     if not pick:
+        if changed: persist()
         bloq=sum(1 for x in rows if x.get("status")=="fila")
         print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila, bloqueadas por dependência)"); sys.exit(0)
-    if peek=="--peek":
-        print("PRÓXIMA (peek):", json.dumps(pick,ensure_ascii=False)[:400]); sys.exit(0)
     pick["status"]="puxada"; pick["puxada_por"]=papel; pick["puxada_em"]=datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    fh.seek(0); fh.truncate()
-    for row in rows: fh.write(json.dumps(row,ensure_ascii=False)+"\n")
+    persist()
     print("PUXADA:", json.dumps(pick,ensure_ascii=False)[:500])
     print(f"AO TERMINAR: bash ~/.claude/scripts/result.sh {papel} {pick['task']} done \"<prova_cmd>\" \"<nota>\" [PR]")
 PY
