@@ -353,8 +353,28 @@ if os.environ.get("DESPACHO") == "1":
         ws = ws.get("workspaces", ws if isinstance(ws, list) else [])
     except Exception: ws = []
     last_by_uuid = {w.get("id"): (w.get("latest_submitted_at") or "") for w in ws}
-    def idle_min(uuid):
-        ts = last_by_uuid.get(uuid, "")
+    # 31/08 (achado do DE-COORD, 2o despacho falso do dia): latest_submitted_at e a hora do PROMPT no
+    # cmux — SendMessage nunca lhe toca, e um builder que trabalha por mensagens fica "ocioso" para
+    # sempre (DE-DATA activo 18:12:46Z no msg-ledger, declarado "ocioso ha 57 min" as 18:20Z, com
+    # E-55 oferecida CONTRA instrucao de espera). Actividade = max(prompt, ultima mensagem no ledger,
+    # ultimo RESULT) — os tres canais em que a frota trabalha. Reparacao de defeito, nao mecanismo novo.
+    last_msg_by_papel = {}
+    try:
+        for _l in open(os.path.expanduser("~/Claude/docs/ai-state/terminais/msg-ledger.jsonl")).readlines()[-4000:]:
+            try: _e = json.loads(_l)
+            except Exception: continue
+            _f = _e.get("from"); _t = _e.get("ts") or ""
+            if _f and _t > last_msg_by_papel.get(_f, ""): last_msg_by_papel[_f] = _t
+    except Exception: pass
+    try:
+        for _l in open(os.path.expanduser("~/Claude/docs/ai-state/roadmap/results.jsonl")).readlines()[-2000:]:
+            try: _e = json.loads(_l)
+            except Exception: continue
+            _f = _e.get("papel"); _t = _e.get("ts") or ""
+            if _f and _t > last_msg_by_papel.get(_f, ""): last_msg_by_papel[_f] = _t
+    except Exception: pass
+    def idle_min(uuid, papel=None):
+        ts = max(last_by_uuid.get(uuid, ""), last_msg_by_papel.get(papel or "", ""))
         try:
             d = datetime.datetime.fromisoformat(ts.replace("Z", "+00:00"))
             return int((datetime.datetime.now(datetime.timezone.utc) - d).total_seconds() // 60)
@@ -368,7 +388,7 @@ if os.environ.get("DESPACHO") == "1":
     achados = []
     for papel, t in reg.items():
         if t.get("tier", 9) not in (1, 2) or t.get("estado") != "aberto" or not t.get("workspace_uuid"): continue
-        im = idle_min(t["workspace_uuid"])
+        im = idle_min(t["workspace_uuid"], papel)
         execs = []
         for e in entregas:
             head = e.split(" · prova:")[0]
