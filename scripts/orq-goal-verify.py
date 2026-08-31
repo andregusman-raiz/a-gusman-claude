@@ -39,8 +39,13 @@ from typing import Any
 
 def _run(cmd: str, timeout: int = 15) -> tuple[int, str]:
     try:
+        # 31/08 (COMANDO): shlex.split + shell=False passa `~` LITERAL ao processo — todo check cujo
+        # comando use ~ falha com exit 127 ("No such file or directory") e NUNCA pode passar: o guard
+        # fica fail-CLOSED para sempre, independentemente do estado real que ele julga medir.
+        # Medido no goal roadmap-completo-comando ("bash ~/.claude/scripts/roadmap-restante.sh"), com o
+        # script a existir e a correr bem no shell. Expandir ~ por token resolve sem abrir shell.
         result = subprocess.run(
-            shlex.split(cmd),
+            [os.path.expanduser(tok) for tok in shlex.split(cmd)],
             capture_output=True,
             text=True,
             timeout=timeout,
