@@ -437,13 +437,32 @@ if view_text_before.strip():
                         # new_estado == estado_atual -> sem mudanca de estado, so
                         # segue pra checagem de efeito/recomendacao abaixo.
 
-                    if efeito and (not target.get('efeito') or efeito not in target['efeito']):
-                        prev = target.get('efeito') or ''
-                        target['efeito'] = (prev + ' ' if prev else '') + f"[manual {NOW_ISO}] {efeito}"
+                    # 2026-08-31T13:49:42Z (COMANDO): o `not in` falhava SEMPRE porque clean() altera o texto lido do .md, e o .md
+                    # e renderizado a partir deste mesmo campo -> cada render anexava prev+' [manual]'+prev = DOBRAVA.
+                    # D-093.recomendacao chegou a 2,83 GB (21 dobras). Regra nova: igual (normalizado) -> nada;
+                    # o novo CONTEM o antigo -> SUBSTITUI (md e a versao estendida); o antigo contem o novo -> nada
+                    # (md e vista truncada); so texto genuinamente diferente e anexado com marcador.
+                    def _merge_manual(campo, novo):
+                        import re as _re
+                        _n=lambda s: _re.sub(r'\s+',' ',(s or '')).strip()
+                        antigo=target.get(campo) or ''
+                        # o valor lido do .md ja passou por clean() (apaga '*', apara ' -·—'); comparar o guardado
+                        # SEM o mesmo clean() faz um '*' literal (ex.: railway.cron*.toml) parecer edicao manual para sempre.
+                        na,nn=_n(clean(antigo)),_n(clean(novo))
+                        if not nn or na==nn or nn in na: return False
+                        # 2026-08-31 13:5xZ: a VISTA (.md) e derivada deste campo; quando ela carrega um valor gigante
+                        # (residuo de dobras anteriores), 'novo contem antigo' e verdadeiro e o store ENGOLE a vista.
+                        # Nenhuma edicao manual tem 16 KB — acima disso e loop: nao aceitar, registar anomalia.
+                        if len(novo) > 16384:
+                            target['anomalias'] = list(target.get('anomalias') or [])
+                            msg = f"override manual de {campo} IGNORADO em {NOW_ISO}: {len(novo)} bytes (>16 KB) — provavel residuo de dobra na vista"
+                            if msg not in target['anomalias']: target['anomalias'].append(msg)
+                            return True
+                        target[campo] = novo if na in nn else ((antigo + ' ' if antigo else '') + f"[manual {NOW_ISO}] {novo}")
+                        return True
+                    if efeito and _merge_manual('efeito', efeito):
                         changed = True
-                    if reco and (not target.get('recomendacao') or reco not in target['recomendacao']):
-                        prev = target.get('recomendacao') or ''
-                        target['recomendacao'] = (prev + ' ' if prev else '') + f"[manual {NOW_ISO}] {reco}"
+                    if reco and _merge_manual('recomendacao', reco):
                         changed = True
 
                     if ambiguous:
