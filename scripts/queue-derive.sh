@@ -7,7 +7,6 @@ S=$(gh pr list -R "$R" --state open --json number,isDraft,reviewDecision,mergeSt
 import sys,json,datetime
 d=json.load(sys.stdin); nd=[p for p in d if not p['isDraft']]
 cr=sum(1 for p in nd if p.get('reviewDecision')=='CHANGES_REQUESTED'); ok=sum(1 for p in nd if p.get('reviewDecision')=='APPROVED' and p.get('mergeStateStatus')=='CLEAN')
-m=$(:) if False else 0
 print(f\"{len(nd)} abertos não-draft · {cr} em CR · {ok} APPROVED+CLEAN · gerado {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')} por queue-derive.sh (NUNCA editar à mão)\")")
 M=$(gh pr list -R "$R" --state merged --search "merged:>=$(date -u -v-24H +%Y-%m-%dT%H:%M:%SZ)" --json number --jq length 2>/dev/null)
 LINE="> **$S · $M merges/24 h**"

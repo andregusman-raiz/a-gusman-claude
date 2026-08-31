@@ -57,8 +57,10 @@ except Exception as e: ev.append((now,f'decisoes.json ilegível: {e}',{'COMANDO'
 try:
     R=os.environ.get('DE_REPO','Raiz-Educacao-SA/raiz-data-engine'); s=since.strftime('%Y-%m-%dT%H:%M:%SZ')
     for st,q,lab in (('open',f'created:>={s}','aberto'),('merged',f'merged:>={s}','mergeado')):
-        j=subprocess.run(['gh','pr','list','-R',R,'--state',st,'--search',q,'--json','number,createdAt,mergedAt','--limit','50'],capture_output=True,text=True,timeout=60).stdout
+        j=subprocess.run(['gh','pr','list','-R',R,'--state',st,'--search',q,'--json','number,createdAt,mergedAt,author','--limit','50'],capture_output=True,text=True,timeout=60).stdout
         for p in json.loads(j or '[]'):
+            _a=str((p.get('author') or {}).get('login','')).lower()
+            if 'dependabot' in _a or _a.endswith('[bot]') or _a=='app/dependabot': continue   # 31/08: PR de bot externo = notícia, não obrigação da frota
             ts=P(p['mergedAt'] or p['createdAt']); ev.append((ts,f"PR #{p['number']} {lab}",prdest(p['number']),rf"#{p['number']}\b"))
     j=subprocess.run(['gh','pr','list','-R',R,'--state','open','--json','number,reviews','--limit','60'],capture_output=True,text=True,timeout=60).stdout
     for p in json.loads(j or '[]'):
