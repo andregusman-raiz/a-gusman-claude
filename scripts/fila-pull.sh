@@ -29,7 +29,12 @@ if os.path.exists(r):
         if k: ult[k]=(d.get("estado") or d.get("status") or "")
 # 30/08 23:3xZ: 'papel in bs' era SUBSTRING — "revisa DE-DATA" deixava o DE-DATA puxar a E-39 cujo executor e Codex/DE-BUILD-B.
 # Mesma semantica do fila_empurra.executor(): Codex -> 'dirigido por X' senao DE-BUILD-B; caso contrario 1o papel conhecido.
-PAPEIS={"DE-MIG","DE-DATA","DE-SYNC","DE-BUILD-B","FUNIL","DE-CODEX","FUNIL-WP4"}
+# 31/08: SALARIOS (papel novo) faltava aqui E na lista do filas-sync.sh:50 — DUAS listas hardcoded,
+# em scripts diferentes, ambas a falhar FAIL-OPEN: sem o papel, executor()->"" -> donos()->set() ->
+# `if dn and papel not in dn` nao filtra -> a E-60 (bloqueada, do SALARIOS) foi oferecida ao FUNIL.
+# Popular o campo no filas-sync era necessario e NAO suficiente: o consumidor tem lista propria.
+# Reparacao minima (P9). Estrutural por fazer: derivar PAPEIS do registry.json, que ja os tem.
+PAPEIS={"DE-MIG","DE-DATA","DE-SYNC","DE-BUILD-B","FUNIL","DE-CODEX","FUNIL-WP4","SALARIOS"}
 def executor(bs):
     bs=bs or ""
     if "Codex" in bs:

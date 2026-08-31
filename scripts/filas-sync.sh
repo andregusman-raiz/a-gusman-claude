@@ -47,7 +47,11 @@ for prog in ('funil','parcelas','prontidao','sustentacao','salarios'):
         if re.search(r'· (pronta|PRONTA)',rest): st='fila'   # rótulo do .md NÃO vale como estado; results.jsonl decide
         elif re.search(r'estacionad',rest): st='estacionada'
         deps=re.findall(r'bloqueada por (E-\d+[a-z]?)',rest)
-        builder=(re.search(r'· ((?:DE-[A-Z-]+|FUNIL|Codex[^·]*))',rest) or [None,''])[1].strip(' ·')
+        # 31/08: a lista de papeis era hardcoded e SALARIOS (papel novo) nao estava la -> builder_sugerido
+        # VAZIO -> fila-pull.sh so filtra quando o campo esta preenchido -> a E-60 (bloqueada, do SALARIOS)
+        # foi oferecida ao FUNIL. Falha FAIL-OPEN: papel novo tem o trabalho oferecido a toda a gente.
+        # Reparacao minima (P9). Estrutural por fazer: derivar os papeis do registry.json em vez desta lista.
+        builder=(re.search(r'· ((?:DE-[A-Z-]+|FUNIL|SALARIOS|Codex[^·]*))',rest) or [None,''])[1].strip(' ·')
         prova=(rest.split('prova:')[1].strip()[:200] if 'prova:' in rest else '')
         todas.add(eid); novos.append({"fora_da_janela": eid in fora, "task":eid,"frente":prog,"resumo":rest.split('·')[0].strip()[:140],"status":st,"depende_de":deps,"builder_sugerido":builder,"prova":prova,"derivada_em":__import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')})
     if novos:
