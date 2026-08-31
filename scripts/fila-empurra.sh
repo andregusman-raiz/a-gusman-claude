@@ -5,7 +5,11 @@
 set -uo pipefail
 AI="$HOME/Claude/docs/ai-state"; SEND="$HOME/Claude/.claude/scripts/terminal-send.sh"; TL="$AI/terminais/tick.log"
 EV="$(mktemp)"
-python3 "$HOME/Claude/.claude/scripts/fila_empurra.py" "$AI" > "$EV" 2>>"$TL" || true
+if ! python3 "$HOME/Claude/.claude/scripts/fila_empurra.py" "$AI" > "$EV" 2>>"$TL"; then
+  # 31/08 (COMANDO): o gerador crashou em TODOS os ticks 02:15→12:55Z e o passo dizia rc=0 — 10h40 sem entregar tarefa.
+  # Falha do gerador passa a ser VISÍVEL: linha rc=1 no tick.log (tick-acorda alarma o COMANDO) e saída ≠0.
+  printf '%s step=fila-empurra-gerador rc=1 FALHOU (ver stderr acima)\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$TL"; rm -f "$EV"; exit 1
+fi
 while IFS=$'\t' read -r PAPEL MSG TASK FRENTE; do
   [ -z "${PAPEL:-}" ] && continue
   if bash "$SEND" "$PAPEL" "$MSG" >/dev/null 2>&1; then
