@@ -95,6 +95,7 @@ post_steps() {
   _t0=$(date +%s); bash "$(dirname "$0")/msg-ledger.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=msg-ledger rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/comunicacao-obrigatoria.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=comunicacao-obrigatoria rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/queue-derive.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=queue-derive rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+  _t0=$(date +%s); bash "$(dirname "$0")/filas-sync.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=filas-sync rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/fila-empurra.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=fila-empurra rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/tick-acorda.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=tick-acorda rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
 }
@@ -106,7 +107,7 @@ if ! command -v gh >/dev/null 2>&1; then
 fi
 
 PR_JSON=$(gh pr list --state open -R "$REPO" \
-  --json number,headRefOid,reviewDecision,mergeStateStatus,statusCheckRollup,isDraft 2>&1) || {
+  --json number,headRefOid,reviewDecision,mergeStateStatus,mergeable,statusCheckRollup,isDraft 2>&1) || {
   echo "de-fila-tick: gh pr list falhou -- nada a fazer, saindo limpo (sem alterar snapshot): $PR_JSON" >&2
   exit 0
 }
@@ -136,8 +137,17 @@ def qualifica(pr):
         return "APPROVED+CLEAN"
     if pr.get("reviewDecision") == "CHANGES_REQUESTED":
         return "CR-NOVO"   # 30/08 (dono): CR novo do bot acorda o DE-COORD — 12 PRs ficaram 5-103 h sem resposta
-    if pr.get("mergeStateStatus") in ("DIRTY", "BLOCKED"):
-        return "merge-falhou"
+    if pr.get("mergeStateStatus") == "DIRTY":
+        return "conflito-com-a-base"   # conflito real: exige rebase. Nome diz o que e.
+    if pr.get("mergeStateStatus") == "BLOCKED":
+        # 31/08 00:0xZ: BLOCKED NAO e "merge falhou" — e "ainda nao pode mergear", e para um PR
+        # acabado de abrir sem review e o estado NORMAL. Rotular o normal como falha custou um
+        # ciclo de triagem por cada PR novo (#6419 e #6418 na mesma noite; o #6418 nem e da frota).
+        # Alarma so quando a review ja nao e a explicacao — ai o bloqueio e outra coisa
+        # (check obrigatorio a falhar, protecao de branch), e isso sim e accionavel.
+        if pr.get("reviewDecision") == "REVIEW_REQUIRED" and pr.get("mergeable") == "MERGEABLE":
+            return None
+        return "bloqueado-e-nao-e-falta-de-review"
     for chk in (pr.get("statusCheckRollup") or []):
         if isinstance(chk, dict) and chk.get("conclusion") == "FAILURE":
             return "check-falhou"
