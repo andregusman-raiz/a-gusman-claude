@@ -54,6 +54,10 @@ with open(q,"r+") as fh:
     pick=None
     for row in rows:
         if row.get("status")!="fila": continue
+        # 31/08 00:3xZ: o empurra ja respeitava `fora_da_janela` (fila_empurra.py:112) e o pull nao —
+        # E-30..E-34 continuavam puxaveis com a cadeia declarada fora do programa em parcelas.md:5.
+        # O campo e DERIVADO pelo filas-sync a cada tick; e a unica representacao do facto.
+        if row.get("fora_da_janela"): continue
         if (row.get("task") or "") in done:
             row["status"]="done"; continue   # reconcilia rótulo velho com results.jsonl
         # 30/08: o fila-empurra ja filtrava por builder_sugerido (fila_empurra.py:54-56) e o pull
