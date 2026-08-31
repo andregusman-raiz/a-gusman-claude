@@ -33,8 +33,23 @@ if os.path.exists(rf):
     for l in open(rf):
         try: e=json.loads(l); ult[e.get('task')]=e   # o ÚLTIMO registro por task vale (retracted reabre)
         except: pass
+import subprocess
+try:
+    _merged=set(json.loads(subprocess.run(['gh','pr','list','-R','Raiz-Educacao-SA/raiz-data-engine','--state','merged','--search','merged:>=2026-08-23','--json','number','--jq','[.[].number]','--limit','300'],capture_output=True,text=True,timeout=60).stdout or '[]'))
+except Exception: _merged=None
+def _pr_ok(e):
+    # done citando PR ainda ABERTO não satisfaz dependência (E-23 #6417 aberto → E-26 empurrada cedo demais, 31/08)
+    _pr=e.get('pr'); nums={','.join(str(x) for x in _pr) if isinstance(_pr,(list,tuple,set)) else str(_pr or '').strip()}|set(re.findall(r'#(\d{4,5})',str(e.get('nota',''))+' '+str(e.get('prova_cmd',''))))
+    # 2026-08-31T13:00:38Z: RESULT da E-2 gravou pr="6380,6407,6413,6429" (lista num campo escalar) e este int() crashava o empurra em
+    # TODOS os ticks desde 02:15Z — com rc=0 no tick.log, logo ninguem viu. Tolerar lista; ignorar o que nao for numero.
+    # rev2 (revisao DE-COORD): lista REAL (JSON array) virava "['6380', '6407']" no str(), zero digitos, nums vazio
+    # -> `if not nums: return True` = dependencia satisfeita SEM verificar merge. Falhar aberto e pior que o crash.
+    def _flat(v): return [str(x) for x in v] if isinstance(v,(list,tuple,set)) else [str(v)]
+    nums={int(x) for n in nums for s in _flat(n) for x in re.split(r'[,\s;]+',s) if x.isdigit()}
+    if not nums or _merged is None: return True
+    return any(n in _merged for n in nums)
 for t,e in ult.items():
-    if e.get('status')=='done': done.add(t)
+    if e.get('status')=='done' and _pr_ok(e): done.add(t)
     elif e.get('status') in ('blocked','failed'): ruim[t]=(e.get('papel'), e.get('nota','')[:80])   # 30/08: guardar QUEM bloqueou — blocked de nao-dono nao e bloqueio, e devolucao
 STp=os.path.expanduser('~/.claude/state/fila-empurra.json'); st=json.load(open(STp)) if os.path.exists(STp) else {}
 lembr=st.get('lembretes',{})
@@ -99,7 +114,7 @@ for papel,t in builders:
     for pref in (True,False):
         for q in filas:
             for r in load(q):
-                if r.get('status')!='fila' or r.get('task') in done or r.get('task') in ruim: continue
+                if r.get('status')!='fila' or r.get('task') in done or r.get('task') in ruim or r.get('fora_da_janela'): continue
                 ex=executor(r.get('builder_sugerido'))
                 if pref and ex!=papel: continue
                 if not pref and ex: continue
