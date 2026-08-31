@@ -112,6 +112,29 @@ PR_JSON=$(gh pr list --state open -R "$REPO" \
   exit 0
 }
 
+# 31/08 01:4xZ: distinguir REVIEW NOVA de HEAD NOVO. Cada merge em main gera um merge-commit em
+# CADA PR aberto (auto-merge), logo head novo, e o tick lia reviewDecision=CHANGES_REQUESTED como
+# CR novo — 7 falsos numa noite, quase todos com origem nos merges do proprio coordenador que os
+# recebia. `gh pr view --json latestReviews` traz commit.oid VAZIO; so a REST API da o commit_id.
+# Enriquecemos APENAS os PRs em CHANGES_REQUESTED (3-6 chamadas, nao uma por PR aberto).
+PR_JSON=$(PR_JSON="$PR_JSON" REPO="$REPO" python3 <<'PYENRICH'
+import json, os, subprocess
+prs = json.loads(os.environ["PR_JSON"])
+for p in prs:
+    if p.get("reviewDecision") != "CHANGES_REQUESTED":
+        continue
+    try:
+        out = subprocess.run(
+            ["gh", "api", f"repos/{os.environ['REPO']}/pulls/{p['number']}/reviews", "--paginate"],
+            capture_output=True, text=True, timeout=30).stdout
+        revs = [r for r in json.loads(out or "[]") if r.get("state") == "CHANGES_REQUESTED"]
+        p["_cr_commit"] = (revs[-1].get("commit_id") or "") if revs else ""
+    except Exception:
+        p["_cr_commit"] = ""          # falha de rede -> campo vazio -> comporta-se como antes (alarma)
+print(json.dumps(prs))
+PYENRICH
+) || true
+
 mkdir -p "$(dirname "$SNAPSHOT")"
 if [[ ! -f "$SNAPSHOT" ]]; then
   echo '{"_schema":"de-fila-tick.sh -- snapshot por PR (headRefOid, qualifica) do ultimo tick. Debounce por SHA.","prs":{}}' > "$SNAPSHOT"
@@ -136,7 +159,14 @@ def qualifica(pr):
     if pr.get("reviewDecision") == "APPROVED" and pr.get("mergeStateStatus") == "CLEAN":
         return "APPROVED+CLEAN"
     if pr.get("reviewDecision") == "CHANGES_REQUESTED":
-        return "CR-NOVO"   # 30/08 (dono): CR novo do bot acorda o DE-COORD — 12 PRs ficaram 5-103 h sem resposta
+        # 30/08 (dono): CR novo do bot acorda o DE-COORD — 12 PRs ficaram 5-103 h sem resposta.
+        # 31/08: so acorda se a CR for sobre o head ACTUAL. Se o head andou depois da review
+        # (merge-commit de main, ou push de correcao a espera de re-review), a CR nao e nova —
+        # e a mesma CR vista de um head diferente. Campo vazio (falha de rede) mantem o alarme.
+        _c = pr.get("_cr_commit")
+        if _c and pr.get("headRefOid") and _c != pr["headRefOid"]:
+            return None
+        return "CR-NOVO"
     if pr.get("mergeStateStatus") == "DIRTY":
         return "conflito-com-a-base"   # conflito real: exige rebase. Nome diz o que e.
     if pr.get("mergeStateStatus") == "BLOCKED":
