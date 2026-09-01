@@ -141,6 +141,12 @@ while [[ "$TENTATIVA" -le "$MENU_RETRIES" ]]; do
   RAZAO=""
   if echo "$SCREEN" | grep -qE "$MENU_RE"; then
     RAZAO="tela:menu-visivel"
+  elif echo "$SCREEN" | grep -qE '^[[:space:]]*❯[[:space:]]+[^[:space:]]'; then
+    # 01/09 17:3xZ (RESUMO): a regra "input parcial (❯ com texto) = não enviar" vivia só na memória, não no
+    # código. Medido: FUNIL com "❯ roda o sync manualmente…" (texto do DONO, sem Enter) e o vigia a 1 min de
+    # lhe escrever — `cmux send` colaria o aviso ao texto dele e o `send-key enter` submeteria os dois como
+    # UM comando. É o D-064 pelo outro lado. Prompt com texto = tela ocupada pelo dono; sem bypass.
+    RAZAO="tela:texto-por-enviar-no-prompt"
   else
     FEED_HIT="$(feed_menu_reason || true)"
     [[ -n "$FEED_HIT" ]] && RAZAO="$FEED_HIT"
@@ -156,7 +162,7 @@ if [[ -n "$RAZAO" ]]; then
   mkdir -p "$T"
   printf '%s FALHA-MENU-ABERTO papel=%s uuid=%s razao=%s tentativas=%s\n' \
     "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$UUID" "$RAZAO" "$MENU_RETRIES" >> "$LOG"
-  echo "RECUSADO: $PAPEL continua com MENU DE DECISAO aberto apos $MENU_RETRIES tentativas ($RAZAO)." >&2
+  echo "RECUSADO: $PAPEL continua com MENU DE DECISAO aberto ou TEXTO POR ENVIAR no prompt apos $MENU_RETRIES tentativas ($RAZAO)." >&2
   echo "Enviar agora faria seu texto virar a RESPOSTA dessa pergunta — ja aconteceu 2x em 28/08" >&2
   echo "(D-064 foi respondida por engano e precisou ser anulada). Esta guarda NAO tem bypass." >&2
   echo "Espere o dono responder e reenvie; falha registrada em $LOG." >&2
