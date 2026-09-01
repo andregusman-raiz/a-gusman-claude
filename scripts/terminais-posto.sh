@@ -86,7 +86,10 @@ def tem_posto(papel):
 alertas=[]
 for papel,v in reg.items():
     if v.get('estado')!='aberto': continue
-    if v.get('tier') not in (0,1,2): continue
+    # 01/09: mesmo defeito do empurra — o tier decidia quem era vigiado, e um papel com roadmap
+    # próprio aberto como tier 3 podia parar em silêncio sem ninguém notar.
+    _fr=(v.get('frente') or papel).lower()
+    if v.get('tier') not in (0,1,2) and not os.path.exists(os.path.join(os.path.dirname(T),'roadmap','filas',f'fila-{_fr}.jsonl')): continue
     ts=ultimo_evento(v.get('session_id') or '')
     trabalho=emcurso.get(papel,[])+claims.get(papel,[])
     if ts is None:

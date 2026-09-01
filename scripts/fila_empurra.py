@@ -25,7 +25,14 @@ DRY=('--dry' in sys.argv)
 AI=[a for a in sys.argv[1:] if a!='--dry'][0]; now=datetime.datetime.now(datetime.timezone.utc)
 reg=json.load(open(f'{AI}/terminais/registry.json'))['terminais']
 P=os.path.expanduser('~/.claude/projects')
-builders=[(p,t) for p,t in reg.items() if t.get('estado')=='aberto' and t.get('agent')=='claude' and t.get('tier') in (1,2)]
+# 01/09 (ordem do dono): o critério era o TIER, que vem do número no nome da janela — o FGTS reabriu
+# como '3 FGTS' e ficou sem receber tarefa nenhuma, apesar de ter fila própria e trabalho por fazer.
+# Proxy a responder pela pergunta real: o que decide é EXECUTAR UM ROADMAP, e isso prova-se por ter
+# fila própria — não por um dígito. Papéis satélite (sem fila) continuam de fora, como devem.
+def _tem_fila(p,t):
+    fr=(t.get('frente') or p).lower()
+    return os.path.exists(f'{AI}/roadmap/filas/fila-{fr}.jsonl')
+builders=[(p,t) for p,t in reg.items() if t.get('estado')=='aberto' and t.get('agent')=='claude' and (t.get('tier') in (1,2) or _tem_fila(p,t))]
 # 01/09: `papeis` respondia a DUAS perguntas diferentes com a mesma lista — quem RECEBE empurrão
 # (tier 1-2, que é `builders`) e quem pode ser NOMEADO executor de uma tarefa. O DE-COORD (tier 0)
 # é o dono das tarefas de triagem de PR e não estava aqui: executor() devolvia '' e a 2ª passagem
