@@ -14,7 +14,7 @@ import json,os,glob,re,subprocess
 from datetime import datetime,timezone
 AI,SNAP,OUT=os.environ['AI'],os.environ['SNAP'],os.environ['OUT']
 now=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
-novo={'prod':os.environ['PROD'].strip(),'prs':{},'claims':{},'entregas':{}}
+novo={'prod':os.environ['PROD'].strip(),'prs':{},'claims':{},'entregas':{},'resultados':{}}
 for pr in json.loads(os.environ['PRS'] or '[]'):
     novo['prs'][str(pr['number'])]=f"{pr['mergeStateStatus']}/{pr.get('reviewDecision') or '-'}"
 try:
@@ -26,16 +26,30 @@ for f in glob.glob(f'{AI}/roadmap/*.md'):
     for l in open(f,errors='replace'):
         m=re.match(r'^  (E-[0-9]+[a-z]?) ·.*?· (em curso|fila|estacionada|pronta|PRONTA|BLOQUEADA|bloqueada)\b',l)
         if m: novo['entregas'][m.group(1)]=m.group(2).lower()
+# 01/09 (ordem do dono): este derivador lia SÓ o rótulo do .md, e o rótulo não é o estado — o estado
+# está no results.jsonl. Consequência medida: quando um trabalho TERMINAVA BEM, nenhum mecanismo
+# avisava o COMANDO (o despertador do tick só dispara em blocked/failed/retracted, e o painel é preciso
+# ir ver). O aviso dependia de o papel mandar mensagem — prática, não mecanismo: a folha produziu 4 PRs
+# e 2 entregas e registou 1 resultado, "não esteve parada, esteve calada". Agora o desfecho de cada
+# tarefa entra no diff como qualquer outra mudança, sem alarme novo e sem depender de ninguém se lembrar.
+try:
+    for l in open(f'{AI}/roadmap/results.jsonl'):
+        try: e=json.loads(l)
+        except Exception: continue
+        if e.get('status') in ('posto','anulado'): continue   # vigília declarada e registo retirado não são desfecho
+        t=e.get('task')
+        if t: novo['resultados'][t]=f"{e.get('status')} ({e.get('papel')})"
+except Exception: pass
 velho=json.load(open(SNAP)) if os.path.exists(SNAP) else None
 json.dump(novo,open(SNAP,'w'),ensure_ascii=False,indent=1)
 if velho is None: print('estado-diff: primeiro snapshot gravado, sem diff'); raise SystemExit(0)
 L=[]
 if velho.get('prod')!=novo['prod']: L.append(f"PROD: {velho.get('prod')} -> {novo['prod']}")
-for k in ('prs','claims','entregas'):
+for k in ('prs','claims','entregas','resultados'):
     a,b=velho.get(k,{}),novo[k]
     for i in sorted(set(a)|set(b)):
         if a.get(i)!=b.get(i):
-            rot={'prs':'PR #','claims':'claim ','entregas':''}[k]
+            rot={'prs':'PR #','claims':'claim ','entregas':'','resultados':'RESULT '}[k]
             L.append(f"{rot}{i}: {a.get(i) or 'NOVO'} -> {b.get(i) or 'SAIU'}")
 if not L: print('estado-diff: nada mudou'); raise SystemExit(0)
 open(OUT,'w').write(f"# MUDOU desde o tick anterior · {now}\n\n"+'\n'.join(f'- {x}' for x in L)+'\n')
