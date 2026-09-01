@@ -32,11 +32,15 @@ builders=[(p,t) for p,t in reg.items() if t.get('estado')=='aberto' and t.get('a
 # oferecia a tarefa a QUEM ESTIVESSE LIVRE — o contrário da regra (a verificação vai a quem depende).
 # Reconhecer nome != receber trabalho: o empurra continua a despachar só para builders.
 papeis={p for p in reg}
-done=set(); ruim={}; ult={}
+done=set(); ruim={}; ult={}; hist={}
 rf=f'{AI}/roadmap/results.jsonl'
 if os.path.exists(rf):
     for l in open(rf):
-        try: e=json.loads(l); ult[e.get('task')]=e   # o ÚLTIMO registro por task vale (retracted reabre)
+        try:
+            e=json.loads(l)
+            if e.get('status')=='anulado': continue   # 01/09: registo retirado por engano de id — não é estado da tarefa
+            ult[e.get('task')]=e   # o ÚLTIMO registro por task vale (retracted reabre)
+            hist.setdefault(e.get('task'),[]).append(e)   # 01/09: histórico COMPLETO — para saber de QUEM era o done retractado
         except: pass
 import subprocess
 try:
@@ -62,7 +66,8 @@ for t,e in ult.items():
     if e.get('status')=='done':
         done_result.add(t)
         if _pr_ok(e): done.add(t)
-    elif e.get('status') in ('blocked','failed'): ruim[t]=(e.get('papel'), e.get('nota','')[:80])   # 30/08: guardar QUEM bloqueou — blocked de nao-dono nao e bloqueio, e devolucao
+    elif e.get('status') in ('blocked','failed'): ruim[t]=(e.get('papel'), e.get('nota','')[:80])
+   # 30/08: guardar QUEM bloqueou — blocked de nao-dono nao e bloqueio, e devolucao
 STp=os.path.expanduser('~/.claude/state/fila-empurra.json'); st=json.load(open(STp)) if os.path.exists(STp) else {}
 lembr=st.get('lembretes',{})
 filas=sorted(glob.glob(f'{AI}/roadmap/filas/fila-*.jsonl'))
@@ -78,7 +83,26 @@ if not DRY:
                     if _p and r.get('puxada_por') and _p!=r.get('puxada_por'): r['status']='fila'; r.pop('puxada_por',None); r['devolvida']=f'blocked por {_p}, que nao a puxou'
                     else: r['status']='bloqueada'; r['bloqueio']=_n
                     ch=True
-                elif ult.get(r['task'],{}).get('status')=='retracted' and r.get('status')=='done': r['status']='fila'; ch=True
+                elif ult.get(r['task'],{}).get('status')=='retracted' and r.get('status')=='done':
+                    # 01/09 (achado do COMANDO, medido no efeito): a condição não olhava DE QUEM era a
+                    # retractação. O SALARIOS cunhou E-75 sem saber que o número já era uma Entrega do
+                    # FUNIL fechada na véspera; ao retractar o SEU registo errado, a linha FECHADA do
+                    # FUNIL foi reaberta e ficou disponível para o tick lha empurrar como trabalho novo.
+                    # Só se recuperou porque alguém avisou o prejudicado — recuperação que depende de
+                    # aviso não é recuperação. Invariante: só quem escreveu o `done` o pode retractar.
+                    # Excepção MEDIDA (não suposta): das 7 retractações do ledger, 2 são cruzadas e uma
+                    # delas é legítima — retractar um `done` de origem automática (semeadura/tick) é
+                    # corrigir o programa, não o trabalho de outro papel. Essa continua a reabrir.
+                    _r=ult.get(r['task'],{}); _quem=_r.get('papel') or ''
+                    _dono_done=''
+                    for _a in reversed(hist.get(r['task'],[])):
+                        if _a.get('status')=='done': _dono_done=_a.get('papel') or ''; break
+                    if _quem==_dono_done or _dono_done in ('','seed','tick'):
+                        r['status']='fila'; ch=True
+                    elif r.get('conflito_retractacao') != f"{_quem}!={_dono_done}":
+                        # não reabre — e deixa rasto no ficheiro, porque não reabrir em silêncio é a
+                        # mesma família do defeito: uma decisão que ninguém consegue ver.
+                        r['conflito_retractacao']=f"{_quem}!={_dono_done}"; r['conflito_em']=_r.get('ts',''); ch=True
             if ch: save(fh,rows)
 def executor(bs):
     bs=bs or ''
