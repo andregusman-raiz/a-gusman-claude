@@ -49,10 +49,32 @@ if os.path.exists(rf):
             ult[e.get('task')]=e   # o ÚLTIMO registro por task vale (retracted reabre)
             hist.setdefault(e.get('task'),[]).append(e)   # 01/09: histórico COMPLETO — para saber de QUEM era o done retractado
         except: pass
-import subprocess
-try:
-    _merged=set(json.loads(subprocess.run(['gh','pr','list','-R','Raiz-Educacao-SA/raiz-data-engine','--state','merged','--search','merged:>=2026-08-23','--json','number','--jq','[.[].number]','--limit','300'],capture_output=True,text=True,timeout=60).stdout or '[]'))
-except Exception: _merged=None
+import subprocess,glob as _glob
+_REPO_DE='Raiz-Educacao-SA/raiz-data-engine'; _merged_cache={}
+def _merged_of(repo):
+    if repo not in _merged_cache:
+        try: _merged_cache[repo]=set(json.loads(subprocess.run(['gh','pr','list','-R',repo,'--state','merged','--search','merged:>=2026-08-23','--json','number','--jq','[.[].number]','--limit','300'],capture_output=True,text=True,timeout=60).stdout or '[]'))
+        except Exception: _merged_cache[repo]=None
+    return _merged_cache[repo]
+_merged=_merged_of(_REPO_DE)
+# 01/09 (FGTS reaberto; achado do handoff do terminal "2 FGTS"): a lista de merges era SÓ do Data Engine, logo um done
+# de frente com repo próprio (fgts-platform #254, salarios-platform) nunca satisfazia dependência — E-205+ ficariam presas
+# para sempre. Repo da frente lido do cabeçalho do programa ("repo <dir>"), resolvido pelo remote do dir; a verificação
+# é na UNIÃO {repo da frente, DE} — nunca só na frente, para não regredir o funil, cujas Entregas citam PRs do DE.
+_repo_frente={}
+for _prog in _glob.glob(f'{AI}/roadmap/*.md'):
+    try:
+        _m=re.search(r'\brepo ((?:GitHub-raiz|GitHub-pessoal|GitHub|Projetos)/[A-Za-z0-9._-]+)',open(_prog).read(4000))
+        if not _m: continue
+        _url=subprocess.run(['git','-C',os.path.expanduser('~/Claude/'+_m.group(1)),'remote','get-url','origin'],capture_output=True,text=True,timeout=5).stdout.strip()
+        _mm=re.search(r'github\.com[:/]([^/\s]+/[^/\s]+?)(?:\.git)?$',_url)
+        if _mm and _mm.group(1)!=_REPO_DE: _repo_frente[os.path.basename(_prog)[:-3]]=_mm.group(1)
+    except Exception: pass
+_task_frente={}
+for _q in _glob.glob(f'{AI}/roadmap/filas/fila-*.jsonl'):
+    for _l in open(_q):
+        try: _task_frente[json.loads(_l)['task']]=os.path.basename(_q)[5:-6]
+        except Exception: pass
 def _pr_ok(e):
     # done citando PR ainda ABERTO não satisfaz dependência (E-23 #6417 aberto → E-26 empurrada cedo demais, 31/08)
     _pr=e.get('pr'); nums={','.join(str(x) for x in _pr) if isinstance(_pr,(list,tuple,set)) else str(_pr or '').strip()}|set(re.findall(r'#(\d{4,5})',str(e.get('nota',''))+' '+str(e.get('prova_cmd',''))))
@@ -62,8 +84,11 @@ def _pr_ok(e):
     # -> `if not nums: return True` = dependencia satisfeita SEM verificar merge. Falhar aberto e pior que o crash.
     def _flat(v): return [str(x) for x in v] if isinstance(v,(list,tuple,set)) else [str(v)]
     nums={int(x) for n in nums for s in _flat(n) for x in re.split(r'[,\s;]+',s) if x.isdigit()}
-    if not nums or _merged is None: return True
-    return any(n in _merged for n in nums)
+    _rf=_repo_frente.get(_task_frente.get(e.get('task'),''))
+    _mf=_merged_of(_rf) if _rf else None
+    if not nums or (_merged is None and _mf is None): return True
+    _todos=(_merged or set())|(_mf or set())
+    return any(n in _todos for n in nums)
 # 31/08 18:5xZ (achado DE-COORD): o mesmo conjunto `done` respondia a DUAS perguntas — (a) "dependencia
 # satisfeita?" (exigir PR merged: CERTO) e (b) "tarefa feita, nao re-oferecas" (exigir merged: ERRADO —
 # E-53 done citando #6437 CONGELADO foi re-empurrada ao DE-MIG a cada tick, 17:57 e 18:43, sem convergir).
