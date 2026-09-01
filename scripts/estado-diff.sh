@@ -46,6 +46,13 @@ if velho is None: print('estado-diff: primeiro snapshot gravado, sem diff'); rai
 L=[]
 if velho.get('prod')!=novo['prod']: L.append(f"PROD: {velho.get('prod')} -> {novo['prod']}")
 for k in ('prs','claims','entregas','resultados'):
+    # 01/09 (achado do COMANDO, medido): acrescentar uma chave NOVA ao retrato fazia o primeiro diff
+    # reportar TODO o conteúdo dela como novidade — 133 linhas "NOVO ->" num tick em que o registo
+    # crescera 8. Erra para o lado que INFLACIONA actividade: quem lesse o MUDOU como medida de ritmo
+    # media o arranque do campo, não o trabalho. Chave que ainda não existia no retrato anterior grava
+    # baseline e cala-se nesta corrida — a mesma regra que já valia para o primeiro retrato inteiro.
+    if k not in velho:
+        print(f'estado-diff: baseline de {k} gravada, sem diff nesta corrida'); continue
     a,b=velho.get(k,{}),novo[k]
     for i in sorted(set(a)|set(b)):
         if a.get(i)!=b.get(i):
