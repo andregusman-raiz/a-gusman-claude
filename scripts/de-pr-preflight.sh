@@ -7,17 +7,32 @@
 #   --t0       só tier 0 (<1min): alembic single-head + index lint + base atualizada + despertador
 #   --fast     tiers 0-1 (~4min): + registry, kpi-gate, auth, colisão NNN de migration
 #   --with-db  inclui migration drift Camada A (exige Postgres postgis local)
-#   --base     branch alvo do PR (default: aws-prd — rota AWS, decisão 2026-08-25)
+#   --base     branch alvo do PR (default: auto-detectado via `gh pr view` se já houver PR
+#              aberto para o branch atual; senão aws-prd — rota AWS, decisão 2026-08-25)
 #   default    tudo menos --with-db (~25-30min; smoke shards em paralelo)
 #
 # Saída: resumo PASS/FAIL + log em ~/Claude/docs/ai-state/de-pr-queue/preflight-logs/
 # Exit: 0 = OK abrir PR (falta só juiz adversarial) | 2 = corrigir FAILs antes
 set -uo pipefail
 
-T0ONLY=0 FAST=0 WITHDB=0 BASE="aws-prd"
+T0ONLY=0 FAST=0 WITHDB=0 BASE="aws-prd" BASE_EXPLICIT=0
 while [[ $# -gt 0 ]]; do case "$1" in
-  --t0) T0ONLY=1;; --fast) FAST=1;; --with-db) WITHDB=1;; --base) BASE="$2"; shift;;
+  --t0) T0ONLY=1;; --fast) FAST=1;; --with-db) WITHDB=1;; --base) BASE="$2"; BASE_EXPLICIT=1; shift;;
   *) echo "arg desconhecido: $1" >&2; exit 64;; esac; shift; done
+
+# E-89 (medido 2026-09-01): 86% dos PRs abertos hoje têm base=main, não aws-prd — o default
+# hardcoded (decisão 2026-08-25, quando aws-prd era a rota dominante) agora erra na maioria
+# das corridas, com 2 FAILs falsos por vez (base-atualizada, pr-overlap contra a linha errada).
+# Em vez de trocar o hardcode de um valor errado por outro (o mesmo defeito, invertido, no dia
+# em que a proporção virar de novo), autodetectar: se já existe PR aberto para este branch, a
+# base REAL dele é o facto — não uma suposição. --base explícito continua a vencer sempre.
+if [[ "$BASE_EXPLICIT" -eq 0 ]] && command -v gh >/dev/null 2>&1; then
+  detected_base="$(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || true)"
+  if [[ -n "$detected_base" ]]; then
+    BASE="$detected_base"
+    echo "base autodetectada via 'gh pr view': $BASE (use --base para forçar outra)" >&2
+  fi
+fi
 
 # check pr-overlap (política 2026-08-26 "1 frente = 1 PR vivo"): arquivos gerados/quentes que
 # TODO PR toca e não indicam overlap real — editar aqui se a lista mudar. alembic/versions/*.py
