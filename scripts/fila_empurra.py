@@ -26,7 +26,12 @@ AI=[a for a in sys.argv[1:] if a!='--dry'][0]; now=datetime.datetime.now(datetim
 reg=json.load(open(f'{AI}/terminais/registry.json'))['terminais']
 P=os.path.expanduser('~/.claude/projects')
 builders=[(p,t) for p,t in reg.items() if t.get('estado')=='aberto' and t.get('agent')=='claude' and t.get('tier') in (1,2)]
-papeis={p for p,_ in builders}
+# 01/09: `papeis` respondia a DUAS perguntas diferentes com a mesma lista — quem RECEBE empurrão
+# (tier 1-2, que é `builders`) e quem pode ser NOMEADO executor de uma tarefa. O DE-COORD (tier 0)
+# é o dono das tarefas de triagem de PR e não estava aqui: executor() devolvia '' e a 2ª passagem
+# oferecia a tarefa a QUEM ESTIVESSE LIVRE — o contrário da regra (a verificação vai a quem depende).
+# Reconhecer nome != receber trabalho: o empurra continua a despachar só para builders.
+papeis={p for p in reg}
 done=set(); ruim={}; ult={}
 rf=f'{AI}/roadmap/results.jsonl'
 if os.path.exists(rf):
@@ -118,16 +123,24 @@ for papel,t in builders:
         out.append((papel,msg[:580],r['task'],fr)); continue
     # (3) sem puxada: entrega nova
     pick=qpick=None
-    for pref in (True,False):
+    # 01/09 (revisão do COMANDO ao pr-cr-fila): a posição no ficheiro só dá prioridade DENTRO da fila —
+    # `filas` é alfabético, logo uma row prioritária no topo de fila-sustentacao perdia para qualquer
+    # elegível em fila-funil. O dono pediu prioridade GLOBAL ("aprovar o que já foi construído vem
+    # antes de construir mais"), por isso o nível de prioridade envolve o ciclo todo: primeiro as rows
+    # com prioridade 0 (hoje: PR com alterações pedidas), em todas as filas; só depois o resto.
+    for prio_only in (True,False):
+      for pref in (True,False):
         for q in filas:
             for r in load(q):
                 if r.get('status')!='fila' or r.get('task') in done_result or r.get('task') in ruim or r.get('fora_da_janela'): continue
+                if prio_only and r.get('prioridade')!=0: continue
                 ex=executor(r.get('builder_sugerido'))
                 if pref and ex!=papel: continue
                 if not pref and ex: continue
                 if all(d in done for d in (r.get('depende_de') or [])): pick,qpick=r,q; break
             if pick: break
         if pick: break
+      if pick: break
     if not pick: continue
     if not DRY:
         with open(qpick,'r+') as fh:

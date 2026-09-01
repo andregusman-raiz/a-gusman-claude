@@ -34,7 +34,15 @@ if os.path.exists(r):
 # `if dn and papel not in dn` nao filtra -> a E-60 (bloqueada, do SALARIOS) foi oferecida ao FUNIL.
 # Popular o campo no filas-sync era necessario e NAO suficiente: o consumidor tem lista propria.
 # Reparacao minima (P9). Estrutural por fazer: derivar PAPEIS do registry.json, que ja os tem.
-PAPEIS={"DE-MIG","DE-DATA","DE-SYNC","DE-BUILD-B","FUNIL","DE-CODEX","FUNIL-WP4","SALARIOS"}
+# 01/09: derivado do registry (a "reparacao estrutural por fazer" que este proprio comentario pedia).
+def _papeis():
+    base={"DE-MIG","DE-DATA","DE-SYNC","DE-BUILD-B","FUNIL","DE-CODEX","FUNIL-WP4","SALARIOS","DE-COORD"}
+    try:
+        _r=json.load(open(os.path.expanduser("~/Claude/docs/ai-state/terminais/registry.json")))["terminais"]
+        base|={k for k in _r if k}
+    except Exception: pass
+    return base
+PAPEIS=_papeis()
 def executor(bs):
     bs=bs or ""
     if "Codex" in bs:

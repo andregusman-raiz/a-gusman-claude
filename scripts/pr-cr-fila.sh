@@ -86,6 +86,16 @@ try:
         claim_dono[int(pr)]=c.get("papel") or c.get("owner") or ""
 except Exception: pass
 
+# 01/09 (medido no teste): o campo `papel` do claim traz às vezes SENTINELAS em prosa — "(sem dono
+# declarado)" — que são texto e passam como se fossem papel. executor() não os reconhece, devolve "",
+# e a 2ª passagem do empurra oferece a tarefa a QUEM ESTIVER LIVRE. Só vale papel que EXISTE no registry.
+try:
+    _reg=json.load(open(f"{AI}/terminais/registry.json"))["terminais"]
+    _PAPEIS={k for k in _reg if k}
+except Exception:
+    _PAPEIS={"DE-MIG","DE-DATA","DE-SYNC","DE-BUILD-B","FUNIL","SALARIOS","DE-COORD"}
+claim_dono={k:(v if v in _PAPEIS else "") for k,v in claim_dono.items()}
+
 ult={}
 if os.path.exists(RES):
     for l in open(RES):
@@ -106,7 +116,37 @@ def result(papel,task,status,prova,nota):
     with open(RES,"a") as fh:
         fcntl.flock(fh,fcntl.LOCK_EX); fh.write(json.dumps(linha,ensure_ascii=False)+"\n")
 
-novos=[]; fechados=[]; externos=[]; ja_reenviados=[]
+novos=[]; fechados=[]; externos=[]; ja_reenviados=[]; obsoletas=[]
+
+# 01/09 (revisão do COMANDO, ponto c): se o PR mergear/fechar enquanto a tarefa está PUXADA, ela fica
+# puxada para sempre e o fila-empurra lembra o papel 1×/60min sobre trabalho que já não existe — um
+# lembrete periódico de uma coisa morta ensina a frota a ignorar lembretes. Fecho por evento:
+# task CR-<n> cuja PR já não está aberta → RESULT done com o estado real como prova, e a row sai.
+_abertos={d["pr"] for d in det}
+import subprocess
+for q in glob.glob(f"{QD}/fila-*.jsonl"):
+    rows=carrega(q); mudou=False; manter=[]
+    for r in rows:
+        t=r.get("task","")
+        if r.get("origem")!="pr-cr-fila" or not t.startswith("CR-"): manter.append(r); continue
+        n=int(t[3:])
+        if n in _abertos: manter.append(r); continue
+        estado=""
+        try:
+            estado=json.loads(subprocess.run(["gh","pr","view",str(n),"-R",os.environ["REPO"],"--json","state"],
+                              capture_output=True,text=True,timeout=40).stdout or "{}").get("state","")
+        except Exception:
+            manter.append(r); continue          # falha de rede: NÃO apagar (ausência não é prova)
+        if estado in ("MERGED","CLOSED"):
+            if (ult.get(t) or {}).get("status")!="done" and not DRY:
+                result("tick",t,"done",f"gh pr view {n} --json state = {estado}",
+                       f"PR #{n} {estado}: tarefa de correcao deixou de ter objecto")
+            obsoletas.append(n); mudou=True
+        elif estado:
+            manter.append(r)                     # voltou a aberto sem CR: fica, o proximo ciclo decide
+        else:
+            manter.append(r)
+    if mudou and not DRY: grava(q,manter)
 por_fila={}   # fila -> lista de rows a inserir no topo
 
 for d in det:
@@ -137,7 +177,12 @@ for d in det:
          "resumo":(f"PR #{n} com alteracoes pedidas ha {h:.0f}h e SEM envio depois — responder e reenviar."
                    + ("" if fr!="revisao" else f" [TRIAGEM: sem frente canonica{' nem dono' if not claim_dono.get(n) else ''}; tema do claim: {_fr or 'nenhum'}]")
                    + f" {d['titulo']}"),
-         "status":"fila","depende_de":[],"builder_sugerido":claim_dono.get(n,""),
+         # 01/09 (revisão do COMANDO, lendo o fila_empurra): builder_sugerido VAZIO não deixa a tarefa
+         # inerte — o ciclo `for pref in (True,False)` oferece-a na 2ª passagem a QUEM ESTIVER OCIOSO.
+         # Isso é pior que ficar parada: uma CR sobre um PR alheio cai em cima de quem calhou estar
+         # livre, e a lição de hoje é a inversa (a verificação vai a quem DEPENDE). Sem dono no claim,
+         # o dono é o coordenador da fila de PRs — atribuir é a função dele, não é inventar responsável.
+         "status":"fila","depende_de":[],"builder_sugerido":(claim_dono.get(n) or "DE-COORD"),
          "prova":"","prioridade":0,"pr":n,"cr_em":d["cr_em"],"origem":"pr-cr-fila","derivado_em":NOW}
     por_fila.setdefault(q,[]).append(row)
     novos.append(n)
@@ -152,6 +197,10 @@ if not DRY:
             if t in idx:                       # upsert: actualiza a idade/resumo, mantém o resto
                 a=atuais[idx[t]]
                 a["resumo"]=r["resumo"]; a["derivado_em"]=NOW
+                a["prioridade"]=0
+                # rows antigas sem dono -> 2ª passagem do empurra as dava a quem estivesse livre.
+                # "sem dono" inclui SENTINELA em prosa ("(sem dono declarado)"), que não é vazio mas também não é papel.
+                if a.get("builder_sugerido") not in _PAPEIS: a["builder_sugerido"]=r["builder_sugerido"]
                 if a.get("status") in ("done","bloqueada"): a["status"]="fila"
             else:
                 topo.append(r)
@@ -160,7 +209,7 @@ if not DRY:
             atuais=topo+atuais                 # TOPO = prioridade
         grava(q,atuais)
 
-print(f"pr-cr-fila: {len(det)} PRs em CR · tarefas novas {len(novos)} {sorted(novos)} · "
+print(f"pr-cr-fila: obsoletas fechadas {len(obsoletas)} {sorted(obsoletas)} · {len(det)} PRs em CR · tarefas novas {len(novos)} {sorted(novos)} · "
       f"fechadas por reenvio {len(fechados)} {sorted(fechados)} · ja reenviados {len(ja_reenviados)} · "
       f"externos ignorados {len(externos)}" + (" [DRY]" if DRY else ""))
 PY
