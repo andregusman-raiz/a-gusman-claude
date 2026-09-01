@@ -13,7 +13,19 @@ for qq in glob.glob(f'{D}/filas/fila-*.jsonl'):
     for l in open(qq):
         try: todas.add(json.loads(l)['task'])
         except Exception: pass
-for prog in ('funil','parcelas','prontidao','sustentacao','salarios'):
+# 01/09: a lista de programas era HARDCODED — terceira lista assim num dia (papéis no empurra, papéis
+# no pull, programas aqui), todas a falhar da mesma forma: o que não está na lista não existe, em
+# silêncio. Um programa novo (fgts) ficava sem fila e ninguém dava por isso. Agora deriva-se do
+# directório: é programa o .md que tem pelo menos uma linha de Entrega no formato "  E-nn · ".
+_ignora={'ROADMAP','MEDICOES','MUDOU','DESPACHO'}
+_progs=[]
+for _f in sorted(glob.glob(f'{D}/*.md')):
+    _b=os.path.basename(_f)[:-3]
+    if _b in _ignora or _b.startswith(('_','RELATORIO-','PLANO-')): continue
+    try:
+        if re.search(r'^  E-\d+', open(_f).read(), re.M): _progs.append(_b)
+    except Exception: pass
+for prog in _progs:
     md=f'{D}/{prog}.md'; q=f'{D}/filas/fila-{prog}.jsonl'
     if not os.path.exists(md): continue
     have=todas
