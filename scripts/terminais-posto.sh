@@ -91,9 +91,15 @@ for papel,v in reg.items():
     except Exception: continue
     mins=int((now-t).total_seconds()//60)
     if mins < LIM: continue
+    # 01/09 (COMANDO, achado do DE-BUILD-B): tem_posto() era so alcancavel no ramo elif, ou seja SO com
+    # trabalho vazio — logo um papel com claim aberto E posto declarado era nudgeado a cada ciclo, e esse e
+    # justamente o caso mais comum de precisar de posto (bloqueado numa Entrega real, nao ocioso).
+    # tem_posto() ja tem janela de 12 h, portanto posto velho volta a alertar sozinho.
+    if tem_posto(papel):
+        continue
     if trabalho:
         alertas.append((papel,f'calado ha {mins} min',trabalho))
-    elif not tem_posto(papel):
+    else:
         alertas.append((papel,f'calado ha {mins} min e sem Entrega em curso nem posto',[]))
 
 if not alertas:
