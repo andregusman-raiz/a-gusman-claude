@@ -123,6 +123,11 @@ with open(q,"r+") as fh:
         if any(d not in done for d in deps): causas["dep-por-fechar"]+=1; continue
         if all(dep_ok(d) for d in deps): pick=row; break
         causas["pr-por-mergear"]+=1
+    outras={}
+    for x in rows:
+        st=x.get("status") or "?"
+        if st!="fila": outras[st]=outras.get(st,0)+1
+    extra="; fora da contagem: "+", ".join(f"{v} {k}" for k,v in sorted(outras.items())) if outras else ""
     def persist():
         fh.seek(0); fh.truncate()
         for row in rows: fh.write(json.dumps(row,ensure_ascii=False)+"\n")
@@ -136,13 +141,13 @@ with open(q,"r+") as fh:
         if not pick:
             bloq=sum(1 for x in rows if x.get("status")=="fila")
             det=", ".join(f"{v} {k}" for k,v in causas.items() if v) or "0 razões contadas"
-            print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila: {det})"); sys.exit(0)
+            print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila: {det}{extra})"); sys.exit(0)
         print("PRÓXIMA (peek):", json.dumps(pick,ensure_ascii=False)[:400]); sys.exit(0)
     if not pick:
         if changed: persist()
         bloq=sum(1 for x in rows if x.get("status")=="fila")
         det=", ".join(f"{v} {k}" for k,v in causas.items() if v) or "0 razões contadas"
-        print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila: {det})"); sys.exit(0)
+        print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila: {det}{extra})"); sys.exit(0)
     pick["status"]="puxada"; pick["puxada_por"]=papel; pick["puxada_em"]=datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     persist()
     print("PUXADA:", json.dumps(pick,ensure_ascii=False)[:500])

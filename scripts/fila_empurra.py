@@ -142,6 +142,20 @@ if not DRY:
                         # não reabre — e deixa rasto no ficheiro, porque não reabrir em silêncio é a
                         # mesma família do defeito: uma decisão que ninguém consegue ver.
                         r['conflito_retractacao']=f"{_quem}!={_dono_done}"; r['conflito_em']=_r.get('ts',''); ch=True
+                elif ult.get(r['task'],{}).get('status')=='retracted' and r.get('status')=='bloqueada':
+                    # 01/09 (achado do COMANDO, consequencia medida no SALARIOS): a retractacao de um blocked
+                    # ERRADO chegava ao ledger e NUNCA a row — o mapa _st do filas-sync so se aplica a row NOVA
+                    # e nenhum ramo aqui olhava para row 'bloqueada'. 'bloqueada' era pegajoso: nada que o papel
+                    # escrevesse o revertia, e a fila lia-se vazia sobre trabalho dele. Guard de autoria igual ao
+                    # ramo de cima: so quem escreveu o blocked/failed (ou origem automatica) o reabre ao retractar.
+                    _r=ult.get(r['task'],{}); _quem=_r.get('papel') or ''
+                    _dono_blk=''
+                    for _a in reversed(hist.get(r['task'],[])):
+                        if _a.get('status') in ('blocked','failed'): _dono_blk=_a.get('papel') or ''; break
+                    if _quem==_dono_blk or _dono_blk in ('','seed','tick'):
+                        r['status']='fila'; r.pop('bloqueio',None); ch=True
+                    elif r.get('conflito_retractacao') != f"{_quem}!={_dono_blk}":
+                        r['conflito_retractacao']=f"{_quem}!={_dono_blk}"; r['conflito_em']=_r.get('ts',''); ch=True
             if ch: save(fh,rows)
 def executor(bs):
     bs=bs or ''
