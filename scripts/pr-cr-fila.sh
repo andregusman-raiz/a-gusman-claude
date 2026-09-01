@@ -162,8 +162,15 @@ for d in det:
                        f"PR #{n}: correcao enviada depois do pedido; aguarda re-review")
             fechados.append(n)
         continue
-    if (ult.get(task) or {}).get("status")=="done":
-        continue   # já fechado antes e sem CR nova
+    # 01/09 15:5xZ (medido): 4 tarefas foram fechadas com `done` pelos papéis SEM que houvesse envio
+    # depois da review — três delas sem nota nenhuma. O papel respondeu por comentário e deu por feito,
+    # mas o portão do bot só reabre com push: o PR continua parado e a tarefa nunca mais era recriada,
+    # porque o `done` a suprimia para sempre. `done` declarado não é efeito no mundo: o critério
+    # objetivo (envio posterior à CR) é que fecha. Reabre, com o motivo escrito e contado.
+    _u=(ult.get(task) or {})
+    if _u.get("status")=="done":
+        _n_reab=int(_u.get("reaberturas") or 0)+1
+        d["_reaberta"]=(_n_reab, _u.get("ts",""), _u.get("papel",""))
     # 01/09 (teste seco do próprio autor): o campo `frente` do claim é o TEMA (contabil, vault-assistant,
     # merge-queue…), não a frente que os construtores puxam. A 1ª execução criou 10 filas com UMA tarefa
     # cada e zero rows pré-existentes — filas que ninguém lê. Só entram nas filas com movimento real;
@@ -174,7 +181,8 @@ for d in det:
     q=f"{QD}/fila-{fr}.jsonl"
     h=horas(d["cr_em"])
     row={"task":task,"frente":fr,
-         "resumo":(f"PR #{n} com alteracoes pedidas ha {h:.0f}h e SEM envio depois — responder e reenviar."
+         "resumo":((f"REABERTA ({d['_reaberta'][0]}x): {d['_reaberta'][2]} registou done as {d['_reaberta'][1][11:16]} mas NAO houve envio depois da review — o bot so re-avalia com PUSH. " if d.get("_reaberta") else "")
+                   + f"PR #{n} com alteracoes pedidas ha {h:.0f}h e SEM envio depois — responder e reenviar."
                    + ("" if fr!="revisao" else f" [TRIAGEM: sem frente canonica{' nem dono' if not claim_dono.get(n) else ''}; tema do claim: {_fr or 'nenhum'}]")
                    + f" {d['titulo']}"),
          # 01/09 (revisão do COMANDO, lendo o fila_empurra): builder_sugerido VAZIO não deixa a tarefa
@@ -183,7 +191,8 @@ for d in det:
          # livre, e a lição de hoje é a inversa (a verificação vai a quem DEPENDE). Sem dono no claim,
          # o dono é o coordenador da fila de PRs — atribuir é a função dele, não é inventar responsável.
          "status":"fila","depende_de":[],"builder_sugerido":(claim_dono.get(n) or "DE-COORD"),
-         "prova":"","prioridade":0,"pr":n,"cr_em":d["cr_em"],"origem":"pr-cr-fila","derivado_em":NOW}
+         "prova":"","prioridade":0,"pr":n,"cr_em":d["cr_em"],"origem":"pr-cr-fila","derivado_em":NOW,
+         "reaberturas":(d["_reaberta"][0] if d.get("_reaberta") else 0)}
     por_fila.setdefault(q,[]).append(row)
     novos.append(n)
 
@@ -198,6 +207,7 @@ if not DRY:
                 a=atuais[idx[t]]
                 a["resumo"]=r["resumo"]; a["derivado_em"]=NOW
                 a["prioridade"]=0
+                a["reaberturas"]=r.get("reaberturas",0)   # senão o contador ficava preso em 1x
                 # rows antigas sem dono -> 2ª passagem do empurra as dava a quem estivesse livre.
                 # "sem dono" inclui SENTINELA em prosa ("(sem dono declarado)"), que não é vazio mas também não é papel.
                 if a.get("builder_sugerido") not in _PAPEIS: a["builder_sugerido"]=r["builder_sugerido"]
