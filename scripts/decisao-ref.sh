@@ -47,11 +47,15 @@ Toda mutação via registry_lib.mutate (flock + tmp + os.replace) — nunca open
                     (docs/ai-state/terminais/registry.json) quando omitido; sem match e sem
                     esta flag -> recusa.
   --forcar          permite sobrescrever `recomendacao`/`efeito` já preenchidos.
+                    NÃO cobre `decidida_em`: esse campo é sobrescrito SEMPRE, por desenho —
+                    corrigir datas é o trabalho deste script. As protecções de `decidida_em` são
+                    outras três: formato, data no futuro, e decisão ainda "aberta".
+                    (01/09: a linha do exit 6 prometia guarda de "campo já preenchido" que nunca
+                    existiu para este campo — texto a descrever mecanismo inexistente, removido.)
 
 Exit codes: 0 ok | 2 uso inválido/nenhum argumento de mudança/--bloqueado-por sem --motivo/
             --bloqueado-por junto de --desbloquear | 3 papel não resolvido | 4 id inexistente |
-            5 lock preso | 6 --decidida-em inválido (aberta/futuro/formato/campo já preenchido
-            sem --forcar) | 7 --bloqueado-por inválido (papel inexistente no registry ou
+            5 lock preso | 6 --decidida-em inválido (aberta/futuro/formato) | 7 --bloqueado-por inválido (papel inexistente no registry ou
             auto-bloqueio).
 
 Ao final roda decisoes-render.sh (view/ARQUIVO refletem a correção imediatamente) e imprime
