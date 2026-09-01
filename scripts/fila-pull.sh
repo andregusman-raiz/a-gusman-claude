@@ -72,12 +72,13 @@ with open(q,"r+") as fh:
     rows=[json.loads(l) for l in fh if l.strip()]
     changed=False
     pick=None
+    causas={"fora-da-janela":0,"dep-por-fechar":0,"de-outro-papel":0,"bloqueada-p-mim":0}
     for row in rows:
         if row.get("status")!="fila": continue
         # 31/08 00:3xZ: o empurra ja respeitava `fora_da_janela` (fila_empurra.py:112) e o pull nao —
         # E-30..E-34 continuavam puxaveis com a cadeia declarada fora do programa em parcelas.md:5.
         # O campo e DERIVADO pelo filas-sync a cada tick; e a unica representacao do facto.
-        if row.get("fora_da_janela"): continue
+        if row.get("fora_da_janela"): causas["fora-da-janela"]+=1; continue
         if (row.get("task") or "") in done:
             row["status"]="done"; changed=True; continue   # reconcilia rótulo velho com results.jsonl
         # 30/08: o fila-empurra ja filtrava por builder_sugerido (fila_empurra.py:54-56) e o pull
@@ -86,10 +87,11 @@ with open(q,"r+") as fh:
         # A frente NAO e o builder: fila-funil tem seccao do DE e seccao do consumidor.
         # So filtra quando o campo esta preenchido — tarefa sem sugestao continua a ser de quem chegar.
         tk=row.get("task") or ""; dn=donos(row.get("builder_sugerido") or "")
-        if ult.get(tk) in ("blocked","failed") and (not dn or ult_papel.get(tk)==papel): continue   # so nao se re-oferece a QUEM bloqueou
-        if dn and papel not in dn: continue   # so quem pode iniciar (executor ou especificador) puxa
+        if ult.get(tk) in ("blocked","failed") and (not dn or ult_papel.get(tk)==papel): causas["bloqueada-p-mim"]+=1; continue   # so nao se re-oferece a QUEM bloqueou
+        if dn and papel not in dn: causas["de-outro-papel"]+=1; continue   # so quem pode iniciar (executor ou especificador) puxa
         deps=row.get("depende_de") or []
         if all(d in done for d in deps): pick=row; break
+        causas["dep-por-fechar"]+=1
     def persist():
         fh.seek(0); fh.truncate()
         for row in rows: fh.write(json.dumps(row,ensure_ascii=False)+"\n")
@@ -102,12 +104,14 @@ with open(q,"r+") as fh:
     if peek=="--peek":
         if not pick:
             bloq=sum(1 for x in rows if x.get("status")=="fila")
-            print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila, bloqueadas por dependência)"); sys.exit(0)
+            det=", ".join(f"{v} {k}" for k,v in causas.items() if v) or "0 razões contadas"
+            print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila: {det})"); sys.exit(0)
         print("PRÓXIMA (peek):", json.dumps(pick,ensure_ascii=False)[:400]); sys.exit(0)
     if not pick:
         if changed: persist()
         bloq=sum(1 for x in rows if x.get("status")=="fila")
-        print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila, bloqueadas por dependência)"); sys.exit(0)
+        det=", ".join(f"{v} {k}" for k,v in causas.items() if v) or "0 razões contadas"
+        print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila: {det})"); sys.exit(0)
     pick["status"]="puxada"; pick["puxada_por"]=papel; pick["puxada_em"]=datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     persist()
     print("PUXADA:", json.dumps(pick,ensure_ascii=False)[:500])
