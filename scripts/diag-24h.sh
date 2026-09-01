@@ -62,6 +62,33 @@ chk "strict na main (O2)" "$(gh api repos/$REPO/branches/main/protection --jq '.
 chk "allow_auto_merge (G1 hold=estado)" "$(gh api repos/$REPO --jq '.allow_auto_merge' 2>/dev/null)"
 chk "rulesets/merge queue (Q2)" "$(gh api repos/$REPO/rulesets --jq 'length' 2>/dev/null)"
 chk "PRs abertos >7d (O4)" "$OLD7"
+# 01/09 (3a face do dia, achado COMANDO/FUNIL): blocked DEPOIS de done nunca desce a row — row `done`
+# velha engana quem LE a row (o dep-check dos consumidores le o LEDGER e esta seguro). Sonda: NAO corrige,
+# so lista — a reconciliacao silenciosa apagaria done posto a mao (P9 pesa; decisao adiada de proposito).
+DIVROWS=$(python3 - <<'PYD'
+import json,glob,os
+AI=os.path.expanduser('~/Claude/docs/ai-state'); ult={}
+try:
+    for l in open(f'{AI}/roadmap/results.jsonl'):
+        try: e=json.loads(l)
+        except: continue
+        if e.get('status') in ('posto','anulado'): continue
+        ult[e.get('task')]=e.get('status')
+except Exception: pass
+mapa={'done':'done','blocked':'bloqueada','failed':'bloqueada'}
+tot=[]; per=[]
+for q in glob.glob(f'{AI}/roadmap/filas/fila-*.jsonl'):
+    for l in open(q):
+        try: r=json.loads(l)
+        except: continue
+        t=r.get('task'); esp=mapa.get(ult.get(t) or '')
+        if not esp or r.get('status') in (esp,'puxada'): continue
+        tot.append(t)
+        if r.get('status')=='done' and esp=='bloqueada': per.append(t)
+print(f"{len(tot)} divergentes; PERIGOSAS (row done, ledger blocked): {len(per)} {' '.join(sorted(set(per))[:6])}")
+PYD
+)
+chk "LEDGER<->ROWS (sonda, nao corrige)" "$DIVROWS"
 chk "caps threads nativas no Railway (D-097)" "$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway variables --service "${DE_RAILWAY_SERVICE:-raiz-data-engine}" --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([k for k in d if any(s in k for s in ('OPENBLAS','OMP_NUM','MKL_NUM','NUMEXPR','ARROW_NUM'))]),'/5')" 2>/dev/null)"
 chk "tick tem board-sync/DESPACHO/aprovador (branch spec/board-sync mergeada)" "$(grep -c 'board-sync\|DESPACHO\|de-aprovador' "$HOME/Claude/.claude/scripts/de-fila-tick.sh" 2>/dev/null) refs"
 chk "cap mecânico de palavras no canal-append (T1)" "$(grep -cE 'wc -w|MAX_WORDS' "$HOME/Claude/.claude/scripts/canal-append.sh" 2>/dev/null)"
