@@ -11,7 +11,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 usage() {
   cat <<'EOF'
 Uso: decisao-ref.sh D-nnn [--pr N]... [--pr-remove N]... [--decidida-em <ISO|AAAA-MM-DD>]
-     [--recomendacao "<texto>"] [--efeito "<texto>"] [--bloco 1|2|3|4] [--motivo "<texto>"]
+     [--recomendacao "<texto>"] [--efeito "<texto>"] [--bloco 1|2|3|4] [--classe A|B|C|D]
+     [--motivo "<texto>"]
      [--bloqueado-por PAPEL --motivo "<texto>"] [--desbloquear]
      [--papel X] [--forcar]
 
@@ -32,6 +33,10 @@ Toda mutação via registry_lib.mutate (flock + tmp + os.replace) — nunca open
                     (o valor antigo vai para `anomalias`, nunca é descartado em silêncio).
   --efeito T        mesma regra do --recomendacao, para o campo `efeito`.
   --bloco N         1|2|3|4 — corrige o bloco de ranking; valor antigo vai para anomalias.
+  --classe C        A|B|C|D — classe da ALCADA. PREENCHE campo vazio livremente (backfill de
+                    ficha cunhada antes de --classe ser obrigatorio). TROCAR uma classe ja
+                    definida exige --forcar: a classe decide o ROTEAMENTO (A vai ao dono),
+                    e mudar isso em silencio desvia uma decisao de quem a tem de ver.
   --motivo T        texto livre anexado às anomalias registradas por esta chamada (de onde
                     veio a informação — narrativa, log, pedido de outro papel). OBRIGATÓRIO
                     junto de --bloqueado-por (vira o campo `bloqueio.motivo`).
@@ -72,6 +77,7 @@ HAS_RECOMENDACAO=0
 EFEITO=""
 HAS_EFEITO=0
 BLOCO=""
+CLASSE=""
 MOTIVO=""
 PAPEL_OVERRIDE=""
 FORCAR=0
@@ -94,6 +100,12 @@ while [[ $# -gt 0 ]]; do
         *) echo "RECUSADO: --bloco inválido '$2' — use 1|2|3|4" >&2; exit 2 ;;
       esac
       BLOCO="$2"; shift 2 ;;
+    --classe) [[ $# -ge 2 ]] || { echo "RECUSADO: --classe exige valor" >&2; exit 2; }
+      case "$2" in
+        A|B|C|D) ;;
+        *) echo "RECUSADO: --classe invalida '$2' — use A|B|C|D" >&2; exit 2 ;;
+      esac
+      CLASSE="$2"; shift 2 ;;
     --motivo) [[ $# -ge 2 ]] || { echo "RECUSADO: --motivo exige valor" >&2; exit 2; }; MOTIVO="$2"; shift 2 ;;
     --bloqueado-por) [[ $# -ge 2 ]] || { echo "RECUSADO: --bloqueado-por exige valor" >&2; exit 2; }; BLOQUEADO_POR="$2"; HAS_BLOQUEADO_POR=1; shift 2 ;;
     --desbloquear) DESBLOQUEAR=1; shift ;;
@@ -129,9 +141,9 @@ fi
 
 # Nenhum argumento de mudança -> recusa antes de tocar no JSON.
 if [[ "${#PR_ADD[@]}" -eq 0 && "${#PR_REMOVE[@]}" -eq 0 && -z "$DECIDIDA_EM_RAW" \
-      && "$HAS_RECOMENDACAO" -eq 0 && "$HAS_EFEITO" -eq 0 && -z "$BLOCO" \
+      && "$HAS_RECOMENDACAO" -eq 0 && "$HAS_EFEITO" -eq 0 && -z "$BLOCO" && -z "$CLASSE" \
       && "$HAS_BLOQUEADO_POR" -eq 0 && "$DESBLOQUEAR" -eq 0 ]]; then
-  echo "RECUSADO: nenhum argumento de mudança — passe pelo menos um de --pr/--pr-remove/--decidida-em/--recomendacao/--efeito/--bloco/--bloqueado-por/--desbloquear" >&2
+  echo "RECUSADO: nenhum argumento de mudança — passe pelo menos um de --pr/--pr-remove/--decidida-em/--recomendacao/--efeito/--bloco/--classe/--bloqueado-por/--desbloquear" >&2
   exit 2
 fi
 
@@ -190,6 +202,7 @@ OUT=$(REGISTRY_LIB_DIR="$SCRIPT_DIR" \
   HAS_RECOMENDACAO="$HAS_RECOMENDACAO" RECOMENDACAO="$RECOMENDACAO" \
   HAS_EFEITO="$HAS_EFEITO" EFEITO="$EFEITO" \
   BLOCO="$BLOCO" \
+  CLASSE="$CLASSE" \
   HAS_BLOQUEADO_POR="$HAS_BLOQUEADO_POR" BLOQUEADO_POR="$BLOQUEADO_POR" DESBLOQUEAR="$DESBLOQUEAR" \
   python3 <<'PYEOF'
 import datetime
@@ -216,6 +229,7 @@ HAS_EFEITO = os.environ["HAS_EFEITO"] == "1"
 EFEITO = os.environ.get("EFEITO") or ""
 BLOCO_RAW = os.environ.get("BLOCO") or ""
 BLOCO = int(BLOCO_RAW) if BLOCO_RAW else None
+CLASSE = os.environ.get("CLASSE") or None
 HAS_BLOQUEADO_POR = os.environ["HAS_BLOQUEADO_POR"] == "1"
 BLOQUEADO_POR = os.environ.get("BLOQUEADO_POR") or ""
 DESBLOQUEAR = os.environ["DESBLOQUEAR"] == "1"
@@ -308,6 +322,25 @@ def do_ref(reg):
             )
             alvo["bloco"] = BLOCO
             diff.append(("bloco", antes_bloco, BLOCO))
+            changed = True
+
+    # --classe — backfill livre sobre vazio; TROCA exige --forcar (a classe decide o roteamento).
+    if CLASSE is not None:
+        antes_classe = alvo.get("classe")
+        if antes_classe != CLASSE:
+            if antes_classe not in (None, "", "None") and not FORCAR:
+                print(
+                    f"RECUSADO: {ID} ja tem classe {antes_classe!r}; trocar para {CLASSE!r} "
+                    "muda o roteamento (A vai ao dono) — repita com --forcar e --motivo.",
+                    file=sys.stderr,
+                )
+                sys.exit(6)
+            alvo["anomalias"].append(
+                f"classe {'preenchida' if antes_classe in (None, '', 'None') else 'trocada'} de "
+                f"{antes_classe!r} para {CLASSE!r} por {PAPEL} em {now_iso}{motivo_sufixo}"
+            )
+            alvo["classe"] = CLASSE
+            diff.append(("classe", antes_classe, CLASSE))
             changed = True
 
     # --recomendacao / --efeito — só sobre campo vazio, a menos que --forcar.
