@@ -10,12 +10,42 @@ python3 - "$Q" "$R" "$PA" "$PEEK" <<'PY'
 import sys,json,fcntl,datetime,os,re
 q,r,papel,peek=sys.argv[1:5]
 # 31/08 (claude-8a; revisto COMANDO): "done" era substring sobre TODAS as linhas → Entrega reaberta (retracted/blocked depois) voltava a done. Agora: ÚLTIMO RESULT por task.
-_ult={}
+_ult={}; _ent={}
 if os.path.exists(r):
     for l in open(r):
-        try: e=json.loads(l); _ult[e.get("task")]=e.get("status")
+        try: e=json.loads(l); _ult[e.get("task")]=e.get("status"); _ent[e.get("task")]=e
         except Exception: pass
 done={t for t,st in _ult.items() if st=="done"}
+# 01/09 (rota do COMANDO, classe B — alinhamento com fila_empurra._pr_ok, familia E-23/#6417):
+# done citando PR ainda ABERTO nao satisfaz dependencia. O empurra segurava as tasks e o pull
+# oferecia-as (E-204 done citando #254 OPEN -> pull ofereceu E-207); a guarda so vale pelo
+# consumidor mais fraco. Direcao do erro exigida na rota: FAIL-CLOSED — estado indeterminavel
+# (gh falhou) NAO oferece. Sem numero citado -> sem rede, nada muda.
+import subprocess
+_frente=os.path.basename(q)[5:-6]; _merged_cache={}
+def _repo_frente():
+    try:
+        _m=re.search(r'\brepo ((?:GitHub-raiz|GitHub-pessoal|GitHub|Projetos)/[A-Za-z0-9._-]+)',open(os.path.join(os.path.dirname(q),'..',f'{_frente}.md')).read(4000))
+        if not _m: return None
+        _url=subprocess.run(['git','-C',os.path.expanduser('~/Claude/'+_m.group(1)),'remote','get-url','origin'],capture_output=True,text=True,timeout=5).stdout.strip()
+        _mm=re.search(r'github\.com[:/]([^/\s]+/[^/\s]+?)(?:\.git)?$',_url)
+        return _mm.group(1) if _mm else None
+    except Exception: return None
+def _merged_of(repo):
+    if repo not in _merged_cache:
+        try: _merged_cache[repo]=set(json.loads(subprocess.run(['gh','pr','list','-R',repo,'--state','merged','--search','merged:>=2026-08-23','--json','number','--jq','[.[].number]','--limit','300'],capture_output=True,text=True,timeout=30).stdout or '[]'))
+        except Exception: _merged_cache[repo]=None
+    return _merged_cache[repo]
+def dep_ok(t):
+    e=_ent.get(t) or {}
+    def _flat(v): return [str(x) for x in v] if isinstance(v,(list,tuple,set)) else [str(v)]
+    nums={int(x) for src in (_flat(e.get('pr') or ''))+re.findall(r'#(\d{3,5})',str(e.get('nota',''))+' '+str(e.get('prova_cmd',''))) for x in re.split(r'[,\s;]+',str(src)) if x.isdigit()}
+    if not nums: return True
+    repos=['Raiz-Educacao-SA/raiz-data-engine']; rf=_repo_frente()
+    if rf and rf not in repos: repos.append(rf)
+    sets=[m for m in (_merged_of(x) for x in repos) if m is not None]
+    if any(n in m for n in nums for m in sets): return True
+    return False   # nao encontrado OU lista indeterminavel -> fail-closed
 # 30/08 23:4xZ: o estado DERIVA do ultimo RESULT (regra em _POLITICAS-COMUNS), mas o pull so lia a fila.
 # Caso medido: E-35b 'bloqueada' em fila-funil e 'fila' em fila-prontidao (o filas-sync criou a 2a row);
 # o ultimo RESULT e blocked, e o pull ia oferece-la ao FUNIL — que foi quem a devolveu bloqueada.
@@ -72,7 +102,7 @@ with open(q,"r+") as fh:
     rows=[json.loads(l) for l in fh if l.strip()]
     changed=False
     pick=None
-    causas={"fora-da-janela":0,"dep-por-fechar":0,"de-outro-papel":0,"bloqueada-p-mim":0}
+    causas={"fora-da-janela":0,"dep-por-fechar":0,"pr-por-mergear":0,"de-outro-papel":0,"bloqueada-p-mim":0}
     for row in rows:
         if row.get("status")!="fila": continue
         # 31/08 00:3xZ: o empurra ja respeitava `fora_da_janela` (fila_empurra.py:112) e o pull nao —
@@ -90,8 +120,9 @@ with open(q,"r+") as fh:
         if ult.get(tk) in ("blocked","failed") and (not dn or ult_papel.get(tk)==papel): causas["bloqueada-p-mim"]+=1; continue   # so nao se re-oferece a QUEM bloqueou
         if dn and papel not in dn: causas["de-outro-papel"]+=1; continue   # so quem pode iniciar (executor ou especificador) puxa
         deps=row.get("depende_de") or []
-        if all(d in done for d in deps): pick=row; break
-        causas["dep-por-fechar"]+=1
+        if any(d not in done for d in deps): causas["dep-por-fechar"]+=1; continue
+        if all(dep_ok(d) for d in deps): pick=row; break
+        causas["pr-por-mergear"]+=1
     def persist():
         fh.seek(0); fh.truncate()
         for row in rows: fh.write(json.dumps(row,ensure_ascii=False)+"\n")

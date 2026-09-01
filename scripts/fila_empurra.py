@@ -86,7 +86,9 @@ def _pr_ok(e):
     nums={int(x) for n in nums for s in _flat(n) for x in re.split(r'[,\s;]+',s) if x.isdigit()}
     _rf=_repo_frente.get(_task_frente.get(e.get('task'),''))
     _mf=_merged_of(_rf) if _rf else None
-    if not nums or (_merged is None and _mf is None): return True
+    if not nums: return True
+    # 01/09 (rota do COMANDO, classe B): FAIL-CLOSED — lista indeterminavel (gh falhou) NAO satisfaz.
+    # Antes: `_merged is None -> True` (aberto), apesar do proprio comentario rev2 dizer que aberto e pior.
     _todos=(_merged or set())|(_mf or set())
     return any(n in _todos for n in nums)
 # 31/08 18:5xZ (achado DE-COORD): o mesmo conjunto `done` respondia a DUAS perguntas — (a) "dependencia
