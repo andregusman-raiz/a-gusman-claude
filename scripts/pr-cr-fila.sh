@@ -223,7 +223,13 @@ if not DRY:
                 # rows antigas sem dono -> 2ª passagem do empurra as dava a quem estivesse livre.
                 # "sem dono" inclui SENTINELA em prosa ("(sem dono declarado)"), que não é vazio mas também não é papel.
                 if a.get("builder_sugerido") not in _PAPEIS: a["builder_sugerido"]=r["builder_sugerido"]
-                if a.get("status") in ("done","bloqueada"): a["status"]="fila"
+                # 01/09 (sequencia medida pelo COMANDO: 7 rows CR classificadas 'bloqueada' com bloqueio
+                # preenchido voltavam a 'fila' a cada tick, bloqueio INTACTO — "a explicacao sobrevive e a
+                # consequencia nao"; o filas-sync reportava re-derivadas 0 e estava inocente, o autor era esta
+                # linha). 'bloqueada' com razao medida e classificacao do coordenador: o upsert NAO a desfaz.
+                # Reabrir bloqueada tem UM caminho sancionado: retractacao do proprio autor no ledger
+                # (reconciler do empurra, 7d7cd60). 'done' continua a reabrir aqui (CR vivo sem push posterior).
+                if a.get("status")=="done": a["status"]="fila"
             else:
                 topo.append(r)
         if topo:

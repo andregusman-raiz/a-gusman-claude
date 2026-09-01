@@ -21,7 +21,7 @@ if sys.argv[1]=='--desfaz':
                 r['status']='fila'; r.pop('puxada_por',None); r.pop('puxada_em',None); r.pop('empurrada',None)
         save(fh,rows)
     sys.exit(0)
-DRY=('--dry' in sys.argv)
+DRY=('--dry' in sys.argv)   # NB: a RECONCILIACAO ledger->rows vive em 'if not DRY' — um teste com --dry NAO exercita esse caminho e da FALHA falsa (medido 01/09)
 AI=[a for a in sys.argv[1:] if a!='--dry'][0]; now=datetime.datetime.now(datetime.timezone.utc)
 reg=json.load(open(f'{AI}/terminais/registry.json'))['terminais']
 P=os.path.expanduser('~/.claude/projects')
