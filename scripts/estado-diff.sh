@@ -24,8 +24,11 @@ except Exception: pass
 for f in glob.glob(f'{AI}/roadmap/*.md'):
     if f.endswith(('ROADMAP.md','MUDOU.md')): continue
     for l in open(f,errors='replace'):
-        m=re.match(r'^  (E-[0-9]+[a-z]?) ·.*?· (em curso|fila|estacionada|pronta|PRONTA|BLOQUEADA|bloqueada)\b',l)
-        if m: novo['entregas'][m.group(1)]=m.group(2).lower()
+        # 01/09 (achado do COMANDO): "· bloqueada por E-nn" no .md e DEPENDENCIA por fechar (estado calculado; a row
+        # da fila diz `fila`), nao o rotulo `bloqueada`. Com a mesma palavra no MUDOU, quem comparava com o ficheiro
+        # via "34 NOVO -> bloqueada" e 0 rows bloqueadas e concluia bug do tick. Palavra distinta no relatorio; o campo nao muda.
+        m=re.match(r'^  (E-[0-9]+[a-z]?) ·.*?· (em curso|fila|estacionada|pronta|PRONTA|BLOQUEADA|bloqueada)\b( por )?',l)
+        if m: novo['entregas'][m.group(1)]='dep-por-fechar' if m.group(3) else m.group(2).lower()
 # 01/09 (ordem do dono): este derivador lia SÓ o rótulo do .md, e o rótulo não é o estado — o estado
 # está no results.jsonl. Consequência medida: quando um trabalho TERMINAVA BEM, nenhum mecanismo
 # avisava o COMANDO (o despertador do tick só dispara em blocked/failed/retracted, e o painel é preciso
