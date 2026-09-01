@@ -18,7 +18,8 @@ except Exception as _e:
     _PAPEIS=['DE-BUILD-B','DE-COORD','DE-DATA','DE-SYNC','DE-MIG','SALARIOS','FUNIL','FGTS']
 _BUILDER_RE=r'· ((?:'+'|'.join(re.escape(_p) for _p in _PAPEIS)+r'|Codex[^·]*))'
 
-import glob
+import glob, datetime
+now_iso=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 # COMANDO 23:4xZ: task que muda de programa duplicava (E-35b em funil E prontidao) — "existe" é em QUALQUER fila
 todas=set()
 for qq in glob.glob(f'{D}/filas/fila-*.jsonl'):
@@ -84,4 +85,58 @@ for prog in _progs:
             for r in novos: fh.write(json.dumps(r,ensure_ascii=False)+'\n')
         add += [f"{prog}:{r['task']}" for r in novos]
 print('filas-sync: novas', add or 0)
+
+# ── Entregas ÓRFÃS: trabalhadas no registo e ausentes de toda a fila ────────────────────────────
+# 01/09 (ordem do dono): a fila responde a "o que há para fazer" e o registo a "o que se fez", e nada
+# obrigava o segundo a passar pelo primeiro. Medido: a folha executou E-106/E-107 sem que existissem
+# em fila nenhuma — quem olhava a fila via 7 fechadas e 3 bloqueadas e concluía "parada", enquanto ela
+# registava trabalho de dez em dez minutos. Duas fontes para a mesma pergunta, e a divergência era
+# invisível. Aqui só entram ENTREGAS CANÓNICAS (E-nnn puro): as fatias (E-29-bateria), os registos
+# operacionais (tick-*, POSTO-*, CR-*) e o trabalho pontual NÃO viram linha — inflariam a fila sem
+# nada a puxar; esses já aparecem ao coordenador pelo diff de resultados.
+_JAN='2026-08-30'   # janela de recuperação: não ressuscita histórico antigo
+_orfas=[]
+try:
+    _todas=set()
+    for _qq in glob.glob(f'{D}/filas/fila-*.jsonl'):
+        for _l in open(_qq):
+            try: _todas.add(json.loads(_l)['task'])
+            except Exception: pass
+    _ult={}
+    for _l in open(f'{D}/results.jsonl'):
+        try: _e=json.loads(_l)
+        except Exception: continue
+        if _e.get('status') in ('posto','anulado'): continue
+        _t=_e.get('task','')
+        if _e.get('ts','')>=_JAN and re.fullmatch(r'E-\d+[a-z]?', _t or '') and _t not in _todas:
+            _ult[_t]=_e
+    # frente: gama declarada no programa (E-100..E-109) > frente do papel no registry > revisao (triagem)
+    _gama=[]
+    for _pr in _progs:
+        try: _txt=open(f'{D}/{_pr}.md').read()
+        except Exception: continue
+        _m=re.search(r'GAMA DE IDs[^\n]*?E-(\d+)\.\.E-(\d+)', _txt)
+        if _m: _gama.append((_pr,int(_m.group(1)),int(_m.group(2))))
+    try:
+        _reg=json.load(open(f'{D}/../terminais/registry.json'))['terminais']
+    except Exception: _reg={}
+    _st={'done':'done','blocked':'bloqueada','failed':'bloqueada','retracted':'fila'}
+    for _t,_e in sorted(_ult.items()):
+        _n=int(re.match(r'E-(\d+)',_t).group(1))
+        _fr=next((g[0] for g in _gama if g[1]<=_n<=g[2]), None)
+        if not _fr:
+            _f2=(_reg.get(_e.get('papel'),{}) or {}).get('frente') or ''
+            _fr=_f2 if os.path.exists(f'{D}/filas/fila-{_f2}.jsonl') else 'revisao'
+        _q=f'{D}/filas/fila-{_fr}.jsonl'
+        _row={"task":_t,"frente":_fr,
+              "resumo":f"[recuperada do registo] trabalhada por {_e.get('papel')} sem existir na fila — {str(_e.get('nota') or '')[:110]}",
+              "status":_st.get(_e.get('status'),'fila'),"depende_de":[],"builder_sugerido":_e.get('papel') or "",
+              "prova":str(_e.get('prova') or '')[:200],"origem":"results-orfa","derivado_em":now_iso}
+        with open(_q,'a') as _fh:
+            fcntl.flock(_fh,fcntl.LOCK_EX); _fh.write(json.dumps(_row,ensure_ascii=False)+'\n')
+        _orfas.append(f"{_fr}:{_t}")
+except Exception as _ex:
+    print('filas-sync: recuperacao de orfas FALHOU —', repr(_ex))
+print('filas-sync: orfas recuperadas', _orfas or 0)
+
 PY
