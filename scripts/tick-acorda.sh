@@ -117,6 +117,17 @@ try:
             ev('OTIMIZADOR',f"tick/acorda: Entrega(s) nova(s) no roadmap: {' '.join(_pend[:8])} — o teu posto declara revisao do roadmap futuro",_agg)
         json.dump(sorted(_agora),open(_KP,'w'))
 except Exception: pass
+# 3b) ADIADOS persistentes (01/09, pergunta do COMANDO: "quem lê os ADIADOS?"): um número num log que ninguém
+# abre é o mesmo silêncio com mais passos. ≥3 ciclos com adiamento na última hora = destinatário a ser
+# alimentado abaixo do que gera → acorda o COMANDO uma vez por hora.
+try:
+    import datetime as _dt2
+    _h1=(_dt2.datetime.now(_dt2.timezone.utc)-_dt2.timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M')
+    _ad=[l for l in open(f'{AI}/terminais/tick.log') if 'ADIADOS' in l and l[:16]>=_h1]
+    if len(_ad)>=3:
+        _hk=_dt2.datetime.now(_dt2.timezone.utc).strftime('%Y-%m-%dT%H')
+        ev('COMANDO',f"tick/acorda: eventos ADIADOS em {len(_ad)} ciclos na ultima hora (teto 4/destinatario a segurar) — ver terminais/tick.log; se persistir, o numero precisa de dono",f"adiados|{_hk}")
+except Exception: pass
 # 3) passo do tick com rc!=0 (novo)
 try:
     bad=[l.strip() for l in open(f'{AI}/terminais/tick.log') if ' rc=' in l and 'rc=0 ' not in l and not l.strip().endswith('rc=0')]

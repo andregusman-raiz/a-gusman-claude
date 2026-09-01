@@ -93,6 +93,8 @@ if not DRY:
                     if _p and r.get('puxada_por') and _p!=r.get('puxada_por'): r['status']='fila'; r.pop('puxada_por',None); r['devolvida']=f'blocked por {_p}, que nao a puxou'
                     else: r['status']='bloqueada'; r['bloqueio']=_n
                     ch=True
+                elif ult.get(r['task'],{}).get('status')=='invalidada' and r.get('status')=='done':
+                    r['status']='fila'; ch=True   # 01/09: veredicto de verificador (critério objetivo) reabre sem guard de autoria
                 elif ult.get(r['task'],{}).get('status')=='retracted' and r.get('status')=='done':
                     # 01/09 (achado do COMANDO, medido no efeito): a condição não olhava DE QUEM era a
                     # retractação. O SALARIOS cunhou E-75 sem saber que o número já era uma Entrega do

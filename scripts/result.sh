@@ -6,15 +6,19 @@
 #             nem sobre quem o fez. 01/09: um papel usou `retracted` numa colisão de identificador e, além de
 #             reabrir a Entrega FECHADA de outro papel, deixou no ledger a afirmação de que a prova DELE caíra —
 #             falso. Um verbo respondia por duas coisas incompatíveis; agora são dois.
+# invalidada = um VERIFICADOR (tick) observou condição objetiva que torna o `done` falso (ex.: nenhum commit
+#              após a review). NÃO é o autor a retirar-se — "eu estava errado" e "o mundo mexeu" não são a mesma
+#              coisa, e contagens de retractação por papel têm de as distinguir. O `done` do papel fica intacto
+#              no histórico; o critério vai na nota. Escrito só por verificadores (papel=tick).
 # O ÚLTIMO registro por task é o que vale (board/filas/empurra), EXCEPTO `anulado`, que é ignorado por eles.
 # posto = declaração de vigília (A28b): NÃO é tarefa nem bloqueio — o tick não alarma, o board não conta. Exige nota (o que vigia + como expira).
 # Append-only com flock em roadmap/results.jsonl. Board/DIAG/despertar derivam daqui.
 set -uo pipefail
 [ $# -ge 4 ] || { echo "uso: result.sh PAPEL TASK done|blocked|failed|retracted|anulado PROVA_CMD [NOTA] [PR]" >&2; exit 2; }
 P=$1; T=$2; ST=$3; PV=$4; NT=${5:-}; PR=${6:-}
-case "$ST" in done|blocked|failed|retracted|anulado|posto) ;; *) echo "status inválido: $ST" >&2; exit 2;; esac
+case "$ST" in done|blocked|failed|retracted|anulado|invalidada|posto) ;; *) echo "status inválido: $ST" >&2; exit 2;; esac
 # 30/08 23:5xZ (COMANDO): chamada incompleta era aceite em silêncio (texto todo em prova_cmd, nota vazia) — verde por ausência.
-# blocked/failed/retracted/anulado EXIGEM nota (o motivo é o registro); done sem nota avisa e segue (prova_cmd basta).
+# blocked/failed/retracted/anulado/invalidada EXIGEM nota (o motivo é o registro); done sem nota avisa e segue (prova_cmd basta).
 if [ -z "$NT" ] && [ "$ST" != "done" ]; then echo "RECUSADO: $ST exige NOTA (5º argumento): o motivo é o registro. Uso: result.sh PAPEL TASK $ST '<prova_cmd>' '<motivo ≤200>' [PR]" >&2; exit 2; fi
 [ -z "$NT" ] && echo "AVISO: done sem nota — prova_cmd será exibida no board como nota." >&2
 F="$HOME/Claude/docs/ai-state/roadmap/results.jsonl"
