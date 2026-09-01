@@ -16,7 +16,15 @@ F="$HOME/Claude/docs/ai-state/roadmap/results.jsonl"
 python3 - "$F" "$P" "$T" "$ST" "$PV" "$NT" "$PR" <<'PY'
 import sys,json,datetime,fcntl
 f,p,t,st,pv,nt,pr=sys.argv[1:8]
-rec={"ts":datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),"papel":p,"task":t,"status":st,"prova_cmd":pv[:400],"nota":nt[:200],"pr":pr}
+# 01/09 (COMANDO): os limites eram aplicados em SILENCIO — medido: 140 de 219 notas (64%) estavam no
+# tecto, cortadas a meio da frase, e ninguem sabia (autor pensa que escreveu tudo, leitor recebe um
+# texto plausivel e amputado). O script ja RECUSAVA nota ausente; passar a marcar o corte torna a
+# perda visivel sem quebrar o fluxo de quem escreve (recusar partiria 64% das chamadas).
+def _cap(v, n):
+    return (v[:n-4].rstrip() + " […]") if len(v) > n else v
+if len(nt) > 200: print(f"AVISO: nota tinha {len(nt)} chars, cortada em 200 — o resto PERDEU-SE. Poe a evidencia num ficheiro e aponta-o.", file=sys.stderr)
+if len(pv) > 400: print(f"AVISO: prova_cmd tinha {len(pv)} chars, cortada em 400 — o resto PERDEU-SE.", file=sys.stderr)
+rec={"ts":datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),"papel":p,"task":t,"status":st,"prova_cmd":_cap(pv,400),"nota":_cap(nt,200),"pr":pr}
 with open(f,"a") as fh:
     fcntl.flock(fh,fcntl.LOCK_EX); fh.write(json.dumps(rec,ensure_ascii=False)+"\n")
 print("RESULT registrado:",t,st)
