@@ -76,7 +76,12 @@ def tem_posto(papel):
     c=os.path.join(T,'papeis',f'{papel}.md')
     if not os.path.exists(c): return False
     head=open(c,errors='replace').read()[:600]
-    return 'posto:' in head or 'acorda_por: evento' in head
+    # 01/09 (COMANDO): removida a disjuncao `or 'acorda_por: evento' in head`. `acorda_por` diz COMO o
+    # papel acorda — nao diz que esta parado AGORA; e a norma do cockpit e que NENHUM papel acorda por
+    # relogio, logo o contrato bem escrito passava a suprimir o alerta de silencio para sempre: quanto
+    # mais correcto o contrato, mais invisivel o papel. Medido antes de mexer: dos 19 contratos so o
+    # OTIMIZADOR casa qualquer das clausulas, e casa AS DUAS -> remocao e no-op hoje, e fecha o buraco.
+    return 'posto:' in head
 
 alertas=[]
 for papel,v in reg.items():
