@@ -6,6 +6,18 @@ set -uo pipefail
 python3 - "$HOME/Claude/docs/ai-state/roadmap" <<'PY'
 import re,json,os,sys,fcntl
 D=sys.argv[1]; add=[]
+# 01/09 (COMANDO): papeis DERIVADOS do registry.json — antes eram lista hardcoded e o defeito
+# repetiu-se: 31/08 com SALARIOS (ver comentario abaixo) e 01/09 com FGTS (E-200..E-203 ficaram
+# com builder vazio e o tick ofereceu trabalho da VM do FGTS a DE-DATA, que recusou). O proprio
+# comentario ja nomeava a reparacao certa: 'derivar os papeis do registry.json em vez desta lista'.
+# Fallback explicito se o registry nao ler: mantem o comportamento antigo em vez de ficar sem papeis.
+try:
+    _PAPEIS=sorted(json.load(open(os.path.join(os.path.dirname(D),'terminais','registry.json')))['terminais'].keys(), key=len, reverse=True)
+except Exception as _e:
+    print(f'filas-sync: registry ilegivel ({_e!r}) — a usar lista de recurso', file=sys.stderr)
+    _PAPEIS=['DE-BUILD-B','DE-COORD','DE-DATA','DE-SYNC','DE-MIG','SALARIOS','FUNIL','FGTS']
+_BUILDER_RE=r'· ((?:'+'|'.join(re.escape(_p) for _p in _PAPEIS)+r'|Codex[^·]*))'
+
 import glob
 # COMANDO 23:4xZ: task que muda de programa duplicava (E-35b em funil E prontidao) — "existe" é em QUALQUER fila
 todas=set()
@@ -62,8 +74,8 @@ for prog in _progs:
         # 31/08: a lista de papeis era hardcoded e SALARIOS (papel novo) nao estava la -> builder_sugerido
         # VAZIO -> fila-pull.sh so filtra quando o campo esta preenchido -> a E-60 (bloqueada, do SALARIOS)
         # foi oferecida ao FUNIL. Falha FAIL-OPEN: papel novo tem o trabalho oferecido a toda a gente.
-        # Reparacao minima (P9). Estrutural por fazer: derivar os papeis do registry.json em vez desta lista.
-        builder=(re.search(r'· ((?:DE-[A-Z-]+|FUNIL|SALARIOS|Codex[^·]*))',rest) or [None,''])[1].strip(' ·')
+        # Reparacao minima (P9) em 31/08. ESTRUTURAL FEITA 01/09: _BUILDER_RE vem do registry (topo).
+        builder=(re.search(_BUILDER_RE,rest) or [None,''])[1].strip(' ·')
         prova=(rest.split('prova:')[1].strip()[:200] if 'prova:' in rest else '')
         todas.add(eid); novos.append({"fora_da_janela": eid in fora, "task":eid,"frente":prog,"resumo":rest.split('·')[0].strip()[:140],"status":st,"depende_de":deps,"builder_sugerido":builder,"prova":prova,"derivada_em":__import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')})
     if novos:
