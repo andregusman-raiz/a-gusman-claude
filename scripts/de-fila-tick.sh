@@ -96,6 +96,9 @@ post_steps() {
   _t0=$(date +%s); bash "$(dirname "$0")/comunicacao-obrigatoria.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=comunicacao-obrigatoria rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/queue-derive.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=queue-derive rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/filas-sync.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=filas-sync rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+  # 01/09 (ordem do dono): PR com alteracoes pedidas vira TAREFA no roadmap, ANTES do empurra —
+  # prioridade e aprovar o que ja foi construido. rc=2 significa sonda suspeita (zero PRs), nao vazio.
+  _t0=$(date +%s); bash "$(dirname "$0")/pr-cr-fila.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=pr-cr-fila rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/fila-empurra.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=fila-empurra rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/tick-acorda.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=tick-acorda rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
 }
