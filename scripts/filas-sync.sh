@@ -5,7 +5,7 @@
 set -uo pipefail
 python3 - "$HOME/Claude/docs/ai-state/roadmap" <<'PY'
 import re,json,os,sys,fcntl
-D=sys.argv[1]; add=[]
+D=sys.argv[1]; add=[]; upd=[]
 # 01/09 (COMANDO): papeis DERIVADOS do registry.json — antes eram lista hardcoded e o defeito
 # repetiu-se: 31/08 com SALARIOS (ver comentario abaixo) e 01/09 com FGTS (E-200..E-203 ficaram
 # com builder vazio e o tick ofereceu trabalho da VM do FGTS a DE-DATA, que recusou). O proprio
@@ -67,7 +67,31 @@ for prog in _progs:
         m=re.match(r'  (E-\d+[a-z]?(?:-[a-z0-9]+)?)(?: \[[^\]]*\])? · (.*)',l)   # tolera "E-20 [em build no Codex] · …"
         if not m: continue
         eid,rest=m.groups()
-        if eid in have: continue
+        if eid in have:
+            # 01/09 (achado do COMANDO): a row existente NUNCA era reprocessada, e o .md muda. Caso medido:
+            # a linha de origem passou a dizer que a Entrega é do DE-DATA e que o outro papel está
+            # "deliberadamente fora da posição de construtor"; a fila tinha sido derivada de madrugada da
+            # versão anterior e continuou a apontar o construtor velho — o dono real ficou 40 min parado
+            # com trabalho seu atribuído a outra pessoa. Preservar ESTADO (status/puxada) é certo;
+            # preservar o que o .md acabou de corrigir, não. Re-derivamos só o que vem do texto.
+            _b=(re.search(_BUILDER_RE,rest) or [None,''])[1].strip(' ·')
+            _dep=re.findall(r'bloqueada por (E-\d+[a-z]?)',rest)
+            _res=rest.split('·')[0].strip()[:140]
+            for _qq in glob.glob(f'{D}/filas/fila-*.jsonl'):
+                _rows=[json.loads(_l) for _l in open(_qq) if _l.strip()]
+                _ch=False
+                for _r in _rows:
+                    if _r.get('task')!=eid: continue
+                    if _b and _r.get('builder_sugerido')!=_b: _r['builder_sugerido']=_b; _ch=True
+                    if _dep and _r.get('depende_de')!=_dep: _r['depende_de']=_dep; _ch=True
+                    if _res and _r.get('resumo')!=_res and _r.get('origem') not in ('pr-cr-fila','results-orfa'):
+                        _r['resumo']=_res; _ch=True
+                if _ch:
+                    with open(_qq,'w') as _fh:
+                        fcntl.flock(_fh,fcntl.LOCK_EX)
+                        for _r in _rows: _fh.write(json.dumps(_r,ensure_ascii=False)+'\n')
+                    upd.append(f"{prog}:{eid}")
+            continue
         st='fila'
         if re.search(r'· (pronta|PRONTA)',rest): st='fila'   # rótulo do .md NÃO vale como estado; results.jsonl decide
         elif re.search(r'estacionad',rest): st='estacionada'
@@ -84,7 +108,7 @@ for prog in _progs:
             fcntl.flock(fh,fcntl.LOCK_EX)
             for r in novos: fh.write(json.dumps(r,ensure_ascii=False)+'\n')
         add += [f"{prog}:{r['task']}" for r in novos]
-print('filas-sync: novas', add or 0)
+print('filas-sync: novas', add or 0, '· re-derivadas', sorted(set(upd)) or 0)
 
 # ── Entregas ÓRFÃS: trabalhadas no registo e ausentes de toda a fila ────────────────────────────
 # 01/09 (ordem do dono): a fila responde a "o que há para fazer" e o registo a "o que se fez", e nada
