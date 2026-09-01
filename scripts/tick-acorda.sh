@@ -63,6 +63,22 @@ try:
         # (31/08: a mutacao gravava human|A+B|A|B e ev() testava human|A+B -> nunca casava,
         #  logo o alarme repetia para sempre; os individuais sao expandidos no leitor abaixo)
 except Exception: pass
+# 2d) conflito de retractacao cruzada nas filas (01/09)
+# O fila_empurra marca a row quando alguem retrata um `done` que NAO e seu (colisao de identificador):
+# nao reabre, e regista `conflito_retractacao`. Sem leitor, esse campo era um bilhete numa gaveta —
+# a mesma familia do campo de excepcao que codigo nenhum consultava. Agora acorda quem tria.
+try:
+    import glob as _g
+    for _q in _g.glob(f'{AI}/roadmap/filas/fila-*.jsonl'):
+        for _l in open(_q):
+            try: _r=json.loads(_l)
+            except Exception: continue
+            _c=_r.get('conflito_retractacao')
+            if not _c: continue
+            _k=f"confret|{_r.get('task')}|{_c}"
+            if _k in sent or tries.get(_k,0)>=3: continue
+            ev('COMANDO', f"tick/acorda: conflito de retractacao em {_r.get('task')} ({_c}) — alguem retratou um done que nao e seu; a linha NAO foi reaberta. Ver {os.path.basename(_q)}", _k)
+except Exception: pass
 # 3) passo do tick com rc!=0 (novo)
 try:
     bad=[l.strip() for l in open(f'{AI}/terminais/tick.log') if ' rc=' in l and 'rc=0 ' not in l and not l.strip().endswith('rc=0')]
