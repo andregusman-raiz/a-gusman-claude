@@ -96,10 +96,13 @@ except Exception:
     _PAPEIS={"DE-MIG","DE-DATA","DE-SYNC","DE-BUILD-B","FUNIL","SALARIOS","DE-COORD"}
 claim_dono={k:(v if v in _PAPEIS else "") for k,v in claim_dono.items()}
 
-ult={}
+ult={}; hist={}
 if os.path.exists(RES):
     for l in open(RES):
-        try: e=json.loads(l); ult[e.get("task")]=e
+        try:
+            e=json.loads(l)
+            if e.get("status")=="anulado": continue
+            ult[e.get("task")]=e; hist.setdefault(e.get("task"),[]).append(e)
         except Exception: pass
 
 def carrega(q):
@@ -169,8 +172,16 @@ for d in det:
     # objetivo (envio posterior à CR) é que fecha. Reabre, com o motivo escrito e contado.
     _u=(ult.get(task) or {})
     if _u.get("status")=="done":
-        _n_reab=int(_u.get("reaberturas") or 0)+1
+        # 01/09 16:5xZ (medido): reabrir SÓ a row não chegava — o ledger continuava a dizer `done`, e tanto
+        # o fila-pull como o empurra derivam estado do ÚLTIMO RESULT: no ciclo seguinte marcavam a row done
+        # outra vez. A reabertura era desfeita em 10 min e as 4 tarefas ficaram invisíveis a todos.
+        # Agora o tick regista `retracted` com o critério objetivo (nenhum commit depois da review): a prova
+        # do done caiu — é retractação legítima, por verificador, não acusação de papel.
+        _n_reab=sum(1 for _h in hist.get(task,[]) if _h.get("status")=="retracted" and _h.get("papel")=="tick")+1
         d["_reaberta"]=(_n_reab, _u.get("ts",""), _u.get("papel",""))
+        if not DRY:
+            result("tick",task,"retracted",f"gh pr view {n}: ultimo commit {d['commit_em'] or '-'} <= review {d['cr_em']}",
+                   f"done de {_u.get('papel')} @{_u.get('ts','')[11:16]} sem envio depois da review — o bot so re-avalia com push (reabertura {_n_reab}x)")
     # 01/09 (teste seco do próprio autor): o campo `frente` do claim é o TEMA (contabil, vault-assistant,
     # merge-queue…), não a frente que os construtores puxam. A 1ª execução criou 10 filas com UMA tarefa
     # cada e zero rows pré-existentes — filas que ninguém lê. Só entram nas filas com movimento real;

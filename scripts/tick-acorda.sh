@@ -79,6 +79,43 @@ try:
             if _k in sent or tries.get(_k,0)>=3: continue
             ev('COMANDO', f"tick/acorda: conflito de retractacao em {_r.get('task')} ({_c}) — alguem retratou um done que nao e seu; a linha NAO foi reaberta. Ver {os.path.basename(_q)}", _k)
 except Exception: pass
+# 2e) triagem de PR: tarefas CR-* com dono DE-COORD (01/09). O DE-COORD é tier 0 — não recebe empurrão e
+# não puxa; 11 tarefas ficaram na fila-revisao sem que nada o acordasse. Contrato dele: acorda_por "tick da fila".
+try:
+    import glob as _g2
+    _tri=[]
+    for _q in _g2.glob(f'{AI}/roadmap/filas/fila-*.jsonl'):
+        for _l in open(_q):
+            try: _r=json.loads(_l)
+            except Exception: continue
+            if str(_r.get('task','')).startswith('CR-') and _r.get('status')=='fila' and _r.get('builder_sugerido')=='DE-COORD':
+                _k=f"triagem|{_r['task']}"
+                if _k not in sent and tries.get(_k,0)<3: _tri.append((_k,_r['task']))
+    if _tri:
+        _agg='triagem|'+'+'.join(k for k,_ in _tri[:8])
+        ev('DE-COORD',f"tick/acorda: {len(_tri)} PR(s) com alteracoes pedidas sem dono na fila-revisao: {' '.join(t for _,t in _tri[:8])} — atribui builder (edita builder_sugerido) ou responde tu. Ver roadmap/filas/fila-revisao.jsonl",_agg)
+except Exception: pass
+# 2f) linha E- nova em qualquer fila -> OTIMIZADOR (01/09). O contrato dele declara posto "acorda quando uma
+# linha E- nasce" e NADA emitia esse evento (7,6 h calado com 6 Entregas novas). Baseline na 1ª corrida: sem emitir.
+try:
+    _KP=os.path.expanduser('~/.claude/state/tick-acorda.tasks.json')
+    _agora=set()
+    for _q in _g2.glob(f'{AI}/roadmap/filas/fila-*.jsonl'):
+        for _l in open(_q):
+            try: _t=json.loads(_l).get('task','')
+            except Exception: continue
+            if re.fullmatch(r'E-\d+[a-z]?',_t): _agora.add(_t)
+    if not os.path.exists(_KP):
+        json.dump(sorted(_agora),open(_KP,'w'))       # baseline: grava e cala-se (lição do MUDOU 133)
+    else:
+        _antes=set(json.load(open(_KP)))
+        _novas=sorted(_agora-_antes)
+        _pend=[t for t in _novas if f"novaE|{t}" not in sent and tries.get(f"novaE|{t}",0)<3]
+        if _pend:
+            _agg='novaE|'+'+'.join(f"novaE|{t}" for t in _pend[:8])
+            ev('OTIMIZADOR',f"tick/acorda: Entrega(s) nova(s) no roadmap: {' '.join(_pend[:8])} — o teu posto declara revisao do roadmap futuro",_agg)
+        json.dump(sorted(_agora),open(_KP,'w'))
+except Exception: pass
 # 3) passo do tick com rc!=0 (novo)
 try:
     bad=[l.strip() for l in open(f'{AI}/terminais/tick.log') if ' rc=' in l and 'rc=0 ' not in l and not l.strip().endswith('rc=0')]
@@ -102,9 +139,10 @@ for l in open(okp):
     # agregado human|<k1>+<k2>: gravar TAMBEM cada chave individual human|<pr>|<n>,
     # senao cada nova combinacao de PRs gera chave nova e o alarme nunca silencia.
     # A contagem <n> faz parte da chave: comentario NOVO do bot muda n -> volta a disparar.
-    if k.startswith('human|'):
-        for part in k[len('human|'):].split('+'):
-            if part.startswith('human|'): sent.add(part)
+    for _pref in ('human|','triagem|','novaE|'):
+        if k.startswith(_pref):
+            for part in k[len(_pref):].split('+'):
+                if part.startswith(_pref): sent.add(part)
     tries.pop(k,None)
 for l in open(kop):
     k=l.strip()

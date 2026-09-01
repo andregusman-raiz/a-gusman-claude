@@ -28,7 +28,11 @@ for sid,papel in sid2papel.items():
             for pid,body in rx.findall(l):
                 n+=1; frm=pid2papel.get(pid,'?'+pid); tot[(frm,papel)]+=1
                 if len(body)>200: big+=1
-                k=(papel,m.group(1),pid)
+                # 01/09 (medido: 405.543 linhas, 5.244 chaves distintas, 98,7% duplicadas): o ledger grava
+                # from_pid como int e a chave de dedup usava pid como STRING -> nunca casava com o que
+                # estava no ficheiro -> cada tick re-acrescentava TUDO. Desde o 1º dia; o 'ledger de 37 MB'
+                # de ontem era a mesma doença. Tipo igual dos dois lados.
+                k=(papel,m.group(1),int(pid))
                 if k in seen: continue
                 _ids=sorted(set(re.findall(r'#\d{4,5}|\bE-\d+[a-z]?\b|\bD-\d{2,3}\b|\bA-\d{2,3}\b', body)))   # 31/08: ids da msg INTEIRA (preview de 300 cegava o cruzamento)
                 seen.add(k); new.append({'ts':m.group(1),'from':frm,'from_pid':int(pid),'to':papel,'chars':len(body),'ids':_ids,'preview':body[:4000].replace('\n',' ')})

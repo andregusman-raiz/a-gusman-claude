@@ -39,7 +39,7 @@ builders=[(p,t) for p,t in reg.items() if t.get('estado')=='aberto' and t.get('a
 # oferecia a tarefa a QUEM ESTIVESSE LIVRE — o contrário da regra (a verificação vai a quem depende).
 # Reconhecer nome != receber trabalho: o empurra continua a despachar só para builders.
 papeis={p for p in reg}
-done=set(); ruim={}; ult={}; hist={}
+done=set(); ruim={}; ruim_ts={}; ult={}; hist={}
 rf=f'{AI}/roadmap/results.jsonl'
 if os.path.exists(rf):
     for l in open(rf):
@@ -73,7 +73,7 @@ for t,e in ult.items():
     if e.get('status')=='done':
         done_result.add(t)
         if _pr_ok(e): done.add(t)
-    elif e.get('status') in ('blocked','failed'): ruim[t]=(e.get('papel'), e.get('nota','')[:80])
+    elif e.get('status') in ('blocked','failed'): ruim[t]=(e.get('papel'), e.get('nota','')[:80]); ruim_ts[t]=e.get('ts','')
    # 30/08: guardar QUEM bloqueou — blocked de nao-dono nao e bloqueio, e devolucao
 STp=os.path.expanduser('~/.claude/state/fila-empurra.json'); st=json.load(open(STp)) if os.path.exists(STp) else {}
 lembr=st.get('lembretes',{})
@@ -85,7 +85,10 @@ if not DRY:
             fcntl.flock(fh,fcntl.LOCK_EX); rows=load(q); ch=False
             for r in rows:
                 if r['task'] in done_result and r.get('status')!='done': r['status']='done'; ch=True
-                elif r['task'] in ruim and r.get('status')=='puxada':
+                elif r['task'] in ruim and r.get('status')=='puxada' and not (r.get('puxada_em') and ruim_ts.get(r['task'],'') and ruim_ts[r['task']] < r['puxada_em']):
+                    # 01/09 (medido): E-201 foi devolvida por DE-BUILD-B às 16:13 (encaminhamento errado) e puxada
+                    # pelo FGTS às 16:3x; a devolução ANTIGA ia desfazer a puxada NOVA. Um RESULT anterior à
+                    # puxada não descreve a puxada — só conta o que veio depois dela.
                     _p,_n=ruim[r['task']]
                     if _p and r.get('puxada_por') and _p!=r.get('puxada_por'): r['status']='fila'; r.pop('puxada_por',None); r['devolvida']=f'blocked por {_p}, que nao a puxou'
                     else: r['status']='bloqueada'; r['bloqueio']=_n
