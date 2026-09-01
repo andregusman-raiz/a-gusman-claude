@@ -44,6 +44,7 @@ try:
             except: continue
             if e.get('status')=='posto': continue   # mecanismo: o STATUS é o campo (31/08)
             if str(e.get('task','')).lower().startswith('posto') and str(e.get('ts',''))<'2026-08-31T06:00': continue   # compat: posto-* registados como blocked ANTES do status existir
+            if e.get('papel')=='tick': continue   # 01/09: retractação AUTOMÁTICA (CR sem push) não é evento raro — já aparece na fila e no MUDOU
             if e.get('status') in ('blocked','failed','retracted'):
                 ev('COMANDO',f"tick/acorda: RESULT {e.get('status')} em {e.get('task')} ({e.get('papel')}): {str(e.get('nota',''))[:120]} — leia roadmap/results.jsonl",f"result|{e.get('ts')}|{e.get('task')}")
 except Exception: pass
@@ -121,7 +122,18 @@ try:
     bad=[l.strip() for l in open(f'{AI}/terminais/tick.log') if ' rc=' in l and 'rc=0 ' not in l and not l.strip().endswith('rc=0')]
     if bad: ev('COMANDO',f"tick/acorda: passo do tick falhou: {bad[-1][-90:]} — leia terminais/tick.log",f"badstep|{bad[-1][:40]}")
 except Exception: pass
-for d,m,k in out[:6]: print(f"{d}\t{m[:380]}\t{k}")
+# 01/09 (medido): o corte `out[:6]` era SILENCIOSO — 9 eventos gerados, o 9º (triagem ao DE-COORD) caía
+# todos os ciclos atrás de 8 RESULTs ao COMANDO, e ninguém via. Agora: teto POR DESTINATÁRIO (4) em vez de
+# global, e o que fica adiado sai escrito no tick.log — adiado não é perdido (os eventos regeneram-se
+# no ciclo seguinte), mas adiado sem dizer é.
+_por=dict(); _emit=[]; _adiados=0
+for d,m,k in out:
+    if _por.get(d,0)>=4: _adiados+=1; continue
+    _por[d]=_por.get(d,0)+1; _emit.append((d,m,k))
+if _adiados:
+    import datetime as _dt
+    open(f'{AI}/terminais/tick.log','a').write(f"{_dt.datetime.now(_dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')} step=tick-acorda ADIADOS {_adiados} evento(s) por teto de 4/destinatario (regeneram no proximo ciclo)\n")
+for d,m,k in _emit: print(f"{d}\t{m[:380]}\t{k}")
 PY
 while IFS=$'\t' read -r DEST MSG KEY; do
   [ -z "${DEST:-}" ] && continue
