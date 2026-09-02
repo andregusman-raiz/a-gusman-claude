@@ -101,6 +101,30 @@ fi
 # na 1a tentativa perderia mensagem legitima por coincidencia de timing. Falha
 # APOS os retries e SEMPRE registrada em send.log (nunca silenciosa, nunca vai
 # para inbox — inbox foi descontinuada em F0a).
+# assinaturas que so' o processo escreve (nunca um humano): base da regra AUTO-SUBMETIDO abaixo
+PROPRIO_RE='^(LEMBRETE \(tick/|TAREFA \(tick/|tick/acorda:|POSTO: (calado|fechaste|sem evento)|MUDOU \([0-9]+\)|leia (QUEUE|roadmap/|terminais/))'
+# 02/09 (medido no DE-MIG): o TUI renderiza TAMBEM as mensagens antigas do utilizador com "❯ " — a guarda
+# antiga (grep de qualquer "❯ texto" na viewport) tomava a ULTIMA mensagem ENTREGUE por "texto por enviar"
+# e recusava tudo a seguir: 30 das 43 janelas de recusa comecaram <=15 min depois de um envio nosso bem
+# sucedido. A caixa de input viva e' o que fica entre os DOIS ULTIMOS separadores (────) da viewport.
+input_box() {
+  printf '%s\n' "$1" | python3 -c '
+import sys,re
+L=sys.stdin.read().split("\n")
+sep=[i for i,l in enumerate(L) if re.match(r"^\s*─{10,}",l)]
+if len(sep)>=2:
+    box=L[sep[-2]+1:sep[-1]]
+elif len(sep)==1:
+    box=L[max(0,sep[-1]-3):sep[-1]]
+else:
+    box=[]
+out=[]
+for l in box:
+    l2=re.sub(r"^\s*❯\s?","",l,count=1) if re.match(r"^\s*❯",l) else l
+    if l2.strip(): out.append(l2)
+print("\n".join(out))
+'
+}
 MENU_RE='Esc to cancel|Enter to (select|confirm|submit)|to select|↑/↓|\(Recommended\)|\(Recomendado\)|❯ *[0-9]+\.|Do you want to|Yes, and don|No, and tell'
 MENU_RETRIES="${TERMINAL_SEND_MENU_RETRIES:-3}"
 MENU_RETRY_SLEEP_S="${TERMINAL_SEND_MENU_RETRY_SLEEP_S:-20}"
@@ -137,16 +161,37 @@ PYEOF
 RAZAO=""
 TENTATIVA=1
 while [[ "$TENTATIVA" -le "$MENU_RETRIES" ]]; do
-  SCREEN=$("$CMUX_BIN" read-screen --workspace "$UUID" --lines 15 2>/dev/null || true)
+  # 02/09 (medido pelo RESUMO a pedido do dono): `--lines N` IMPLICA `--scrollback` (help do cmux),
+  # logo esta leitura via HISTORICO, nao a tela viva — uma linha de prompt renderizada ha horas fazia a
+  # guarda recusar o envio a um terminal com o prompt VAZIO. Caso apanhado: DE-DATA as 16:21 com texto no
+  # scrollback e viewport limpa. A guarda passa a decidir pela VIEWPORT (sem --lines); o scrollback fica
+  # so' para o menu, onde historico nao induz falso positivo do mesmo modo.
+  SCREEN=$("$CMUX_BIN" read-screen --workspace "$UUID" 2>/dev/null || true)
+  SCREEN_HIST=$("$CMUX_BIN" read-screen --workspace "$UUID" --lines 15 2>/dev/null || true)
   RAZAO=""
-  if echo "$SCREEN" | grep -qE "$MENU_RE"; then
+  if echo "$SCREEN_HIST" | grep -qE "$MENU_RE"; then
     RAZAO="tela:menu-visivel"
-  elif echo "$SCREEN" | grep -qE '^[[:space:]]*❯[[:space:]]+[^[:space:]]'; then
+  elif [[ -n "$(input_box "$SCREEN")" ]]; then
     # 01/09 17:3xZ (RESUMO): a regra "input parcial (❯ com texto) = não enviar" vivia só na memória, não no
     # código. Medido: FUNIL com "❯ roda o sync manualmente…" (texto do DONO, sem Enter) e o vigia a 1 min de
     # lhe escrever — `cmux send` colaria o aviso ao texto dele e o `send-key enter` submeteria os dois como
     # UM comando. É o D-064 pelo outro lado. Prompt com texto = tela ocupada pelo dono; sem bypass.
     RAZAO="tela:texto-por-enviar-no-prompt"
+    # 02/09 (auditoria do RESUMO, dono): 18,4 h-terminal sem canal em 2 dias, 30 de 43 janelas de recusa
+    # comecaram <=15 min depois de um envio NOSSO — o `send-key enter` nao submeteu, o texto do tick ficou
+    # no prompt, e a partir dai esta mesma guarda recusou TODOS os envios seguintes (DE-MIG: 27 recusas em
+    # 4,7 h com a TAREFA do empurra presa; CR-6446 oferecida e desfeita 33x). O tick trancava-se a si proprio.
+    # Regra: se TODAS as linhas da caixa de input sao assinatura do processo (nada que um humano escreva),
+    # submeter e' terminar a entrega anterior, nao responder por ninguem — D-064 nao se aplica.
+    INPUT_BOX=$(input_box "$SCREEN")
+    if [[ -n "$INPUT_BOX" ]] && ! printf '%s\n' "$INPUT_BOX" | grep -vE '^[[:space:]]*$' | grep -qvE "$PROPRIO_RE"; then
+      "$CMUX_BIN" send-key --workspace "$UUID" enter; sleep 1
+      SCREEN2=$("$CMUX_BIN" read-screen --workspace "$UUID" 2>/dev/null || true)
+      if [[ -z "$(input_box "$SCREEN2")" ]]; then
+        printf '%s AUTO-SUBMETIDO papel=%s uuid=%s texto-proprio-preso=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$UUID" "$(printf '%s' "$INPUT_BOX" | head -1 | cut -c1-60 | tr ' ' '_')" >> "$LOG"
+        RAZAO=""
+      fi
+    fi
   else
     FEED_HIT="$(feed_menu_reason || true)"
     [[ -n "$FEED_HIT" ]] && RAZAO="$FEED_HIT"
@@ -162,6 +207,32 @@ if [[ -n "$RAZAO" ]]; then
   mkdir -p "$T"
   printf '%s FALHA-MENU-ABERTO papel=%s uuid=%s razao=%s tentativas=%s\n' \
     "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$UUID" "$RAZAO" "$MENU_RETRIES" >> "$LOG"
+  # 02/09: a recusa era silenciosa e sem prazo — DE-MIG ficou 14 h sem canal e ninguem soube. Deriva-se do
+  # proprio send.log a lista de terminais com >=3 recusas seguidas; o cockpit e o diag leem o ficheiro.
+  python3 - "$LOG" "$T/INALCANCAVEIS.md" <<'PYESC' 2>/dev/null || true
+import re,sys,collections
+log,out=sys.argv[1],sys.argv[2]
+seq=collections.defaultdict(list)
+for l in open(log,errors='replace'):
+    m=re.match(r'(\S+) FALHA-MENU-ABERTO papel=(\S+) .*?razao=(\S+)',l)
+    if m: seq[m.group(2)].append((m.group(1),'F',m.group(3))); continue
+    m=re.match(r'(\S+) \S+ from=\S+ to=(\S+) ',l)
+    if m: seq[m.group(2)].append((m.group(1),'ok',''))
+rows=[]
+for p,L in seq.items():
+    n=0; first=None
+    for ts,k,r in reversed(L):
+        if k!='F': break
+        n+=1; first=(ts,r)
+    if n>=3: rows.append((p,first[0],n,first[1]))
+with open(out,'w') as f:
+    f.write('# Terminais INALCANCAVEIS pelo processo (derivado do send.log; >=3 recusas seguidas)\n\n')
+    f.write('O tick, o vigia e o empurra nao conseguem falar com estes terminais. Enquanto durar, nada os acorda.\n\n')
+    if rows:
+        f.write('| papel | desde (UTC) | recusas seguidas | razao |\n|---|---|---|---|\n')
+        for p,ts,n,r in sorted(rows,key=lambda x:x[1]): f.write(f'| {p} | {ts} | {n} | {r} |\n')
+    else: f.write('(nenhum)\n')
+PYESC
   echo "RECUSADO: $PAPEL continua com MENU DE DECISAO aberto ou TEXTO POR ENVIAR no prompt apos $MENU_RETRIES tentativas ($RAZAO)." >&2
   echo "Enviar agora faria seu texto virar a RESPOSTA dessa pergunta — ja aconteceu 2x em 28/08" >&2
   echo "(D-064 foi respondida por engano e precisou ser anulada). Esta guarda NAO tem bypass." >&2
@@ -170,6 +241,9 @@ if [[ -n "$RAZAO" ]]; then
 fi
 
 "$CMUX_BIN" send --workspace "$UUID" "$MSG"
+# 02/09: enter imediato depois de um paste longo era engolido pelo TUI e o texto ficava no prompt
+# (medido: 76 de 244 envios "OK" de hoje nunca chegaram como mensagem ao destino). Pausa curta antes do enter.
+sleep "${SEND_ENTER_DELAY_S:-0.5}"
 "$CMUX_BIN" send-key --workspace "$UUID" enter
 
 # CONFIRMACAO DE ENTREGA — o script confirma, o chamador nao improvisa.
@@ -182,15 +256,25 @@ fi
 # linhas do fim da tela. Tres inferencias frageis empilhadas para declarar sucesso.
 sleep 2
 CONFIRMA=""
-TELA_POS=$("$CMUX_BIN" read-screen --workspace "$UUID" --lines 25 2>/dev/null || true)
-# procura uma fatia distintiva da mensagem (as primeiras palavras significativas)
+# 02/09: a confirmacao antiga ("texto visivel na tela") era VERDADEIRA no modo de falha — o texto preso no
+# prompt e' visivel. Submissao prova-se pelo contrario: a linha do prompt ficou VAZIA. Se ainda tem a
+# nossa amostra, o enter foi engolido: repete-se UMA vez (e' o nosso texto, nao o de ninguem) e re-mede.
 AMOSTRA=$(printf '%s' "$MSG" | tr -s ' ' | cut -c1-40)
-if [[ -n "$AMOSTRA" ]] && printf '%s' "$TELA_POS" | grep -qF -- "$AMOSTRA"; then
-  CONFIRMA="confirmado: texto visivel na tela do destino"
-elif printf '%s' "$TELA_POS" | grep -qiE "queued messages|esc to interrupt|working|thinking"; then
-  CONFIRMA="ENFILEIRADO: destino ocupado; texto nao visivel ainda (nao e prova de leitura)"
+VIEW=$("$CMUX_BIN" read-screen --workspace "$UUID" 2>/dev/null || true)
+PROMPT_LINE=$(input_box "$VIEW")
+if [[ -n "$AMOSTRA" ]] && printf '%s' "$PROMPT_LINE" | grep -qF -- "$(printf '%s' "$AMOSTRA" | cut -c1-25)"; then
+  "$CMUX_BIN" send-key --workspace "$UUID" enter; sleep 1.5
+  VIEW=$("$CMUX_BIN" read-screen --workspace "$UUID" 2>/dev/null || true)
+  PROMPT_LINE=$(input_box "$VIEW")
+fi
+if [[ -n "$AMOSTRA" ]] && printf '%s' "$PROMPT_LINE" | grep -qF -- "$(printf '%s' "$AMOSTRA" | cut -c1-25)"; then
+  CONFIRMA="PRESO-NO-PROMPT: enter nao submeteu (2 tentativas) — o destino NAO recebeu; texto do tick ficou no input"
+elif printf '%s' "$VIEW" | grep -qF -- "$AMOSTRA"; then
+  CONFIRMA="submetido: prompt vazio e texto na conversa do destino"
+elif printf '%s' "$VIEW" | grep -qiE "queued messages|esc to interrupt|working|thinking"; then
+  CONFIRMA="ENFILEIRADO: destino ocupado; prompt vazio (entra quando o turno acabar)"
 else
-  CONFIRMA="NAO CONFIRMADO: texto nao apareceu na tela em 2s — verifique antes de assumir entrega"
+  CONFIRMA="NAO CONFIRMADO: prompt vazio mas texto nao visivel em 2s"
 fi
 
 # Quem MANDOU, nao so quem recebeu. Sem isso o log responde "o papel X foi
@@ -218,7 +302,7 @@ PYEOF
 MSG_ID="${ORIGEM}-$(date -u +%Y%m%dT%H%M%SZ)-$$"
 
 mkdir -p "$T"
-printf '%s %s from=%s to=%s uuid=%s :: %s\n' \
-  "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$MSG_ID" "$ORIGEM" "$PAPEL" "$UUID" "$MSG" >> "$LOG"
+printf '%s %s from=%s to=%s uuid=%s confirma=%s :: %s\n' \
+  "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$MSG_ID" "$ORIGEM" "$PAPEL" "$UUID" "${CONFIRMA%%:*}" "$MSG" >> "$LOG"
 echo "OK: mensagem enviada para $PAPEL ($UUID) [msg_id=$MSG_ID]"
 echo "     $CONFIRMA"
