@@ -118,6 +118,43 @@ print(f"{len(out)} row(s): "+" · ".join(out[:6]) if out else "0 (nenhuma row bl
 PYD
 )
 chk "BLOQUEIO com decisao JA decidida (sonda, o autor e que levanta)" "$BLOQDEC"
+# 02/09 (decisao do dono): a superficie do dono e' RESUMO/COMANDO/DECISAO. Duas violacoes medem-se
+# sem tocar em nada: (a) terminal FORA dos tres com texto do dono por enviar no prompt — a pergunta
+# foi ao sitio errado E o texto corta o tick aquele terminal; (b) nota de ledger que pede ato do dono
+# dentro de um terminal. Sonda: LISTA, nao age.
+CANAL=$(python3 - <<'PYD'
+import json,os,re,subprocess,datetime
+AI=os.path.expanduser('~/Claude/docs/ai-state'); CMUX='/Applications/cmux.app/Contents/Resources/bin/cmux'
+SUP={'RESUMO','COMANDO','DECISAO'}
+out=[]
+try: reg=json.load(open(f'{AI}/terminais/registry.json'))['terminais']
+except Exception: reg={}
+for papel,t in sorted(reg.items()):
+    if t.get('estado')!='aberto' or papel in SUP or not t.get('workspace_uuid'): continue
+    try:
+        r=subprocess.run([CMUX,'read-screen','--workspace',t['workspace_uuid'],'--lines','8'],capture_output=True,text=True,timeout=4)
+        ls=[l.rstrip() for l in r.stdout.splitlines() if l.strip()]
+    except Exception: continue
+    for l in reversed(ls):
+        if l.lstrip().startswith('\u276f'):
+            if l.lstrip()[1:].strip(): out.append(f"{papel}:texto-no-prompt")
+            break
+notas=0
+cut=(datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%SZ')
+try:
+    for l in open(f'{AI}/roadmap/results.jsonl',errors='replace'):
+        try: e=json.loads(l)
+        except Exception: continue
+        if str(e.get('ts',''))<cut: continue
+        n=str(e.get('nota') or '')
+        if re.search(r'dono',n,re.I) and re.search(r'\bno (teu|seu) terminal|terminal dele|corre no terminal|sess[aeo][ao] dele',n,re.I):
+            notas+=1
+except Exception: pass
+tot=len(out)+notas
+print((f"{tot}: "+(' · '.join(out[:6]) if out else '')+(f" · {notas} nota(s) a pedir ato do dono em terminal" if notas else '')) if tot else "0 (nenhuma violacao de canal)")
+PYD
+)
+chk "VIOLACAO DE CANAL do dono (RESUMO/COMANDO/DECISAO)" "$CANAL"
 chk "caps threads nativas no Railway (D-097)" "$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway variables --service "${DE_RAILWAY_SERVICE:-raiz-data-engine}" --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([k for k in d if any(s in k for s in ('OPENBLAS','OMP_NUM','MKL_NUM','NUMEXPR','ARROW_NUM'))]),'/5')" 2>/dev/null)"
 chk "tick tem board-sync/DESPACHO/aprovador (branch spec/board-sync mergeada)" "$(grep -c 'board-sync\|DESPACHO\|de-aprovador' "$HOME/Claude/.claude/scripts/de-fila-tick.sh" 2>/dev/null) refs"
 chk "cap mecânico de palavras no canal-append (T1)" "$(grep -cE 'wc -w|MAX_WORDS' "$HOME/Claude/.claude/scripts/canal-append.sh" 2>/dev/null)"

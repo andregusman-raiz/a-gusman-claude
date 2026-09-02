@@ -31,6 +31,14 @@ o id criado (ex: "D-065") em stdout.
                     aberta_em_origem — M-2/M-15 usam para nao confundir
                     ficha aberta por tick com ficha aberta por humano.
   --recomendacao   opcional. 1-2 linhas.
+  --onde           ONDE o ato do dono se executa. Obrigatorio quando a ficha
+                    pede um ATO (nao so um veredicto). Valores:
+                    console (COMANDO/DECISAO — o dono decide e alguem executa) |
+                    github | railway | neon | aws | externo:<sistema>.
+                    `terminal` e' INVALIDO por decisao do dono (02/09): a
+                    superficie dele e' RESUMO/COMANDO/DECISAO — quem precisa de
+                    um comando corrido converte-o em algo que corre do console,
+                    ou executa-o com a autorizacao registada na propria ficha.
   --bloco          1 (efeito silencioso em produção) | 2 (prazo) |
                     3 (destrava fila) | 4 (produto/operação). Sem --bloco:
                     vai para 4 com aviso em stderr — quem abre decide o
@@ -66,6 +74,7 @@ CLASSE=""
 CRITERIO=""
 ORIGEM="evento"
 RECOMENDACAO=""
+ONDE=""
 BLOCO=""
 PRS=()
 SUPERSEDE=()
@@ -82,6 +91,7 @@ while [[ $# -gt 0 ]]; do
     --criterio) [[ $# -ge 2 ]] || { echo "RECUSADO: --criterio exige valor" >&2; exit 2; }; CRITERIO="$2"; shift 2 ;;
     --origem) [[ $# -ge 2 ]] || { echo "RECUSADO: --origem exige valor" >&2; exit 2; }; ORIGEM="$2"; shift 2 ;;
     --recomendacao) [[ $# -ge 2 ]] || { echo "RECUSADO: --recomendacao exige valor" >&2; exit 2; }; RECOMENDACAO="$2"; shift 2 ;;
+    --onde) [[ $# -ge 2 ]] || { echo "RECUSADO: --onde exige valor" >&2; exit 2; }; ONDE="$2"; shift 2 ;;
     --bloco) [[ $# -ge 2 ]] || { echo "RECUSADO: --bloco exige valor" >&2; exit 2; }; BLOCO="$2"; shift 2 ;;
     --pr) [[ $# -ge 2 ]] || { echo "RECUSADO: --pr exige valor" >&2; exit 2; }; PRS+=("$2"); shift 2 ;;
     --supersede) [[ $# -ge 2 ]] || { echo "RECUSADO: --supersede exige valor" >&2; exit 2; }; SUPERSEDE+=("$2"); shift 2 ;;
@@ -167,11 +177,26 @@ if [[ "${#SUPERSEDE[@]}" -gt 0 ]]; then
   SUPERSEDE_JSON=$(printf '%s\n' "${SUPERSEDE[@]}" | python3 -c 'import sys, json; print(json.dumps([x.strip() for x in sys.stdin if x.strip()]))')
 fi
 
+# 02/09 (decisao do dono; auditoria do RESUMO): o ato do dono tem DESTINO declarado.
+# `terminal` e' invalido — a superficie do dono e' RESUMO/COMANDO/DECISAO e um pedido
+# do tipo "corre isto no teu terminal" foi medido a existir (SALARIOS/E-100, 13:16Z).
+if [[ -n "${ONDE:-}" ]]; then
+  if [[ "$ONDE" =~ ^terminal ]]; then
+    echo "RECUSADO: --onde terminal e invalido (superficie do dono = RESUMO/COMANDO/DECISAO)." >&2
+    echo "          Converte o ato em comando que corre do console, ou executa-o com a autorizacao na ficha." >&2
+    exit 2
+  fi
+  if [[ ! "$ONDE" =~ ^(console|github|railway|neon|aws|externo:[a-z0-9_-]+)$ ]]; then
+    echo "RECUSADO: --onde invalido: '$ONDE' (console|github|railway|neon|aws|externo:<sistema>)" >&2
+    exit 2
+  fi
+fi
+
 set +e
 NEW_ID=$(REGISTRY_LIB_DIR="$SCRIPT_DIR" \
   DECISOES_JSON="$DECISOES_JSON" \
   TITULO="$TITULO" EFEITO="$EFEITO" RECOMENDACAO="$RECOMENDACAO" BLOCO="$BLOCO" \
-  CLASSE="$CLASSE" CRITERIO="$CRITERIO" ORIGEM="$ORIGEM" \
+  CLASSE="$CLASSE" ONDE="$ONDE" CRITERIO="$CRITERIO" ORIGEM="$ORIGEM" \
   PAPEL="$PAPEL" PR_JSON="$PR_JSON" SUPERSEDE_JSON="$SUPERSEDE_JSON" \
   NARR_DIR="$T/decisoes" NARRATIVA_TEXT="$NARRATIVA_TEXT" \
   LOG_FILE="$T/decisoes-ingest.log" \
@@ -246,6 +271,7 @@ def do_add(reg):
         "decidida_em": None,
         "decisao": None,
         "efeito": os.environ["EFEITO"],
+        "onde": os.environ.get("ONDE") or "",
         "recomendacao": (os.environ.get("RECOMENDACAO") or None),
         "supersede": json.loads(os.environ["SUPERSEDE_JSON"]),
         "refs": {"pr": json.loads(os.environ["PR_JSON"]), "papel": [os.environ["PAPEL"]]},
