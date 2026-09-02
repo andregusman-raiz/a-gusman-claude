@@ -129,7 +129,18 @@ if [ "$NOWT" = "0" ]; then
     printf 'ALREADY_SATISFIED: CBUILD_RED_COMMAND passa no head atual (%s) — nada a construir.\n' "$(git -C "$REPO_ROOT" rev-parse --short HEAD)" >&2
     exit 20
   fi
-  git -C "$REPO_ROOT" worktree add "$WT" -b "$BRANCH"
+  # 02/09 (bug medido pelo DE-BUILD-B, E-29 WP-6): sem start-point, o worktree herdava o HEAD do
+  # checkout principal SILENCIOSAMENTE — nasceu de fix/matriculas-* (770 ficheiros de diff vs main)
+  # em vez de main. Base agora EXPLICITA: CBUILD_BASE > origin/main > main; falha alto se nenhuma.
+  CBUILD_BASE="${CBUILD_BASE:-}"
+  if [ -z "$CBUILD_BASE" ]; then
+    git -C "$REPO_ROOT" fetch origin main >/dev/null 2>&1 || true
+    if git -C "$REPO_ROOT" rev-parse --verify -q origin/main >/dev/null; then CBUILD_BASE=origin/main
+    elif git -C "$REPO_ROOT" rev-parse --verify -q main >/dev/null; then CBUILD_BASE=main
+    else echo "ERRO: nem origin/main nem main existem — passe CBUILD_BASE explicito" >&2; exit 6; fi
+  fi
+  echo "▶ worktree base: $CBUILD_BASE ($(git -C "$REPO_ROOT" rev-parse --short "$CBUILD_BASE"))"
+  git -C "$REPO_ROOT" worktree add "$WT" -b "$BRANCH" "$CBUILD_BASE"
   # SPEC recém-escrita/editada pode não estar commitada — sincroniza no worktree
   if ! cmp -s "$SPEC_ABS" "$WT/$SPEC_REL" 2>/dev/null; then
     mkdir -p "$WT/$(dirname "$SPEC_REL")"
