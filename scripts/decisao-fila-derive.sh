@@ -49,12 +49,27 @@ with open(Q,"r+") as fh:
                 return 0 if db<=hoje else (0 if meta.get("sev")=="P0" else 1)
             except: return 1
         return 0 if meta.get("bloco")==1 else 1
+    _ult={}
+    try:
+        for _l in open(os.path.expanduser("~/Claude/docs/ai-state/roadmap/results.jsonl"),errors="replace"):
+            try: _e=json.loads(_l)
+            except Exception: continue
+            if _e.get("status") and _e["status"] not in ("posto","anulado"): _ult[_e.get("task")]=_e
+    except Exception: _ult={}
     for task,meta in list(abertas.items())+list(desp.items()):
         is_desp=task.startswith("DESP-")
         if task in seen:
             r=seen[task]
             r["resumo"]=meta["titulo"]
             if r.get("status")=="done":   # reaberta na fonte -> reabre na fila
+                # 02/09 (achado do COMANDO, 9 rows): o DECISAO regista `done` no ledger (decidiu/despachou), o empurra
+                # reconcilia a row para done, e este derive reabria-a a cada tick porque a FONTE (yaml do DE, que so'
+                # muda por PR) continua `open` — 7 DESP-* em ping-pong desde 11:57Z. Ledger `done` posterior ao ultimo
+                # derive vale: a row fica done com nota; a fonte fecha quando o PR mergear (linha 69-70 trata).
+                _l=_ult.get(task) or {}
+                if _l.get("status")=="done" and str(_l.get("ts") or "")>=str(r.get("derivada_em") or ""):
+                    r["nota_derive"]=f"fonte ainda open; ledger done {_l.get('ts','')[:16]} por {_l.get('papel','')} — aguarda fecho na fonte (PR)"
+                    continue
                 r["status"]="fila"; r["nota_derive"]=f"reaberta na fonte {now}"
             continue
         rows.append({"task":task,"frente":"decisao","resumo":meta["titulo"],"status":"fila",

@@ -29,7 +29,9 @@ PYF
 }
 while IFS=$'\t' read -r PAPEL MSG TASK FRENTE; do
   [ -z "${PAPEL:-}" ] && continue
-  printf '{"ts":"%s","papel":"%s","task":"%s","frente":"%s","msg":%s}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$TASK" "$FRENTE" "$(printf '%s' "$MSG" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()[:300]))')" >> "$ATR"
+  # formato com espaco depois dos dois pontos ("papel": "X") — e' o que o contrato manda os papeis filtrarem;
+  # o SALARIOS apanhou que json compacto tornaria os monitores mudos (e mudo le-se como calmo).
+  printf '{"ts": "%s", "papel": "%s", "task": "%s", "frente": "%s", "msg": %s}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$TASK" "$FRENTE" "$(printf '%s' "$MSG" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()[:300]))')" >> "$ATR"
   if [ "$(_falhas check "$PAPEL")" = "skip" ]; then
     printf '%s step=fila-empurra dest=%s task=%s ADIADO-backoff (3+ falhas de tela; evento em atribuicoes.jsonl)\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$TASK" >> "$TL"; continue
   fi
