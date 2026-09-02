@@ -219,4 +219,14 @@ os.makedirs(OUT_DIR, exist_ok=True)
 tmp = OUT + '.tmp'
 with open(tmp, 'w') as f: json.dump(snap, f, ensure_ascii=False)
 os.replace(tmp, OUT)
+# 02/09 23:5xZ (incidente: `git checkout -- claims.json` apagou 14 h de edicoes de varias sessoes; nenhuma fonte de
+# recuperacao existia — o snapshot ja tinha sido regenerado por cima). Retencao: 1 copia por hora, 24 h, em hist/.
+# E' a unica fotografia periodica do estado partilhado; custa ~110 KB/h.
+try:
+    hd=f'{OUT_DIR}/hist'; os.makedirs(hd, exist_ok=True)
+    hp=f"{hd}/snapshot-{NOW.strftime('%Y%m%dT%H')}.json"
+    if not os.path.exists(hp):
+        import shutil; shutil.copyfile(OUT, hp)
+        for old in sorted(glob.glob(f'{hd}/snapshot-*.json'))[:-24]: os.remove(old)
+except Exception: pass
 print(f"snapshot ok {snap['ts']} terminais={len(terminais)} filas={len(filas)} roadmaps={len(roadmaps)} {snap['gerado_em_ms']}ms")
