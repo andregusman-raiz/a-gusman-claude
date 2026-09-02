@@ -139,6 +139,9 @@ for _papel,_v in reg.items():
     try: _min=int((now-datetime.fromisoformat(_ts.replace('Z','+00:00'))).total_seconds()//60)
     except Exception: continue
     if _min>_JAN_MIN: continue
+    # 02/09 20:3xZ (caso FGTS): posto declarado ha pouco = esta em algo (a row pode ja estar done por reconciliacao
+    # enquanto ele corrige/continua). Mesma janela de 12 h do ramo do silencio.
+    if tem_posto(_papel): continue
     _fr=(_v.get('frente') or _papel).lower()
     if not os.path.exists(os.path.join(os.path.dirname(T),'roadmap','filas',f'fila-{_fr}.jsonl')): continue
     try:
@@ -146,8 +149,10 @@ for _papel,_v in reg.items():
                    capture_output=True,text=True,timeout=60).stdout
     except Exception: continue
     if 'PRÓXIMA' not in _o and 'PROXIMA' not in _o: continue
-    _prox=_o.split('PRÓXIMA (peek):')[-1].strip()[:90]
-    alertas.append((_papel,f'fechaste ha {_min} min e nao puxaste (fila-{_fr} tem elegivel)',[f'proxima: {_prox}']))
+    try:
+        _pj=json.loads(_o.split('PRÓXIMA (peek):')[-1].strip()); _prox=f"{_pj.get('task')} — {str(_pj.get('resumo') or '')[:70]}"
+    except Exception: _prox=_o.split('PRÓXIMA (peek):')[-1].strip()[:80]
+    alertas.append((_papel,f'fechaste ha {_min} min e nao puxaste — fila-{_fr} tem elegivel: {_prox}. Puxa (fila-pull.sh {_fr} {_papel}) ou declara posto',[]))
 
 if not alertas:
     print(f'posto ok: nenhum papel calado >{LIM} min com trabalho por fazer, nenhum fechou sem puxar'); raise SystemExit(0)
