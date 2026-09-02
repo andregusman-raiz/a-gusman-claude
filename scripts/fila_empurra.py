@@ -111,7 +111,10 @@ if not DRY:
         with open(q,'r+') as fh:
             fcntl.flock(fh,fcntl.LOCK_EX); rows=load(q); ch=False
             for r in rows:
-                if r['task'] in done_result and r.get('status')!='done': r['status']='done'; ch=True
+                # 02/09: em fila-decisao, `done` do DECISAO fecha a DECISAO, nao a EXECUCAO (row com fase=execucao e
+                # builder DE-COORD). Reconciliar para done escondia PRs por abrir.
+                if r['task'] in done_result and r.get('status')!='done' and not (r.get('fase')=='execucao' and (ult.get(r['task']) or {}).get('papel')=='DECISAO'):
+                    r['status']='done'; ch=True
                 # 02/09 (auditoria do dono; §5 do COMANDO): a reconciliacao so subia (fila->done) e nunca
                 # descia. Medido: E-4 e E-94 `done` na row com `blocked` no ledger ha >24 h — e `done` na row
                 # nao e' so rotulo, e' o que o BOARD e a leitura humana mostram como fechado. O contrato ja

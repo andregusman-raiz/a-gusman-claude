@@ -66,11 +66,17 @@ with open(Q,"r+") as fh:
                 # reconcilia a row para done, e este derive reabria-a a cada tick porque a FONTE (yaml do DE, que so'
                 # muda por PR) continua `open` — 7 DESP-* em ping-pong desde 11:57Z. Ledger `done` posterior ao ultimo
                 # derive vale: a row fica done com nota; a fonte fecha quando o PR mergear (linha 69-70 trata).
+                # 02/09 19:3xZ (objeccao do COMANDO/DE-COORD, aceite): o `done` do DECISAO e' da DECISAO ("veredicto do
+                # dono: … Requer PR no yaml"); a row e' da EXECUCAO (abrir o PR). Dois referentes, um id. Marcar done
+                # escondia 5 PRs por abrir — a direccao cara. A row volta a `fila` mas muda de FASE: o executor passa a
+                # ser o coordenador do DE (quem abre PR no yaml), nao o DECISAO, que ja decidiu.
                 _l=_ult.get(task) or {}
-                if _l.get("status")=="done" and str(_l.get("ts") or "")>=str(r.get("derivada_em") or ""):
-                    r["nota_derive"]=f"fonte ainda open; ledger done {_l.get('ts','')[:16]} por {_l.get('papel','')} — aguarda fecho na fonte (PR)"
-                    continue
-                r["status"]="fila"; r["nota_derive"]=f"reaberta na fonte {now}"
+                r["status"]="fila"
+                if _l.get("status")=="done" and _l.get("papel")=="DECISAO" and is_desp:
+                    r["builder_sugerido"]="DE-COORD"; r["fase"]="execucao"
+                    r["nota_derive"]=f"decidida pelo DECISAO {_l.get('ts','')[:16]}; falta PR no decisions_despertador.yaml (fonte ainda open)"
+                else:
+                    r["nota_derive"]=f"reaberta na fonte {now}"
             continue
         rows.append({"task":task,"frente":"decisao","resumo":meta["titulo"],"status":"fila",
                      "depende_de":[],"builder_sugerido":"DECISAO","prova":"",
