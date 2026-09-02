@@ -109,7 +109,9 @@ with open(q,"r+") as fh:
         # E-30..E-34 continuavam puxaveis com a cadeia declarada fora do programa em parcelas.md:5.
         # O campo e DERIVADO pelo filas-sync a cada tick; e a unica representacao do facto.
         if row.get("fora_da_janela"): causas["fora-da-janela"]+=1; continue
-        if (row.get("task") or "") in done:
+        # 02/09 21:3xZ (auditoria das filas): em fila-decisao, `done` do DECISAO fecha a DECISAO; a row em fase=execucao
+        # (abrir o PR no yaml, builder DE-COORD) NAO esta feita — o pull marcava-a done e tornava-a invisivel (7 DESP-*).
+        if (row.get("task") or "") in done and not (row.get("fase")=="execucao" and ult_papel.get(row.get("task") or "")=="DECISAO"):
             row["status"]="done"; changed=True; continue   # reconcilia rótulo velho com results.jsonl
         # 30/08: o fila-empurra ja filtrava por builder_sugerido (fila_empurra.py:54-56) e o pull
         # nao filtrava nada — puxava a 1a elegivel fosse de quem fosse. Efeito medido: o FUNIL puxou
