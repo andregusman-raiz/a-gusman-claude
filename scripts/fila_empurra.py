@@ -208,7 +208,13 @@ for papel,t in builders:
     mine=[]
     for q in filas:
         for r in load(q):
-            if r.get('status')=='puxada' and r.get('puxada_por')==papel and r['task'] not in done_result and r['task'] not in ruim:
+            # 02/09 (achado do DE-MIG): `posto` declarado sobre a task (RESULT posto mais recente que a puxada, <12 h)
+            # e' o papel a dizer "estou nisto / parado a espera de terceiro, declarado" — nao merece LEMBRETE horario.
+            # Antes so done/blocked calavam o lembrete, e o posto era ignorado (mesma classe do bug do watchdog).
+            _pst=(ult.get(r.get('task')) or {})
+            _posto_recente=(_pst.get('status')=='posto' and _pst.get('papel')==papel and str(_pst.get('ts') or '')>=str(r.get('puxada_em') or '')
+                            and (now-datetime.datetime.fromisoformat(str(_pst.get('ts')).replace('Z','+00:00'))).total_seconds()<43200)
+            if r.get('status')=='puxada' and r.get('puxada_por')==papel and r['task'] not in done_result and r['task'] not in ruim and not _posto_recente:
                 try: age=(now-datetime.datetime.fromisoformat(r.get('puxada_em','').replace('Z','+00:00'))).total_seconds()/60
                 except Exception: age=10**6
                 mine.append((age,r,q))
