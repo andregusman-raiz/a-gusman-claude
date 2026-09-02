@@ -162,8 +162,10 @@ cj = jload(f'{AI}/de-pr-queue/claims.json', {})
 claims = cj.get('claims', {}) if isinstance(cj, dict) else {}
 prs = []
 for b, c in claims.items():
-    st = str(c.get('status') or c.get('estado') or '')[:40]
-    prs.append({'pr': c.get('pr'), 'branch': b[:60], 'frente': c.get('frente'), 'owner': c.get('owner'), 'terminal': c.get('terminal'), 'status': st, 'ha_min': idade_min(c.get('synced_at') or c.get('claimed_at'))})
+    st_raw = str(c.get('status') or c.get('estado') or '')
+    # status e narrativo em muitos claims (ate 4,5k chars): reduzir a um token curto para agrupar/exibir
+    st = re.split(r'[:·—|(\n]', st_raw)[0].strip().lower()[:24] or '?'
+    prs.append({'pr': c.get('pr'), 'branch': b[:60], 'frente': c.get('frente'), 'owner': c.get('owner'), 'terminal': c.get('terminal'), 'status': st, 'status_nota': st_raw[:120], 'ha_min': idade_min(c.get('synced_at') or c.get('claimed_at'))})
 prs_ab = [p for p in prs if 'merge' not in p['status'].lower() and 'fechad' not in p['status'].lower() and 'closed' not in p['status'].lower()]
 pc = {}
 for p in prs_ab: pc[p['status'] or '?'] = pc.get(p['status'] or '?', 0) + 1
