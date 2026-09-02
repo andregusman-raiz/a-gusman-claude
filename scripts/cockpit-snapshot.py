@@ -6,7 +6,13 @@ claims.json, MUDOU.md e SO A CAUDA de msg-ledger/send.log/tick.log (nunca os 11 
 da tela de cada janela (cmux read-screen, ~0,15 s cada — o mesmo instrumento do tick). Escreve
 docs/ai-state/cockpit/snapshot.json (tmp + os.replace). Nunca escreve fora de cockpit/.
 """
-import json, os, re, glob, subprocess, datetime, time, sys
+import json
+import os
+import re
+import glob
+import subprocess
+import datetime
+import time
 
 T0 = time.time()
 AI = os.path.expanduser('~/Claude/docs/ai-state')
