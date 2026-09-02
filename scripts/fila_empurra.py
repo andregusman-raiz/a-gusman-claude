@@ -254,6 +254,50 @@ for papel,t in builders:
          f"Prova: {(pick.get('prova') or 'ver programa')[:100]}. Já feita? regista e puxa outra. "
          f"FIM: bash ~/.claude/scripts/result.sh {papel} {pick['task']} done '<prova>' ; DEPOIS: bash ~/.claude/scripts/fila-pull.sh {fr} {papel}")
     out.append((papel,msg[:580],pick['task'],fr))
+# ---------- 02/09 (ordem do dono): dois sinais que ate hoje so o COMANDO fazia a mao ----------
+# (N4) FILA VAZIA != PROGRAMA CUMPRIDO: uma fila sem nada em 'fila' nem 'puxada' avisa o coordenador da frente
+#      1x/24h — "cunhar ou declarar concluida". Medido: salarios com 0 puxaveis e 26 itens em aberto no programa.
+# (P1) ROW BLOQUEADA A CITAR DECISAO JA TOMADA: a decisao saiu do console e a row ficou presa (7 rows, uma ha 133 h).
+#      Avisa o AUTOR do blocked 1x/12h; a partir de 48 h copia o COMANDO. Levantar continua a ser ato do autor.
+_vaz=st.get('vazias',{}); _dpres=st.get('decididas_presas',{})
+def _coord(fr):
+    try:
+        head=open(f'{AI}/roadmap/{fr}.md',errors='replace').read(3000)
+        m=re.search(r'\brepo ((?:GitHub-raiz|GitHub-pessoal|GitHub|Projetos)/[A-Za-z0-9._-]+)',head)
+        if m and 'raiz-data-engine' in m.group(1): return 'DE-COORD'
+        if m: return 'COMANDO'
+    except Exception: pass
+    return 'DE-COORD' if fr in ('parcelas','prontidao','sustentacao','revisao','deps') else 'COMANDO'
+try:
+    _dj=json.load(open(f'{AI}/terminais/decisoes.json')); _decs=_dj.get('decisoes',_dj)
+    _decs=list(_decs.values()) if isinstance(_decs,dict) else (_decs or [])
+    _byid={d.get('id'):d for d in _decs if isinstance(d,dict)}
+except Exception: _byid={}
+for q in filas:
+    fr=os.path.basename(q)[5:-6]; rows=load(q)
+    if fr in ('decisao',): continue
+    if rows and not any(r.get('status') in ('fila','puxada') for r in rows):
+        if now.timestamp()-_vaz.get(fr,0)>=86400:
+            _vaz[fr]=now.timestamp(); _c=_coord(fr)
+            out.append((_c,f"tick/fila-empurra: fila-{fr} SEM trabalho enfileirado ({sum(1 for r in rows if r.get('status')=='done')} done, {sum(1 for r in rows if r.get('status')=='bloqueada')} bloqueadas). Fila vazia nao e programa cumprido: confere roadmap/{fr}.md — cunha o que falta ou declara concluida.",f"fila-{fr}-vazia",fr))
+    for r in rows:
+        if r.get('status')!='bloqueada': continue
+        txt=str(r.get('bloqueio') or '')+' '+str(r.get('nota_comando') or '')
+        for did in sorted(set(re.findall(r'D-\d+',txt))):
+            d=_byid.get(did) or {}
+            if not d.get('decidida_em'): continue
+            try: h=(now-datetime.datetime.fromisoformat(str(d['decidida_em']).replace('Z','+00:00'))).total_seconds()/3600
+            except Exception: continue
+            if h<24: continue
+            autor=(ult.get(r.get('task'),{}) or {}).get('papel') or r.get('puxada_por') or r.get('builder_sugerido') or ''
+            if not autor or autor=='tick': continue
+            k=f"{r.get('task')}|{did}|{autor}"
+            if now.timestamp()-_dpres.get(k,0)<43200: continue
+            _dpres[k]=now.timestamp()
+            m=f"tick/fila-empurra: {r.get('task')} [{fr}] continua bloqueada a citar {did}, DECIDIDA ha {int(h)} h ({str(d.get('decisao') or '')[:80]}). So o autor levanta: regista RESULT novo (posto/done) ou re-bloqueia com motivo NOVO."
+            out.append((autor,m,r.get('task'),fr))
+            if h>=48: out.append(('COMANDO',f"tick/fila-empurra: {r.get('task')} [{fr}] bloqueada ha {int(h)} h a citar {did} ja decidida; autor {autor} avisado; sem RESULT novo — cobra.",r.get('task'),fr))
+st['vazias']=_vaz; st['decididas_presas']=_dpres
 if not DRY:
     st['lembretes']=lembr; json.dump(st,open(STp,'w'))
 for p,m,tk,fr in out[:6]: print(f"{p}\t{m}\t{tk}\t{fr}")

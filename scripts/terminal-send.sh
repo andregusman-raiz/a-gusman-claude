@@ -257,6 +257,7 @@ with open(out,'w') as f:
         for p,ts,n,r in sorted(rows,key=lambda x:x[1]): f.write(f'| {p} | {ts} | {n} | {r} |\n')
     else: f.write('(nenhum)\n')
 PYESC
+  [[ "$RAZAO" == "tela:pane-nao-aceita-input" ]] && bash "$SCRIPT_DIR/notify-dono.sh" "pane-morta:$PAPEL" "$PAPEL nao aceita input (sonda nao apareceu na caixa) — terminal inalcancavel de facto; ver INALCANCAVEIS.md" >/dev/null 2>&1 || true
   echo "RECUSADO: $PAPEL continua com MENU DE DECISAO aberto ou TEXTO POR ENVIAR no prompt apos $MENU_RETRIES tentativas ($RAZAO)." >&2
   echo "Enviar agora faria seu texto virar a RESPOSTA dessa pergunta — ja aconteceu 2x em 28/08" >&2
   echo "(D-064 foi respondida por engano e precisou ser anulada). Esta guarda NAO tem bypass." >&2

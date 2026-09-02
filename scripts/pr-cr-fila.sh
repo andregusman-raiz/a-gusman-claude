@@ -47,12 +47,22 @@ for p in prs:
     except Exception: continue
     crs=[r for r in d.get("reviews",[]) if r.get("state")=="CHANGES_REQUESTED"]
     if not crs: continue
-    cr=sorted(crs,key=lambda r:r.get("submittedAt",""))[-1]
+    crs_s=sorted(crs,key=lambda r:r.get("submittedAt",""))
+    cr=crs_s[-1]
+    # 02/09 (auditoria do RESUMO): o bot re-publica CHANGES_REQUESTED a cada ~45 min (#6340: 8 CRs num dia) e
+    # cada uma invalidava o done e re-oferecia a tarefa. CR nova com o MESMO corpo (normalizado: sem digitos/
+    # espacos) da anterior nao e' trabalho novo — e' o ciclo do bot; fica registado, nao reabre.
+    import re as _re
+    def _norm(b): return _re.sub(r'[\d\s]+','',str(b or ''))[:2000]
+    # Medido (4 PRs): o corpo da CR repetida do bot QUASE nunca e' igual (re-escreve a prosa). O criterio
+    # que discrimina e' o FACTO: houve commit entre a CR anterior e esta? Sem commit, o bot so' repetiu.
+    _cms_between = [c for c in d.get("commits",[]) if len(crs_s)>=2 and crs_s[-2].get("submittedAt","") < (c.get("committedDate") or "") <= cr.get("submittedAt","")]
+    cr_igual = len(crs_s)>=2 and (not _cms_between or _norm(cr.get("body"))==_norm(crs_s[-2].get("body")))
     cms=sorted(d.get("commits",[]),key=lambda c:c.get("committedDate",""))
     last=cms[-1] if cms else {}
     out.append({"pr":n,"autor":(p.get("author") or {}).get("login",""),
                 "titulo":(p.get("title") or "")[:120],
-                "cr_em":cr.get("submittedAt",""),"cr_por":(cr.get("author") or {}).get("login",""),
+                "cr_em":cr.get("submittedAt",""),"cr_por":(cr.get("author") or {}).get("login",""),"cr_igual":cr_igual,
                 "commit_em":last.get("committedDate",""),"commit_oid":(last.get("oid") or "")[:8]})
 print(json.dumps(out,ensure_ascii=False))
 PY
@@ -185,6 +195,12 @@ for d in det:
         # significa 'o autor retira porque a prova caiu' e aqui o autor não retirou nada — um verificador viu
         # uma condição objetiva. Com `retracted`, as contagens de retractação por papel ficavam poluídas.
         _n_reab=sum(1 for _h in hist.get(task,[]) if _h.get("status") in ("retracted","invalidada") and _h.get("papel")=="tick")+1
+        if d.get("cr_igual"):
+            _ja=any(d["cr_em"] in str(_h.get("prova") or "") for _h in hist.get(task,[]))
+            if not _ja and not DRY:
+                result("tick",task,"done",f"CR {d['cr_em']} do bot e' identica a anterior (corpo normalizado)",
+                       f"PR #{n}: bot repetiu a mesma CR sem push novo — ciclo do bot, nao trabalho novo; precisa de humano/dismiss (D-034/D-138)")
+            continue
         d["_reaberta"]=(_n_reab, _u.get("ts",""), _u.get("papel",""))
         if not DRY:
             result("tick",task,"invalidada",f"gh pr view {n}: ultimo commit {d['commit_em'] or '-'} <= review {d['cr_em']}",
