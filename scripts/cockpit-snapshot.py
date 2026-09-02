@@ -128,7 +128,10 @@ for fr, rows in filas_rows.items():
     filas[fr] = {
         'contagem': c, 'total': len(rows),
         'puxadas': [{'task': r.get('task'), 'por': r.get('puxada_por'), 'ha_min': idade_min(r.get('puxada_em')), 'resumo': (r.get('resumo') or '')[:110]} for r in rows if r.get('status') == 'puxada'],
-        'elegiveis': [{'task': r.get('task'), 'builder': r.get('builder_sugerido'), 'resumo': (r.get('resumo') or '')[:110]} for r in em_fila if not deps_pendentes(r) and not r.get('fora_da_janela')][:8],
+        # 02/09: "elegivel" aqui NAO e' o predicado do fila-pull (que ainda checa PR mergeado por gh — proibido no
+        # derivador). Aplica-se o que e' barato e decisivo: ultimo RESULT da task blocked/failed/done exclui;
+        # o resto e' CANDIDATA (o pull decide). O COMANDO leu a lista antiga como "a fila oferece" e nao oferecia.
+        'elegiveis': [{'task': r.get('task'), 'builder': r.get('builder_sugerido'), 'resumo': (r.get('resumo') or '')[:110]} for r in em_fila if not deps_pendentes(r) and not r.get('fora_da_janela') and (ult.get(r.get('task')) or {}).get('status') not in ('blocked','failed','done')][:8],
         'presas': [{'task': r.get('task'), 'deps': deps_pendentes(r), 'fora_da_janela': bool(r.get('fora_da_janela')), 'resumo': (r.get('resumo') or '')[:90]} for r in em_fila if deps_pendentes(r) or r.get('fora_da_janela')][:12],
         'bloqueadas': [{'task': r.get('task'), 'bloqueio': (r.get('bloqueio') or r.get('nota_comando') or '')[:120]} for r in rows if r.get('status') == 'bloqueada'][:10],
     }
@@ -205,6 +208,7 @@ snap = {
     'prs': {'abertos': prs_ab, 'por_status': pc, 'total_claims': len(prs)},
     'interacoes': {'msgs': msgs, 'sends': sends, 'tick_acorda': tick_acorda, 'tick_passos': tick_passos, 'deploys': deploys},
     'ledger_hoje': [{'ts': e.get('ts'), 'papel': e.get('papel'), 'task': e.get('task'), 'status': e.get('status'), 'nota': (e.get('nota') or '')[:120], 'pr': e.get('pr')} for e in eventos_hoje[-60:]],
+    'inalcancaveis': [l for l in tail(f'{AI}/terminais/INALCANCAVEIS.md', 40) if l.startswith('| ') and not l.startswith('| papel')],
     'mudou': mudou,
     'gerado_em_ms': int((time.time() - T0) * 1000),
 }

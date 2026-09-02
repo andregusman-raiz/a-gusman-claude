@@ -159,7 +159,13 @@ for d in det:
         externos.append((n,d["autor"],reenviado)); continue
     if reenviado:
         ja_reenviados.append(n)
-        if (ult.get(task) or {}).get("status") not in ("done",None):
+        # 02/09 (auditoria do RESUMO): o tick escrevia `done` por cima do `blocked` do builder sem facto novo —
+        # e 27-48 min depois invalidava o proprio done, a row voltava a fila, o empurra re-oferecia, o builder
+        # bloqueava de novo em 1-2 min (CR-6340: 9 ciclos/9 turnos de LLM em 6 h, zero progresso). Um `done`
+        # do tick por cima de um `blocked` so' e' legitimo se houver commit POSTERIOR ao blocked.
+        _u=ult.get(task) or {}
+        _bloq_sem_facto_novo = _u.get("status") in ("blocked","failed") and str(d.get("commit_em") or "") <= str(_u.get("ts") or "")
+        if _u.get("status") not in ("done",None) and not _bloq_sem_facto_novo:
             if not DRY:
                 result("tick",task,"done",f"commit {d['commit_oid']} em {d['commit_em']} > review {d['cr_em']}",
                        f"PR #{n}: correcao enviada depois do pedido; aguarda re-review")

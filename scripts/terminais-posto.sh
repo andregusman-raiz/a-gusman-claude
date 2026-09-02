@@ -110,8 +110,47 @@ for papel,v in reg.items():
     else:
         alertas.append((papel,f'calado ha {mins} min e sem Entrega em curso nem posto',[]))
 
+# 02/09 (auditoria do dono; achado nomeado pelo SALARIOS): o vigia e o empurra so olhavam OCIOSIDADE —
+# e o empurra so entrega a quem esta parado ha >=10 min. Um papel ATIVO que fecha Entregas e nunca puxa
+# fica invisivel aos dois: "o mecanismo que apanharia a omissao esta desligado pela mesma condicao que a
+# produz". Medido no dia: COMANDO/FUNIL/SALARIOS fecharam 2/5/6 Entregas com ZERO pulls. Segunda condicao,
+# ortogonal ao silencio: fechou ha pouco + nao tem nada puxado + a fila DELE tem coisa elegivel.
+# A elegibilidade NAO e re-implementada aqui — pergunta-se ao proprio fila-pull em --peek (nao muta).
+import subprocess as _sp
+_JAN_MIN=int(os.environ.get('POSTO_FECHOU_SEM_PUXAR_MIN','90'))
+_ult_done={}; _puxadas=set()
+_rf=os.path.join(os.path.dirname(T),'roadmap','results.jsonl')
+if os.path.exists(_rf):
+    for _l in open(_rf,errors='replace'):
+        try: _e=json.loads(_l)
+        except Exception: continue
+        if _e.get('status')=='done' and _e.get('papel') and _e.get('papel')!='tick':
+            _ult_done[_e['papel']]=_e.get('ts')
+for _q in glob.glob(os.path.join(os.path.dirname(T),'roadmap','filas','fila-*.jsonl')):
+    for _l in open(_q,errors='replace'):
+        try: _r=json.loads(_l)
+        except Exception: continue
+        if _r.get('status')=='puxada' and _r.get('puxada_por'): _puxadas.add(_r['puxada_por'])
+_ja=[a[0] for a in alertas]
+for _papel,_v in reg.items():
+    if _v.get('estado')!='aberto' or _papel in _ja or _papel in _puxadas: continue
+    _ts=_ult_done.get(_papel)
+    if not _ts: continue
+    try: _min=int((now-datetime.fromisoformat(_ts.replace('Z','+00:00'))).total_seconds()//60)
+    except Exception: continue
+    if _min>_JAN_MIN: continue
+    _fr=(_v.get('frente') or _papel).lower()
+    if not os.path.exists(os.path.join(os.path.dirname(T),'roadmap','filas',f'fila-{_fr}.jsonl')): continue
+    try:
+        _o=_sp.run(['bash',os.path.expanduser('~/.claude/scripts/fila-pull.sh'),_fr,_papel,'--peek'],
+                   capture_output=True,text=True,timeout=60).stdout
+    except Exception: continue
+    if 'PRÓXIMA' not in _o and 'PROXIMA' not in _o: continue
+    _prox=_o.split('PRÓXIMA (peek):')[-1].strip()[:90]
+    alertas.append((_papel,f'fechaste ha {_min} min e nao puxaste (fila-{_fr} tem elegivel)',[f'proxima: {_prox}']))
+
 if not alertas:
-    print(f'posto ok: nenhum papel calado >{LIM} min com trabalho por fazer'); raise SystemExit(0)
+    print(f'posto ok: nenhum papel calado >{LIM} min com trabalho por fazer, nenhum fechou sem puxar'); raise SystemExit(0)
 
 for papel,motivo,trab in alertas:
     o=f"POSTO: {motivo}." + (f" Tens em curso: {', '.join(trab)}. Retoma ou diz o que te bloqueia." if trab else " Sem Entrega em curso e sem posto declarado — pede trabalho ao DE-COORD.")

@@ -6,6 +6,20 @@ set -uo pipefail
 python3 - "$HOME/Claude/docs/ai-state/roadmap" <<'PY'
 import re,json,os,sys,fcntl
 D=sys.argv[1]; add=[]; upd=[]
+
+def _coage_dep(_r):
+    """02/09 (auditoria): `depende_de` como STRING e iterado CARACTERE A CARACTERE pelos consumidores —
+    a CR-6301 tinha 'D-027-reaberta-ou-GitHub-App-provisionado' e produzia 42 dependencias fantasma
+    ('D','-','0','2','7',...), nenhuma satisfazivel: a row nunca seria elegivel e a mensagem dizia
+    'dep-por-fechar' como se fosse legitimo. Coage para lista de tokens de TASK; texto sem token
+    nenhum e' condicao humana, nao dependencia — preserva-se em `depende_de_texto` (visivel) e a
+    lista fica vazia. Nao muda elegibilidade de row `bloqueada`, que e' o caso medido."""
+    _d=_r.get('depende_de')
+    if not isinstance(_d,str) or not _d.strip(): return False
+    _toks=re.findall(r'\b(?:E-\d+[a-z]?|CR-\d+)\b',_d)
+    _r['depende_de']=_toks
+    if not _toks: _r['depende_de_texto']=_d[:200]
+    return True
 # 01/09 (COMANDO): papeis DERIVADOS do registry.json — antes eram lista hardcoded e o defeito
 # repetiu-se: 31/08 com SALARIOS (ver comentario abaixo) e 01/09 com FGTS (E-200..E-203 ficaram
 # com builder vazio e o tick ofereceu trabalho da VM do FGTS a DE-DATA, que recusou). O proprio
@@ -82,6 +96,7 @@ for prog in _progs:
                 _ch=False
                 for _r in _rows:
                     if _r.get('task')!=eid: continue
+                    _ch = _coage_dep(_r) or _ch
                     if _b and _r.get('builder_sugerido')!=_b: _r['builder_sugerido']=_b; _ch=True
                     if _dep and _r.get('depende_de')!=_dep: _r['depende_de']=_dep; _ch=True
                     if _res and _r.get('resumo')!=_res and _r.get('origem') not in ('pr-cr-fila','results-orfa'):
@@ -108,7 +123,17 @@ for prog in _progs:
             fcntl.flock(fh,fcntl.LOCK_EX)
             for r in novos: fh.write(json.dumps(r,ensure_ascii=False)+'\n')
         add += [f"{prog}:{r['task']}" for r in novos]
-print('filas-sync: novas', add or 0, '· re-derivadas', sorted(set(upd)) or 0)
+_coag=[]
+for _qq in glob.glob(f'{D}/filas/fila-*.jsonl'):
+    _rows=[json.loads(_l) for _l in open(_qq) if _l.strip()]
+    _ch=False
+    for _r in _rows:
+        if _coage_dep(_r): _ch=True; _coag.append(f"{os.path.basename(_qq)[5:-6]}:{_r.get('task')}")
+    if _ch:
+        with open(_qq,'w') as _fh:
+            fcntl.flock(_fh,fcntl.LOCK_EX)
+            for _r in _rows: _fh.write(json.dumps(_r,ensure_ascii=False)+'\n')
+print('filas-sync: novas', add or 0, '· re-derivadas', sorted(set(upd)) or 0, '· deps coagidas', _coag or 0)
 
 # ── Entregas ÓRFÃS: trabalhadas no registo e ausentes de toda a fila ────────────────────────────
 # 01/09 (ordem do dono): a fila responde a "o que há para fazer" e o registo a "o que se fez", e nada
