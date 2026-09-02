@@ -112,6 +112,15 @@ if not DRY:
             fcntl.flock(fh,fcntl.LOCK_EX); rows=load(q); ch=False
             for r in rows:
                 if r['task'] in done_result and r.get('status')!='done': r['status']='done'; ch=True
+                # 02/09 (auditoria do dono; §5 do COMANDO): a reconciliacao so subia (fila->done) e nunca
+                # descia. Medido: E-4 e E-94 `done` na row com `blocked` no ledger ha >24 h — e `done` na row
+                # nao e' so rotulo, e' o que o BOARD e a leitura humana mostram como fechado. O contrato ja
+                # existe ("o ultimo registo do ledger vale"); isto aplica-o na direccao que faltava, com a
+                # mesma guarda do ramo de baixo: so quando o blocked e' POSTERIOR a puxada da row (um RESULT
+                # anterior a puxada nao descreve o trabalho que a row representa).
+                elif r.get('status')=='done' and r['task'] in ruim and not (r.get('puxada_em') and ruim_ts.get(r['task'],'') and ruim_ts[r['task']] < r['puxada_em']):
+                    _p,_n=ruim[r['task']]
+                    r['status']='bloqueada'; r['bloqueio']=_n; r['reconciliado_do_ledger']=ruim_ts.get(r['task'],''); ch=True
                 elif r['task'] in ruim and r.get('status')=='puxada' and not (r.get('puxada_em') and ruim_ts.get(r['task'],'') and ruim_ts[r['task']] < r['puxada_em']):
                     # 01/09 (medido): E-201 foi devolvida por DE-BUILD-B às 16:13 (encaminhamento errado) e puxada
                     # pelo FGTS às 16:3x; a devolução ANTIGA ia desfazer a puxada NOVA. Um RESULT anterior à
@@ -157,13 +166,26 @@ if not DRY:
                     elif r.get('conflito_retractacao') != f"{_quem}!={_dono_blk}":
                         r['conflito_retractacao']=f"{_quem}!={_dono_blk}"; r['conflito_em']=_r.get('ts',''); ch=True
             if ch: save(fh,rows)
-def executor(bs):
-    bs=bs or ''
+def donos(bs):
+    # 01/09 (FUNIL, ordem do dono "entenda pq nao recebo empurra e corrija"): este resolvedor era a
+    # versao PRE-correcao do que o fila-pull.sh ja consertou em 30/08 (substring -> word-boundary;
+    # "revisa DE-DATA" fazia o REVISOR virar executor) e 01/09 (donos = executor + ESPECIFICADORES:
+    # "quem pode INICIAR"). Duas copias do mesmo predicado, uma corrigida e a outra nao — mesma
+    # familia do caso SALARIOS documentado no proprio fila-pull.sh:30-36. Efeito medido com a row
+    # real da E-12b ("Codex (R2); especifica FUNIL/spec; revisa DE-DATA"): executor() devolvia
+    # DE-BUILD-B e a tarefa NUNCA seria oferecida ao FUNIL, que e quem escreve a SPEC sem a qual o
+    # build nao arranca — "trabalho do papel que o mecanismo nao sabia mostrar", por construcao.
+    # Espelho de fila-pull.sh::donos(); se mudar la, mudar aqui (estrutural por fazer: 1 fonte so).
+    bs=bs or ''; d=set()
     if 'Codex' in bs:
-        m=re.search(r'dirigid[oa] por ([A-Z][A-Z-]+)',bs); return m.group(1) if m and m.group(1) in papeis else 'DE-BUILD-B'
-    for p in papeis:
-        if p in bs: return p
-    return ''   # sem sugestão
+        m=re.search(r'dirigid[oa] por ([A-Z][A-Z-]+)',bs)
+        d.add(m.group(1) if m and m.group(1) in papeis else 'DE-BUILD-B')
+    else:
+        for p_ in sorted(papeis):   # sorted: iterar set era nao-deterministico com 2+ papeis na string
+            if re.search(r'\b'+re.escape(p_)+r'\b',bs): d.add(p_); break
+    for m in re.finditer(r'especifica[m]?\s+([A-Z][A-Z-]+)',bs):
+        if m.group(1) in papeis: d.add(m.group(1))
+    return d   # vazio = sem sugestão
 def idle_min(sid):
     last=None
     for f in glob.glob(f'{P}/*/{sid}*.jsonl'):
@@ -211,9 +233,9 @@ for papel,t in builders:
             for r in load(q):
                 if r.get('status')!='fila' or r.get('task') in done_result or r.get('task') in ruim or r.get('fora_da_janela'): continue
                 if prio_only and r.get('prioridade')!=0: continue
-                ex=executor(r.get('builder_sugerido'))
-                if pref and ex!=papel: continue
-                if not pref and ex: continue
+                dn=donos(r.get('builder_sugerido'))
+                if pref and papel not in dn: continue
+                if not pref and dn: continue
                 if all(d in done for d in (r.get('depende_de') or [])): pick,qpick=r,q; break
             if pick: break
         if pick: break

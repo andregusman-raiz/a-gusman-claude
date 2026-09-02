@@ -89,6 +89,35 @@ print(f"{len(tot)} divergentes; PERIGOSAS (row done, ledger blocked): {len(per)}
 PYD
 )
 chk "LEDGER<->ROWS (sonda, nao corrige)" "$DIVROWS"
+# 02/09 (auditoria do dono): a decisao sai do console mas a row so reabre com RESULT novo do AUTOR —
+# medido 7 rows bloqueadas a citar D-nnn ja decidida, uma ha 133 h. Nada no tick cruzava as duas fontes.
+# Sonda: LISTA, nao corrige (so o autor pode levantar o proprio blocked).
+BLOQDEC=$(python3 - <<'PYD'
+import json,glob,os,re,datetime
+AI=os.path.expanduser('~/Claude/docs/ai-state'); NOW=datetime.datetime.now(datetime.timezone.utc)
+try:
+    dj=json.load(open(f'{AI}/terminais/decisoes.json')); decs=dj.get('decisoes',dj)
+    decs=list(decs.values()) if isinstance(decs,dict) else (decs or [])
+    byid={d.get('id'):d for d in decs if isinstance(d,dict)}
+except Exception: byid={}
+out=[]
+for q in sorted(glob.glob(f'{AI}/roadmap/filas/fila-*.jsonl')):
+    fr=os.path.basename(q)[5:-6]
+    for l in open(q,errors='replace'):
+        try: r=json.loads(l)
+        except Exception: continue
+        if r.get('status')!='bloqueada': continue
+        txt=str(r.get('bloqueio') or '')+' '+str(r.get('nota_comando') or '')
+        for did in sorted(set(re.findall(r'D-\d+',txt))):
+            d=byid.get(did) or {}
+            if not d.get('decidida_em'): continue
+            try: h=int((NOW-datetime.datetime.fromisoformat(str(d['decidida_em']).replace('Z','+00:00'))).total_seconds()//3600)
+            except Exception: h='?'
+            out.append(f"{fr}/{r.get('task')}<-{did}({h}h)")
+print(f"{len(out)} row(s): "+" · ".join(out[:6]) if out else "0 (nenhuma row bloqueada cita decisao ja decidida)")
+PYD
+)
+chk "BLOQUEIO com decisao JA decidida (sonda, o autor e que levanta)" "$BLOQDEC"
 chk "caps threads nativas no Railway (D-097)" "$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway variables --service "${DE_RAILWAY_SERVICE:-raiz-data-engine}" --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([k for k in d if any(s in k for s in ('OPENBLAS','OMP_NUM','MKL_NUM','NUMEXPR','ARROW_NUM'))]),'/5')" 2>/dev/null)"
 chk "tick tem board-sync/DESPACHO/aprovador (branch spec/board-sync mergeada)" "$(grep -c 'board-sync\|DESPACHO\|de-aprovador' "$HOME/Claude/.claude/scripts/de-fila-tick.sh" 2>/dev/null) refs"
 chk "cap mecânico de palavras no canal-append (T1)" "$(grep -cE 'wc -w|MAX_WORDS' "$HOME/Claude/.claude/scripts/canal-append.sh" 2>/dev/null)"
