@@ -313,3 +313,16 @@ RENDER="$SCRIPT_DIR/decisoes-render.sh"
 if [[ -x "$RENDER" ]]; then
   DECISOES_DIR="$T" "$RENDER" >&2 || echo "AVISO: decisoes-render.sh falhou após criar $NEW_ID — rode manualmente" >&2
 fi
+
+# --- Ordem do dono 2026-09-02 (fila única + papel DECISAO): TODA decisão nova, sem excepção,
+# é comunicada ao papel DECISAO. Duas camadas: (1) o notify abaixo (evento, best-effort);
+# (2) a REDE DE SEGURANÇA é o decisao-fila-derive.sh, que corre no tick e apanha qualquer
+# ficha que entre por OUTRA porta (ingest manual incluído — lição da D-172). Falha aqui
+# nunca falha a criação da ficha.
+DERIVE="$SCRIPT_DIR/decisao-fila-derive.sh"
+[[ -x "$DERIVE" ]] && bash "$DERIVE" >/dev/null 2>&1 || true
+SENDBIN="$SCRIPT_DIR/terminal-send.sh"
+if [[ -x "$SENDBIN" ]]; then
+  bash "$SENDBIN" DECISAO "decisao nova ${NEW_ID} — puxa: fila-pull.sh decisao DECISAO (fila-decisao.jsonl)" \
+    >/dev/null 2>&1 || echo "AVISO: notify ao DECISAO falhou (${NEW_ID} está na fila na mesma — o derive cobre)" >&2
+fi

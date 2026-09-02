@@ -99,6 +99,10 @@ post_steps() {
   # 01/09 (ordem do dono): PR com alteracoes pedidas vira TAREFA no roadmap, ANTES do empurra —
   # prioridade e aprovar o que ja foi construido. rc=2 significa sonda suspeita (zero PRs), nao vazio.
   _t0=$(date +%s); bash "$(dirname "$0")/pr-cr-fila.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=pr-cr-fila rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
+  # 02/09 (ordem do dono, fila unica de decisoes): deriva fila-decisao.jsonl ANTES do empurra,
+  # para o papel DECISAO receber pelo mesmo mecanismo que os builders. Rede de seguranca da
+  # regra "toda decisao sem excecao" — apanha fichas entradas por qualquer porta (D-172).
+  _t0=$(date +%s); bash "$(dirname "$0")/decisao-fila-derive.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=decisao-fila-derive rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/fila-empurra.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=fila-empurra rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
   _t0=$(date +%s); bash "$(dirname "$0")/tick-acorda.sh" >/dev/null 2>&1; _rc=$?; printf '%s step=tick-acorda rc=%s dur=%ss\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_rc" "$(( $(date +%s) - _t0 ))" >> "$TICK_LOG"
 }
