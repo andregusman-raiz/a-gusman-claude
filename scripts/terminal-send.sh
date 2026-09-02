@@ -172,6 +172,29 @@ while [[ "$TENTATIVA" -le "$MENU_RETRIES" ]]; do
   if echo "$SCREEN_HIST" | grep -qE "$MENU_RE"; then
     RAZAO="tela:menu-visivel"
   elif [[ -n "$(input_box "$SCREEN")" ]]; then
+    # 02/09 19:0xZ (medido no DE-MIG, a pedido do dono — "nao tem nada meu, e' falso positivo"): a caixa VAZIA
+    # do TUI mostra um texto FANTASMA (sugestao/historico) que o read-screen devolve igual a texto digitado.
+    # Prova por efeito: escrever 1 char deu caixa=[~] (o fantasma sumiu), apagar devolveu o fantasma; Enter
+    # na caixa "com texto" nao fez nada. Logo "texto na caixa" NAO e' prova de rascunho. Discrimina-se pelo
+    # mesmo efeito, antes de decidir: escreve-se uma sonda e le-se a caixa —
+    #   caixa == sonda            -> era fantasma (ou vazia): apaga a sonda e SEGUE
+    #   caixa == rascunho + sonda -> rascunho REAL de alguem: apaga a sonda e RECUSA (D-064)
+    #   sonda nao aparece         -> a pane nao aceita input: RECUSA com razao propria (inalcancavel de facto)
+    SONDA='~'
+    "$CMUX_BIN" send --workspace "$UUID" "$SONDA" >/dev/null 2>&1; sleep 0.7
+    BOX_S=$(input_box "$("$CMUX_BIN" read-screen --workspace "$UUID" 2>/dev/null || true)")
+    if [[ "$BOX_S" == "$SONDA" ]]; then
+      "$CMUX_BIN" send-key --workspace "$UUID" backspace >/dev/null 2>&1; sleep 0.3
+      printf '%s FANTASMA-NO-PROMPT papel=%s uuid=%s texto=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$UUID" "$(input_box "$SCREEN" | head -1 | cut -c1-50 | tr ' ' '_')" >> "$LOG"
+      RAZAO=""
+    elif [[ "$BOX_S" == *"$SONDA" ]]; then
+      "$CMUX_BIN" send-key --workspace "$UUID" backspace >/dev/null 2>&1
+      RAZAO="tela:texto-por-enviar-no-prompt"
+    else
+      RAZAO="tela:pane-nao-aceita-input"
+    fi
+  fi
+  if [[ "$RAZAO" == "tela:texto-por-enviar-no-prompt" ]]; then
     # 01/09 17:3xZ (RESUMO): a regra "input parcial (❯ com texto) = não enviar" vivia só na memória, não no
     # código. Medido: FUNIL com "❯ roda o sync manualmente…" (texto do DONO, sem Enter) e o vigia a 1 min de
     # lhe escrever — `cmux send` colaria o aviso ao texto dele e o `send-key enter` submeteria os dois como
@@ -192,7 +215,8 @@ while [[ "$TENTATIVA" -le "$MENU_RETRIES" ]]; do
         RAZAO=""
       fi
     fi
-  else
+  fi
+  if [[ -z "$RAZAO" ]]; then
     FEED_HIT="$(feed_menu_reason || true)"
     [[ -n "$FEED_HIT" ]] && RAZAO="$FEED_HIT"
   fi
