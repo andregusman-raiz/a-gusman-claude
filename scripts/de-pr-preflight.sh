@@ -7,14 +7,25 @@
 #   --t0       só tier 0 (<1min): alembic single-head + index lint + base atualizada + despertador
 #   --fast     tiers 0-1 (~4min): + registry, kpi-gate, auth, colisão NNN de migration
 #   --with-db  inclui migration drift Camada A (exige Postgres postgis local)
-#   --base     branch alvo do PR (default: aws-prd — rota AWS, decisão 2026-08-25)
+#   --base     branch alvo do PR (default: main)
+#
+#   SUPERSEDED — o default era `aws-prd`, ancorado na "rota AWS, decisão 2026-08-25".
+#   Esse texto fica SUCEDIDO, e SÓ NESTE PONTO (o default do preflight): a D-075 do dono
+#   (2026-08-28 16:35Z) mudou a base do funil diário de aws-prd para main/Railway. A D-075
+#   decide UMA SPEC, não o repo inteiro — quem justifica o default é a PRÁTICA MEDIDA:
+#   2026-09-01, PRs abertos = 21 base main : 3 base aws-prd. Com o default antigo, quase
+#   todo PR falhava `base-atualizada` e `pr-overlap` por DESCOMPASSO DE BASE, não por
+#   conflito — e a diff main↔aws-prd inteira aparecia como "overlap forte", soterrando o
+#   overlap verdadeiro. Alarme que grita por artefacto treina quem o lê a dispensá-lo.
+#   Trabalho AWS (tooling de migrations, port para aws-prd) passa `--base aws-prd`.
+#   Medição e precedente: DE-COORD/COMANDO 2026-09-01, QUEUE.md.
 #   default    tudo menos --with-db (~25-30min; smoke shards em paralelo)
 #
 # Saída: resumo PASS/FAIL + log em ~/Claude/docs/ai-state/de-pr-queue/preflight-logs/
 # Exit: 0 = OK abrir PR (falta só juiz adversarial) | 2 = corrigir FAILs antes
 set -uo pipefail
 
-T0ONLY=0 FAST=0 WITHDB=0 BASE="aws-prd"
+T0ONLY=0 FAST=0 WITHDB=0 BASE="main"
 while [[ $# -gt 0 ]]; do case "$1" in
   --t0) T0ONLY=1;; --fast) FAST=1;; --with-db) WITHDB=1;; --base) BASE="$2"; shift;;
   *) echo "arg desconhecido: $1" >&2; exit 64;; esac; shift; done
@@ -128,6 +139,22 @@ _fetch_open_pr_files() {
 
 # colisão de NNN: migrations novas LOCAIS (ausentes em origin/$BASE) vs migrations de PRs abertos remotos.
 # Causa nº1 de CR de migration (BOT-REVIEW-BEST-PRACTICES item 3). Short-circuit sem migration nova: zero rede.
+# `alembic/versions/*.py`: a IDENTIDADE é a revision id inteira (`NNN_slug`), não o
+# prefixo. Duas frentes que cortam revisions da mesma base caem na mesma faixa numérica
+# por construção — comparar só o NNN acusa isso como colisão e já custou uma triagem
+# indevida ao DE-MIG (#6345 × #6281, falso positivo real). Medido 02/09 nos três filhos
+# vivos de `633_funnel_coverage_calendar`: #6468→634, #6444→631, #6340→625 — DOIS com
+# NNN MENOR que o do pai, prova de que o prefixo não ordena nem identifica.
+# O SINAL DE PERIGO REAL (mesmo `down_revision` ⇒ dois heads) NÃO some: vive no check
+# `alembic-single-head` (l.390), que é ABORT do preflight e lê `down_revision` de todos
+# os ficheiros. Aqui trocou-se o sinal, não se apagou o check — e o prefixo NNN continua
+# a ser identidade em `migrations/*.sql`, onde `sql_migration_nnn_collision` o compara.
+_migration_revid() {
+  local base; base=$(basename "$1")
+  # `20260824_1230-619_funnel_engagements_v2.py` → `619_funnel_engagements_v2`
+  [[ "$base" =~ ^[0-9]{8}_[0-9]{4}-(.+)\.py$ ]] && echo "${BASH_REMATCH[1]}"
+}
+
 alembic_nnn_collision() {
   local -a local_files=() local_nnns=()
   while IFS= read -r f; do [[ -n "$f" ]] && local_files+=("$f"); done < <(
@@ -138,11 +165,11 @@ alembic_nnn_collision() {
     echo "sem migrations novas vs origin/$BASE — short-circuit, nenhuma chamada gh."; return 0
   fi
   local f nnn
-  for f in "${local_files[@]}"; do nnn=$(_migration_nnn "$f"); [[ -n "$nnn" ]] && local_nnns+=("$nnn"); done
+  for f in "${local_files[@]}"; do nnn=$(_migration_revid "$f"); [[ -n "$nnn" ]] && local_nnns+=("$nnn"); done
   if [[ ${#local_nnns[@]} -eq 0 ]]; then
-    echo "arquivos novos não seguem convenção NNN (YYYYMMDD_HHMM-NNN_slug.py) — pulando colisão."; return 0
+    echo "arquivos novos não seguem convenção YYYYMMDD_HHMM-<revision>.py — pulando colisão."; return 0
   fi
-  echo "migrations novas locais: ${local_files[*]} (NNN: ${local_nnns[*]})"
+  echo "migrations novas locais: ${local_files[*]} (revision: ${local_nnns[*]})"
   if ! _fetch_open_pr_files; then
     echo "colisão remota não verificada (não bloqueia)."; return 0
   fi
@@ -151,21 +178,16 @@ alembic_nnn_collision() {
   while IFS=$'\t' read -r pr rf; do
     [[ -z "$pr" ]] && continue
     case "$rf" in alembic/versions/*.py) ;; *) continue;; esac
-    rnnn=$(_migration_nnn "$rf"); [[ -z "$rnnn" ]] && continue
-    for nnn in "${local_nnns[@]}"; do [[ "$rnnn" == "$nnn" ]] && conflicts+=("PR #$pr: $rf (NNN=$rnnn)"); done
+    rnnn=$(_migration_revid "$rf"); [[ -z "$rnnn" ]] && continue
+    for nnn in "${local_nnns[@]}"; do [[ "$rnnn" == "$nnn" ]] && conflicts+=("PR #$pr: $rf (revision=$rnnn)"); done
   done <<< "$_PR_FILES_CACHE"
   if [[ ${#conflicts[@]} -gt 0 ]]; then
-    local maxnnn next
-    maxnnn=$({ for x in alembic/versions/*.py; do _migration_nnn "$x"; done 2>/dev/null
-      printf '%s\n' "${local_nnns[@]}"
-      printf '%s\n' "${conflicts[@]}" | grep -oE 'NNN=[0-9]+' | cut -d= -f2
-    } | sort -n | tail -1)
-    next=$((10#${maxnnn:-0} + 1))
-    echo "COLISÃO de NNN com PR(s) aberto(s):"; printf '  - %s\n' "${conflicts[@]}"
-    echo "  → renumerar migration local para NNN=$next (head+1 livre) antes de abrir PR."
+    echo "COLISÃO de REVISION ID com PR(s) aberto(s) — duas migrations com a MESMA identidade:"
+    printf '  - %s\n' "${conflicts[@]}"
+    echo "  → renomear a revision local (id inteiro, não só o prefixo) antes de abrir PR."
     return 1
   fi
-  echo "sem colisão de NNN ($_PR_COUNT PRs abertos verificados)."
+  echo "sem colisão de revision id ($_PR_COUNT PRs abertos verificados; prefixo NNN igual NÃO é colisão aqui)."
 }
 
 # colisão na camada `migrations/NNN_*.sql`, onde o NNN É A IDENTIDADE do script (diferente do
@@ -213,7 +235,7 @@ sql_migration_nnn_collision() {
       rnnn=$(_sql_nnn "$rf"); [[ -z "$rnnn" ]] && continue
       for nnn in "${local_nnns[@]}"; do
         [[ "$rnnn" == "$nnn" ]] && [[ "$rf" != "$(printf '%s\n' "${local_files[@]}" | grep -Fx "$rf")" ]] \
-          && pr_conflicts+=("PR #$pr: $rf (NNN=$rnnn)")
+          && pr_conflicts+=("PR #$pr: $rf (revision=$rnnn)")
       done
     done <<< "$_PR_FILES_CACHE"
   else
@@ -267,7 +289,10 @@ decision_despertador() {
   python3 "$tmpd/scripts/ci/check_decision_despertador.py"; rc=$?
   rm -rf "$tmpd"
   if [[ $rc -ne 0 ]]; then
-    echo "decisão(ões) vencida(s) na origin/$DECISION_DESPERTADOR_MAIN — FAIL real (CI vermelho repo-wide, não é defasagem local)."
+    echo "decisão(ões) vencida(s) na origin/$DECISION_DESPERTADOR_MAIN — vermelho REAL na CI (não é defasagem local),"
+    echo "  mas NÃO bloqueia merge: medido 2026-09-02, 'Verify generated sections are in sync' não consta"
+    echo "  dos required checks nem de main (8) nem de aws-prd (9). E não é repo-wide: só corre em PRs que"
+    echo "  tocam os paths: do docs-drift-check (inclui api/**, admin/**). Avisar coordenador; não corrigir aqui."
     return 1
   fi
   echo "despertador OK contra origin/$DECISION_DESPERTADOR_MAIN (fonte é a main, não o checkout local)."
@@ -382,10 +407,13 @@ run_check "venv-nao-trackeado" bash -c '! git ls-files -s | grep -qE "^120000 .*
 run_check "base-atualizada($BASE)" git merge-base --is-ancestor "origin/$BASE" HEAD \
   || echo "  ⚠ rebase em origin/$BASE antes de abrir PR (strict:true exige de toda forma)"
 # despertador de decisões vencidas (WS12-PR21 [C7]) — vencida = "Verify generated sections are
-# in sync" fica vermelho repo-wide, independente do diff (checklist item 4 BOT-REVIEW-BEST-PRACTICES)
+# in sync" fica vermelho — mas SÓ nos PRs que tocam os paths: do docs-drift-check, e o check NÃO é
+# required em ramo nenhum (medido 2026-09-02: main 8 required, aws-prd 9, não consta de nenhum).
+# SUPERSEDED aqui o "repo-wide, independente do diff" do checklist item 4 do BOT-REVIEW-BEST-PRACTICES:
+# o texto antigo fez um builder tratar aviso de script como facto medido sobre bloqueio (custo real).
 if [[ -f scripts/ci/check_decision_despertador.py ]]; then
   run_check "decision-despertador" decision_despertador \
-    || echo "  ⚠ decisão vencida no despertador (origin/$DECISION_DESPERTADOR_MAIN) → CI vermelho repo-wide; avisar coordenador, NÃO tentar corrigir no seu PR"
+    || echo "  ⚠ decisão vencida no despertador (origin/$DECISION_DESPERTADOR_MAIN) → vermelho ADVISORY (não é required em nenhum ramo, e só corre se o PR tocar os paths do docs-drift-check); avisar coordenador, NÃO tentar corrigir no seu PR"
 else
   RESULTS+=("SKIP  -  decision-despertador (script ausente nesta branch)")
 fi
