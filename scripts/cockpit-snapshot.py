@@ -109,6 +109,9 @@ for papel, t in reg.items():
     terminais.append({
         'papel': papel, 'tier': t.get('tier'), 'frente': t.get('frente'), 'agent': t.get('agent'),
         'titulo': t.get('workspace_title'), 'session': str(t.get('session_id') or '')[:8], 'pid': (end.get(papel) or {}).get('pid'),
+        # 02/09 (ordem do dono, item 5 do diagnostico): tier 3 sem fila propria e' SATELITE — nao tem tick, nao puxa,
+        # nao conta como ocioso nem como parado. Aparece a parte no cockpit; deixa de poluir o diagnostico.
+        'satelite': (t.get('tier') not in (0,1,2)) and not os.path.exists(f"{AI}/roadmap/filas/fila-{(t.get('frente') or papel).lower()}.jsonl"),
         'tela': ls, 'modo': modo(ls),
         'ultimo_result': {'task': ur.get('task'), 'status': ur.get('status'), 'ts': ur.get('ts'), 'ha_min': idade_min(ur.get('ts')), 'nota': (ur.get('nota') or '')[:160]} if ur else None,
         'puxadas': puxadas_por_papel.get(papel, []),
