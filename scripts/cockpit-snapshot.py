@@ -164,7 +164,11 @@ prs = []
 for b, c in claims.items():
     st_raw = str(c.get('status') or c.get('estado') or '')
     # status e narrativo em muitos claims (ate 4,5k chars): reduzir a um token curto para agrupar/exibir
-    st = re.split(r'[:·—|(\n]', st_raw)[0].strip().lower()[:24] or '?'
+    s0 = st_raw.lower()
+    st = ('mergeado' if re.search(r'merge[ad]', s0) else 'estacionado' if 'estacionad' in s0 else
+          'encerrado' if re.search(r'supersed|absorv|absorbed|cancelad|retratad|rebaixad|reescopad|fechad|closed|nao e nossa', s0) else
+          'em review' if 'review' in s0 else 'retido' if re.search(r'retido|blocked|parado|aguarda|adiado|atras', s0) else
+          'aberto' if re.search(r'abert|open|claim|construcao|preflight|despachad|medido|achado', s0) else 'outro')
     prs.append({'pr': c.get('pr'), 'branch': b[:60], 'frente': c.get('frente'), 'owner': c.get('owner'), 'terminal': c.get('terminal'), 'status': st, 'status_nota': st_raw[:120], 'ha_min': idade_min(c.get('synced_at') or c.get('claimed_at'))})
 prs_ab = [p for p in prs if 'merge' not in p['status'].lower() and 'fechad' not in p['status'].lower() and 'closed' not in p['status'].lower()]
 pc = {}
