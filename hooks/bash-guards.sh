@@ -60,6 +60,24 @@ except Exception:
     print("")' 2>/dev/null)"
 [ -z "$CMD" ] && exit 0
 
+# 03/09 (incidente: `git checkout -- claims.json` apagou 14 h de claims de varias sessoes; diagnostico §7/§13 A4, ordem do
+# dono): estado partilhado VIVO em docs/ai-state nunca se repoe por git a partir de uma sessao — o commit e' sempre mais velho
+# do que as escritas dos outros. Recuperacao deliberada leva bypass explicito: AI_STATE_GIT_OK=1.
+# Controlo negativo medido no proprio lote: a mensagem de commit que DESCREVE a guarda disparou-a — por isso as strings entre
+# aspas sao removidas e o verbo git tem de estar em posicao de comando (inicio, `;`, `&&`, `|`, `$(`).
+if [ -z "${AI_STATE_GIT_OK:-}" ] && AI_CMD="$CMD" python3 - <<'PYAI'
+import os, re, sys
+c = os.environ.get("AI_CMD", "")
+c = re.sub(r'"(?:\\.|[^"\\])*"|\'[^\']*\'', "", c, flags=re.S)          # fora com o que esta entre aspas (mensagens, notas)
+verbo = re.search(r"(?:^|[;&|(]|\$\()\s*git\s+(?:-C\s+\S+\s+)?(checkout|restore|reset\s+--hard)\b", c, re.M)
+alvo = re.search(r"docs/ai-state|claims\.json|results\.jsonl|decisoes\.json|fila-[a-z]+\.jsonl", c)
+sys.exit(0 if (verbo and alvo) else 1)
+PYAI
+then
+  echo "BLOCKED: git checkout/restore/reset sobre docs/ai-state (estado partilhado VIVO). O commit e' mais velho do que as escritas das outras sessoes — repor por git apaga-as (claims.json, 02/09: 14 h perdidas). Para desfazer a TUA escrita, edita o ficheiro; para recuperacao deliberada: AI_STATE_GIT_OK=1." >&2
+  exit 2
+fi
+
 # guards-info: 1 unico spawn python3 devolve (linha1) NORM em base64,
 # (linha2) 1/0 "git push --force*" em posicao de comando, (linha3) idem
 # pkill/killall, (linha4) idem "railway variables --kv". Cada flag JA inclui

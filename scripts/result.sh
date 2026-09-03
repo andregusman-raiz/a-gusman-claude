@@ -17,6 +17,12 @@ set -uo pipefail
 [ $# -ge 4 ] || { echo "uso: result.sh PAPEL TASK done|blocked|failed|retracted|anulado PROVA_CMD [NOTA] [PR]" >&2; exit 2; }
 P=$1; T=$2; ST=$3; PV=$4; NT=${5:-}; PR=${6:-}
 case "$ST" in done|blocked|failed|retracted|anulado|invalidada|posto) ;; *) echo "status inválido: $ST" >&2; exit 2;; esac
+# 03/09 (diagnostico §4/§9 #3, ordem do dono): "dois referentes, um id" — 10 dos 16 desacordos row×ledger eram um D-nnn a
+# significar DECISAO (done pelo DECISAO) e EXECUCAO (blocked por um builder) ao mesmo tempo. O id nu D-nnn e' da decisao;
+# quem regista trabalho de execucao sobre ela usa D-nnn-<slug> (ex.: D-167-rotacao). Bypass: RESULT_DID_OK=1.
+if [[ "$T" =~ ^D-[0-9]+$ ]] && [[ "$P" != "DECISAO" && "$P" != "COMANDO" && "$P" != "tick" ]] && [ -z "${RESULT_DID_OK:-}" ]; then
+  echo "RECUSADO: '$T' e' o id da DECISAO (so DECISAO/COMANDO registam nele). Para a EXECUCAO usa '$T-<slug>' (ex.: $T-execucao). Bypass: RESULT_DID_OK=1." >&2; exit 2
+fi
 # 30/08 23:5xZ (COMANDO): chamada incompleta era aceite em silêncio (texto todo em prova_cmd, nota vazia) — verde por ausência.
 # blocked/failed/retracted/anulado/invalidada EXIGEM nota (o motivo é o registro); done sem nota avisa e segue (prova_cmd basta).
 if [ -z "$NT" ] && [ "$ST" != "done" ]; then echo "RECUSADO: $ST exige NOTA (5º argumento): o motivo é o registro. Uso: result.sh PAPEL TASK $ST '<prova_cmd>' '<motivo ≤200>' [PR]" >&2; exit 2; fi

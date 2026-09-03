@@ -309,6 +309,15 @@
             "statusMessage": "PDF markitdown guard..."
           }
         ]
+      },
+      {
+        "matcher": "ScheduleWakeup|CronCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/Claude/.claude/hooks/loop-guard.py"
+          }
+        ]
       }
     ]
   },

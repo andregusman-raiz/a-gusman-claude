@@ -60,7 +60,7 @@ PYEOF
 
 FINAL_RC=0
 
-for guard in gap-acceptance-guard.py completion-gate.py autonomous-persist-guard.py; do
+for guard in gap-acceptance-guard.py completion-gate.py autonomous-persist-guard.py posto-gate.py; do
   printf '%s' "$PAYLOAD" | python3 "$DIR/$guard"
   rc=$?
   log_hook "$guard" "$rc"

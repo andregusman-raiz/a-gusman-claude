@@ -235,3 +235,29 @@ RENDER="$SCRIPT_DIR/decisoes-render.sh"
 if [[ -x "$RENDER" ]]; then
   DECISOES_DIR="$T" "$RENDER" >&2 || echo "AVISO: decisoes-render.sh falhou após decidir $ID — rode manualmente" >&2
 fi
+
+# 03/09 (diagnostico §6/§11 #5, ordem do dono): 9 decisoes tomadas nao chegaram a quem estava parado nelas (ate 43 h).
+# A decisao registada ACORDA, no mesmo gesto, quem a cita no ultimo blocked/posto: evento no 2o canal (Monitor) +
+# tela (best-effort). Sem LLM, sem esperar o tick.
+python3 - "$ID" "$DECISAO_TEXTO" <<'PYW' 2>/dev/null || true
+import json,os,re,datetime,subprocess
+did,txt=sys_argv=None,None
+import sys; did,txt=sys.argv[1],sys.argv[2]
+AI=os.path.expanduser('~/Claude/docs/ai-state'); now=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+last={}
+for l in open(f'{AI}/roadmap/results.jsonl',errors='replace'):
+    try: e=json.loads(l)
+    except Exception: continue
+    if e.get('status') in ('anulado',): continue
+    last[e.get('task')]=e
+alvos={}
+for t,e in last.items():
+    if e.get('status') in ('blocked','failed','posto') and re.search(r'\b'+re.escape(did)+r'\b',str(e.get('nota') or '')) and e.get('papel') not in (None,'tick','DECISAO'):
+        alvos.setdefault(e['papel'],[]).append(t)
+for papel,tasks in alvos.items():
+    msg=f"tick/decisao: {did} DECIDIDA agora — {txt[:110]} — a tua {', '.join(tasks[:3])} cita-a como bloqueio; regista RESULT novo (posto/done) ou re-bloqueia com motivo novo."
+    with open(f'{AI}/roadmap/filas/atribuicoes.jsonl','a') as f:
+        f.write(json.dumps({"ts": now, "papel": papel, "task": tasks[0], "frente": "decisao", "msg": msg}, ensure_ascii=False)+'\n')
+    subprocess.run(['bash',os.path.expanduser('~/Claude/.claude/scripts/terminal-send.sh'),papel,msg],capture_output=True,timeout=90)
+    print(f"acordado: {papel} ({', '.join(tasks[:3])})")
+PYW

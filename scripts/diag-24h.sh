@@ -184,6 +184,23 @@ print((f"{tot}: "+(' · '.join(out[:6]) if out else '')+(f" · {notas} nota(s) a
 PYD
 )
 chk "VIOLACAO DE CANAL do dono (RESUMO/COMANDO/DECISAO)" "$CANAL"
+# 03/09 (diagnostico §5, ordem do dono): "fila vazia != programa cumprido" so era visto a mao. Sonda: programa com 0 rows
+# em fila/puxada e itens abertos no proprio .md (checkbox "- [ ]" ou marcas AUSENTE/pendente/FALTA) — cunhar ou declarar concluido.
+PROGVAZIO=$(python3 - <<'PYD'
+import json,glob,os,re
+AI=os.path.expanduser('~/Claude/docs/ai-state'); out=[]
+for q in sorted(glob.glob(f'{AI}/roadmap/filas/fila-*.jsonl')):
+    fr=os.path.basename(q)[5:-6]; md=f'{AI}/roadmap/{fr}.md'
+    if not os.path.exists(md): continue
+    rows=[json.loads(l) for l in open(q) if l.strip()]
+    if any(r.get('status') in ('fila','puxada') for r in rows): continue
+    t=open(md,errors='replace').read()
+    cb=len(re.findall(r'^\s*- \[ \]',t,re.M)); marcas=len(re.findall(r'\b(AUSENTE|PENDENTE|FALTA|POR MEDIR|TODO)\b',t))
+    if cb or marcas: out.append(f"{fr}: {cb} checkbox abertas, {marcas} marcas")
+print((f"{len(out)} programa(s) com fila vazia e itens abertos: "+" · ".join(out)) if out else "0 (fila vazia = programa sem itens abertos)")
+PYD
+)
+chk "FILA VAZIA com programa por cunhar (sonda)" "$PROGVAZIO"
 chk "caps threads nativas no Railway (D-097)" "$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway variables --service "${DE_RAILWAY_SERVICE:-raiz-data-engine}" --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([k for k in d if any(s in k for s in ('OPENBLAS','OMP_NUM','MKL_NUM','NUMEXPR','ARROW_NUM'))]),'/5')" 2>/dev/null)"
 chk "tick tem board-sync/DESPACHO/aprovador (branch spec/board-sync mergeada)" "$(grep -c 'board-sync\|DESPACHO\|de-aprovador' "$HOME/Claude/.claude/scripts/de-fila-tick.sh" 2>/dev/null) refs"
 chk "cap mecânico de palavras no canal-append (T1)" "$(grep -cE 'wc -w|MAX_WORDS' "$HOME/Claude/.claude/scripts/canal-append.sh" 2>/dev/null)"
