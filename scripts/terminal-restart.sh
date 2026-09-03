@@ -69,7 +69,7 @@ say "relancar com: $CMD"
 # pre-check 1: ocupado? (turno a correr) — NUNCA se reinicia a meio de um turno
 # 14:08Z: o spinner desta versao nao mostra 'esc to interrupt' — 'Photosynthesizing… (1m 42s · ↓ 5.5k tokens' passou por ocioso e o FGTS foi
 # reiniciado A MEIO de um turno. Ocupado = spinner (verbo… (Ns) ou 'tokens') ou tool call a correr.
-if printf '%s' "$SCREEN" | grep -qiE 'esc to interrupt|queued messages|\bthinking\b|\bworking\b|… \([0-9]+(m [0-9]+)?s|↓ [0-9.]+k? tokens'; then   # (14:18Z: '⏺ Bash(' sem ')' na linha e' quebra de linha, nao tool a correr — padrao removido)
+if printf '%s' "$SCREEN" | grep -qE 'esc to interrupt|queued messages|^[^A-Za-z0-9[:space:]]{1,2} *[A-Z][a-z]+… \([0-9]+(m [0-9]+)?s|↓ [0-9.]+k? tokens'; then   # (14:33Z DE-MIG: 'thinking'/'working' em PROSA davam ocupado — so o spinner VIVO no inicio da linha conta)   # (14:18Z: '⏺ Bash(' sem ')' na linha e' quebra de linha, nao tool a correr — padrao removido)
   die "$PAPEL esta OCUPADO (turno a correr). Espera o fim do turno e repete."
 fi
 # pre-check 2: texto no prompt (caixa entre os 2 ultimos separadores)
