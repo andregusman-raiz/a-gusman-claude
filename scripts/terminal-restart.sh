@@ -26,7 +26,24 @@ AGENT=$(python3 -c "import json; print((json.load(open('$REG'))['terminais'].get
 
 # comando de relancamento = o mesmo que o terminal-open.sh derivaria (model/effort do contrato, --resume session_id)
 CMD=$(bash "$HOME/Claude/.claude/scripts/terminal-open.sh" "$PAPEL" --dry-run --force 2>/dev/null | grep -oE 'claude --dangerously-skip-permissions.*' | head -1)
-[ -n "$CMD" ] || die "nao consegui derivar o comando de relancamento (terminal-open --dry-run)"
+if [ -z "$CMD" ]; then   # terminal-open recusa (memoria <20%, cap): um REINICIO nao acrescenta sessao — deriva do registry + frontmatter
+  CMD=$(python3 - "$REG" "$PAPEL" "$AI/terminais/papeis/$PAPEL.md" <<'PYC'
+import json,sys,re
+reg,papel,md=sys.argv[1:4]; t=json.load(open(reg))['terminais'].get(papel) or {}; fm={}
+try:
+    s=open(md).read()
+    if s.startswith('---'):
+        for l in s.split('---',2)[1].splitlines():
+            m=re.match(r'\s*(model|effort)\s*:\s*"?([A-Za-z0-9-]+)"?',l)
+            if m: fm[m.group(1)]=m.group(2)
+except Exception: pass
+model=fm.get('model') or t.get('model') or ''; effort=fm.get('effort') or ''; sid=t.get('session_id') or ''
+print('claude --dangerously-skip-permissions'+(f' --model {model}' if model else '')+(f' --effort {effort}' if effort else '')+(f' --resume {sid}' if sid else ''))
+PYC
+)
+  say "comando derivado do registry+contrato (terminal-open recusou: $(bash "$HOME/Claude/.claude/scripts/terminal-open.sh" "$PAPEL" --dry-run --force 2>&1 | grep RECUSADO | head -1 | cut -c1-60))"
+fi
+[ -n "$CMD" ] || die "nao consegui derivar o comando de relancamento"
 SID=$(printf '%s' "$CMD" | grep -oE -- '--resume [0-9a-f-]+' | awk '{print $2}')
 if [ -n "$SID" ] && [ "${#SID}" -lt 36 ]; then   # registry com id CURTO (ex.: RESUMO) — --resume exige o uuid inteiro
   FULL=$(ls "$HOME/.claude/projects"/*/"$SID"*.jsonl 2>/dev/null | head -1 | xargs -I{} basename {} .jsonl)
