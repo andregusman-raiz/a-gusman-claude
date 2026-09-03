@@ -129,7 +129,7 @@ try:
         if _pend:
             _agg='novaE|'+'+'.join(f"novaE|{t}" for t in _pend[:8])
             ev('OTIMIZADOR',f"tick/acorda: Entrega(s) nova(s) no roadmap: {' '.join(_pend[:8])} — o teu posto declara revisao do roadmap futuro",_agg)
-        json.dump(sorted(_agora),open(_KP,'w'))
+        json.dump(sorted(_agora-set(_pend[8:])),open(_KP,'w'))   # 03/09 (6.o defeito, OTIMIZADOR; dono: 'entra'): so o que foi DITO fica conhecido; o que passou do corte de 8 volta a ser novo no ciclo seguinte
 except Exception: pass
 # 3b) ADIADOS persistentes (01/09, pergunta do COMANDO: "quem lê os ADIADOS?"): um número num log que ninguém
 # abre é o mesmo silêncio com mais passos. ≥3 ciclos com adiamento na última hora = destinatário a ser
