@@ -11,16 +11,25 @@ import json,os,sys,subprocess,re
 AI,STp=sys.argv[1],sys.argv[2]
 st=json.load(open(STp)) if os.path.exists(STp) else {}
 sent=set(st.get('sent',[])); tries=st.get('tries',{})
+import datetime as _d0; _NOW=_d0.datetime.now(_d0.timezone.utc)
 out=[]  # (dest, msg, key)
 def ev(dest,msg,key):
     if key in sent: return
-    if tries.get(key,0)>=3: return
+    # 03/09 (5 defeitos medidos pelo DE-COORD/COMANDO; ordem do dono de corrigir): (4) 3 falhas nao abandonam para
+    # sempre — cooldown de 6 h e volta a tentar; o evento so morre quando e' entregue.
+    t=tries.get(key,0); t=t if isinstance(t,dict) else {'n':t,'ts':''}
+    if t.get('n',0)>=3:
+        try:
+            if (_NOW-_d0.datetime.fromisoformat(str(t.get('ts')).replace('Z','+00:00'))).total_seconds()<6*3600: return
+        except Exception: return
     out.append((dest,msg,key))
 # 1) deploy FAILED novo
 try:
     j=subprocess.run(['railway','deployment','list','--json'],cwd=os.path.expanduser('~/Claude/GitHub/raiz-data-engine'),capture_output=True,text=True,timeout=60).stdout
     d=json.loads(j or '[]'); d=d if isinstance(d,list) else d.get('deployments',[])
-    for x in [x.get('node',x) for x in d[:5]]:
+    # (1) 03/09: "algum FAILED nos 5 primeiros" re-anunciava o mesmo deploy falhado enquanto os 4 seguintes ja tinham
+    # substituido; so o MAIS RECENTE que serve conta como estado presente.
+    for x in [x.get('node',x) for x in d[:1]]:
         if x.get('status')=='FAILED' and x.get('id'):
             ev('DE-COORD',f"tick/acorda: deploy FAILED {x['id'][:8]} ({str(x.get('createdAt',''))[11:16]}Z) — leia o log do deployment e o predeploy; fila pode estar travada.",f"deploy|{x['id']}"); break
 except Exception: pass
@@ -39,11 +48,16 @@ except Exception: pass
 try:
     rf=f'{AI}/roadmap/results.jsonl'
     if os.path.exists(rf):
+        # (2) 03/09: varria TODAS as linhas e anunciava um blocked ja superado por um done (passado como presente, 6+ ecos
+        # por noite). Agora: ULTIMO registo por task; so acorda se o estado ATUAL da task e' blocked/failed/retracted.
+        _last={}
         for l in open(rf):
             try: e=json.loads(l)
             except: continue
-            if e.get('status')=='posto': continue   # mecanismo: o STATUS é o campo (31/08)
-            if str(e.get('task','')).lower().startswith('posto') and str(e.get('ts',''))<'2026-08-31T06:00': continue   # compat: posto-* registados como blocked ANTES do status existir
+            if e.get('status') in ('posto','anulado'): continue   # mecanismo: o STATUS é o campo (31/08); anulado nao e' estado
+            if str(e.get('task','')).lower().startswith('posto') and str(e.get('ts',''))<'2026-08-31T06:00': continue   # compat
+            _last[e.get('task')]=e
+        for e in _last.values():
             if e.get('papel')=='tick': continue   # 01/09: retractação AUTOMÁTICA (CR sem push) não é evento raro — já aparece na fila e no MUDOU
             if e.get('status') in ('blocked','failed','retracted'):
                 ev('COMANDO',f"tick/acorda: RESULT {e.get('status')} em {e.get('task')} ({e.get('papel')}): {str(e.get('nota',''))[:120]} — leia roadmap/results.jsonl",f"result|{e.get('ts')}|{e.get('task')}")
@@ -122,11 +136,16 @@ except Exception: pass
 # alimentado abaixo do que gera → acorda o COMANDO uma vez por hora.
 try:
     import datetime as _dt2
+    # (5) 03/09: contava CICLOS com sobra (1 evento drenado no ciclo seguinte disparava 17 ciclos seguidos); agora conta a
+    # DIVIDA: quantos eventos ficaram adiados no ultimo ciclo registado; so acorda se >=3 no mesmo ciclo.
     _h1=(_dt2.datetime.now(_dt2.timezone.utc)-_dt2.timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M')
     _ad=[l for l in open(f'{AI}/terminais/tick.log') if 'ADIADOS' in l and l[:16]>=_h1]
-    if len(_ad)>=3:
+    _n=0
+    if _ad:
+        _m=re.search(r'ADIADOS (\d+) evento',_ad[-1]); _n=int(_m.group(1)) if _m else 0
+    if _n>=3:
         _hk=_dt2.datetime.now(_dt2.timezone.utc).strftime('%Y-%m-%dT%H')
-        ev('COMANDO',f"tick/acorda: eventos ADIADOS em {len(_ad)} ciclos na ultima hora (teto 4/destinatario a segurar) — ver terminais/tick.log; se persistir, o numero precisa de dono",f"adiados|{_hk}")
+        ev('COMANDO',f"tick/acorda: {_n} eventos ADIADOS no ultimo ciclo (teto 4/destinatario a segurar) — ver terminais/tick.log; se persistir, o numero precisa de dono",f"adiados|{_hk}")
 except Exception: pass
 # 3) passo do tick com rc!=0 (novo)
 try:
@@ -167,13 +186,20 @@ for l in open(okp):
             for part in k[len(_pref):].split('+'):
                 if part.startswith(_pref): sent.add(part)
     tries.pop(k,None)
+_now=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 for l in open(kop):
     k=l.strip()
     if not k: continue
-    tries[k]=tries.get(k,0)+1
-    if tries[k]>=3:
-        open(tl,'a').write(f"{datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')} step=tick-acorda ABANDONADO após 3 falhas: {k[:80]}\n")
-st['sent']=sorted(sent)[-500:]; st['tries']=tries
+    t=tries.get(k,0); t=t if isinstance(t,dict) else {'n':t,'ts':''}
+    t['n']=t.get('n',0)+1; t['ts']=_now; tries[k]=t
+    if t['n']==3:
+        open(tl,'a').write(f"{_now} step=tick-acorda ADIADO-6h após 3 falhas (volta a tentar): {k[:80]}\n")
+# (3) 03/09: `sorted(sent)[-500:]` podava por ORDEM ALFABETICA e as chaves levam "DD HH:MM" sem mes — "31 22:44" (agosto)
+# sobrevivia e "02 07:00" (hoje) era podado: os dias 01-09 de cada mes eram esquecidos. Poda por ordem de INSERCAO.
+_ordem=[k for k in st.get('sent',[]) if k in sent]
+for k in sorted(sent):
+    if k not in _ordem: _ordem.append(k)
+st['sent']=_ordem[-500:]; st['tries']=tries
 # open(...,'w') TRUNCA antes do dump: leitor concorrente ve ficheiro VAZIO e le-o como
 # "nada enviado ainda" -> re-alarma tudo. tmp no MESMO dir + os.replace = troca atomica.
 # (decisao COMANDO 31/08 15:0xZ; padrao ja medido 4/25 vs 25/25 noutro ledger)

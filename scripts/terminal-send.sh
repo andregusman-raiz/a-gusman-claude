@@ -233,30 +233,7 @@ if [[ -n "$RAZAO" ]]; then
     "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$PAPEL" "$UUID" "$RAZAO" "$MENU_RETRIES" >> "$LOG"
   # 02/09: a recusa era silenciosa e sem prazo — DE-MIG ficou 14 h sem canal e ninguem soube. Deriva-se do
   # proprio send.log a lista de terminais com >=3 recusas seguidas; o cockpit e o diag leem o ficheiro.
-  python3 - "$LOG" "$T/INALCANCAVEIS.md" <<'PYESC' 2>/dev/null || true
-import re,sys,collections
-log,out=sys.argv[1],sys.argv[2]
-seq=collections.defaultdict(list)
-for l in open(log,errors='replace'):
-    m=re.match(r'(\S+) FALHA-MENU-ABERTO papel=(\S+) .*?razao=(\S+)',l)
-    if m: seq[m.group(2)].append((m.group(1),'F',m.group(3))); continue
-    m=re.match(r'(\S+) \S+ from=\S+ to=(\S+) ',l)
-    if m: seq[m.group(2)].append((m.group(1),'ok',''))
-rows=[]
-for p,L in seq.items():
-    n=0; first=None
-    for ts,k,r in reversed(L):
-        if k!='F': break
-        n+=1; first=(ts,r)
-    if n>=3: rows.append((p,first[0],n,first[1]))
-with open(out,'w') as f:
-    f.write('# Terminais INALCANCAVEIS pelo processo (derivado do send.log; >=3 recusas seguidas)\n\n')
-    f.write('O tick, o vigia e o empurra nao conseguem falar com estes terminais. Enquanto durar, nada os acorda.\n\n')
-    if rows:
-        f.write('| papel | desde (UTC) | recusas seguidas | razao |\n|---|---|---|---|\n')
-        for p,ts,n,r in sorted(rows,key=lambda x:x[1]): f.write(f'| {p} | {ts} | {n} | {r} |\n')
-    else: f.write('(nenhum)\n')
-PYESC
+  bash "$SCRIPT_DIR/inalcancaveis-derive.sh" "$LOG" "$T/INALCANCAVEIS.md" 2>/dev/null || true
   # 03/09 00:1xZ (medido: D-205 apresentada ao dono como MENU no DECISAO desde 23:40Z; 4 ticks a recusar por
   # menu-visivel e o aviso ao dono dizia "inalcancavel" — o certo e' "tens uma pergunta ABERTA na tela do X").
   if [[ "$RAZAO" == "tela:menu-visivel" ]]; then
@@ -336,5 +313,6 @@ MSG_ID="${ORIGEM}-$(date -u +%Y%m%dT%H%M%SZ)-$$"
 mkdir -p "$T"
 printf '%s %s from=%s to=%s uuid=%s confirma=%s :: %s\n' \
   "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$MSG_ID" "$ORIGEM" "$PAPEL" "$UUID" "${CONFIRMA%%:*}" "$MSG" >> "$LOG"
+bash "$SCRIPT_DIR/inalcancaveis-derive.sh" "$LOG" "$T/INALCANCAVEIS.md" 2>/dev/null || true   # 03/09: sucesso tambem re-deriva (entrada velha sai)
 echo "OK: mensagem enviada para $PAPEL ($UUID) [msg_id=$MSG_ID]"
 echo "     $CONFIRMA"
