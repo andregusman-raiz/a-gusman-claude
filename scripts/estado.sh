@@ -2,7 +2,7 @@
 # estado.sh — UM comando para o estado da frota, lido do snapshot que o cockpit ja deriva a cada 60 s.
 # 03/09 (diagnostico §13 A1, ordem do dono): 1.623 chamadas Bash/dia eram papeis a medir filas/ledger/PRs a mao, cada um
 # com o seu criterio (3 divergencias entre coordenadores num dia). Aqui todos leem o MESMO numero. Sem gh, sem LLM.
-# Uso: estado.sh [filas|prs|decisoes|terminais|veto|tudo] [PAPEL]   (veto = A32: decididas pelo DECISAO nas ultimas 24 h, a espera do veto do dono)
+# Uso: estado.sh [filas|prs|decisoes|terminais|veto|tudo] [PAPEL]   (veto = A33: decididas pelo DECISAO nas ultimas 24 h, a espera do veto do dono)
 S="$HOME/Claude/docs/ai-state/cockpit/snapshot.json"; Q="${1:-tudo}"; P="${2:-}"
 [ -f "$S" ] || { echo "sem snapshot (cockpit-snapshot nao correu)"; exit 1; }
 python3 - "$S" "$Q" "$P" <<'PY'
@@ -42,7 +42,7 @@ if q in ('veto','tudo'):
         except Exception: continue
         h=(now-t).total_seconds()/3600
         if h<=24: vet.append((24-h,x))
-    print(f"\nVETO (A32 — decididas pelo DECISAO nas ultimas 24 h; silencio = ratificada): {len(vet)}")
+    print(f"\nVETO (A33 — decididas pelo DECISAO nas ultimas 24 h; silencio = ratificada): {len(vet)}")
     for rest,x in sorted(vet):
         dec=str(x.get('decisao',''))
         rev=dec.split('—')[0].strip() if dec.upper().startswith('REVERSAO') else 'REVERSAO em falta'

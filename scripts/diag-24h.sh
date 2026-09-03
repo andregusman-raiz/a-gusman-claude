@@ -201,9 +201,9 @@ print((f"{len(out)} programa(s) com fila vazia e itens abertos: "+" · ".join(ou
 PYD
 )
 chk "FILA VAZIA com programa por cunhar (sonda)" "$PROGVAZIO"
-# 03/09 A32 (dono: alcada por veto a posteriori). Mede o risco assumido: decisoes tomadas pelo DECISAO por alcada nas 24 h,
+# 03/09 A33 (dono: alcada por veto a posteriori). Mede o risco assumido: decisoes tomadas pelo DECISAO por alcada nas 24 h,
 # quantas sem linha REVERSAO (= irreversivel disfarcado), e vetos do dono (ficha --supersede com origem dono) em 7 dias.
-# 3 vetos no mesmo tema em 7 dias = o tema volta a A (A32 d).
+# 3 vetos no mesmo tema em 7 dias = o tema volta a A (A33 d).
 VETO32=$(python3 - <<'PYD'
 import json,os,datetime as dt
 AI=os.path.expanduser('~/Claude/docs/ai-state'); now=dt.datetime.now(dt.timezone.utc)
@@ -220,7 +220,7 @@ vetos=[x for x in items if isinstance(x,dict) and str(x.get('origem','')).lower(
 print(f"{len(alc)} por alcada (24h) · {len(semrev)} sem REVERSAO{(' ('+', '.join(semrev)+')') if semrev else ''} · {len(vetos)} veto(s) do dono (7d)")
 PYD
 )
-chk "A32 alcada do DECISAO: decididas/sem REVERSAO/vetos (sonda)" "$VETO32"
+chk "A33 alcada do DECISAO: decididas/sem REVERSAO/vetos (sonda)" "$VETO32"
 chk "caps threads nativas no Railway (D-097)" "$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway variables --service "${DE_RAILWAY_SERVICE:-raiz-data-engine}" --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(len([k for k in d if any(s in k for s in ('OPENBLAS','OMP_NUM','MKL_NUM','NUMEXPR','ARROW_NUM'))]),'/5')" 2>/dev/null)"
 chk "tick tem board-sync/DESPACHO/aprovador (branch spec/board-sync mergeada)" "$(grep -c 'board-sync\|DESPACHO\|de-aprovador' "$HOME/Claude/.claude/scripts/de-fila-tick.sh" 2>/dev/null) refs"
 chk "cap mecânico de palavras no canal-append (T1)" "$(grep -cE 'wc -w|MAX_WORDS' "$HOME/Claude/.claude/scripts/canal-append.sh" 2>/dev/null)"

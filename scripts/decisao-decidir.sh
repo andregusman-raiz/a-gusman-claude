@@ -85,10 +85,10 @@ if [[ ! "$ORIGEM_DECISAO" =~ ^(console:[A-Z][A-Z0-9-]*|externo:(github|railway|n
   echo "          Formatos: console:<PAPEL> · externo:github|railway|neon|aws|outro · alcada:<PAPEL> · par:<PAPEL>" >&2
   exit 2
 fi
-# A32 (dono 03/09): o DECISAO decide o reversivel por alcada; a linha REVERSAO e o que torna "reversivel" verificavel e o que o
+# A33 (dono 03/09): o DECISAO decide o reversivel por alcada; a linha REVERSAO e o que torna "reversivel" verificavel e o que o
 # papel de origem executa se o dono vetar em 24 h. Sem ela, a decisao e irreversivel por definicao e sobe ao dono.
 if [[ "$ORIGEM_DECISAO" == "alcada:DECISAO" ]] && ! printf '%s' "$DECISAO_TEXTO" | grep -qiE '^[[:space:]]*REVERS[AÃ]O:[[:space:]]*[^[:space:]]'; then
-  echo "RECUSADO (A32): decisao por alcada do DECISAO tem de comecar por 'REVERSAO: <como se desfaz em 1 linha> — <decisao>'. Se nao ha como desfazer, e irreversivel: sobe ao dono (console:DECISAO)." >&2
+  echo "RECUSADO (A33): decisao por alcada do DECISAO tem de comecar por 'REVERSAO: <como se desfaz em 1 linha> — <decisao>'. Se nao ha como desfazer, e irreversivel: sobe ao dono (console:DECISAO)." >&2
   exit 2
 fi
 if [[ "$ORIGEM_DECISAO" == console:* ]]; then
