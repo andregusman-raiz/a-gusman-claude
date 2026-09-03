@@ -178,26 +178,7 @@
       "Bash(python3 *)",
       "Bash(cd *)"
     ],
-    "deny": [
-      "Read(.env)",
-      "Read(.env.*)",
-      "Read(**/.env)",
-      "Read(**/.env.*)",
-      "Read(~/.ssh/**)",
-      "Read(**/secrets/**)",
-      "Read(**/*.pem)",
-      "Read(**/*.key)",
-      "Edit(.env)",
-      "Edit(.env.*)",
-      "Edit(**/.env)",
-      "Edit(**/.env.*)",
-      "Bash(cat .env*)",
-      "Bash(cat **/.env*)",
-      "Bash(head .env*)",
-      "Bash(tail .env*)",
-      "Bash(less .env*)",
-      "Bash(more .env*)"
-    ]
+    "deny": []
   },
   "disabledMcpjsonServers": [
     "sentry"
@@ -316,6 +297,15 @@
           {
             "type": "command",
             "command": "python3 ~/Claude/.claude/hooks/loop-guard.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/Claude/.claude/hooks/secret-read-guard.sh"
           }
         ]
       }
