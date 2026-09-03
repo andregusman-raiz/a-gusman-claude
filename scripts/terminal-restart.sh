@@ -44,6 +44,12 @@ PYC
   say "comando derivado do registry+contrato (terminal-open recusou: $(bash "$HOME/Claude/.claude/scripts/terminal-open.sh" "$PAPEL" --dry-run --force 2>&1 | grep RECUSADO | head -1 | cut -c1-60))"
 fi
 [ -n "$CMD" ] || die "nao consegui derivar o comando de relancamento"
+# FGTS 14:06Z: relancou em 2.1.246 — cada pane resolve o `claude` do prefixo fnm do SEU shell (4 prefixos, 4 versoes: 2.1.79/.226/.246/.259).
+# O update (claude-update.sh) so toca o prefixo default. Relanca-se pelo caminho ABSOLUTO do binario actualizado; a versao esperada e' a dele.
+CLAUDE_BIN="${CLAUDE_BIN:-$HOME/.local/share/fnm/node-versions/$(fnm default 2>/dev/null || echo v20.20.1)/installation/bin/claude}"
+[ -x "$CLAUDE_BIN" ] || die "binario $CLAUDE_BIN nao existe"
+VER_ESP=$("$CLAUDE_BIN" --version 2>/dev/null | awk '{print $1}')
+CMD="$CLAUDE_BIN ${CMD#claude }"
 SID=$(printf '%s' "$CMD" | grep -oE -- '--resume [0-9a-f-]+' | awk '{print $2}')
 if [ -n "$SID" ] && [ "${#SID}" -lt 36 ]; then   # registry com id CURTO (ex.: RESUMO) — --resume exige o uuid inteiro
   FULL=$(ls "$HOME/.claude/projects"/*/"$SID"*.jsonl 2>/dev/null | head -1 | xargs -I{} basename {} .jsonl)
@@ -104,5 +110,6 @@ SOCK_OK=$([ -S "/tmp/cc-socks/$NEWPID.sock" ] && echo sim || echo NAO)
 # 4) espera o prompt e instrui a re-armar
 for i in $(seq 1 30); do "$CMUX" read-screen --workspace "$UUID" --lines 12 2>/dev/null | grep -q '❯' && break; sleep 1; done
 "$CMUX" send --workspace "$UUID" "Sessao reiniciada na versao ${VER_NEW} (update do Claude Code, ordem do dono 03/09). Tinhas ${MON:-0 monitors} armados: re-arma AGORA os Monitors que o teu contrato (acorda_por) exige, confirma em 1 linha o que armaste, e continua de onde estavas — sem RESULT novo."; sleep 0.4; "$CMUX" send-key --workspace "$UUID" enter
+[ "$VER_NEW" = "$VER_ESP" ] || say "AVISO: versao nova $VER_NEW != esperada $VER_ESP"
 say "OK: $PAPEL pid $OLDPID → $NEWPID · versao ${VER_OLD:-?} → $VER_NEW · enderecos=$([ "$EPID" = "$NEWPID" ] && echo sincronizado || echo "DESSINCRONIZADO ($EPID)") · sock=$SOCK_OK · monitors a re-armar: ${MON:-0}"
 printf '%s\t%s\t%s→%s\t%s→%s\tmonitors=%s\tsock=%s\n' "$(now)" "$PAPEL" "$OLDPID" "$NEWPID" "${VER_OLD:-?}" "$VER_NEW" "${MON:-0}" "$SOCK_OK" >> "$LOG"
