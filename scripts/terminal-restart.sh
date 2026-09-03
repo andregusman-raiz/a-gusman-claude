@@ -49,7 +49,9 @@ fi
 CLAUDE_BIN="${CLAUDE_BIN:-$HOME/.local/share/fnm/node-versions/$(fnm default 2>/dev/null || echo v20.20.1)/installation/bin/claude}"
 [ -x "$CLAUDE_BIN" ] || die "binario $CLAUDE_BIN nao existe"
 VER_ESP=$("$CLAUDE_BIN" --version 2>/dev/null | awk '{print $1}')
-CMD="$CLAUDE_BIN ${CMD#claude }"
+# FGTS 14:08Z: o shell do pane tinha CLAUDECODE/CLAUDE_CODE_CHILD_SESSION/CLAUDE_CODE_SESSION_ID no ambiente (zsh nascido dentro de uma
+# sessao Claude) e a sessao nova arrancou como "child session": transcript DESLIGADO, session-id trocado. Limpa-se sempre (inocuo se ausente).
+CMD="env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_ENTRYPOINT $CLAUDE_BIN ${CMD#claude }"
 SID=$(printf '%s' "$CMD" | grep -oE -- '--resume [0-9a-f-]+' | awk '{print $2}')
 if [ -n "$SID" ] && [ "${#SID}" -lt 36 ]; then   # registry com id CURTO (ex.: RESUMO) — --resume exige o uuid inteiro
   FULL=$(ls "$HOME/.claude/projects"/*/"$SID"*.jsonl 2>/dev/null | head -1 | xargs -I{} basename {} .jsonl)
@@ -65,7 +67,9 @@ VER_OLD=$(python3 -c "import json,glob; print(next((json.load(open(f)).get('vers
 say "== $PAPEL · workspace $UUID · pid atual ${OLDPID:-?} · versao atual ${VER_OLD:-?} · ${MON:-0 monitors} =="
 say "relancar com: $CMD"
 # pre-check 1: ocupado? (turno a correr) — NUNCA se reinicia a meio de um turno
-if printf '%s' "$SCREEN" | grep -qiE 'esc to interrupt|queued messages|\bthinking\b|\bworking\b'; then
+# 14:08Z: o spinner desta versao nao mostra 'esc to interrupt' — 'Photosynthesizing… (1m 42s · ↓ 5.5k tokens' passou por ocioso e o FGTS foi
+# reiniciado A MEIO de um turno. Ocupado = spinner (verbo… (Ns) ou 'tokens') ou tool call a correr.
+if printf '%s' "$SCREEN" | grep -qiE 'esc to interrupt|queued messages|\bthinking\b|\bworking\b|… \([0-9]+(m [0-9]+)?s|↓ [0-9.]+k? tokens|⏺ [A-Za-z]+\([^)]*$'; then
   die "$PAPEL esta OCUPADO (turno a correr). Espera o fim do turno e repete."
 fi
 # pre-check 2: texto no prompt (caixa entre os 2 ultimos separadores)
