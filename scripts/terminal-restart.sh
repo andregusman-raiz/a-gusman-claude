@@ -76,8 +76,25 @@ fi
 BOX=$(printf '%s' "$SCREEN" | python3 -c "
 import sys,re; s=sys.stdin.read().split('\n'); seps=[i for i,l in enumerate(s) if re.match(r'^─{10,}',l.strip())]
 box=s[seps[-2]+1:seps[-1]] if len(seps)>=2 else []; t=' '.join(l.strip().lstrip('❯').strip() for l in box).strip(); print(t)")
+# 15:2xZ (dono): "esse texto nao e' meu — e' a SUGESTAO de prompt do proprio Claude Code, a cinzento, que eu nem materializei".
+# O read-screen devolve a sugestao como texto; 5 dos 13 reinicios pararam num falso positivo. Prova por EFEITO (igual ao
+# terminal-send.sh): escreve-se 1 char e le-se a caixa — so a sonda => sugestao/fantasma (apaga e segue);
+# texto+sonda => rascunho REAL (recusa); sonda ausente => pane nao aceita input (recusa).
+box_of(){ printf '%s' "$1" | python3 -c "
+import sys,re; s=sys.stdin.read().split('\n'); seps=[i for i,l in enumerate(s) if re.match(r'^─{10,}',l.strip())]
+box=s[seps[-2]+1:seps[-1]] if len(seps)>=2 else []; print(' '.join(l.strip().lstrip('❯').strip() for l in box).strip())"; }
 if [ -n "$BOX" ] && [ "$FORCE" -eq 0 ]; then
-  say "AVISO: ha texto no prompt de $PAPEL: '$(printf '%s' "$BOX" | cut -c1-80)'. Se e' fantasma/rascunho sem valor, repete com --force; se e' teu, envia-o ou apaga-o primeiro."; exit 3
+  SONDA='~'; "$CMUX" send --workspace "$UUID" "$SONDA" >/dev/null 2>&1; sleep 0.7
+  BOX_S=$(box_of "$("$CMUX" read-screen --workspace "$UUID" --lines 40 2>/dev/null || true)")
+  if [ "$BOX_S" = "$SONDA" ]; then
+    "$CMUX" send-key --workspace "$UUID" backspace >/dev/null 2>&1; sleep 0.3
+    say "prompt: '$(printf '%s' "$BOX" | cut -c1-60)' era SUGESTAO do Claude Code (sumiu com 1 char) — sigo"
+  elif [ "${BOX_S%"$SONDA"}" != "$BOX_S" ]; then
+    "$CMUX" send-key --workspace "$UUID" backspace >/dev/null 2>&1
+    say "RASCUNHO REAL no prompt de $PAPEL: '$(printf '%s' "$BOX" | cut -c1-80)' (sobreviveu a sonda). Envia-o ou apaga-o primeiro; --force ignora."; exit 3
+  else
+    die "a pane de $PAPEL nao aceita input (sonda nao apareceu na caixa)."
+  fi
 fi
 if [ "$DRY" -eq 1 ]; then say "[dry-run] 1) send '/exit' → 2) espera pid $OLDPID morrer → 3) send comando → 4) espera sessions/<pid>.json novo com $SID → 5) enderecos-sync → 6) instrucao de re-armar ${MON:-monitors}"; exit 0; fi
 
