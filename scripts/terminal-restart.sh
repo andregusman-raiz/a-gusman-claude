@@ -90,6 +90,11 @@ for i in $(seq 1 60); do
   if [ $((i % 3)) -eq 0 ] && "$CMUX" read-screen --workspace "$UUID" --lines 8 2>/dev/null | grep -q "Exit and stop tasks"; then
     say "dialogo de saida com tarefas de fundo: confirmo '1. Exit and stop tasks'"; "$CMUX" send-key --workspace "$UUID" enter >/dev/null 2>&1
   fi
+  # DE-SYNC 14:24Z: "You have N unsent feedback drafts — Enter to review & send · Esc to discard and exit": rascunhos de feedback
+  # do produto, nao estado do projeto — Esc (descarta e sai).
+  if [ $((i % 3)) -eq 0 ] && "$CMUX" read-screen --workspace "$UUID" --lines 8 2>/dev/null | grep -q "unsent feedback draft"; then
+    say "dialogo de rascunhos de feedback: Esc (descartar e sair)"; "$CMUX" send-key --workspace "$UUID" escape >/dev/null 2>&1
+  fi
   sleep 1
 done
 if [ -n "$OLDPID" ] && kill -0 "$OLDPID" 2>/dev/null; then die "o processo $OLDPID nao saiu em 60 s — NAO relancei. Ve o pane."; fi
