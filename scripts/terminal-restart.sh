@@ -133,9 +133,24 @@ done
 bash "$HOME/Claude/.claude/scripts/enderecos-sync.sh" >/dev/null 2>&1 || true
 EPID=$(python3 -c "import json; d=json.load(open('$AI/terminais/enderecos.json')); d=d.get('papeis',d); v=d.get('$PAPEL'); print((v.get('pid') if isinstance(v,dict) else v) or '')" 2>/dev/null)
 SOCK_OK=$([ -S "/tmp/cc-socks/$NEWPID.sock" ] && echo sim || echo NAO)
-# 4) espera o prompt e instrui a re-armar
-for i in $(seq 1 30); do "$CMUX" read-screen --workspace "$UUID" --lines 12 2>/dev/null | grep -q '❯' && break; sleep 1; done
-"$CMUX" send --workspace "$UUID" "Sessao reiniciada na versao ${VER_NEW} (update do Claude Code, ordem do dono 03/09). Tinhas ${MON:-0 monitors} armados: re-arma AGORA os Monitors que o teu contrato (acorda_por) exige, confirma em 1 linha o que armaste, e continua de onde estavas — sem RESULT novo."; sleep 0.4; "$CMUX" send-key --workspace "$UUID" enter
+# 4) instrui a re-armar — e PROVA por efeito que a instrucao entrou (auditoria 15:4xZ: 0/14 transcripts tinham a linha; o '❯'
+#    que eu esperava era o do ecra ANTIGO e o texto foi digitado antes de a sessao nova aceitar input). Prova = a linha aparece
+#    no transcript como mensagem do utilizador; senao reenvia (max 3).
+TF=$(ls "$HOME/.claude/projects"/*/"$SID"*.jsonl 2>/dev/null | head -1)
+MARK="REARMA-$(date -u +%H%M%S)"
+MSG="Sessao reiniciada na versao ${VER_NEW} (update do Claude Code, ordem do dono 03/09) [$MARK]. Tinhas ${MON:-0 monitors} armados e morreram com o processo: re-arma AGORA (1) o Monitor persistente das ATRIBUICOES (tail -n0 -F ~/Claude/docs/ai-state/roadmap/filas/atribuicoes.jsonl | grep --line-buffered -E '\"papel\" *: *\"$PAPEL\"') e (2) os outros que o teu contrato exige; confirma em 1 linha o que armaste e continua de onde estavas — sem RESULT novo."
+ENTROU=0
+for tent in 1 2 3; do
+  for i in $(seq 1 40); do   # sessao nova pronta = caixa de input viva (2 separadores) E linha de estado com o modelo
+    S2=$("$CMUX" read-screen --workspace "$UUID" --lines 14 2>/dev/null || true)
+    [ "$(printf '%s' "$S2" | grep -cE '^─{10,}')" -ge 2 ] && printf '%s' "$S2" | grep -qE 'Fable|Opus|Sonnet|Haiku' && break; sleep 1
+  done
+  "$CMUX" send --workspace "$UUID" "$MSG"; sleep 0.5; "$CMUX" send-key --workspace "$UUID" enter
+  for i in $(seq 1 25); do [ -n "$TF" ] && grep -q "$MARK" "$TF" 2>/dev/null && ENTROU=1 && break; sleep 1; done
+  [ "$ENTROU" -eq 1 ] && { say "instrucao de re-armar ENTROU no transcript (tentativa $tent)"; break; }
+  say "instrucao nao apareceu no transcript (tentativa $tent) — reenvio"; sleep 3
+done
+[ "$ENTROU" -eq 1 ] || say "AVISO: instrucao de re-armar NAO provada no transcript apos 3 tentativas — manda por UDS: uds:/tmp/cc-socks/$NEWPID.sock"
 [ "$VER_NEW" = "$VER_ESP" ] || say "AVISO: versao nova $VER_NEW != esperada $VER_ESP"
-say "OK: $PAPEL pid $OLDPID → $NEWPID · versao ${VER_OLD:-?} → $VER_NEW · enderecos=$([ "$EPID" = "$NEWPID" ] && echo sincronizado || echo "DESSINCRONIZADO ($EPID)") · sock=$SOCK_OK · monitors a re-armar: ${MON:-0}"
+say "OK: $PAPEL pid $OLDPID → $NEWPID · versao ${VER_OLD:-?} → $VER_NEW · enderecos=$([ "$EPID" = "$NEWPID" ] && echo sincronizado || echo "DESSINCRONIZADO ($EPID)") · sock=$SOCK_OK · monitors a re-armar: ${MON:-0} · instrucao=$([ "$ENTROU" -eq 1 ] && echo entregue || echo NAO-ENTREGUE)"
 printf '%s\t%s\t%s→%s\t%s→%s\tmonitors=%s\tsock=%s\n' "$(now)" "$PAPEL" "$OLDPID" "$NEWPID" "${VER_OLD:-?}" "$VER_NEW" "${MON:-0}" "$SOCK_OK" >> "$LOG"
