@@ -292,11 +292,22 @@ for q in filas:
     for r in rows:
         if r.get('status')!='bloqueada': continue
         txt=str(r.get('bloqueio') or '')+' '+str(r.get('nota_comando') or '')
+        # 02/09 (FUNIL): a regex apanha QUALQUER D-nnn no texto — inclusive "D-132 aprovada" como
+        # contexto num bloqueio ja reescrito. Cobranca que o autor nao consegue quitar (re-bloqueou
+        # com motivo novo e ela re-dispara) e alarme falso. Campo novo `bloqueio_em` (ISO, escrito
+        # pelo autor ao re-bloquear): bloqueio reescrito DEPOIS de decidida_em => a mencao e
+        # historia, nao motivo — nao cobrar. Sem o campo, comportamento antigo (cobra) — o custo
+        # de nao carimbar fica com quem nao carimba.
+        _bem=None
+        try:
+            if r.get('bloqueio_em'): _bem=datetime.datetime.fromisoformat(str(r['bloqueio_em']).replace('Z','+00:00'))
+        except Exception: _bem=None
         for did in sorted(set(re.findall(r'D-\d+',txt))):
             d=_byid.get(did) or {}
             if not d.get('decidida_em'): continue
-            try: h=(now-datetime.datetime.fromisoformat(str(d['decidida_em']).replace('Z','+00:00'))).total_seconds()/3600
+            try: _dem=datetime.datetime.fromisoformat(str(d['decidida_em']).replace('Z','+00:00')); h=(now-_dem).total_seconds()/3600
             except Exception: continue
+            if _bem and _bem>_dem: continue
             if h<24: continue
             autor=(ult.get(r.get('task'),{}) or {}).get('papel') or r.get('puxada_por') or r.get('builder_sugerido') or ''
             if not autor or autor=='tick': continue
