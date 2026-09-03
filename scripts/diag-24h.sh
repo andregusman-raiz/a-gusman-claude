@@ -100,6 +100,13 @@ try:
     decs=list(decs.values()) if isinstance(decs,dict) else (decs or [])
     byid={d.get('id'):d for d in decs if isinstance(d,dict)}
 except Exception: byid={}
+ult={}
+try:
+    for _l in open(f'{AI}/roadmap/results.jsonl',errors='replace'):
+        try: _e=json.loads(_l)
+        except Exception: continue
+        if _e.get('status') and _e['status'] not in ('posto','anulado'): ult[_e.get('task')]=_e
+except Exception: pass
 out=[]
 for q in sorted(glob.glob(f'{AI}/roadmap/filas/fila-*.jsonl')):
     fr=os.path.basename(q)[5:-6]
@@ -107,10 +114,14 @@ for q in sorted(glob.glob(f'{AI}/roadmap/filas/fila-*.jsonl')):
         try: r=json.loads(l)
         except Exception: continue
         if r.get('status')!='bloqueada': continue
-        txt=str(r.get('bloqueio') or '')+' '+str(r.get('nota_comando') or '')
+        # 03/09 (refutado pelo FUNIL): mencao em texto historico da row nao e' uso. So o MOTIVO ATUAL (ultimo blocked
+        # no ledger) e so se a decisao foi tomada DEPOIS desse blocked.
+        _ub=ult.get(r.get('task')) or {}
+        if _ub.get('status') not in ('blocked','failed'): continue
+        txt=str(_ub.get('nota') or '')
         for did in sorted(set(re.findall(r'D-\d+',txt))):
             d=byid.get(did) or {}
-            if not d.get('decidida_em'): continue
+            if not d.get('decidida_em') or str(d['decidida_em'])<=str(_ub.get('ts') or ''): continue
             try: h=int((NOW-datetime.datetime.fromisoformat(str(d['decidida_em']).replace('Z','+00:00'))).total_seconds()//3600)
             except Exception: h='?'
             out.append(f"{fr}/{r.get('task')}<-{did}({h}h)")
