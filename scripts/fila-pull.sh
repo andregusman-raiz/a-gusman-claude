@@ -125,6 +125,47 @@ with open(q,"r+") as fh:
         if any(d not in done for d in deps): causas["dep-por-fechar"]+=1; continue
         if all(dep_ok(d) for d in deps): pick=row; break
         causas["pr-por-mergear"]+=1
+    # 03/09 (ordem do dono: "precisa dar trabalho sempre que possivel"; diagnostico tier1 §4.2/§4.4 — 4 builders ociosos
+    # 8-16% de ocupacao com 7 Entregas executaveis fora da janela por declaracao de 30/08). Dois passos EXTRA, so para
+    # papel SEM NENHUMA puxada em fila nenhuma (quem tem trabalho em maos nao ganha mais):
+    #   passo 2 "capacidade ociosa entra" (precedente: COMANDO 31/08 13:00Z, E-27, citando A22) — row PROPRIA `fora_da_janela`
+    #            com dependencias fechadas; a row leva `entrou_por` para o leitor saber que entrou por capacidade, nao por plano.
+    #   passo 3 "emprestimo" — row de OUTRO papel (nunca CR-/DESP-/D-: PR e decisao tem autor), dependencias fechadas, cujo dono
+    #            esta ocupado (tem puxada) ou e' coordenador (tier 0); a row leva `emprestada_de`.
+    entrou=None
+    if not pick:
+        import glob as _g3
+        _pux={}
+        for _q in _g3.glob(os.path.join(os.path.dirname(q),"fila-*.jsonl")):
+            try:
+                for _l in open(_q):
+                    if not _l.strip(): continue
+                    _r=json.loads(_l)
+                    if _r.get("status")=="puxada" and _r.get("puxada_por"): _pux[_r["puxada_por"]]=_pux.get(_r["puxada_por"],0)+1
+            except Exception: pass
+        try: _tier={k:v.get("tier") for k,v in json.load(open(os.path.expanduser("~/Claude/docs/ai-state/terminais/registry.json")))["terminais"].items()}
+        except Exception: _tier={}
+        if _pux.get(papel,0)==0:
+            for row in rows:
+                if row.get("status")!="fila" or not row.get("fora_da_janela"): continue
+                tk=row.get("task") or ""; dn=donos(row.get("builder_sugerido") or "")
+                if ult.get(tk) in ("blocked","failed") and (not dn or ult_papel.get(tk)==papel): continue
+                if dn and papel not in dn: continue
+                deps=row.get("depende_de") or []
+                if any(d not in done for d in deps) or not all(dep_ok(d) for d in deps): continue
+                pick=row; entrou="capacidade-ociosa (A22; precedente E-27 31/08)"; break
+        if _pux.get(papel,0)==0 and not pick:
+            for row in rows:
+                if row.get("status")!="fila" or row.get("fora_da_janela"): continue
+                tk=row.get("task") or ""
+                if re.match(r"^(CR|DESP|D)-",tk): continue
+                dn=donos(row.get("builder_sugerido") or "")
+                if not dn or papel in dn: continue
+                if ult.get(tk) in ("blocked","failed"): continue
+                deps=row.get("depende_de") or []
+                if any(d not in done for d in deps) or not all(dep_ok(d) for d in deps): continue
+                if all((_pux.get(d_,0)>0 or _tier.get(d_)==0) for d_ in dn):
+                    pick=row; entrou="emprestimo:"+",".join(sorted(dn)); break
     outras={}
     for x in rows:
         st=x.get("status") or "?"
@@ -144,14 +185,19 @@ with open(q,"r+") as fh:
             bloq=sum(1 for x in rows if x.get("status")=="fila")
             det=", ".join(f"{v} {k}" for k,v in causas.items() if v) or "0 razões contadas"
             print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila: {det}{extra})"); sys.exit(0)
-        print("PRÓXIMA (peek):", json.dumps(pick,ensure_ascii=False)[:400]); sys.exit(0)
+        print("PRÓXIMA (peek"+(f", entrou_por={entrou}" if entrou else "")+"):", json.dumps(pick,ensure_ascii=False)[:400]); sys.exit(0)
     if not pick:
         if changed: persist()
         bloq=sum(1 for x in rows if x.get("status")=="fila")
         det=", ".join(f"{v} {k}" for k,v in causas.items() if v) or "0 razões contadas"
         print(f"FILA-VAZIA: nenhuma tarefa elegível em {os.path.basename(q)} ({bloq} na fila: {det}{extra})"); sys.exit(0)
     pick["status"]="puxada"; pick["puxada_por"]=papel; pick["puxada_em"]=datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    if entrou:
+        pick["entrou_por"]=entrou
+        if entrou.startswith("emprestimo:"): pick["emprestada_de"]=entrou.split(":",1)[1]
     persist()
     print("PUXADA:", json.dumps(pick,ensure_ascii=False)[:500])
+    if entrou and entrou.startswith("emprestimo:"): print(f"EMPRESTADA de {pick['emprestada_de']}: avisa-o em 1 linha (leia fila-{_frente} {pick['task']}) — se ele discordar, regista anulado e devolve.")
+    elif entrou: print("ENTROU POR CAPACIDADE OCIOSA (fora da janela declarada): regista no RESULT que entrou por capacidade; o COMANDO pode devolver a fila.")
     print(f"AO TERMINAR: bash ~/.claude/scripts/result.sh {papel} {pick['task']} done \"<prova_cmd>\" \"<nota>\" [PR]")
 PY

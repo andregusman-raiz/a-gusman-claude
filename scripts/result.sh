@@ -27,7 +27,28 @@ fi
 # blocked/failed/retracted/anulado/invalidada EXIGEM nota (o motivo é o registro); done sem nota avisa e segue (prova_cmd basta).
 if [ -z "$NT" ] && [ "$ST" != "done" ]; then echo "RECUSADO: $ST exige NOTA (5º argumento): o motivo é o registro. Uso: result.sh PAPEL TASK $ST '<prova_cmd>' '<motivo ≤200>' [PR]" >&2; exit 2; fi
 [ -z "$NT" ] && echo "AVISO: done sem nota — prova_cmd será exibida no board como nota." >&2
-F="$HOME/Claude/docs/ai-state/roadmap/results.jsonl"
+F="${RESULT_LEDGER:-$HOME/Claude/docs/ai-state/roadmap/results.jsonl}"
+# 03/09 (diagnostico tier1 §4.3, ordem do dono): 67 `blocked` em 24 h nos 4 builders do DE contra 43 done; o DE-MIG registou
+# 21x o MESMO bloqueio ("revalidado, nada mudou"). Espera declara-se com `posto` (o que vigias, como expira) e cala-se.
+# 2.o blocked consecutivo na MESMA task pelo MESMO papel em <12 h so entra se a nota comecar por "FACTO NOVO:". Bypass: RESULT_BLOCKED_OK=1.
+if [ "$ST" = "blocked" ] && [ -z "${RESULT_BLOCKED_OK:-}" ] && ! printf '%s' "$NT" | grep -qiE '^[[:space:]]*FA[CT]TO NOVO:' && [ -f "$F" ]; then
+  if python3 - "$F" "$P" "$T" <<'PYB'
+import sys,json,datetime
+f,p,t=sys.argv[1:4]; last=None
+for l in open(f):
+    try: e=json.loads(l)
+    except Exception: continue
+    if e.get('papel')==p and e.get('task')==t and e.get('status')!='anulado': last=e
+ok=False
+if last and last.get('status')=='blocked':
+    try: ok=(datetime.datetime.now(datetime.timezone.utc)-datetime.datetime.fromisoformat(str(last['ts']).replace('Z','+00:00'))).total_seconds()<43200
+    except Exception: ok=False
+sys.exit(0 if ok else 1)
+PYB
+  then
+    echo "RECUSADO: $P ja registou blocked em $T ha <12 h. Repetir o mesmo bloqueio nao e' registo, e' turno gasto. Ou: result.sh $P $T posto '<cmd>' '<o que vigias + como expira>'  |  ou: result.sh $P $T blocked '<cmd>' 'FACTO NOVO: <o que mudou>'. Bypass: RESULT_BLOCKED_OK=1." >&2; exit 2
+  fi
+fi
 python3 - "$F" "$P" "$T" "$ST" "$PV" "$NT" "$PR" <<'PY'
 import sys,json,datetime,fcntl
 f,p,t,st,pv,nt,pr=sys.argv[1:8]

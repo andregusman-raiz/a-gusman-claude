@@ -249,17 +249,65 @@ for papel,t in builders:
             if pick: break
         if pick: break
       if pick: break
-    if not pick: continue
+    # 03/09 (ordem do dono "dar trabalho sempre que possivel"; espelho de fila-pull.sh passos 2 e 3 — se mudar la, mudar aqui):
+    entrou=None
+    if not pick:
+        _pux={}
+        for q in filas:
+            for r in load(q):
+                if r.get('status')=='puxada' and r.get('puxada_por'): _pux[r['puxada_por']]=_pux.get(r['puxada_por'],0)+1
+        _tier={k:v.get('tier') for k,v in reg.items()}
+        if _pux.get(papel,0)==0:
+            for q in filas:                       # passo 2: capacidade ociosa entra (row propria fora da janela, deps fechadas)
+                for r in load(q):
+                    if r.get('status')!='fila' or not r.get('fora_da_janela') or r.get('task') in done_result or r.get('task') in ruim: continue
+                    dn=donos(r.get('builder_sugerido'))
+                    if dn and papel not in dn: continue
+                    if all(d in done for d in (r.get('depende_de') or [])): pick,qpick,entrou=r,q,'capacidade-ociosa (A22; precedente E-27 31/08)'; break
+                if pick: break
+        if _pux.get(papel,0)==0 and not pick:
+            for q in filas:                       # passo 3: emprestimo (dono ocupado ou tier 0; nunca CR-/DESP-/D-)
+                for r in load(q):
+                    if r.get('status')!='fila' or r.get('fora_da_janela') or r.get('task') in done_result or r.get('task') in ruim: continue
+                    if re.match(r'^(CR|DESP|D)-',str(r.get('task') or '')): continue
+                    dn=donos(r.get('builder_sugerido'))
+                    if not dn or papel in dn: continue
+                    if not all((_pux.get(d_,0)>0 or _tier.get(d_)==0) for d_ in dn): continue
+                    if all(d in done for d in (r.get('depende_de') or [])): pick,qpick,entrou=r,q,'emprestimo:'+','.join(sorted(dn)); break
+                if pick: break
+    if not pick:
+        # 03/09 (diagnostico tier1 §4.6): ocioso, fila vazia, e com bloqueios PROPRIOS envelhecidos (>48 h) — o trabalho
+        # possivel e' revalida-los: done (prova) | posto (gatilho) | blocked 'FACTO NOVO: ...'. 1x/24 h por papel.
+        _env=st.get('envelhecidos',{})
+        if now.timestamp()-_env.get(papel,0)>=86400:
+            _vel=[]
+            for q in filas:
+                fr=os.path.basename(q)[5:-6]
+                for r in load(q):
+                    if r.get('status')!='bloqueada': continue
+                    _u=ult.get(r.get('task')) or {}
+                    if _u.get('papel')!=papel or _u.get('status') not in ('blocked','failed'): continue
+                    try: _h=(now-datetime.datetime.fromisoformat(str(_u.get('ts')).replace('Z','+00:00'))).total_seconds()/3600
+                    except Exception: continue
+                    if _h>=48: _vel.append((int(_h),r.get('task'),fr))
+            if _vel:
+                _env[papel]=now.timestamp(); st['envelhecidos']=_env
+                _vel.sort(reverse=True); _lst=' '.join(f"{t}[{f},{h}h]" for h,t,f in _vel[:5])
+                out.append((papel,f"TRABALHO (tick/fila-empurra): fila vazia para ti e {len(_vel)} bloqueio(s) TEUS com >48 h: {_lst}. Revalida cada um AGORA na fonte e regista: done '<prova>' | posto '<gatilho e expiracao>' | blocked 'FACTO NOVO: <o que mudou>'. blocked repetido sem facto novo e' recusado pelo result.sh.",'envelhecidos',_vel[0][2]))
+        continue
     if not DRY:
         with open(qpick,'r+') as fh:
             fcntl.flock(fh,fcntl.LOCK_EX); rows=load(qpick)
             for r in rows:
                 if r.get('task')==pick['task'] and r.get('status')=='fila':
                     r['status']='puxada'; r['puxada_por']=papel; r['puxada_em']=now.strftime('%Y-%m-%dT%H:%M:%SZ'); r['empurrada']=True
+                    if entrou: r['entrou_por']=entrou
+                    if entrou and entrou.startswith('emprestimo:'): r['emprestada_de']=entrou.split(':',1)[1]
             save(fh,rows)
     fr=os.path.basename(qpick)[5:-6]
     cod=' (via cbuild/Codex — tu diriges)' if 'Codex' in (pick.get('builder_sugerido') or '') else ''
-    msg=(f"TAREFA (tick/fila-empurra, sem coordenador): {pick['task']} [{fr}]{cod} — {pick.get('resumo','')[:160]}. "
+    _ent=(' — ENTROU POR CAPACIDADE OCIOSA (fora da janela declarada; regista-o no RESULT)' if entrou and entrou.startswith('capacidade') else (f" — EMPRESTADA de {entrou.split(':',1)[1]} (avisa-o em 1 linha; se discordar, anulado e devolve)" if entrou else ''))
+    msg=(f"TAREFA (tick/fila-empurra, sem coordenador): {pick['task']} [{fr}]{cod}{_ent} — {pick.get('resumo','')[:160]}. "
          f"Prova: {(pick.get('prova') or 'ver programa')[:100]}. Já feita? regista e puxa outra. "
          f"FIM: bash ~/.claude/scripts/result.sh {papel} {pick['task']} done '<prova>' ; DEPOIS: bash ~/.claude/scripts/fila-pull.sh {fr} {papel}")
     out.append((papel,msg[:580],pick['task'],fr))
