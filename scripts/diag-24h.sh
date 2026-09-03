@@ -125,7 +125,22 @@ for q in sorted(glob.glob(f'{AI}/roadmap/filas/fila-*.jsonl')):
             try: h=int((NOW-datetime.datetime.fromisoformat(str(d['decidida_em']).replace('Z','+00:00'))).total_seconds()//3600)
             except Exception: h='?'
             out.append(f"{fr}/{r.get('task')}<-{did}({h}h)")
-print(f"{len(out)} row(s): "+" · ".join(out[:6]) if out else "0 (nenhuma row bloqueada cita decisao ja decidida)")
+# 03/09 (COMANDO): a sonda so varria as FILAS; o lado dos PRs (claims.json) — onde vive quase todo o trabalho do DE —
+# era invisivel por desenho. Segunda fonte: claim aberto cujo status cita D-nnn decidida DEPOIS do ultimo carimbo do claim.
+try:
+    cj=json.load(open(f'{AI}/de-pr-queue/claims.json')).get('claims',{})
+    for b,c in cj.items():
+        st=str(c.get('status') or '')
+        if re.search(r'merge[ad]|fechad|closed',st.lower()): continue
+        ts=str(c.get('synced_at') or c.get('claimed_at') or '')
+        for did in sorted(set(re.findall(r'D-\d+',st))):
+            d=byid.get(did) or {}
+            if not d.get('decidida_em') or str(d['decidida_em'])<=ts: continue
+            try: h=int((NOW-datetime.datetime.fromisoformat(str(d['decidida_em']).replace('Z','+00:00'))).total_seconds()//3600)
+            except Exception: h='?'
+            out.append(f"claim#{c.get('pr')}<-{did}({h}h)")
+except Exception: pass
+print((f"{len(out)} item(s): "+" · ".join(out[:8])) if out else "0 (nenhuma row/claim bloqueado cita decisao ja decidida)")
 PYD
 )
 chk "BLOQUEIO com decisao JA decidida (sonda, o autor e que levanta)" "$BLOQDEC"
@@ -243,7 +258,14 @@ _(a preencher)_
 ## 6. Blocos por papel (3 linhas: pior falha do dia · como seria evitável · 1 proposta) — obrigatório
 EOM
 for p in $PAPEIS; do echo "### $p"; echo "_(pendente)_"; echo; done
-} > "$F"
+} > "$F.new"
+# 03/09 06:5xZ (incidente do RESUMO: um re-render com DIAG_FORCE apagou os 10 blocos de §6 do retrospectivo e as §3-§5;
+# recuperado do git). O que os papeis ESCREVEM (§3-§6) sobrevive a qualquer regeneracao: §1-§2 sao derivados e
+# refrescam; §3 em diante vem do ficheiro anterior do mesmo dia, se existir.
+if [ -f "$F" ] && grep -q '^## 3\.' "$F"; then
+  { sed -n '1,/^## 3\./p' "$F.new" | sed '$d'; sed -n '/^## 3\./,$p' "$F"; } > "$F.merged" && mv "$F.merged" "$F.new"
+fi
+mv "$F.new" "$F"
 echo "$TODAY" > "$STAMP"
 printf '%s\n' "- $(date -u +%H:%MZ) tick/diag-24h: DIAG-24H-$TODAY.md gerado (§1 números + §2 verificação); OTIMIZADOR acordado para §3/§4; papéis: $PAPEIS" >> "$L2"
 bash "$HOME/.claude/scripts/terminal-send.sh" OTIMIZADOR "tick/diag-24h: DIAG-24H-$TODAY.md gerado — leia docs/ai-state/diag/DIAG-24H-$TODAY.md e preencha §3 (falhas c/ mecanismo) e §4 (oportunidades token/velocidade/roadmap) até $PRAZO; depois avise o COMANDO para §5." >/dev/null 2>&1 || true
