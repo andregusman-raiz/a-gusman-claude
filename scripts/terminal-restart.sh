@@ -73,7 +73,15 @@ if [ "$DRY" -eq 1 ]; then say "[dry-run] 1) send '/exit' → 2) espera pid $OLDP
 
 # 1) sair
 "$CMUX" send --workspace "$UUID" "/exit"; sleep 0.4; "$CMUX" send-key --workspace "$UUID" enter
-for i in $(seq 1 60); do [ -n "$OLDPID" ] && ! kill -0 "$OLDPID" 2>/dev/null && break; [ -z "$OLDPID" ] && sleep 6 && break; sleep 1; done
+for i in $(seq 1 60); do
+  [ -n "$OLDPID" ] && ! kill -0 "$OLDPID" 2>/dev/null && break; [ -z "$OLDPID" ] && sleep 6 && break
+  # FGTS 14:05Z: sessao com shells/monitors de fundo abre o dialogo "1. Exit and stop tasks / 2. Move to background / 3. Stay"
+  # e espera Enter — a opcao 1 e' a certa (os monitors sao re-armados pelo papel depois do resume; em background ficariam orfaos).
+  if [ $((i % 3)) -eq 0 ] && "$CMUX" read-screen --workspace "$UUID" --lines 8 2>/dev/null | grep -q "Exit and stop tasks"; then
+    say "dialogo de saida com tarefas de fundo: confirmo '1. Exit and stop tasks'"; "$CMUX" send-key --workspace "$UUID" enter >/dev/null 2>&1
+  fi
+  sleep 1
+done
 if [ -n "$OLDPID" ] && kill -0 "$OLDPID" 2>/dev/null; then die "o processo $OLDPID nao saiu em 60 s — NAO relancei. Ve o pane."; fi
 say "sessao antiga terminou (pid ${OLDPID:-?})"; sleep 2
 # 2) relancar no MESMO pane
