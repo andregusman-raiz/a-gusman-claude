@@ -131,7 +131,10 @@ try:
     cj=json.load(open(f'{AI}/de-pr-queue/claims.json')).get('claims',{})
     for b,c in cj.items():
         st=str(c.get('status') or '')
-        if re.search(r'merge[ad]|fechad|closed',st.lower()): continue
+        # 03/09 (COMANDO, antes de levar ao dono): mencao nao e' uso — SUPERSEDED/merged/anulado citam a decisao que os
+        # FECHOU; claim sem PR nao e' bloqueio vivo do lado dos PRs. Sobrevivem os que valem (#6301←D-027, #6435←D-133, #6446←D-162).
+        if re.search(r'merge[ad]|fechad|closed|supersed|anulad|cancelad|absorv',st.lower()): continue
+        if not c.get('pr'): continue
         ts=str(c.get('synced_at') or c.get('claimed_at') or '')
         for did in sorted(set(re.findall(r'D-\d+',st))):
             d=byid.get(did) or {}
