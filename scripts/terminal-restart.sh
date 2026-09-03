@@ -33,6 +33,8 @@ if [ -n "$SID" ] && [ "${#SID}" -lt 36 ]; then   # registry com id CURTO (ex.: R
   [ -n "$FULL" ] && CMD=${CMD/--resume $SID/--resume $FULL} && SID=$FULL
 fi
 OLDPID=$(python3 -c "import json; d=json.load(open('$AI/terminais/enderecos.json')); d=d.get('papeis',d); v=d.get('$PAPEL'); print((v.get('pid') if isinstance(v,dict) else v) or '')" 2>/dev/null)
+# pid antigo em falta no enderecos (VISAO, 14:01Z: esperou 6 s as cegas) -> deriva do processo que corre esta sessao
+if [ -z "$OLDPID" ] && [ -n "$SID" ]; then OLDPID=$(ps -axo pid,command | grep -E -- "--(resume|session-id) ${SID:0:8}" | grep -v grep | awk '{print $1}' | head -1); fi
 SCREEN=$("$CMUX" read-screen --workspace "$UUID" --lines 40 2>/dev/null || true)
 MON=$(printf '%s' "$SCREEN" | grep -oE '[0-9]+ monitors?' | tail -1)
 VER_OLD=$(python3 -c "import json,glob; print(next((json.load(open(f)).get('version','?') for f in glob.glob('$HOME/.claude/sessions/*.json') if str(json.load(open(f)).get('pid'))=='$OLDPID'),'?'))" 2>/dev/null)
