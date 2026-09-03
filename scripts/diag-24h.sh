@@ -164,10 +164,11 @@ for papel,t in sorted(reg.items()):
         r=subprocess.run([CMUX,'read-screen','--workspace',t['workspace_uuid'],'--lines','8'],capture_output=True,text=True,timeout=4)
         ls=[l.rstrip() for l in r.stdout.splitlines() if l.strip()]
     except Exception: continue
-    for l in reversed(ls):
-        if l.lstrip().startswith('\u276f'):
-            if l.lstrip()[1:].strip(): out.append(f"{papel}:texto-no-prompt")
-            break
+    # 03/09 15:4xZ (dono: "esse texto nao e' meu, e' sugestao do Claude Code"): texto a seguir ao '❯' e' a SUGESTAO de prompt
+    # a cinzento na caixa vazia; so se distingue de rascunho por EFEITO (escrever 1 char), e uma sonda nao escreve em panes.
+    # O sinal 'texto-no-prompt' era falso positivo sistematico (4 papeis no diag de hoje) — removido; a violacao de canal
+    # mede-se pelo send.log (RECUSADO-TELA de sessao Claude) e pelo msg-ledger, que ja estao abaixo.
+    pass
 notas=0
 cut=(datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%SZ')
 try:
