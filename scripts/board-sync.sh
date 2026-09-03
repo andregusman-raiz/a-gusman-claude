@@ -206,11 +206,15 @@ def probe(url):
     try: return subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "-m", "10", url], capture_output=True, text=True, timeout=15).stdout.strip()
     except Exception: return "?"
 base = os.environ.get("DE_PROD_URL", "https://dataengine.raizeducacao.com.br")
-rd = probe(base + "/health/readiness")
-if rd == "200": prod = "PROD ok (readiness 200)"
+# 03/09 (DIAG-24H F1, medido ao vivo): o dominio custom e' uma FACHADA CURADA (~12 RouteKeys explicitos; /health e
+# /health/readiness NUNCA foram publicados) — a sonda batia no gateway, 79 x 404/dia, e nunca tocou na aplicacao.
+# Rota publicada que chega a app: /v1/agg/value -> 422 (validacao DA APP) e /v1/portal-kpis/available -> 401 (auth
+# da app). 422/401 = aplicacao viva atras do gateway; 404 = so a fachada respondeu; 000/5xx = fora.
+rd = probe(base + "/v1/agg/value")
+if rd in ("422", "401", "200"): prod = f"PROD ok (app respondeu {rd} em /v1/agg/value)"
 else:
-    hl = probe(base + "/health")
-    prod = f"PROD readiness={rd} · liveness={hl}" + (" ⚠" if rd not in ("200", "401") or hl != "200" else " (readiness sob auth)")
+    hl = probe(base + "/v1/portal-kpis/available")
+    prod = f"PROD /v1/agg/value={rd} · /v1/portal-kpis/available={hl}" + (" ⚠" if hl not in ("401", "200") else " (2a rota viva)")
 by_entrega = {}
 for p in prs:
     e = entrega_do_pr(p)
@@ -342,7 +346,7 @@ if os.environ.get("DESPACHO") == "1":
     # sonda de prod persistida (alimenta o diag-24h: fração do tempo com readiness ≠ 200) — 1 linha por tick, sem LLM
     try:
         # 31/08 (apagão 11:35–11:56Z: só tínhamos o código): grava DNS/TCP/IP separados para distinguir "resolução daqui" de "edge recusa"
-        _out = subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code} %{time_namelookup} %{time_connect} %{time_total} %{remote_ip}", "-m", "10", os.environ.get("DE_PROD_URL", "https://dataengine.raizeducacao.com.br") + "/health/readiness"], capture_output=True, text=True, timeout=15).stdout.strip().split()
+        _out = subprocess.run(["curl", "-s", "-o", "/dev/null", "-w", "%{http_code} %{time_namelookup} %{time_connect} %{time_total} %{remote_ip}", "-m", "10", os.environ.get("DE_PROD_URL", "https://dataengine.raizeducacao.com.br") + "/v1/agg/value"], capture_output=True, text=True, timeout=15).stdout.strip().split()
         _rc = _out[0] if _out else "ERR"
         _rec = {"ts": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "readiness": _rc, "namelookup_s": (_out[1] if len(_out) > 1 else None), "connect_s": (_out[2] if len(_out) > 2 else None), "total_s": (_out[3] if len(_out) > 3 else None), "remote_ip": (_out[4] if len(_out) > 4 else None), "observador": "laptop-dono"}
         with open(os.path.join(os.path.dirname(rm_p), "PROD-PROBE.jsonl"), "a") as _f: _f.write(json.dumps(_rec) + "\n")
