@@ -154,7 +154,11 @@ with open(q,"r+") as fh:
                 deps=row.get("depende_de") or []
                 if any(d not in done for d in deps) or not all(dep_ok(d) for d in deps): continue
                 pick=row; entrou="capacidade-ociosa (A22; precedente E-27 31/08)"; break
-        if _pux.get(papel,0)==0 and not pick:
+        _DE_FILAS={"parcelas","prontidao","sustentacao","revisao","deps"}
+        try: _frente_papel=((json.load(open(os.path.expanduser("~/Claude/docs/ai-state/terminais/registry.json")))["terminais"].get(papel) or {}).get("frente") or papel).lower()
+        except Exception: _frente_papel=papel.lower()
+        _casa=(_frente in _DE_FILAS) if papel.startswith("DE-") else (_frente==_frente_papel)   # 03/09 13:43Z: emprestimo so na casa do papel (espelho do fila_empurra)
+        if _pux.get(papel,0)==0 and not pick and _casa:
             for row in rows:
                 if row.get("status")!="fila" or row.get("fora_da_janela"): continue
                 tk=row.get("task") or ""

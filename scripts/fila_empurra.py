@@ -201,6 +201,14 @@ def idle_min(sid):
                 if not last or d>last: last=d
         except Exception: pass
     return 10**6 if last is None else (now-last).total_seconds()/60
+# 03/09 13:43Z (medido no 1.o tick apos instalar o emprestimo): E-149/E-150 [salarios] foram emprestadas a DE-MIG/DE-DATA —
+# repo salarios-platform, frente de outro coordenador, e o SALARIOS estava a puxa-las em sequencia. O teste sintetico tinha
+# UMA fila e nunca exercitou a topologia real (varias filas). Emprestimo so dentro da CASA do papel: papel DE-* nas filas do
+# DE-COORD; qualquer outro papel so na sua propria frente. Espelho em fila-pull.sh (se mudar la, mudar aqui).
+_DE_FILAS={'parcelas','prontidao','sustentacao','revisao','deps'}
+def _casa(papel,fr):
+    if papel.startswith('DE-'): return fr in _DE_FILAS
+    return fr==((reg.get(papel) or {}).get('frente') or papel).lower()
 out=[]
 for papel,t in builders:
     if idle_min(t.get('session_id') or '')<10: continue
@@ -266,7 +274,8 @@ for papel,t in builders:
                     if all(d in done for d in (r.get('depende_de') or [])): pick,qpick,entrou=r,q,'capacidade-ociosa (A22; precedente E-27 31/08)'; break
                 if pick: break
         if _pux.get(papel,0)==0 and not pick:
-            for q in filas:                       # passo 3: emprestimo (dono ocupado ou tier 0; nunca CR-/DESP-/D-)
+            for q in filas:                       # passo 3: emprestimo (dono ocupado ou tier 0; nunca CR-/DESP-/D-; so na casa do papel)
+                if not _casa(papel,os.path.basename(q)[5:-6]): continue
                 for r in load(q):
                     if r.get('status')!='fila' or r.get('fora_da_janela') or r.get('task') in done_result or r.get('task') in ruim: continue
                     if re.match(r'^(CR|DESP|D)-',str(r.get('task') or '')): continue
