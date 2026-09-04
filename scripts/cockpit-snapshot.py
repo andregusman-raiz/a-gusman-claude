@@ -81,14 +81,32 @@ def tela(uuid):
     except Exception:
         return []
 
-def modo(lines):
+# 04/09 (ponto 9 do plano dos 31; Codex ronda 2: 10 AskUserQuestion/24 h = 15,5 terminal-h presas, invisiveis): o TERCEIRO estado.
+# A sessao presa num menu a espera do dono nao esta ocupada nem ociosa — o proprio Claude Code diz-o em ~/.claude/sessions/<pid>.json
+# (status=waiting, statusUpdatedAt). Le-se dai, nao da tela. Override para teste: COCKPIT_SESSIONS_DIR.
+_SESS = {}
+for _f in glob.glob(os.path.join(os.environ.get('COCKPIT_SESSIONS_DIR') or os.path.expanduser('~/.claude/sessions'), '*.json')):
+    try:
+        _d = json.load(open(_f)); _SESS[str(_d.get('pid'))] = _d
+    except Exception: pass
+def _sess_modo(pid):
+    d = _SESS.get(str(pid)) or {}
+    st = d.get('status'); ts = d.get('statusUpdatedAt')
+    try: ha = int((datetime.datetime.now(datetime.timezone.utc).timestamp() - int(ts)/1000) // 60) if ts else None
+    except Exception: ha = None
+    return st, ha
+
+def modo(lines, pid=None):
+    st, ha = _sess_modo(pid)
+    if st == 'waiting': return 'aguarda-dono'
     txt = '\n'.join(lines)
     if not lines: return 'sem-tela'
     if MENU_RE.search(txt): return 'menu-aberto'
     if SPIN_RE.search(txt): return 'trabalhando'
     for l in reversed(lines):
         if l.lstrip().startswith('❯'):
-            return 'texto-por-enviar' if l.lstrip()[1:].strip() else 'ocioso'
+            # texto a seguir ao '❯' com sessao idle/shell = SUGESTAO de prompt do Claude Code (dono 03/09), nao rascunho -> ocioso
+            return 'ocioso' if (not l.lstrip()[1:].strip() or st in ('idle','shell')) else 'texto-por-enviar'
     return 'trabalhando'
 
 filas_rows = {}
@@ -112,12 +130,16 @@ for papel, t in reg.items():
         # 02/09 (ordem do dono, item 5 do diagnostico): tier 3 sem fila propria e' SATELITE — nao tem tick, nao puxa,
         # nao conta como ocioso nem como parado. Aparece a parte no cockpit; deixa de poluir o diagnostico.
         'satelite': (t.get('tier') not in (0,1,2)) and not os.path.exists(f"{AI}/roadmap/filas/fila-{(t.get('frente') or papel).lower()}.jsonl"),
-        'tela': ls, 'modo': modo(ls),
+        'tela': ls, 'modo': modo(ls, (end.get(papel) or {}).get('pid')), 'aguarda_min': (_sess_modo((end.get(papel) or {}).get('pid'))[1] if _sess_modo((end.get(papel) or {}).get('pid'))[0]=='waiting' else None),
         'ultimo_result': {'task': ur.get('task'), 'status': ur.get('status'), 'ts': ur.get('ts'), 'ha_min': idade_min(ur.get('ts')), 'nota': (ur.get('nota') or '')[:160]} if ur else None,
         'puxadas': puxadas_por_papel.get(papel, []),
         'cwd': (t.get('cwd') or '').replace(os.path.expanduser('~'), '~'), 'branch': t.get('branch'), 'model': t.get('model'),
     })
 terminais.sort(key=lambda x: (x['tier'] if isinstance(x['tier'], int) else 9, x['papel']))
+for _t in terminais:
+    if _t.get('modo') == 'aguarda-dono' and (_t.get('aguarda_min') or 0) >= 10 and not os.environ.get('COCKPIT_SESSIONS_DIR'):
+        try: subprocess.run(['bash', os.path.expanduser('~/.claude/scripts/notify-dono.sh'), f"aguarda-dono:{_t['papel']}", f"{_t['papel']} esta a tua espera num menu ha {_t['aguarda_min']} min (console do {_t['papel']})"], capture_output=True, timeout=10)
+        except Exception: pass
 
 # ---------- filas ----------
 def deps_pendentes(r):
