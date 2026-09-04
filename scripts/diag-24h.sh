@@ -33,8 +33,8 @@ for x in d:
     if (x.get('createdAt') or '')>='$SINCE': n+=1; c[x.get('status')]+=1
 print(n, dict(c))" 2>/dev/null || echo "?")
 PROBE="$AI/roadmap/PROD-PROBE.jsonl"; PRODDOWN=$(awk -v s="$SINCE" -F'"' '$4 >= s' "$PROBE" 2>/dev/null | python3 -c "
-import sys,json; L=[json.loads(l) for l in sys.stdin if l.strip()]; n=len(L); bad=sum(1 for x in L if str(x.get('readiness'))!='200')
-print(f'{bad}/{n} sondas ≠200 (≈{(bad/n*100 if n else 0):.0f}% do tempo)' if n else 'sem sondas (PROD-PROBE.jsonl vazio)')" 2>/dev/null)
+import sys,json; L=[json.loads(l) for l in sys.stdin if l.strip()]; n=len(L); bad=sum(1 for x in L if str(x.get('readiness')) not in ('200','401','422'))  # 04/09 OTIMIZADOR: sonda passou a /v1/agg/value (422 = app respondeu); leitor alinhado ao produtor
+print(f'{bad}/{n} sondas sem resposta da app (≠200/401/422) (≈{(bad/n*100 if n else 0):.0f}% do tempo)' if n else 'sem sondas (PROD-PROBE.jsonl vazio)')" 2>/dev/null)
 THREADERR=$(cd "$HOME/Claude/GitHub/raiz-data-engine" 2>/dev/null && railway logs --service "${DE_RAILWAY_SERVICE:-raiz-data-engine}" --json -S "$SINCE" -f "can't start new thread" -n 5000 2>/dev/null | wc -l | tr -d ' ')
 ENT=$(grep -hE "^  E-" "$AI"/roadmap/[a-z]*.md 2>/dev/null | grep -oE "· (em curso|fila|estacionad[ao]|pronta|PRONTA)" | sort | uniq -c | awk '{printf "%s=%s ", $3, $1}'); ENTTOT=$(grep -hcE "^  E-" "$AI"/roadmap/[a-z]*.md 2>/dev/null | awk '{s+=$1} END{print s+0}')
 MEM=$(find "$HOME/.claude/projects/-Users-andregusmandeoliveira-Claude/memory" -name "*.md" -newermt "$(date -u -v-24H +%Y-%m-%dT%H:%M:%S)" 2>/dev/null | wc -l | tr -d ' ')
