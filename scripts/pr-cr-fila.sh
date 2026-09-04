@@ -173,13 +173,10 @@ for d in det:
         # e 27-48 min depois invalidava o proprio done, a row voltava a fila, o empurra re-oferecia, o builder
         # bloqueava de novo em 1-2 min (CR-6340: 9 ciclos/9 turnos de LLM em 6 h, zero progresso). Um `done`
         # do tick por cima de um `blocked` so' e' legitimo se houver commit POSTERIOR ao blocked.
-        _u=ult.get(task) or {}
-        _bloq_sem_facto_novo = _u.get("status") in ("blocked","failed") and str(d.get("commit_em") or "") <= str(_u.get("ts") or "")
-        if _u.get("status") not in ("done",None) and not _bloq_sem_facto_novo:
-            if not DRY:
-                result("tick",task,"done",f"commit {d['commit_oid']} em {d['commit_em']} > review {d['cr_em']}",
-                       f"PR #{n}: correcao enviada depois do pedido; aguarda re-review")
-            fechados.append(n)
+        # 04/09 (ponto 1 do plano dos 31; Codex D1/P1): push prova ENVIO, nao resolucao da CR. O tick deixa de escrever
+        # `done` por inferencia (19 dos 59 "done" de 24 h eram do proprio tick, invalidados por ele 13 min depois). O estado
+        # da task fica como o papel o deixou; quando o bot aprovar, o PR sai de CHANGES_REQUESTED e a row fecha por obsoleta.
+        if DRY: print(f"[DRY] {task}: reenviado (commit {d['commit_oid']} > review) — sem done do tick")
         continue
     # 01/09 15:5xZ (medido): 4 tarefas foram fechadas com `done` pelos papéis SEM que houvesse envio
     # depois da review — três delas sem nota nenhuma. O papel respondeu por comentário e deu por feito,
@@ -187,6 +184,14 @@ for d in det:
     # porque o `done` a suprimia para sempre. `done` declarado não é efeito no mundo: o critério
     # objetivo (envio posterior à CR) é que fecha. Reabre, com o motivo escrito e contado.
     _u=(ult.get(task) or {})
+    # 04/09 (ponto 1; medido 03-04/09: 19 reviews em 6 PRs, 16 exactas em minuto terminado em 4 — o bot RE-AVALIA POR AGENDA,
+    # depois de ELE mergear a main no ramo, nao por push). Criterio de 3 casos:
+    #   review posterior ao done, mesmo achado (cr_igual)  -> done prematuro: invalida 1x (o papel responde blocked FACTO NOVO/posto)
+    #   review posterior ao done, CR nova                   -> trabalho novo: reabre
+    #   nenhuma review posterior ao done                    -> nao se sabe: ESPERAR o ciclo (era isto que reabria a toa)
+    if _u.get("status")=="done" and str(d.get("cr_em") or "") <= str(_u.get("ts") or ""):
+        if DRY: print(f"[DRY] {task}: done @{str(_u.get('ts'))[11:16]} sem review posterior (cr {d['cr_em'][11:16]}) — fica")
+        continue
     if _u.get("status")=="done":
         # 01/09 16:5xZ (medido): reabrir SÓ a row não chegava — o ledger continuava a dizer `done`, e tanto
         # o fila-pull como o empurra derivam estado do ÚLTIMO RESULT: no ciclo seguinte marcavam a row done
@@ -195,16 +200,12 @@ for d in det:
         # significa 'o autor retira porque a prova caiu' e aqui o autor não retirou nada — um verificador viu
         # uma condição objetiva. Com `retracted`, as contagens de retractação por papel ficavam poluídas.
         _n_reab=sum(1 for _h in hist.get(task,[]) if _h.get("status") in ("retracted","invalidada") and _h.get("papel")=="tick")+1
-        if d.get("cr_igual"):
-            _ja=any(d["cr_em"] in str(_h.get("prova") or "") for _h in hist.get(task,[]))
-            if not _ja and not DRY:
-                result("tick",task,"done",f"CR {d['cr_em']} do bot e' identica a anterior (corpo normalizado)",
-                       f"PR #{n}: bot repetiu a mesma CR sem push novo — ciclo do bot, nao trabalho novo; precisa de humano/dismiss (D-034/D-138)")
-            continue
+        _mesmo = " (mesmo achado)" if d.get("cr_igual") else " (CR nova)"
         d["_reaberta"]=(_n_reab, _u.get("ts",""), _u.get("papel",""))
-        if not DRY:
-            result("tick",task,"invalidada",f"gh pr view {n}: ultimo commit {d['commit_em'] or '-'} <= review {d['cr_em']}",
-                   f"done de {_u.get('papel')} @{_u.get('ts','')[11:16]} sem envio depois da review — o bot so re-avalia com push (reabertura {_n_reab}x)")
+        if DRY: print(f"[DRY] {task}: done @{str(_u.get('ts'))[11:16]} < review {d['cr_em'][11:16]}{_mesmo} — INVALIDADA ({_n_reab}x)")
+        else:
+            result("tick",task,"invalidada",f"review do bot {d['cr_em']} > done {_u.get('ts','')}",
+                   f"done de {_u.get('papel')} @{_u.get('ts','')[11:16]}; o bot RE-AVALIOU depois ({d['cr_em'][11:16]}Z){_mesmo} e mantem alteracoes pedidas — responder ao CONTEUDO; commit vazio nao serve, o bot reve por agenda (reabertura {_n_reab}x)")
     # 01/09 (teste seco do próprio autor): o campo `frente` do claim é o TEMA (contabil, vault-assistant,
     # merge-queue…), não a frente que os construtores puxam. A 1ª execução criou 10 filas com UMA tarefa
     # cada e zero rows pré-existentes — filas que ninguém lê. Só entram nas filas com movimento real;
@@ -215,8 +216,8 @@ for d in det:
     q=f"{QD}/fila-{fr}.jsonl"
     h=horas(d["cr_em"])
     row={"task":task,"frente":fr,
-         "resumo":((f"REABERTA ({d['_reaberta'][0]}x): {d['_reaberta'][2]} registou done as {d['_reaberta'][1][11:16]} mas NAO houve envio depois da review — o bot so re-avalia com PUSH. " if d.get("_reaberta") else "")
-                   + f"PR #{n} com alteracoes pedidas ha {h:.0f}h e SEM envio depois — responder e reenviar."
+         "resumo":((f"REABERTA ({d['_reaberta'][0]}x): {d['_reaberta'][2]} registou done as {d['_reaberta'][1][11:16]} mas o bot re-avaliou depois e mantem alteracoes pedidas — responder ao CONTEUDO (o bot reve por agenda ~10 min; commit vazio nao serve). " if d.get("_reaberta") else "")
+                   + f"PR #{n} com alteracoes pedidas ha {h:.0f}h — responder ao conteudo da CR (o bot re-avalia por agenda)."
                    + ("" if fr!="revisao" else f" [TRIAGEM: sem frente canonica{' nem dono' if not claim_dono.get(n) else ''}; tema do claim: {_fr or 'nenhum'}]")
                    + f" {d['titulo']}"),
          # 01/09 (revisão do COMANDO, lendo o fila_empurra): builder_sugerido VAZIO não deixa a tarefa
@@ -250,7 +251,7 @@ if not DRY:
                 # consequencia nao"; o filas-sync reportava re-derivadas 0 e estava inocente, o autor era esta
                 # linha). 'bloqueada' com razao medida e classificacao do coordenador: o upsert NAO a desfaz.
                 # Reabrir bloqueada tem UM caminho sancionado: retractacao do proprio autor no ledger
-                # (reconciler do empurra, 7d7cd60). 'done' continua a reabrir aqui (CR vivo sem push posterior).
+                # (reconciler do empurra, 7d7cd60). 'done' so reabre aqui quando ha review do bot POSTERIOR ao done (04/09).
                 if a.get("status")=="done": a["status"]="fila"
             else:
                 topo.append(r)
